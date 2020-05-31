@@ -11,6 +11,7 @@ extern crate lazy_static;
 extern crate atoi;
 extern crate num_derive;
 extern crate num_traits;
+extern crate regex;
 
 // Rust言語の mod や ソース置き場の説明
 //     「Rust のモジュールシステム」
@@ -62,7 +63,7 @@ fn main_loop(universe: &mut Universe) {
         } else if 2 < len && &line[starts..3] == "usi" {
             Kifuwarabe::usi();
         } else if 1 < len && &line[starts..2] == "go" {
-            Kifuwarabe::go(universe);
+            Kifuwarabe::go(universe, &line);
         } else {
             help_chiyuri(&line, len, starts, universe);
         }

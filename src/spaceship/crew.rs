@@ -7,6 +7,7 @@ use crate::law::cryptographic::*;
 use crate::law::generate_move::PseudoLegalMoves;
 use crate::law::generate_move::Way;
 use crate::law::usi::*;
+use crate::spaceship::engine;
 use crate::spaceship::equipment::{Beam, PvString, Telescope};
 use crate::spaceship::facility::{CommandRoom, GameRoom, Kitchen};
 use rand::Rng;
@@ -46,8 +47,10 @@ impl Kifuwarabe {
         (line, len, starts)
     }
     /// bestmoveコマンドを送るぜ☆（＾～＾） 思考するのもこの中だぜ☆（＾～＾）
-    pub fn go(universe: &mut Universe) {
+    pub fn go(universe: &mut Universe, line: &String) {
         // go btime 40000 wtime 50000 binc 10000 winc 10000
+        let go1 = engine::Go::parse(line);
+        Beam::shoot(&format!("info string test {}", go1));
         let mut tree = Tree::new(
             universe.option_many_ways_weight,
             universe.option_komawari_weight,
