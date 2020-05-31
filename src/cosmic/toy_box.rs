@@ -241,17 +241,12 @@ impl Board {
         self.pieces[adr.address() as usize]
     }
 
-    /// 升で指定して駒を置く
-    pub fn push_to_board(&mut self, addr: &AbsoluteAddress, piece: Option<Piece>) {
-        if let Some(piece_val) = piece {
-            self.pieces[addr.address() as usize] = piece;
-            self.location[piece_val.num as usize] = Location::Board(*addr);
-        } else {
-            self.pieces[addr.address() as usize] = None;
-        }
-    }
-    /// 盤に駒か空升を置いていきます。
-    pub fn push_piece_on_init(&mut self, addr: &AbsoluteAddress, piece_meaning: PieceMeaning) {
+    /// 先手玉、後手玉なら、その位置を確定させます。背番号も付けます。
+    pub fn make_piece_number(
+        &mut self,
+        addr: &AbsoluteAddress,
+        piece_meaning: PieceMeaning,
+    ) -> Piece {
         if !(FILE_0 < addr.file()
             && addr.file() < FILE_10
             && RANK_0 < addr.rank()
@@ -264,6 +259,7 @@ impl Board {
             )))
         }
 
+        // 背番号を付けるぜ☆（＾～＾）
         let piece_num = match piece_meaning {
             // 玉だけ、先後を確定させようぜ☆（＾～＾）
             PieceMeaning::King1 => {
@@ -282,7 +278,16 @@ impl Board {
                 pn
             }
         };
-        self.push_to_board(addr, Some(Piece::new(piece_meaning, piece_num)));
+        return Piece::new(piece_meaning, piece_num);
+    }
+    /// 升で指定して駒を置く
+    pub fn push_to_board(&mut self, addr: &AbsoluteAddress, piece: Option<Piece>) {
+        if let Some(piece_val) = piece {
+            self.pieces[addr.address() as usize] = piece;
+            self.location[piece_val.num as usize] = Location::Board(*addr);
+        } else {
+            self.pieces[addr.address() as usize] = None;
+        }
     }
 
     /// 盤上から駒を無くし、その駒を返り値で返すぜ☆（＾～＾）

@@ -243,7 +243,9 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Game) {
         match board_part {
             BoardPart::Alphabet(piece_meaning) => {
                 *starts += 1;
-                board.push_piece_on_init(&AbsoluteAddress::new(file, rank), piece_meaning);
+                let addr = AbsoluteAddress::new(file, rank);
+                let piece = board.make_piece_number(&addr, piece_meaning);
+                board.push_to_board(&addr, Some(piece));
                 file -= 1;
             }
             BoardPart::Number(space_num) => {
