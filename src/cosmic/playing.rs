@@ -202,12 +202,6 @@ impl Game {
         self.set_move(movement);
         let friend = self.history.get_friend();
 
-        // TODO 利き
-        {
-            // game.board.controls[friend_index]
-            //     .add(ways.get(*index).movement.destination.address(), sign);
-        }
-
         // 取った駒
         let cap: Option<Piece>;
         {

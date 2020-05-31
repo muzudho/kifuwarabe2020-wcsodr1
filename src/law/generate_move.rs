@@ -223,29 +223,11 @@ impl PseudoLegalMoves {
                         Any => {
                             // 成ったり、成れなかったりできるとき。
                             if !forbidden {
-                                /* TODO
-                                listen_move(
-                                    Some(Way::new(
-                                        Movement::new(Some(*source), destination, false, None),
-                                        pseudo_captured,
-                                    )),
-                                    &destination,
-                                );
-                                */
                                 listen_move(Way::new(
                                     Movement::new(Some(*source), destination, false, None),
                                     pseudo_captured,
                                 ));
                             }
-                            /* TODO
-                            listen_move(
-                                Some(Way::new(
-                                    Movement::new(Some(*source), destination, true, None),
-                                    pseudo_captured,
-                                )),
-                                &destination,
-                            );
-                            */
                             listen_move(Way::new(
                                 Movement::new(Some(*source), destination, true, None),
                                 pseudo_captured,
@@ -254,15 +236,6 @@ impl PseudoLegalMoves {
                         _ => {
                             // 成れるか、成れないかのどちらかのとき。
                             if promotion || !forbidden {
-                                /* TODO
-                                listen_move(
-                                    Some(Way::new(
-                                        Movement::new(Some(*source), destination, promotion, None),
-                                        pseudo_captured,
-                                    )),
-                                    &destination,
-                                );
-                                */
                                 listen_move(Way::new(
                                     Movement::new(Some(*source), destination, promotion, None),
                                     pseudo_captured,
@@ -270,8 +243,6 @@ impl PseudoLegalMoves {
                             }
                         }
                     };
-                    // } else {
-                    // TODO listen_move(None, &destination);
                 }
 
                 !space
@@ -309,20 +280,6 @@ impl PseudoLegalMoves {
                         }
                         _ => {}
                     }
-                    /* TOTO
-                    listen_move(
-                        Some(Way::new(
-                            Movement::new(
-                                None,                                        // 駒台
-                                destination,                                 // どの升へ行きたいか
-                                false,                                       // 打に成りは無し
-                                Some(piece.meaning.hand_address().r#type()), // 打った駒種類
-                            ),
-                            None,
-                        )),
-                        &destination,
-                    );
-                    */
                     listen_move(Way::new(
                         Movement::new(
                             None,                                        // 駒台

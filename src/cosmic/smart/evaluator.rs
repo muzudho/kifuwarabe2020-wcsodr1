@@ -1,7 +1,6 @@
 //!
 //! １手指して、何点動いたかを評価するぜ☆（＾～＾）
 //!
-use crate::cosmic::playing::Game;
 use crate::law::generate_move::Piece;
 use crate::law::generate_move::Ways;
 

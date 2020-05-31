@@ -93,30 +93,6 @@ impl Movement {
         }
     }
 
-    /*
-    pub fn from_hash(hash: u64) -> Option<Movement> {
-        if hash == 0 {
-            None
-        } else {
-            // 逆順で押し込んであるんで、正順に引き出す☆（＾～＾）
-            let (hash, src52) = pop_sq_from_hash(hash);
-            let (hash, dst53) = pop_sq_from_hash(hash);
-            let (hash, pro54) = pop_bool_from_hash(hash);
-            let (_hash, drop55) = pop_drop_from_hash(hash);
-            Some(Movement::new(src52, dst53.unwrap(), pro54, drop55))
-        }
-    }
-
-    pub fn to_hash(&self) -> u64 {
-        let mut hash = 0;
-        // 正順で取り出すことを考えて、逆順で押し込む☆（＾～＾）
-        hash = push_drop_to_hash(hash, self.drop);
-        hash = push_bool_to_hash(hash, self.promote);
-        hash = push_sq_to_hash(hash, Some(&self.destination));
-        push_sq_to_hash(hash, self.source.as_ref())
-    }
-    */
-
     pub fn set(&mut self, b: &Movement) {
         self.source = b.source;
         self.destination = b.destination;
@@ -177,36 +153,6 @@ impl fmt::Debug for Movement {
     }
 }
 
-/*
-///
-/// 先後。単純にプレイヤー１を先手、プレイヤー２を後手とする。
-/// 駒落ち戦での通称　上手／下手　の場合、上手は先手、下手は後手とする。
-///
-/// #[derive(PartialEq)]
-pub enum Person {
-    Friend,
-    _Opponent,
-}
-impl fmt::Display for Person {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        use self::Person::*;
-        match *self {
-            Friend => write!(f, "Fr"),
-            _Opponent => write!(f, "Op"),
-        }
-    }
-}
-*/
-/*
-pub fn turn_person(person: &Person) -> Person {
-    use self::Person::*;
-    match *person {
-        Friend => Opponent,
-        Opponent => Friend,
-    }
-}
-*/
-
 /// 局面ハッシュを作るときに、フェーズ用に配列があって、それのサイズに使ってるぜ☆（＾～＾）
 pub const PHASE_FIRST: usize = 0;
 pub const PHASE_SECOND: usize = 1;
@@ -220,6 +166,7 @@ pub enum Phase {
     Second,
 }
 impl Phase {
+    /*
     pub fn turn(self) -> Phase {
         use self::Phase::*;
         match self {
@@ -227,6 +174,7 @@ impl Phase {
             Second => First,
         }
     }
+    */
 }
 /// 後手（上手）を盤の下側に持ってきて表示するのを基本とするぜ☆（＾～＾）
 impl fmt::Display for Phase {

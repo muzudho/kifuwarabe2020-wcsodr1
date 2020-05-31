@@ -17,8 +17,6 @@ use crate::cosmic::smart::features::{HandAddress, HandAddressType, PieceMeaning,
 use crate::cosmic::smart::square::{Angle, RelAdr, ANGLE_LEN};
 use crate::cosmic::toy_box::PieceNum;
 use crate::law::generate_move::{Agility, Mobility};
-use num_traits::FromPrimitive;
-// use std::sync::Mutex;
 
 // グローバル定数
 //
@@ -61,9 +59,6 @@ struct SpeedOfLight {
     /// 駒種類☆（＾～＾）
     piece_type_to_promoted_table: [bool; PIECE_TYPE_LEN],
     piece_type_to_mobility_table: [Vec<Mobility>; PIECE_TYPE_LEN],
-    piece_type_to_movility_table: [Vec<Movility>; PIECE_TYPE_LEN],
-    piece_type_to_see_order_table: [usize; PIECE_TYPE_LEN],
-
     /// 持ち駒☆（＾～＾）
     /// 玉２枚引く☆（＾～＾）
     hand_addresses_legal_all: [HandAddress; HAND_ADDRESS_LEN - 2],
@@ -75,14 +70,6 @@ struct SpeedOfLight {
     west_ccw: [RelAdr; ANGLE_LEN],
     west_ccw_double_rank: [RelAdr; ANGLE_LEN],
 
-    /// 時計回り(Clockwise)☆（＾～＾）
-    rotate90cw: [Angle; ANGLE_LEN],
-    /// 時計回り(Clockwise)☆（＾～＾）
-    rotate45cw: [Angle; ANGLE_LEN],
-    /// 反時計回り(Counterclockwise)☆（＾～＾）
-    rotate45ccw: [Angle; ANGLE_LEN],
-    /// 反時計回り(Counterclockwise)☆（＾～＾）
-    rotate90ccw: [Angle; ANGLE_LEN],
     /// 点対称☆（＾～＾）
     rotate180: [Angle; ANGLE_LEN],
 
@@ -440,90 +427,6 @@ impl Default for SpeedOfLight {
                     Mobility::new(Angle::Ccw225, Agility::Hopping),
                 ], // PromotedPawn
             ],
-            piece_type_to_movility_table: [
-                vec![
-                    Movility::BackDiagonally,
-                    Movility::FrontDiagonally,
-                    Movility::SideBackSlider,
-                    Movility::FrontDiagonally,
-                ], // King
-                vec![
-                    Movility::SideBackSlider,
-                    Movility::FrontSlider,
-                    Movility::SideBack,
-                    Movility::Front,
-                ], // Rook
-                vec![
-                    Movility::SlideDiagonally,
-                    Movility::BackDiagonally,
-                    Movility::FrontDiagonally,
-                ], // Bishop
-                vec![
-                    Movility::FrontDiagonally,
-                    Movility::SideBack,
-                    Movility::Front,
-                ], // Gold
-                vec![
-                    Movility::BackDiagonally,
-                    Movility::FrontDiagonally,
-                    Movility::Front,
-                ], // Silver
-                vec![Movility::Knight],                       // Knight
-                vec![Movility::FrontSlider, Movility::Front], // Lance
-                vec![Movility::Front],                        // Pawn
-                vec![
-                    Movility::SideBackSlider,
-                    Movility::FrontSlider,
-                    Movility::BackDiagonally,
-                    Movility::FrontDiagonally,
-                    Movility::SideBack,
-                    Movility::Front,
-                ], // Dragon
-                vec![
-                    Movility::SlideDiagonally,
-                    Movility::BackDiagonally,
-                    Movility::FrontDiagonally,
-                    Movility::SideBack,
-                    Movility::Front,
-                ], // Horse
-                vec![
-                    Movility::FrontDiagonally,
-                    Movility::SideBack,
-                    Movility::Front,
-                ], // PromotedSilver
-                vec![
-                    Movility::FrontDiagonally,
-                    Movility::SideBack,
-                    Movility::Front,
-                ], // PromotedKnight
-                vec![
-                    Movility::FrontDiagonally,
-                    Movility::SideBack,
-                    Movility::Front,
-                ], // PromotedLance
-                vec![
-                    Movility::FrontDiagonally,
-                    Movility::SideBack,
-                    Movility::Front,
-                ], // PromotedPawn
-            ],
-            // 駒の取り合いになったときに、先に捨てていく順だぜ☆（＾～＾）
-            piece_type_to_see_order_table: [
-                8, // King
-                5, // Rook
-                4, // Bishop
-                3, // Gold
-                3, // Silver
-                2, // Knight
-                2, // Lance
-                0, // Pawn
-                7, // Dragon
-                6, // Horse
-                3, // PromotedSilver
-                2, // PromotedKnight
-                2, // PromotedLance
-                1, // PromotedPawn
-            ],
             // 持ち駒☆（＾～＾）
             hand_addresses_legal_all: [
                 HandAddress::Rook1,
@@ -621,50 +524,6 @@ impl Default for SpeedOfLight {
                     .clone(),
             ],
 
-            /// 時計回り(Clockwise)☆（＾～＾）
-            rotate90cw: [
-                Angle::Ccw270,
-                Angle::Ccw315,
-                Angle::Ccw0,
-                Angle::Ccw45,
-                Angle::Ccw90,
-                Angle::Ccw135,
-                Angle::Ccw180,
-                Angle::Ccw225,
-            ],
-            /// 時計回り(Clockwise)☆（＾～＾）
-            rotate45cw: [
-                Angle::Ccw315,
-                Angle::Ccw0,
-                Angle::Ccw45,
-                Angle::Ccw90,
-                Angle::Ccw135,
-                Angle::Ccw180,
-                Angle::Ccw225,
-                Angle::Ccw270,
-            ],
-            /// 反時計回り(Counterclockwise)☆（＾～＾）
-            rotate45ccw: [
-                Angle::Ccw45,
-                Angle::Ccw90,
-                Angle::Ccw135,
-                Angle::Ccw180,
-                Angle::Ccw225,
-                Angle::Ccw270,
-                Angle::Ccw315,
-                Angle::Ccw0,
-            ],
-            /// 反時計回り(Counterclockwise)☆（＾～＾）
-            rotate90ccw: [
-                Angle::Ccw90,
-                Angle::Ccw135,
-                Angle::Ccw180,
-                Angle::Ccw225,
-                Angle::Ccw270,
-                Angle::Ccw315,
-                Angle::Ccw0,
-                Angle::Ccw45,
-            ],
             rotate180: [
                 Angle::Ccw180,
                 Angle::Ccw225,
@@ -684,23 +543,6 @@ impl Default for SpeedOfLight {
                 // 駒割は取ったときにカウントしているので、成りを考慮しないぜ☆（＾～＾）
                 1000, 900, 600, 500, 300, 200, 100,
             ],
-            /*
-            hand_address_to_captured_value: [
-                // 玉を取った時の評価は別にするから、ここではしないぜ☆（＾～＾）
-                0,
-                // 駒割は取ったときにカウントしているので、成りを考慮しないぜ☆（＾～＾）
-                1000, 900, 600, 500, 300, 200, 100,
-            ],
-            */
-            /* 変な動きをする☆（＾～＾）！
-            hand_address_to_captured_value: [
-                // 玉を取った時の評価は別にするから、ここではしないぜ☆（＾～＾）
-                15000, // TODO 玉は 0 にしたい,
-                // 駒割は取ったときにカウントしているので、成りを考慮しないぜ☆（＾～＾）
-                // 角は、金銀２枚より低めの中で大きく。
-                1300, 1000, 600, 460, 280, 190, 100,
-            ],
-            */
             // 座標☆（＾～＾）
             west: RelAdr::new(1, 0),
         }
@@ -752,12 +594,6 @@ impl PieceType {
     pub fn mobility(self) -> &'static Vec<Mobility> {
         &NINE_299792458.piece_type_to_mobility_table[self as usize]
     }
-    pub fn movility(self) -> &'static Vec<Movility> {
-        &NINE_299792458.piece_type_to_movility_table[self as usize]
-    }
-    pub fn see_order(self) -> usize {
-        NINE_299792458.piece_type_to_see_order_table[self as usize]
-    }
 }
 
 /// 持駒種類
@@ -783,24 +619,6 @@ impl HandAddress {
     }
 }
 
-/// ハッシュ値を作る
-pub fn push_drop_to_hash(hash: u64, piece_type_o: Option<HandAddressType>) -> u64 {
-    let num = if let Some(piece_type) = piece_type_o {
-        // 持ち駒の型は 7つ ＋ 持ち駒無しの 1つ なんで、8(=2^3) で OK
-        piece_type as u64
-    } else {
-        // None の変わりに 玉を使うぜ☆（＾～＾）
-        HandAddressType::King as u64
-    };
-    (hash << 3) + num
-}
-
-/// ハッシュ値から作る
-pub fn pop_drop_from_hash(hash: u64) -> (u64, Option<HandAddressType>) {
-    // 使ってるのは8種類なんで、8(=2^3) で OK
-    (hash >> 3, HandAddressType::from_u64(hash & 0b111))
-}
-
 /// コーディングを短くするためのものだぜ☆（＾～＾）
 impl HandAddressType {
     pub fn promotion_value(self) -> isize {
@@ -813,22 +631,6 @@ impl HandAddressType {
 
 /// コーディングを短くするためのものだぜ☆（＾～＾）
 impl Angle {
-    /// 時計回り(Clockwise)☆（＾～＾）
-    pub fn rotate90cw(self) -> Angle {
-        NINE_299792458.rotate90cw[self as usize]
-    }
-    /// 時計回り(Clockwise)☆（＾～＾）
-    pub fn rotate45cw(self) -> Angle {
-        NINE_299792458.rotate45cw[self as usize]
-    }
-    /// 反時計回り(Counterclockwise)☆（＾～＾）
-    pub fn rotate45ccw(self) -> Angle {
-        NINE_299792458.rotate45ccw[self as usize]
-    }
-    /// 反時計回り(Counterclockwise)☆（＾～＾）
-    pub fn rotate90ccw(self) -> Angle {
-        NINE_299792458.rotate90ccw[self as usize]
-    }
     /// 点対称☆（＾～＾）
     pub fn rotate180(self) -> Angle {
         NINE_299792458.rotate180[self as usize]
@@ -839,90 +641,4 @@ impl Angle {
     pub fn west_ccw(self) -> RelAdr {
         NINE_299792458.west_ccw[self as usize]
     }
-}
-
-/*
-/// 駒の利き☆（＾～＾）
-pub enum RelativePieceControl66 {
-    West0,
-    West1,
-    West2,
-    West3,
-    West4,
-    West5,
-    West6,
-    West7,
-    West8,
-    SouthWest0,
-    SouthWest1,
-    SouthWest2,
-    SouthWest3,
-    SouthWest4,
-    SouthWest5,
-    SouthWest6,
-    SouthWest7,
-    South0,
-    South1,
-    South2,
-    South3,
-    South4,
-    South5,
-    South6,
-    South7,
-    SouthEast0,
-    SouthEast1,
-    SouthEast2,
-    SouthEast3,
-    SouthEast4,
-    SouthEast5,
-    SouthEast6,
-    SouthEast7,
-    East0,
-    East1,
-    East2,
-    East3,
-    East4,
-    East5,
-    East6,
-    East7,
-    NorthEast0,
-    NorthEast1,
-    NorthEast2,
-    NorthEast3,
-    NorthEast4,
-    NorthEast5,
-    NorthEast6,
-    NorthEast7,
-    North0,
-    North1,
-    North2,
-    North3,
-    North4,
-    North5,
-    North6,
-    North7,
-    NorthWest0,
-    NorthWest1,
-    NorthWest2,
-    NorthWest3,
-    NorthWest4,
-    NorthWest5,
-    NorthWest6,
-    NorthWest7,
-    Knight0,
-    Knight1,
-}
-*/
-
-/// ミーシーな駒の機動性☆（＾～＾）
-#[derive(PartialEq)]
-pub enum Movility {
-    Knight,
-    SlideDiagonally,
-    SideBackSlider,
-    FrontSlider,
-    BackDiagonally,
-    FrontDiagonally,
-    SideBack,
-    Front,
 }

@@ -6,9 +6,7 @@ use crate::cosmic::playing::Game;
 use crate::cosmic::recording::{Movement, PLY_LEN, SENNTITE_NUM};
 use crate::cosmic::smart::evaluator::{Evaluation, REPITITION_VALUE};
 use crate::cosmic::smart::features::PieceType;
-use crate::cosmic::smart::mate1::Lioncatch;
 use crate::cosmic::smart::see::SEE;
-use crate::cosmic::smart::square::AbsoluteAddress;
 use crate::cosmic::universe::Universe;
 use crate::law::generate_move::{Piece, PseudoLegalMoves, Ways};
 use crate::spaceship::equipment::{Beam, PvString};
@@ -138,53 +136,22 @@ impl Tree {
         // この手を指すと負けてしまう、という手が見えていたら、このフラグを立てろだぜ☆（＾～＾）
         let mut exists_lose = false;
 
-        // TODO let mut controls = Vec::<AbsoluteAddress>::new();
-
         // 指し手の一覧を作るぜ☆（＾～＾） 指し手はハッシュ値で入っている☆（＾～＾）
         let mut ways = {
-            /*
-            // TODO 1手詰めは必ず仕留めなければいけないぜ☆（＾～＾）？
-            let mut lioncatch = Lioncatch::new(game);
-            lioncatch.init(game).pinned_pieces(game).checkers(game);
-            if !lioncatch.checks.is_empty() {
-                lioncatch.checks
-            } else {
-                //   */
             let mut ways = Ways::new();
 
             // 現局面で、各駒が、他に駒がないと考えた場合の最大数の指し手を生成しろだぜ☆（＾～＾）
-            /* TODO
-            PseudoLegalMoves::make_move(
-                game.history.get_friend(),
-                &game.board,
-                &mut |way, destination| {
-                    if let Some(way_val) = way {
-                        ways.push(&way_val);
-                    }
-                    // TODO 利きを一旦覚えようぜ☆（＾～＾）？
-                    // controls.push(*destination);
-                },
-            );
-            */
             PseudoLegalMoves::make_move(game.history.get_friend(), &game.board, &mut |way| {
                 ways.push(&way);
             });
 
             ways
-            //}
         };
 
         // 指せる手が無ければ投了☆（＾～＾）
         if ways.is_empty() {
             return ts;
         }
-
-        // TODO この利きは、この１手を指すまえの利き（１年前の夜空を見ていることを１光年と言うだろ）をキープしているということに注意しろだぜ☆（＾～＾）
-        // いわば、１光手 利きカウントボードだぜ☆（＾～＾）
-        // for destination in &controls {
-        //     game.board
-        //         .add_control(game.history.get_friend(), destination, 1);
-        // }
 
         // 指し手のオーダリングをしたいぜ☆（＾～＾） 取った駒は指し手生成の段階で調べているし☆（＾～＾）
         let mut cap = 0;
@@ -291,21 +258,6 @@ impl Tree {
                             self.evaluation.ways(),
                             self.evaluation.komawari(),
                             self.evaluation.promotion(),
-                            /* TODO
-                            // サンプルを見ているだけだぜ☆（＾～＾）
-                            game.board.get_control(
-                                game.history.get_friend(),
-                                &AbsoluteAddress::new(6, 8)
-                            ),
-                            game.board.get_control(
-                                game.history.get_friend(),
-                                &AbsoluteAddress::new(5, 8)
-                            ),
-                            game.board.get_control(
-                                game.history.get_friend(),
-                                &AbsoluteAddress::new(4, 8)
-                            ),
-                            */
                         ))),
                     );
                     game.info.print(
@@ -379,12 +331,6 @@ impl Tree {
             }
         }
         self.evaluation.add_control(-1 * coverage_sign, &ways);
-
-        // TODO 利き削除☆（＾～＾）
-        // for destination in &controls {
-        //     game.board
-        //         .add_control(game.history.get_friend(), destination, -1);
-        // }
 
         if !exists_lose {
             if let None = ts.bestmove.movement {

@@ -3,15 +3,13 @@
 //!
 use crate::cosmic::playing::Game;
 use crate::cosmic::recording::Phase;
-use crate::cosmic::recording::PHASE_LEN;
-use crate::cosmic::smart::features::ControlBoard;
 use crate::cosmic::smart::features::HAND_ADDRESS_LEN;
 use crate::cosmic::smart::features::HAND_ADDRESS_TYPE_LEN;
 use crate::cosmic::smart::features::{HandAddress, PieceMeaning, PieceType, HAND_MAX};
 use crate::cosmic::smart::square::{
-    AbsoluteAddress, RelAdr, BOARD_MEMORY_AREA, FILE_0, FILE_1, FILE_10, RANK_0, RANK_1, RANK_10,
+    AbsoluteAddress, BOARD_MEMORY_AREA, FILE_0, FILE_1, FILE_10, RANK_0, RANK_1, RANK_10,
 };
-use crate::law::generate_move::{Agility, Area, Piece};
+use crate::law::generate_move::Piece;
 use crate::law::speed_of_light::{HandAddresses, Nine299792458};
 use crate::spaceship::equipment::Beam;
 use num_derive::FromPrimitive;
@@ -126,10 +124,6 @@ pub struct Board {
     hand_index: [usize; HAND_ADDRESS_TYPE_LEN],
     /// 持ち駒☆（＾～＾）TODO 固定長サイズのスタックを用意したいぜ☆（＾～＾）
     pub hands: [HandAddressTypeStack; HAND_ADDRESS_LEN],
-    /* TODO
-    /// 利きの数☆（＾～＾）
-    controls: [ControlBoard; PHASE_LEN],
-    */
 }
 impl Default for Board {
     fn default() -> Self {
@@ -175,7 +169,6 @@ impl Default for Board {
                 HandAddressTypeStack::default(),
                 HandAddressTypeStack::default(),
             ],
-            // TODO controls: [ControlBoard::default(); PHASE_LEN],
         }
     }
 }
@@ -229,78 +222,7 @@ impl Board {
         self.location = board.location.clone();
         self.hand_index = board.hand_index.clone();
         self.hands = board.hands.clone();
-        // TODO self.controls = board.controls.clone();
     }
-
-    /* TODO
-    pub fn add_control(&mut self, phase: Phase, adr: &AbsoluteAddress, offset: isize) {
-        self.controls[phase as usize].add(adr.address(), offset);
-    }
-
-    pub fn get_control(&self, phase: Phase, adr: &AbsoluteAddress) -> isize {
-        self.controls[phase as usize].get(adr.address())
-    }
-    */
-
-    /* TODO
-    /// TODO 初期局面の利きを数えようぜ☆（＾～＾）？
-    pub fn init_controls(&mut self) {
-        Area::for_all(&mut |source| {
-            // そこに置いてある駒を調べようぜ☆（＾～＾）？
-            if let Some(piece) = self.piece_at(&source) {
-                // 駒の利きを調べようぜ☆（＾～＾）？
-                for mobility in piece.meaning.r#type().mobility() {
-                    match mobility.agility {
-                        Agility::Hopping => {
-                            let mut cur = source.clone();
-                            let mut rel = RelAdr::new(1, 0);
-                            rel.rotate(mobility.angle);
-                            if piece.meaning.phase() == Phase::Second {
-                                rel.rotate_180();
-                            }
-                            if !cur.offset(&rel).wall() {
-                                self.add_control(piece.meaning.phase(), &cur, 1);
-                            }
-                        }
-                        Agility::Sliding => {
-                            let mut cur = source.clone();
-                            let mut rel = RelAdr::new(1, 0);
-                            rel.rotate(mobility.angle);
-                            if piece.meaning.phase() == Phase::Second {
-                                rel.rotate_180();
-                            }
-                            for _i in 0..8 {
-                                if !cur.offset(&rel).wall() {
-                                    // とりあえず盤の上なら隣に利きは通るぜ☆（＾～＾）
-                                    self.add_control(piece.meaning.phase(), &cur, 1);
-
-                                    // 利きを調べたいだけなんで、味方／敵問わず駒が有れば終了だぜ☆（＾～＾）
-                                    if let Some(_collision_piece) = self.piece_at(&cur) {
-                                        break;
-                                    }
-                                } else {
-                                    // 壁に利きは通らないぜ☆（＾～＾）
-                                    break;
-                                }
-                            }
-                        }
-                        Agility::Knight => {
-                            let mut cur = source.clone();
-                            let mut rel = RelAdr::new(1, 0);
-                            rel.rotate(mobility.angle).double_rank();
-                            if piece.meaning.phase() == Phase::Second {
-                                rel.rotate_180();
-                            }
-                            if !cur.offset(&rel).wall() {
-                                self.add_control(piece.meaning.phase(), &cur, 1);
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
-    */
 
     /// 歩が置いてあるか確認
     pub fn exists_pawn_on_file(&self, phase: Phase, file: usize) -> bool {
@@ -317,10 +239,6 @@ impl Board {
     /// 升で指定して駒を取得
     pub fn piece_at(&self, adr: &AbsoluteAddress) -> Option<Piece> {
         self.pieces[adr.address() as usize]
-    }
-    /// 駒の背番号で指定して場所を取得
-    pub fn location_at(&self, adr: PieceNum) -> Location {
-        self.location[adr as usize]
     }
 
     /// 升で指定して駒を置く
