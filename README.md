@@ -20,6 +20,19 @@ cargo build --release
 Shogidokoro `[対局(G)] - [エンジン管理...] - [追加...]`  
 `./target/release/rust-kifuwarabe-wcsc30.exe`
 
+## Engine option example
+
+```Plain
+大会設定例。
+DepthNotToGiveUp 5 - 最低でも5手は読む
+MaxDepth 6 - 6手読んだら打切り(優先度高)
+MinThinkMsec 30000 - 最低でも一手30秒は読む
+MaxThinkMsec 35000 - 一手35秒読んだら打切り(優先度高、MaxDepthより低)
+KomawariWeightPer1000 1000 - 駒割評価値100.0%反映
+ManyWaysPer1000 10 - 選択肢の多い（非一直線な）局面好む。変な手になるばかり。001.0%反映
+PromotionWeightPer1000 1000 - 成りに加点100.0%反映
+```
+
 ## Debug on the terminal
 
 Visual Studio Code `[Terminal] - [New Terminal]`.  
@@ -35,8 +48,6 @@ cargo run
 * `KomawariWeightPer1000` - 千分率。駒割。
 * `PromotionWeightPer1000` - 千分率。成らないよりは成った方がお得だぜ、ということを教えるだけだぜ☆（＾～＾）大きくすると、歩と交換で角が成り込むぜ☆（＾～＾）
 * `MaxDepth` - この深さを読んだら決断。
-* `MaxThinkSec` - 秒。１手にかける思考時間の上限。
-* `MinThinkSec` - 秒。１手にかける思考時間の下限。MaxDepth より弱い。
 
 ## Done
 

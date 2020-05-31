@@ -2,10 +2,10 @@ use regex::Regex;
 use std::fmt;
 
 pub struct Go {
-    pub btime: i64,
-    pub wtime: i64,
-    pub binc: i64,
-    pub winc: i64,
+    pub btime: u64,
+    pub wtime: u64,
+    pub binc: u64,
+    pub winc: u64,
 }
 impl fmt::Display for Go {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

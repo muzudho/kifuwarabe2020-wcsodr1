@@ -1,6 +1,7 @@
 use crate::config::*;
 use crate::cosmic::daydream::Tree;
 use crate::cosmic::playing::{Game, PosNums};
+use crate::cosmic::recording::Phase;
 use crate::cosmic::smart::square::{AbsoluteAddress, FILE_1};
 use crate::cosmic::universe::Universe;
 use crate::law::cryptographic::*;
@@ -11,6 +12,7 @@ use crate::spaceship::engine;
 use crate::spaceship::equipment::{Beam, PvString, Telescope};
 use crate::spaceship::facility::{CommandRoom, GameRoom, Kitchen};
 use rand::Rng;
+use std;
 use std::io as std_io;
 
 /// 船長：きふわらべ
@@ -57,6 +59,20 @@ impl Kifuwarabe {
             universe.option_promotion_weight,
             universe.option_depth_not_to_give_up,
         );
+        // TODO 自分が黒手番か、白手番かどうやって調べるんだぜ☆（＾～＾）？
+        let msec: u64 = match universe.game.history.get_friend() {
+            Phase::First => go1.btime,
+            Phase::Second => go1.wtime,
+        };
+        tree.think_msec = if msec < universe.option_max_think_msec {
+            rand::thread_rng().gen_range(msec - 1, msec) as u128
+        } else {
+            rand::thread_rng().gen_range(
+                universe.option_min_think_msec,
+                universe.option_max_think_msec,
+            ) as u128
+        };
+
         let ts = tree.iteration_deeping(universe);
         // その手を選んだ理由☆（＾～＾）
         universe.game.info.print(
@@ -109,11 +125,11 @@ impl Kifuwarabe {
                 "MaxDepth" => {
                     universe.option_max_depth = value.parse().unwrap();
                 }
-                "MinThinkSec" => {
-                    universe.option_min_think_sec = value.parse().unwrap();
+                "MinThinkMsec" => {
+                    universe.option_min_think_msec = value.parse().unwrap();
                 }
-                "MaxThinkSec" => {
-                    universe.option_max_think_sec = value.parse().unwrap();
+                "MaxThinkMsec" => {
+                    universe.option_max_think_msec = value.parse().unwrap();
                 }
                 _ => {}
             }
@@ -137,8 +153,8 @@ impl Kifuwarabe {
         Beam::shoot("option name DepthNotToGiveUp type spin default 4 min 1 max 8");
         Beam::shoot("option name MaxDepth type spin default 7 min 1 max 15");
         // 思考時間関連☆（＾～＾）
-        Beam::shoot("option name MinThinkSec type spin default 5 min 0 max 599");
-        Beam::shoot("option name MaxThinkSec type spin default 17 min 1 max 600");
+        Beam::shoot("option name MinThinkMsec type spin default 5000 min 0 max 599000");
+        Beam::shoot("option name MaxThinkMsec type spin default 17000 min 1000 max 600000");
         // 評価値関連☆（＾～＾）
         Beam::shoot(
             "option name KomawariWeightPer1000 type spin default 1000 min -100000 max 100000",

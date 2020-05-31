@@ -10,7 +10,6 @@ use crate::cosmic::smart::see::SEE;
 use crate::cosmic::universe::Universe;
 use crate::law::generate_move::{Piece, PseudoLegalMoves, Ways};
 use crate::spaceship::equipment::{Beam, PvString};
-use rand::Rng;
 use std::fmt;
 use std::time::Instant;
 
@@ -23,8 +22,8 @@ pub struct Tree {
     // Principal variation(読み筋)☆（＾～＾）
     pv: PrincipalVariation,
 
-    // 思考時間（秒）をランダムにすることで、指し手を変えるぜ☆（＾～＾）
-    think_sec: u64,
+    // 思考時間（ミリ秒）をランダムにすることで、指し手を変えるぜ☆（＾～＾）
+    pub think_msec: u128,
 
     pub evaluation: Evaluation,
 
@@ -44,7 +43,7 @@ impl Tree {
             stopwatch: Instant::now(),
             state_nodes: 0,
             pv: PrincipalVariation::default(),
-            think_sec: 0,
+            think_msec: 0,
             evaluation: Evaluation::new(many_ways_weight, komawari_weight, promotion_weight),
             depth_not_to_give_up: depth_not_to_give_up,
             max_depth0: 0,
@@ -53,10 +52,6 @@ impl Tree {
     /// 反復深化探索だぜ☆（＾～＾）
     pub fn iteration_deeping(&mut self, universe: &mut Universe) -> TreeState {
         universe.game.info.clear();
-        self.think_sec = rand::thread_rng().gen_range(
-            universe.option_min_think_sec as u64,
-            universe.option_max_think_sec as u64,
-        );
 
         // とりあえず 1手読み を叩き台にするぜ☆（＾～＾）
         // 初手の３０手が葉になるぜ☆（＾～＾）
@@ -190,7 +185,7 @@ impl Tree {
         for index in ways.indexes.iter() {
             let way = ways.get(*index);
             // 時間を見ようぜ☆（＾～＾）？
-            if self.think_sec < self.sec() && self.depth_not_to_give_up <= self.max_depth0 {
+            if self.think_msec < self.msec() && self.depth_not_to_give_up <= self.max_depth0 {
                 // とりあえず ランダム秒で探索を打ち切ろうぜ☆（＾～＾）？
                 // タイムアウトしたんだったら、終了処理 すっとばして早よ終われだぜ☆（＾～＾）
                 ts.timeout = true;
