@@ -242,14 +242,49 @@ impl Board {
     }
 
     /// 升で指定して駒を置く
-    pub fn push_to_board(&mut self, adr: &AbsoluteAddress, piece: Option<Piece>) {
+    pub fn push_to_board(&mut self, addr: &AbsoluteAddress, piece: Option<Piece>) {
         if let Some(piece_val) = piece {
-            self.pieces[adr.address() as usize] = piece;
-            self.location[piece_val.num as usize] = Location::Board(*adr);
+            self.pieces[addr.address() as usize] = piece;
+            self.location[piece_val.num as usize] = Location::Board(*addr);
         } else {
-            self.pieces[adr.address() as usize] = None;
+            self.pieces[addr.address() as usize] = None;
         }
     }
+    /// 盤に駒か空升を置いていきます。
+    pub fn push_piece_on_init(&mut self, addr: &AbsoluteAddress, piece_meaning: PieceMeaning) {
+        if !(FILE_0 < addr.file()
+            && addr.file() < FILE_10
+            && RANK_0 < addr.rank()
+            && addr.rank() < RANK_10)
+        {
+            panic!(Beam::trouble(&format!(
+                "(Err.323) 盤上の初期化で盤の外を指定するのは止めろだぜ☆（＾～＾）！ ({}, {})",
+                addr.file(),
+                addr.rank()
+            )))
+        }
+
+        let piece_num = match piece_meaning {
+            // 玉だけ、先後を確定させようぜ☆（＾～＾）
+            PieceMeaning::King1 => {
+                self.location[PieceNum::King1 as usize] = Location::Board(*addr);
+                PieceNum::King1
+            }
+            PieceMeaning::King2 => {
+                self.location[PieceNum::King2 as usize] = Location::Board(*addr);
+                PieceNum::King2
+            }
+            _ => {
+                let hand_type = piece_meaning.hand_address().r#type();
+                self.location[self.hand_index[hand_type as usize]] = Location::Board(*addr);
+                let pn = PieceNum::from_usize(self.hand_index[hand_type as usize]).unwrap();
+                self.hand_index[hand_type as usize] += 1;
+                pn
+            }
+        };
+        self.push_to_board(addr, Some(Piece::new(piece_meaning, piece_num)));
+    }
+
     /// 盤上から駒を無くし、その駒を返り値で返すぜ☆（＾～＾）
     pub fn pop_from_board(&mut self, adr: &AbsoluteAddress) -> Option<Piece> {
         // 取り出すピースは複製するぜ☆（＾～＾）
@@ -259,41 +294,6 @@ impl Board {
             self.location[piece_val.num as usize] = Location::Busy;
         }
         piece
-    }
-    /// 盤に駒か空升を置いていきます。
-    pub fn push_piece_on_init(&mut self, file: usize, rank: usize, piece: Option<PieceMeaning>) {
-        if !(FILE_0 < file && file < FILE_10 && RANK_0 < rank && rank < RANK_10) {
-            panic!(Beam::trouble(&format!(
-                "(Err.323) 盤上の初期化で盤の外を指定するのは止めろだぜ☆（＾～＾）！ ({}, {})",
-                file, rank
-            )))
-        }
-
-        if let Some(piece_meaning) = piece {
-            let source = AbsoluteAddress::new(file, rank);
-            let piece_num = match piece_meaning {
-                // 玉だけ、先後を確定させようぜ☆（＾～＾）
-                PieceMeaning::King1 => {
-                    self.location[PieceNum::King1 as usize] = Location::Board(source);
-                    PieceNum::King1
-                }
-                PieceMeaning::King2 => {
-                    self.location[PieceNum::King2 as usize] = Location::Board(source);
-                    PieceNum::King2
-                }
-                _ => {
-                    let hand_type = piece_meaning.hand_address().r#type();
-                    self.location[self.hand_index[hand_type as usize]] = Location::Board(source);
-                    let pn = PieceNum::from_usize(self.hand_index[hand_type as usize]).unwrap();
-                    self.hand_index[hand_type as usize] += 1;
-                    pn
-                }
-            };
-            self.push_to_board(
-                &AbsoluteAddress::new(file, rank),
-                Some(Piece::new(piece_meaning, piece_num)),
-            );
-        }
     }
     /// 駒台に置く
     pub fn push_hand_on_init(&mut self, piece_meaning: PieceMeaning, number: isize) {
