@@ -110,4 +110,7 @@ position sfen 9/9/9/9/9/9/9/7R1/9 b - 1
 position sfen 9/9/9/9/9/9/9/1B5R1/9 b - 1
 position sfen 9/9/9/9/9/9/9/9/LNSGKGSNL b - 1
 position sfen 9/9/ppppppppp/9/9/9/9/9/9 b - 1
+
+### 2020-06-01(mon) 香車が前に進まず、後に進む☆（＾～＾）？
+position sfen 4k4/9/9/9/3L1l3/9/9/9/4K4 b RB2G2S2NL9Prb2g2s2nl9p 1
 ```

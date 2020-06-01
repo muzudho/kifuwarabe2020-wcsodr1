@@ -11,7 +11,7 @@ use crate::cosmic::smart::square::{
     RANK_6, RANK_7, RANK_8, RANK_9,
 };
 use crate::cosmic::toy_box::PieceNum;
-use crate::cosmic::toy_box::{Board, Location};
+use crate::cosmic::toy_box::{AddressOnPosition, Board};
 use crate::spaceship::equipment::Beam;
 use std::fmt;
 
@@ -148,13 +148,13 @@ impl PseudoLegalMoves {
         F1: FnMut(Way),
     {
         board.for_some_pieces_on_list40(friend, &mut |location, piece| match location {
-            Location::Board(source) => {
+            AddressOnPosition::Board(source) => {
                 PseudoLegalMoves::start_on_board(friend, &source, &piece, board, listen_move)
             }
-            Location::Hand(adr) => {
+            AddressOnPosition::Hand(adr) => {
                 PseudoLegalMoves::make_drop(friend, adr, board, listen_move);
             }
-            Location::Busy => panic!(Beam::trouble(
+            AddressOnPosition::Busy => panic!(Beam::trouble(
                 "(Err.94) なんで駒が作業中なんだぜ☆（＾～＾）！"
             )),
         });

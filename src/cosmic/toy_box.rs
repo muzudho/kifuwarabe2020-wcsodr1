@@ -104,9 +104,12 @@ pub enum PieceNum {
     Pawn40,
 }
 
+/// 局面全体を範囲にして振られた番地。
 #[derive(Clone, Copy)]
-pub enum Location {
+pub enum AddressOnPosition {
+    // 盤上の番地
     Board(AbsoluteAddress),
+    // 持ち駒の番地
     Hand(PhysicalPiece),
     // 作業中のときは、これだぜ☆（＾～＾）
     Busy,
@@ -120,7 +123,7 @@ pub struct Board {
     // いわゆる盤☆（＾～＾）
     pieces: [Option<Piece>; BOARD_MEMORY_AREA as usize],
     /// 駒の居場所☆（＾～＾）
-    location: [Location; PIECE_NUM_LEN],
+    address: [AddressOnPosition; PIECE_NUM_LEN],
     /// 駒の背番号を付けるのに使うぜ☆（＾～＾）
     physical_piece_type_index: [usize; PHYSICAL_PIECE_TYPE_LEN],
     /// 持ち駒☆（＾～＾）TODO 固定長サイズのスタックを用意したいぜ☆（＾～＾）
@@ -140,7 +143,7 @@ impl Default for Board {
                 None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                 None, None, None, None, None, None, None, None, None, None, None, None, None,
             ],
-            location: [Location::Busy; PIECE_NUM_LEN],
+            address: [AddressOnPosition::Busy; PIECE_NUM_LEN],
             physical_piece_type_index: [
                 PieceNum::King1 as usize,
                 PieceNum::Rook21 as usize,
@@ -185,7 +188,7 @@ impl Board {
             None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             None, None, None, None, None, None, None, None, None, None, None, None, None,
         ];
-        self.location = [Location::Busy; PIECE_NUM_LEN];
+        self.address = [AddressOnPosition::Busy; PIECE_NUM_LEN];
         self.physical_piece_type_index = [
             PieceNum::King1 as usize,
             PieceNum::Rook21 as usize,
@@ -220,7 +223,7 @@ impl Board {
     /// 開始盤面を、現盤面にコピーしたいときに使うぜ☆（＾～＾）
     pub fn copy_from(&mut self, board: &Board) {
         self.pieces = board.pieces.clone();
-        self.location = board.location.clone();
+        self.address = board.address.clone();
         self.physical_piece_type_index = board.physical_piece_type_index.clone();
         self.hands = board.hands.clone();
     }
@@ -228,33 +231,41 @@ impl Board {
     /// 盤に駒を置く
     pub fn push_to_board(&mut self, addr: &AbsoluteAddress, piece: Option<Piece>) {
         if let Some(piece_val) = piece {
-            self.pieces[addr.address() as usize] = piece;
-            self.location[piece_val.num as usize] = Location::Board(*addr);
+            // マスに駒を置きます。
+            self.pieces[addr.serial_number() as usize] = piece;
+            // 背番号に番地を紐づけます。
+            self.address[piece_val.num as usize] = AddressOnPosition::Board(*addr);
         } else {
             // マスを空にします。
-            self.pieces[addr.address() as usize] = None;
+            self.pieces[addr.serial_number() as usize] = None;
         }
     }
     /// 台に駒を置く
     pub fn push_to_hand(&mut self, piece: &Piece) {
-        let addr = piece.meaning.physical_piece();
-        self.hands[addr as usize].push(piece);
-        self.location[piece.num as usize] = Location::Hand(addr);
+        let pp = piece.meaning.physical_piece();
+        // 持ち駒を１つ増やします。
+        self.hands[pp as usize].push(piece);
+        // 背番号に番地を紐づけます。
+        self.address[piece.num as usize] = AddressOnPosition::Hand(pp);
     }
     /// 盤から駒を取りのぞく
     pub fn pop_from_board(&mut self, adr: &AbsoluteAddress) -> Option<Piece> {
-        // 取り出すピースは複製するぜ☆（＾～＾）
-        let piece = self.pieces[adr.address() as usize].clone();
+        // まず、駒があるか確認するぜ☆（＾～＾）
+        let piece = self.pieces[adr.serial_number() as usize];
         if let Some(piece_val) = piece {
-            self.pieces[adr.address() as usize] = None;
-            self.location[piece_val.num as usize] = Location::Busy;
+            // マスを空にします。
+            self.pieces[adr.serial_number() as usize] = None;
+            // 背番号の番地を消去します。
+            self.address[piece_val.num as usize] = AddressOnPosition::Busy;
         }
         piece
     }
     /// 台から駒を取りのぞく
     pub fn pop_from_hand(&mut self, adr: PhysicalPiece) -> Piece {
+        // 台から取りのぞきます。
         let piece = self.hands[adr as usize].pop();
-        self.location[piece.num as usize] = Location::Busy;
+        // 背番号の番地を消去します。
+        self.address[piece.num as usize] = AddressOnPosition::Busy;
         piece
     }
 
@@ -321,7 +332,7 @@ impl Board {
     }
     /// 升で指定して駒を取得
     pub fn piece_at(&self, adr: &AbsoluteAddress) -> Option<Piece> {
-        self.pieces[adr.address() as usize]
+        self.pieces[adr.serial_number() as usize]
     }
     /// 指し手生成で使うぜ☆（＾～＾）
     pub fn last_hand(&self, adr: PhysicalPiece) -> Option<&Piece> {
@@ -340,7 +351,8 @@ impl Board {
             for file in (FILE_1..FILE_10).rev() {
                 let ab_adr = &AbsoluteAddress::new(file, rank);
                 if let Some(piece) = self.piece_at(ab_adr) {
-                    hash ^= game.hash_seed.piece[ab_adr.address() as usize][piece.meaning as usize];
+                    hash ^= game.hash_seed.piece[ab_adr.serial_number() as usize]
+                        [piece.meaning as usize];
                 }
             }
         }
@@ -368,18 +380,18 @@ impl Board {
     where
         F: FnMut(usize, Option<&AbsoluteAddress>, Option<Piece>),
     {
-        for (i, location) in self.location.iter().enumerate() {
+        for (i, location) in self.address.iter().enumerate() {
             match location {
-                Location::Board(adr) => {
+                AddressOnPosition::Board(adr) => {
                     // 盤上の駒☆（＾～＾）
                     let piece = self.piece_at(adr).unwrap();
                     piece_get(i, Some(adr), Some(piece));
                 }
-                Location::Hand(_adr) => {
+                AddressOnPosition::Hand(_adr) => {
                     // TODO 持ち駒☆（＾～＾）
                     piece_get(i, None, None);
                 }
-                Location::Busy => panic!(Beam::trouble(
+                AddressOnPosition::Busy => panic!(Beam::trouble(
                     "(Err.624) なんで駒が作業中なんだぜ☆（＾～＾）！"
                 )),
             }
@@ -389,22 +401,22 @@ impl Board {
     /// 盤上を検索するのではなく、４０個の駒を検索するぜ☆（＾～＾）
     pub fn for_some_pieces_on_list40<F>(&self, friend: Phase, piece_get: &mut F)
     where
-        F: FnMut(Location, Piece),
+        F: FnMut(AddressOnPosition, Piece),
     {
         for piece_num in Nine299792458::piece_numbers().iter() {
-            let location = self.location[*piece_num as usize];
+            let location = self.address[*piece_num as usize];
             match location {
-                Location::Board(adr) => {
+                AddressOnPosition::Board(adr) => {
                     // 盤上の駒☆（＾～＾）
                     let piece = self.piece_at(&adr).unwrap();
                     if piece.meaning.phase() == friend {
                         piece_get(location, piece);
                     }
                 }
-                Location::Hand(_adr) => {
+                AddressOnPosition::Hand(_adr) => {
                     // 持ち駒はここで調べるのは無駄な気がするよな☆（＾～＾）持ち駒に歩が１８個とか☆（＾～＾）
                 }
-                Location::Busy => panic!(Beam::trouble(
+                AddressOnPosition::Busy => panic!(Beam::trouble(
                     "(Err.650) なんで駒が作業中なんだぜ☆（＾～＾）！"
                 )),
             }
@@ -434,7 +446,7 @@ impl Board {
         ];
         for adr in &FIRST_SECOND[friend as usize] {
             if let Some(piece) = self.last_hand(*adr) {
-                piece_get(Location::Hand(*adr), *piece);
+                piece_get(AddressOnPosition::Hand(*adr), *piece);
             }
         }
     }
