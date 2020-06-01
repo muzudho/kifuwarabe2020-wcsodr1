@@ -73,7 +73,7 @@ impl Evaluation {
                 .r#type()
                 .promoted()
             {
-                captured_piece_val.meaning.hand_address().r#type().promotion_value()
+                captured_piece_val.meaning.physical_piece().r#type().promotion_value()
             } else {
                 0
             }
@@ -84,7 +84,7 @@ impl Evaluation {
         +
         if let Some(source_piece_val) = source_piece {
             if promotion {
-                source_piece_val.meaning.hand_address().r#type().promotion_value()
+                source_piece_val.meaning.physical_piece().r#type().promotion_value()
             } else {
                 0
             }
@@ -113,7 +113,7 @@ impl Evaluation {
         if let Some(captured_piece_val) = captured_piece {
             captured_piece_val
                 .meaning
-                .hand_address()
+                .physical_piece()
                 .r#type()
                 .captured_value()
         } else {

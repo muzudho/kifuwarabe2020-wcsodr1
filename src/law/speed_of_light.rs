@@ -9,11 +9,11 @@
 //!
 use crate::cosmic::recording::Phase;
 use crate::cosmic::recording::PHASE_LEN;
-use crate::cosmic::smart::features::HAND_ADDRESS_LEN;
-use crate::cosmic::smart::features::HAND_ADDRESS_TYPE_LEN;
+use crate::cosmic::smart::features::PHYSICAL_PIECES_LEN;
+use crate::cosmic::smart::features::PHYSICAL_PIECE_TYPE_LEN;
 use crate::cosmic::smart::features::PIECE_MEANING_LEN;
 use crate::cosmic::smart::features::PIECE_TYPE_LEN;
-use crate::cosmic::smart::features::{HandAddress, HandAddressType, PieceMeaning, PieceType};
+use crate::cosmic::smart::features::{PhysicalPiece, PhysicalPieceType, PieceMeaning, PieceType};
 use crate::cosmic::smart::square::{Angle, RelAdr, ANGLE_LEN};
 use crate::cosmic::toy_box::PieceNum;
 use crate::law::generate_move::{Agility, Mobility};
@@ -54,17 +54,17 @@ struct SpeedOfLight {
     /// この駒を取ったら、先後が反転して、相手の駒になる、というリンクだぜ☆（＾～＾）
     /// 探索部では、玉のような取れない駒も　らいおんきゃっち　しているので、玉も取れるように作っておけだぜ☆（＾～＾）
     piece_meaning_captured_table: [PieceMeaning; PIECE_MEANING_LEN],
-    piece_meaning_hand_address_table: [HandAddress; PIECE_MEANING_LEN],
+    piece_meaning_physical_table: [PhysicalPiece; PIECE_MEANING_LEN],
 
     /// 駒種類☆（＾～＾）
     piece_type_to_promoted_table: [bool; PIECE_TYPE_LEN],
     piece_type_to_mobility_table: [Vec<Mobility>; PIECE_TYPE_LEN],
     /// 持ち駒☆（＾～＾）
     /// 玉２枚引く☆（＾～＾）
-    hand_addresses_legal_all: [HandAddress; HAND_ADDRESS_LEN - 2],
-    hand_addresses: [[HandAddress; HAND_ADDRESS_TYPE_LEN]; PHASE_LEN],
-    hand_address_to_type_table: [HandAddressType; HAND_ADDRESS_LEN],
-    hand_address_to_captured_value: [isize; HAND_ADDRESS_TYPE_LEN],
+    physical_pieces_legal_all: [PhysicalPiece; PHYSICAL_PIECES_LEN - 2],
+    physical_pieces: [[PhysicalPiece; PHYSICAL_PIECE_TYPE_LEN]; PHASE_LEN],
+    physical_piece_to_type_table: [PhysicalPieceType; PHYSICAL_PIECES_LEN],
+    physical_piece_to_captured_value: [isize; PHYSICAL_PIECE_TYPE_LEN],
 
     // 相対番地と角度☆（＾～＾）
     west_ccw: [RelAdr; ANGLE_LEN],
@@ -76,7 +76,7 @@ struct SpeedOfLight {
     /// 評価値☆（＾～＾）
     /// 成らないよりは、成った方がお得という、それだけの差を付けるだけの加点だぜ☆（＾～＾）
     /// 大きくすると、歩と交換に角が成り込むぜ☆（＾～＾）
-    promotion_value: [isize; HAND_ADDRESS_TYPE_LEN],
+    promotion_value: [isize; PHYSICAL_PIECE_TYPE_LEN],
 
     west: RelAdr,
 }
@@ -282,35 +282,35 @@ impl Default for SpeedOfLight {
                 Lance1,  // PromotedLance2
                 Pawn1,   // PromotedPawn2
             ],
-            piece_meaning_hand_address_table: [
-                HandAddress::King1,   // King1
-                HandAddress::Rook1,   // Rook1
-                HandAddress::Bishop1, // Bishop1
-                HandAddress::Gold1,   // Gold1
-                HandAddress::Silver1, // Silver1
-                HandAddress::Knight1, // Knight1
-                HandAddress::Lance1,  // Lance1
-                HandAddress::Pawn1,   // Pawn1
-                HandAddress::Rook1,   // Dragon1
-                HandAddress::Bishop1, // Horse1
-                HandAddress::Silver1, // PromotedSilver1
-                HandAddress::Knight1, // PromotedKnight1
-                HandAddress::Lance1,  // PromotedLance1
-                HandAddress::Pawn1,   // PromotedPawn1
-                HandAddress::King2,   // King2
-                HandAddress::Rook2,   // Rook2
-                HandAddress::Bishop2, // Bishop2
-                HandAddress::Gold2,   // Gold2
-                HandAddress::Silver2, // Silver2
-                HandAddress::Knight2, // Knight2
-                HandAddress::Lance2,  // Lance2
-                HandAddress::Pawn2,   // Pawn2
-                HandAddress::Rook2,   // Dragon2
-                HandAddress::Bishop2, // Horse2
-                HandAddress::Silver2, // PromotedSilver2
-                HandAddress::Knight2, // PromotedKnight2
-                HandAddress::Lance2,  // PromotedLance2
-                HandAddress::Pawn2,   // PromotedPawn2
+            piece_meaning_physical_table: [
+                PhysicalPiece::King1,   // King1
+                PhysicalPiece::Rook1,   // Rook1
+                PhysicalPiece::Bishop1, // Bishop1
+                PhysicalPiece::Gold1,   // Gold1
+                PhysicalPiece::Silver1, // Silver1
+                PhysicalPiece::Knight1, // Knight1
+                PhysicalPiece::Lance1,  // Lance1
+                PhysicalPiece::Pawn1,   // Pawn1
+                PhysicalPiece::Rook1,   // Dragon1
+                PhysicalPiece::Bishop1, // Horse1
+                PhysicalPiece::Silver1, // PromotedSilver1
+                PhysicalPiece::Knight1, // PromotedKnight1
+                PhysicalPiece::Lance1,  // PromotedLance1
+                PhysicalPiece::Pawn1,   // PromotedPawn1
+                PhysicalPiece::King2,   // King2
+                PhysicalPiece::Rook2,   // Rook2
+                PhysicalPiece::Bishop2, // Bishop2
+                PhysicalPiece::Gold2,   // Gold2
+                PhysicalPiece::Silver2, // Silver2
+                PhysicalPiece::Knight2, // Knight2
+                PhysicalPiece::Lance2,  // Lance2
+                PhysicalPiece::Pawn2,   // Pawn2
+                PhysicalPiece::Rook2,   // Dragon2
+                PhysicalPiece::Bishop2, // Horse2
+                PhysicalPiece::Silver2, // PromotedSilver2
+                PhysicalPiece::Knight2, // PromotedKnight2
+                PhysicalPiece::Lance2,  // PromotedLance2
+                PhysicalPiece::Pawn2,   // PromotedPawn2
             ],
 
             // 成り駒か☆（＾～＾）？
@@ -428,62 +428,62 @@ impl Default for SpeedOfLight {
                 ], // PromotedPawn
             ],
             // 持ち駒☆（＾～＾）
-            hand_addresses_legal_all: [
-                HandAddress::Rook1,
-                HandAddress::Bishop1,
-                HandAddress::Gold1,
-                HandAddress::Silver1,
-                HandAddress::Knight1,
-                HandAddress::Lance1,
-                HandAddress::Pawn1,
-                HandAddress::Rook2,
-                HandAddress::Bishop2,
-                HandAddress::Gold2,
-                HandAddress::Silver2,
-                HandAddress::Knight2,
-                HandAddress::Lance2,
-                HandAddress::Pawn2,
+            physical_pieces_legal_all: [
+                PhysicalPiece::Rook1,
+                PhysicalPiece::Bishop1,
+                PhysicalPiece::Gold1,
+                PhysicalPiece::Silver1,
+                PhysicalPiece::Knight1,
+                PhysicalPiece::Lance1,
+                PhysicalPiece::Pawn1,
+                PhysicalPiece::Rook2,
+                PhysicalPiece::Bishop2,
+                PhysicalPiece::Gold2,
+                PhysicalPiece::Silver2,
+                PhysicalPiece::Knight2,
+                PhysicalPiece::Lance2,
+                PhysicalPiece::Pawn2,
             ],
-            hand_addresses: [
+            physical_pieces: [
                 [
-                    HandAddress::King1,
-                    HandAddress::Rook1,
-                    HandAddress::Bishop1,
-                    HandAddress::Gold1,
-                    HandAddress::Silver1,
-                    HandAddress::Knight1,
-                    HandAddress::Lance1,
-                    HandAddress::Pawn1,
+                    PhysicalPiece::King1,
+                    PhysicalPiece::Rook1,
+                    PhysicalPiece::Bishop1,
+                    PhysicalPiece::Gold1,
+                    PhysicalPiece::Silver1,
+                    PhysicalPiece::Knight1,
+                    PhysicalPiece::Lance1,
+                    PhysicalPiece::Pawn1,
                 ],
                 [
-                    HandAddress::King2,
-                    HandAddress::Rook2,
-                    HandAddress::Bishop2,
-                    HandAddress::Gold2,
-                    HandAddress::Silver2,
-                    HandAddress::Knight2,
-                    HandAddress::Lance2,
-                    HandAddress::Pawn2,
+                    PhysicalPiece::King2,
+                    PhysicalPiece::Rook2,
+                    PhysicalPiece::Bishop2,
+                    PhysicalPiece::Gold2,
+                    PhysicalPiece::Silver2,
+                    PhysicalPiece::Knight2,
+                    PhysicalPiece::Lance2,
+                    PhysicalPiece::Pawn2,
                 ],
             ],
 
-            hand_address_to_type_table: [
-                HandAddressType::King,
-                HandAddressType::Rook,
-                HandAddressType::Bishop,
-                HandAddressType::Gold,
-                HandAddressType::Silver,
-                HandAddressType::Knight,
-                HandAddressType::Lance,
-                HandAddressType::Pawn,
-                HandAddressType::King,
-                HandAddressType::Rook,
-                HandAddressType::Bishop,
-                HandAddressType::Gold,
-                HandAddressType::Silver,
-                HandAddressType::Knight,
-                HandAddressType::Lance,
-                HandAddressType::Pawn,
+            physical_piece_to_type_table: [
+                PhysicalPieceType::King,
+                PhysicalPieceType::Rook,
+                PhysicalPieceType::Bishop,
+                PhysicalPieceType::Gold,
+                PhysicalPieceType::Silver,
+                PhysicalPieceType::Knight,
+                PhysicalPieceType::Lance,
+                PhysicalPieceType::Pawn,
+                PhysicalPieceType::King,
+                PhysicalPieceType::Rook,
+                PhysicalPieceType::Bishop,
+                PhysicalPieceType::Gold,
+                PhysicalPieceType::Silver,
+                PhysicalPieceType::Knight,
+                PhysicalPieceType::Lance,
+                PhysicalPieceType::Pawn,
             ],
 
             // よく使う、角度の付いた相対番地☆（＾～＾）
@@ -537,7 +537,7 @@ impl Default for SpeedOfLight {
 
             // 評価値☆（＾～＾）
             promotion_value: [0, 1, 1, 0, 0, 1, 1, 1],
-            hand_address_to_captured_value: [
+            physical_piece_to_captured_value: [
                 // 玉を取った時の評価は別にするから、ここではしないぜ☆（＾～＾）
                 15000, // TODO 玉は 0 にしたい,
                 // 駒割は取ったときにカウントしているので、成りを考慮しないぜ☆（＾～＾）
@@ -581,8 +581,8 @@ impl PieceMeaning {
         NINE_299792458.piece_meaning_captured_table[self as usize]
     }
 
-    pub fn hand_address(self) -> HandAddress {
-        NINE_299792458.piece_meaning_hand_address_table[self as usize]
+    pub fn physical_piece(self) -> PhysicalPiece {
+        NINE_299792458.piece_meaning_physical_table[self as usize]
     }
 }
 
@@ -601,31 +601,31 @@ pub struct HandAddresses {}
 impl HandAddresses {
     pub fn for_all<F1>(callback: &mut F1)
     where
-        F1: FnMut(HandAddress),
+        F1: FnMut(PhysicalPiece),
     {
-        for adr in &NINE_299792458.hand_addresses_legal_all {
+        for adr in &NINE_299792458.physical_pieces_legal_all {
             callback(*adr);
         }
     }
 }
 
 /// コーディングを短くするためのものだぜ☆（＾～＾）
-impl HandAddress {
-    pub fn from_phase_and_type(phase: Phase, adr: HandAddressType) -> Self {
-        NINE_299792458.hand_addresses[phase as usize][adr as usize]
+impl PhysicalPiece {
+    pub fn from_phase_and_type(phase: Phase, adr: PhysicalPieceType) -> Self {
+        NINE_299792458.physical_pieces[phase as usize][adr as usize]
     }
-    pub fn r#type(self) -> HandAddressType {
-        NINE_299792458.hand_address_to_type_table[self as usize]
+    pub fn r#type(self) -> PhysicalPieceType {
+        NINE_299792458.physical_piece_to_type_table[self as usize]
     }
 }
 
 /// コーディングを短くするためのものだぜ☆（＾～＾）
-impl HandAddressType {
+impl PhysicalPieceType {
     pub fn promotion_value(self) -> isize {
         NINE_299792458.promotion_value[self as usize]
     }
     pub fn captured_value(self) -> isize {
-        NINE_299792458.hand_address_to_captured_value[self as usize]
+        NINE_299792458.physical_piece_to_captured_value[self as usize]
     }
 }
 

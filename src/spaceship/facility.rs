@@ -1,5 +1,5 @@
 use crate::cosmic::playing::{Game, PosNums};
-use crate::cosmic::smart::features::{HandAddress, PIECE_WHITE_SPACE};
+use crate::cosmic::smart::features::{PhysicalPiece, PIECE_WHITE_SPACE};
 use crate::cosmic::smart::square::*;
 use crate::law::generate_move::Piece;
 use crate::law::generate_move::Way;
@@ -169,21 +169,21 @@ P x{87:2}   |{63}|{64}|{65}|{66}|{67}|{68}|{69}|{70}|{71}| h8   p x{94:2}
             GameRoom::to_string2(board.piece_at(&AbsoluteAddress::new(2, 9))),
             GameRoom::to_string2(board.piece_at(&AbsoluteAddress::new(1, 9))),
             //                   ▲き,　                   ▲ぞ,                     ▲い,                     ▲ね,                     ▲う,                     ▲し,                     ▲ひ,
-            board.count_hand(HandAddress::Rook1),
-            board.count_hand(HandAddress::Bishop1),
-            board.count_hand(HandAddress::Gold1),
-            board.count_hand(HandAddress::Silver1),
-            board.count_hand(HandAddress::Knight1),
-            board.count_hand(HandAddress::Lance1),
-            board.count_hand(HandAddress::Pawn1),
+            board.count_hand(PhysicalPiece::Rook1),
+            board.count_hand(PhysicalPiece::Bishop1),
+            board.count_hand(PhysicalPiece::Gold1),
+            board.count_hand(PhysicalPiece::Silver1),
+            board.count_hand(PhysicalPiece::Knight1),
+            board.count_hand(PhysicalPiece::Lance1),
+            board.count_hand(PhysicalPiece::Pawn1),
             //                   ▽キ,                     ▽ゾ,                     ▽イ,                     ▽ネ,                     ▽ウ,                     ▽シ,                     ▽ヒ,
-            board.count_hand(HandAddress::Rook2),
-            board.count_hand(HandAddress::Bishop2),
-            board.count_hand(HandAddress::Gold2),
-            board.count_hand(HandAddress::Silver2),
-            board.count_hand(HandAddress::Knight2),
-            board.count_hand(HandAddress::Lance2),
-            board.count_hand(HandAddress::Pawn2),
+            board.count_hand(PhysicalPiece::Rook2),
+            board.count_hand(PhysicalPiece::Bishop2),
+            board.count_hand(PhysicalPiece::Gold2),
+            board.count_hand(PhysicalPiece::Silver2),
+            board.count_hand(PhysicalPiece::Knight2),
+            board.count_hand(PhysicalPiece::Lance2),
+            board.count_hand(PhysicalPiece::Pawn2),
             ply,
             phase,
             same_pos_count

@@ -76,8 +76,6 @@ pub enum PieceMeaning {
 
 // 持ち駒の駒のうち、最大の枚数は歩の 18。
 pub const HAND_MAX: usize = 18;
-// Note: 持ち駒には玉も含むぜ☆（＾～＾）
-pub const HAND_ADDRESS_LEN: usize = 16;
 pub static PIECE_WHITE_SPACE: &str = "    ";
 impl fmt::Display for PieceMeaning {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -174,9 +172,10 @@ impl fmt::Display for PieceType {
     }
 }
 
-pub const HAND_ADDRESS_TYPE_LEN: usize = 8;
+pub const PHYSICAL_PIECE_TYPE_LEN: usize = 8;
 #[derive(Clone, Copy, Debug, FromPrimitive)]
-pub enum HandAddressType {
+/// 物理的な駒の種類。玉を除けば、持ち駒の種類。
+pub enum PhysicalPieceType {
     King,
     Rook,
     Bishop,
@@ -187,8 +186,12 @@ pub enum HandAddressType {
     Pawn,
 }
 
+// Note: 持ち駒には玉も含むぜ☆（＾～＾）
+pub const PHYSICAL_PIECES_LEN: usize = 16;
+
 #[derive(Clone, Copy, Debug)]
-pub enum HandAddress {
+/// 物理的な駒の種類。玉を除けば、持ち駒の種類。
+pub enum PhysicalPiece {
     King1,
     Rook1,
     Bishop1,

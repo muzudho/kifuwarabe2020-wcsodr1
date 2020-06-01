@@ -4,7 +4,7 @@
 //! * Phase (先後。手番,相手番)
 //! * Person (先手,後手)
 //!
-use crate::cosmic::smart::features::HandAddressType;
+use crate::cosmic::smart::features::PhysicalPieceType;
 use crate::cosmic::smart::square::AbsoluteAddress;
 use crate::law::cryptographic::num_to_lower_case;
 use crate::law::generate_move::Piece;
@@ -65,7 +65,7 @@ pub struct Movement {
     // 移動後に成るなら真
     pub promote: bool,
     // 打の場合、打った駒種類
-    pub drop: Option<HandAddressType>,
+    pub drop: Option<PhysicalPieceType>,
 }
 impl Default for Movement {
     /// ゴミの値を作るぜ☆（＾～＾）
@@ -83,7 +83,7 @@ impl Movement {
         source: Option<AbsoluteAddress>,
         destination: AbsoluteAddress,
         promote: bool,
-        drop: Option<HandAddressType>,
+        drop: Option<PhysicalPieceType>,
     ) -> Self {
         Movement {
             source: source,

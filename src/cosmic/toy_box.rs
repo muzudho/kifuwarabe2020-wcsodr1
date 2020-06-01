@@ -3,9 +3,9 @@
 //!
 use crate::cosmic::playing::Game;
 use crate::cosmic::recording::Phase;
-use crate::cosmic::smart::features::HAND_ADDRESS_LEN;
-use crate::cosmic::smart::features::HAND_ADDRESS_TYPE_LEN;
-use crate::cosmic::smart::features::{HandAddress, PieceMeaning, PieceType, HAND_MAX};
+use crate::cosmic::smart::features::PHYSICAL_PIECES_LEN;
+use crate::cosmic::smart::features::PHYSICAL_PIECE_TYPE_LEN;
+use crate::cosmic::smart::features::{PhysicalPiece, PieceMeaning, PieceType, HAND_MAX};
 use crate::cosmic::smart::square::{
     AbsoluteAddress, BOARD_MEMORY_AREA, FILE_0, FILE_1, FILE_10, RANK_0, RANK_1, RANK_10,
 };
@@ -107,7 +107,7 @@ pub enum PieceNum {
 #[derive(Clone, Copy)]
 pub enum Location {
     Board(AbsoluteAddress),
-    Hand(HandAddress),
+    Hand(PhysicalPiece),
     // 作業中のときは、これだぜ☆（＾～＾）
     Busy,
 }
@@ -121,9 +121,10 @@ pub struct Board {
     pieces: [Option<Piece>; BOARD_MEMORY_AREA as usize],
     /// 駒の居場所☆（＾～＾）
     location: [Location; PIECE_NUM_LEN],
-    hand_index: [usize; HAND_ADDRESS_TYPE_LEN],
+    /// 駒の背番号を付けるのに使うぜ☆（＾～＾）
+    physical_piece_type_index: [usize; PHYSICAL_PIECE_TYPE_LEN],
     /// 持ち駒☆（＾～＾）TODO 固定長サイズのスタックを用意したいぜ☆（＾～＾）
-    pub hands: [HandAddressTypeStack; HAND_ADDRESS_LEN],
+    pub hands: [HandAddressTypeStack; PHYSICAL_PIECES_LEN],
 }
 impl Default for Board {
     fn default() -> Self {
@@ -140,7 +141,7 @@ impl Default for Board {
                 None, None, None, None, None, None, None, None, None, None, None, None, None,
             ],
             location: [Location::Busy; PIECE_NUM_LEN],
-            hand_index: [
+            physical_piece_type_index: [
                 PieceNum::King1 as usize,
                 PieceNum::Rook21 as usize,
                 PieceNum::Bishop19 as usize,
@@ -185,7 +186,7 @@ impl Board {
             None, None, None, None, None, None, None, None, None, None, None, None, None,
         ];
         self.location = [Location::Busy; PIECE_NUM_LEN];
-        self.hand_index = [
+        self.physical_piece_type_index = [
             PieceNum::King1 as usize,
             PieceNum::Rook21 as usize,
             PieceNum::Bishop19 as usize,
@@ -220,7 +221,7 @@ impl Board {
     pub fn copy_from(&mut self, board: &Board) {
         self.pieces = board.pieces.clone();
         self.location = board.location.clone();
-        self.hand_index = board.hand_index.clone();
+        self.physical_piece_type_index = board.physical_piece_type_index.clone();
         self.hands = board.hands.clone();
     }
 
@@ -235,7 +236,7 @@ impl Board {
     }
     /// 台に駒を置く
     pub fn push_to_hand(&mut self, piece: &Piece) {
-        let addr = piece.meaning.hand_address();
+        let addr = piece.meaning.physical_piece();
         self.hands[addr as usize].push(piece);
         self.location[piece.num as usize] = Location::Hand(addr);
     }
@@ -250,11 +251,14 @@ impl Board {
         piece
     }
     /// 台から駒を取りのぞく
-    pub fn pop_from_hand(&mut self, adr: HandAddress) -> Piece {
+    pub fn pop_from_hand(&mut self, adr: PhysicalPiece) -> Piece {
         let piece = self.hands[adr as usize].pop();
         self.location[piece.num as usize] = Location::Busy;
         piece
     }
+
+    /// 駒の新しい背番号を生成します。
+    pub fn make_piece_number() {}
 
     /// 先手玉、後手玉なら、その位置を確定させます。背番号も付けます。
     pub fn push_to_board_from_sfen(&mut self, addr: &AbsoluteAddress, piece_meaning: PieceMeaning) {
@@ -282,10 +286,12 @@ impl Board {
                 PieceNum::King2
             }
             _ => {
-                let hand_type = piece_meaning.hand_address().r#type();
-                self.location[self.hand_index[hand_type as usize]] = Location::Board(*addr);
-                let pn = PieceNum::from_usize(self.hand_index[hand_type as usize]).unwrap();
-                self.hand_index[hand_type as usize] += 1;
+                let phy_pct = piece_meaning.physical_piece().r#type();
+                self.location[self.physical_piece_type_index[phy_pct as usize]] =
+                    Location::Board(*addr);
+                let pn =
+                    PieceNum::from_usize(self.physical_piece_type_index[phy_pct as usize]).unwrap();
+                self.physical_piece_type_index[phy_pct as usize] += 1;
                 pn
             }
         };
@@ -299,13 +305,13 @@ impl Board {
     pub fn push_to_hand_from_sfen(&mut self, piece_meaning: PieceMeaning, number: isize) {
         for _i in 0..number {
             // 駒に背番号を付けます。
-            let addr = piece_meaning.hand_address();
-            let hand_type = addr.r#type();
-            let hand_num = self.hand_index[hand_type as usize];
-            let piece = &Piece::new(piece_meaning, PieceNum::from_usize(hand_num).unwrap());
-            self.hand_index[hand_type as usize] += 1;
+            let phy_pct = piece_meaning.physical_piece().r#type();
+            let pn =
+                PieceNum::from_usize(self.physical_piece_type_index[phy_pct as usize]).unwrap();
+            self.physical_piece_type_index[phy_pct as usize] += 1;
 
             // 駒台に置く
+            let piece = &Piece::new(piece_meaning, pn);
             self.push_to_hand(piece);
         }
     }
@@ -327,10 +333,10 @@ impl Board {
         self.pieces[adr.address() as usize]
     }
     /// 指し手生成で使うぜ☆（＾～＾）
-    pub fn last_hand(&self, adr: HandAddress) -> Option<&Piece> {
+    pub fn last_hand(&self, adr: PhysicalPiece) -> Option<&Piece> {
         self.hands[adr as usize].last()
     }
-    pub fn count_hand(&self, adr: HandAddress) -> usize {
+    pub fn count_hand(&self, adr: PhysicalPiece) -> usize {
         self.hands[adr as usize].len()
     }
 
@@ -413,26 +419,26 @@ impl Board {
             }
         }
 
-        const FIRST_SECOND: [[HandAddress; HAND_ADDRESS_TYPE_LEN - 1]; 2] = [
+        const FIRST_SECOND: [[PhysicalPiece; PHYSICAL_PIECE_TYPE_LEN - 1]; 2] = [
             [
                 // King なし
-                HandAddress::Rook1,
-                HandAddress::Bishop1,
-                HandAddress::Gold1,
-                HandAddress::Silver1,
-                HandAddress::Knight1,
-                HandAddress::Lance1,
-                HandAddress::Pawn1,
+                PhysicalPiece::Rook1,
+                PhysicalPiece::Bishop1,
+                PhysicalPiece::Gold1,
+                PhysicalPiece::Silver1,
+                PhysicalPiece::Knight1,
+                PhysicalPiece::Lance1,
+                PhysicalPiece::Pawn1,
             ],
             [
                 // King なし
-                HandAddress::Rook2,
-                HandAddress::Bishop2,
-                HandAddress::Gold2,
-                HandAddress::Silver2,
-                HandAddress::Knight2,
-                HandAddress::Lance2,
-                HandAddress::Pawn2,
+                PhysicalPiece::Rook2,
+                PhysicalPiece::Bishop2,
+                PhysicalPiece::Gold2,
+                PhysicalPiece::Silver2,
+                PhysicalPiece::Knight2,
+                PhysicalPiece::Lance2,
+                PhysicalPiece::Pawn2,
             ],
         ];
         for adr in &FIRST_SECOND[friend as usize] {

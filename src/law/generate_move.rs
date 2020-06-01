@@ -3,7 +3,7 @@
 //!
 
 use crate::cosmic::recording::{Movement, Phase};
-use crate::cosmic::smart::features::HandAddress;
+use crate::cosmic::smart::features::PhysicalPiece;
 use crate::cosmic::smart::features::PieceMeaning;
 use crate::cosmic::smart::features::PieceType;
 use crate::cosmic::smart::square::{
@@ -260,7 +260,7 @@ impl PseudoLegalMoves {
     /// * `board` - 現局面の盤上だぜ☆（＾～＾）
     /// * `listen_move` - 指し手を受け取れだぜ☆（＾～＾）
     /// * `listen_control` - 利きを受け取れだぜ☆（＾～＾）
-    fn make_drop<F1>(friend: Phase, adr: HandAddress, board: &Board, listen_move: &mut F1)
+    fn make_drop<F1>(friend: Phase, adr: PhysicalPiece, board: &Board, listen_move: &mut F1)
     where
         // TODO F1: FnMut(Option<Way>, &AbsoluteAddress),
         F1: FnMut(Way),
@@ -282,10 +282,10 @@ impl PseudoLegalMoves {
                     }
                     listen_move(Way::new(
                         Movement::new(
-                            None,                                        // 駒台
-                            destination,                                 // どの升へ行きたいか
-                            false,                                       // 打に成りは無し
-                            Some(piece.meaning.hand_address().r#type()), // 打った駒種類
+                            None,                                          // 駒台
+                            destination,                                   // どの升へ行きたいか
+                            false,                                         // 打に成りは無し
+                            Some(piece.meaning.physical_piece().r#type()), // 打った駒種類
                         ),
                         None,
                     ));
@@ -294,7 +294,7 @@ impl PseudoLegalMoves {
 
             // 駒を持っていれば
             let ty = adr.r#type();
-            use crate::cosmic::smart::features::HandAddressType::*;
+            use crate::cosmic::smart::features::PhysicalPieceType::*;
             match ty {
                 // 歩、香
                 Pawn | Lance => Area::drop_pawn_lance(friend, drop),

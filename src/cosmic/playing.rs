@@ -1,5 +1,7 @@
 use crate::cosmic::recording::{History, Movement, PHASE_FIRST, PHASE_LEN, PHASE_SECOND};
-use crate::cosmic::smart::features::{HandAddress, HAND_ADDRESS_LEN, HAND_MAX, PIECE_MEANING_LEN};
+use crate::cosmic::smart::features::{
+    PhysicalPiece, HAND_MAX, PHYSICAL_PIECES_LEN, PIECE_MEANING_LEN,
+};
 use crate::cosmic::smart::square::{BOARD_MEMORY_AREA, SQUARE_NONE};
 use crate::cosmic::toy_box::Board;
 use crate::law::generate_move::Piece;
@@ -20,7 +22,7 @@ pub struct GameHashSeed {
     // 盤上の駒
     pub piece: [[u64; PIECE_MEANING_LEN]; BOARD_MEMORY_AREA as usize],
     // 持ち駒
-    pub hands: [[u64; HAND_MAX]; HAND_ADDRESS_LEN],
+    pub hands: [[u64; HAND_MAX]; PHYSICAL_PIECES_LEN],
     // 先後
     pub phase: [u64; PHASE_LEN],
 }
@@ -49,7 +51,7 @@ impl Default for Game {
                 // 盤上の駒
                 piece: [[0; PIECE_MEANING_LEN]; BOARD_MEMORY_AREA as usize],
                 // 持ち駒
-                hands: [[0; HAND_MAX]; HAND_ADDRESS_LEN],
+                hands: [[0; HAND_MAX]; PHYSICAL_PIECES_LEN],
                 // 先後
                 phase: [0; PHASE_LEN],
             },
@@ -72,7 +74,7 @@ impl Game {
             }
         }
         // 持ち駒
-        for i_piece in 0..HAND_ADDRESS_LEN {
+        for i_piece in 0..PHYSICAL_PIECES_LEN {
             for i_count in 0..HAND_MAX {
                 self.hash_seed.hands[i_piece][i_count] =
                     rand::thread_rng().gen_range(0, 18_446_744_073_709_551_615);
@@ -229,7 +231,7 @@ impl Game {
                 if let Some(drp) = movement.drop {
                     Some(
                         self.board
-                            .pop_from_hand(HandAddress::from_phase_and_type(friend, drp)),
+                            .pop_from_hand(PhysicalPiece::from_phase_and_type(friend, drp)),
                     )
                 } else {
                     panic!(Beam::trouble(
@@ -304,7 +306,7 @@ impl Game {
                 if let Some(captured_piece_val) = captured {
                     // 自分の持ち駒を減らす
                     self.board
-                        .pop_from_hand(captured_piece_val.meaning.captured().hand_address());
+                        .pop_from_hand(captured_piece_val.meaning.captured().physical_piece());
                     // 移動先の駒を、取った駒（あるいは空）に戻す
                     self.board.push_to_board(&movement.destination, captured);
                 }
