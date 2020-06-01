@@ -565,7 +565,7 @@ impl PieceMeaning {
         NINE_299792458.piece_meaning_to_phase_table[self as usize]
     }
 
-    pub fn r#type(self) -> PieceType {
+    pub fn type_(self) -> PieceType {
         NINE_299792458.piece_meaning_type_table[self as usize]
     }
 
@@ -614,7 +614,7 @@ impl PhysicalPiece {
     pub fn from_phase_and_type(phase: Phase, adr: PhysicalPieceType) -> Self {
         NINE_299792458.physical_pieces[phase as usize][adr as usize]
     }
-    pub fn r#type(self) -> PhysicalPieceType {
+    pub fn type_(self) -> PhysicalPieceType {
         NINE_299792458.physical_piece_to_type_table[self as usize]
     }
 }

@@ -248,7 +248,7 @@ impl PseudoLegalMoves {
                 !space
             };
 
-        Area::piece_of(piece.meaning.r#type(), friend, &source, moving);
+        Area::piece_of(piece.meaning.type_(), friend, &source, moving);
     }
 
     /// 駒台を見ようぜ☆（＾～＾） 駒台の駒の動きを作るぜ☆（＾～＾）
@@ -282,10 +282,10 @@ impl PseudoLegalMoves {
                     }
                     listen_move(Way::new(
                         Movement::new(
-                            None,                                          // 駒台
-                            destination,                                   // どの升へ行きたいか
-                            false,                                         // 打に成りは無し
-                            Some(piece.meaning.physical_piece().r#type()), // 打った駒種類
+                            None,                                         // 駒台
+                            destination,                                  // どの升へ行きたいか
+                            false,                                        // 打に成りは無し
+                            Some(piece.meaning.physical_piece().type_()), // 打った駒種類
                         ),
                         None,
                     ));
@@ -293,7 +293,7 @@ impl PseudoLegalMoves {
             };
 
             // 駒を持っていれば
-            let ty = adr.r#type();
+            let ty = adr.type_();
             use crate::cosmic::smart::features::PhysicalPieceType::*;
             match ty {
                 // 歩、香
@@ -380,7 +380,7 @@ impl Area {
         };
 
         for mobility in PieceType::Pawn.mobility().iter() {
-            Area::r#move(&Some(friend), source, *mobility, moving);
+            Area::move_(&Some(friend), source, *mobility, moving);
         }
     }
 
@@ -406,7 +406,7 @@ impl Area {
         };
 
         for mobility in PieceType::Lance.mobility().iter() {
-            Area::r#move(&Some(friend), source, *mobility, moving);
+            Area::move_(&Some(friend), source, *mobility, moving);
         }
     }
 
@@ -432,7 +432,7 @@ impl Area {
         };
 
         for mobility in PieceType::Knight.mobility().iter() {
-            Area::r#move(&Some(friend), source, *mobility, moving);
+            Area::move_(&Some(friend), source, *mobility, moving);
         }
     }
 
@@ -452,7 +452,7 @@ impl Area {
             &mut |destination, _agility| Promoting::silver(friend, &source, &destination, moving);
 
         for mobility in PieceType::Silver.mobility().iter() {
-            Area::r#move(&Some(friend), source, *mobility, moving);
+            Area::move_(&Some(friend), source, *mobility, moving);
         }
     }
 
@@ -473,7 +473,7 @@ impl Area {
         };
 
         for mobility in PieceType::Gold.mobility().iter() {
-            Area::r#move(&Some(friend), source, *mobility, moving);
+            Area::move_(&Some(friend), source, *mobility, moving);
         }
     }
 
@@ -493,7 +493,7 @@ impl Area {
         };
 
         for mobility in PieceType::King.mobility().iter() {
-            Area::r#move(&None, source, *mobility, moving);
+            Area::move_(&None, source, *mobility, moving);
         }
     }
 
@@ -512,7 +512,7 @@ impl Area {
             Promoting::bishop_rook(friend, &source, &destination, moving)
         };
         for mobility in PieceType::Bishop.mobility().iter() {
-            Area::r#move(&Some(friend), source, *mobility, moving);
+            Area::move_(&Some(friend), source, *mobility, moving);
         }
     }
 
@@ -531,7 +531,7 @@ impl Area {
             Promoting::bishop_rook(friend, &source, &destination, moving)
         };
         for mobility in PieceType::Rook.mobility().iter() {
-            Area::r#move(&Some(friend), source, *mobility, moving);
+            Area::move_(&Some(friend), source, *mobility, moving);
         }
     }
 
@@ -550,7 +550,7 @@ impl Area {
             &mut |destination, agility| moving(destination, Promotability::Deny, agility, None);
 
         for mobility in PieceType::Horse.mobility().iter() {
-            Area::r#move(&None, source, *mobility, moving);
+            Area::move_(&None, source, *mobility, moving);
         }
     }
 
@@ -570,7 +570,7 @@ impl Area {
                 &mut |destination, agility| moving(destination, Promotability::Deny, agility, None);
 
             for mobility in PieceType::Dragon.mobility().iter() {
-                Area::r#move(&None, source, *mobility, moving);
+                Area::move_(&None, source, *mobility, moving);
             }
         }
     }
@@ -632,7 +632,7 @@ impl Area {
     /// * `angle` - 角度☆（＾～＾）
     /// * `agility` - 動き方☆（＾～＾）
     /// * `callback` - 絶対番地を受け取れだぜ☆（＾～＾）
-    fn r#move<F1>(
+    fn move_<F1>(
         friend: &Option<Phase>,
         start: &AbsoluteAddress,
         mobility: Mobility,
@@ -655,7 +655,7 @@ impl Area {
         match mobility.agility {
             Agility::Sliding => {
                 let mut cur = start.clone();
-                let r = RelAdr::new(1, 0).rotate(mobility.angle).clone();
+                let r = RelAdr::new(1, 0).rotate(angle).clone();
 
                 loop {
                     // 西隣から反時計回りだぜ☆（＾～＾）

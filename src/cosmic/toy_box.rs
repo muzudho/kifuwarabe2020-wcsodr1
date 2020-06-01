@@ -276,7 +276,7 @@ impl Board {
             PieceMeaning::King1 => Piece::new(piece_meaning, PieceNum::King1),
             PieceMeaning::King2 => Piece::new(piece_meaning, PieceNum::King2),
             _ => {
-                let phy_pct = piece_meaning.physical_piece().r#type() as usize;
+                let phy_pct = piece_meaning.physical_piece().type_() as usize;
                 // 玉以外の背番号は、先後に関わりなく SFENに書いてあった順で☆（＾～＾）
                 let pn = PieceNum::from_usize(self.physical_piece_type_index[phy_pct]).unwrap();
                 // カウントアップ☆（＾～＾）
@@ -323,7 +323,7 @@ impl Board {
         for rank in RANK_1..RANK_10 {
             let adr = AbsoluteAddress::new(file, rank);
             if let Some(piece) = self.piece_at(&adr) {
-                if piece.meaning.phase() == phase && piece.meaning.r#type() == PieceType::Pawn {
+                if piece.meaning.phase() == phase && piece.meaning.type_() == PieceType::Pawn {
                     return true;
                 }
             }

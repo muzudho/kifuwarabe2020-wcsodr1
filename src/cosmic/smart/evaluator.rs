@@ -70,10 +70,10 @@ impl Evaluation {
         // 成り駒を取って降格させたら、成り駒評価値追加だぜ☆（＾～＾）
         let delta_promotion = if let Some(captured_piece_val) = captured_piece {
             if captured_piece_val.meaning
-                .r#type()
+                .type_()
                 .promoted()
             {
-                captured_piece_val.meaning.physical_piece().r#type().promotion_value()
+                captured_piece_val.meaning.physical_piece().type_().promotion_value()
             } else {
                 0
             }
@@ -84,7 +84,7 @@ impl Evaluation {
         +
         if let Some(source_piece_val) = source_piece {
             if promotion {
-                source_piece_val.meaning.physical_piece().r#type().promotion_value()
+                source_piece_val.meaning.physical_piece().type_().promotion_value()
             } else {
                 0
             }
@@ -114,7 +114,7 @@ impl Evaluation {
             captured_piece_val
                 .meaning
                 .physical_piece()
-                .r#type()
+                .type_()
                 .captured_value()
         } else {
             0
