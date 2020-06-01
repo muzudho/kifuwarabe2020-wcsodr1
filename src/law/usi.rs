@@ -244,8 +244,7 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Game) {
             BoardPart::Alphabet(piece_meaning) => {
                 *starts += 1;
                 let addr = AbsoluteAddress::new(file, rank);
-                let piece = board.make_piece_number(&addr, piece_meaning);
-                board.push_to_board(&addr, Some(piece));
+                board.push_to_board_from_sfen(&addr, piece_meaning);
                 file -= 1;
             }
             BoardPart::Number(space_num) => {
@@ -388,7 +387,7 @@ pub fn set_position(line: &str, game: &mut Game) {
                     };
                     starts += 1;
 
-                    game.mut_starting().push_hand_on_init(hand, hand_num);
+                    game.mut_starting().push_to_hand_from_sfen(hand, hand_num);
                 } //if
             } //loop
         } //else

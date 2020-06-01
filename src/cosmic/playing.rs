@@ -229,7 +229,7 @@ impl Game {
                 if let Some(drp) = movement.drop {
                     Some(
                         self.board
-                            .pop_hand(HandAddress::from_phase_and_type(friend, drp)),
+                            .pop_from_hand(HandAddress::from_phase_and_type(friend, drp)),
                     )
                 } else {
                     panic!(Beam::trouble(
@@ -242,7 +242,7 @@ impl Game {
                 // 移動先升の駒を盤上から消し、自分の持ち駒に増やす
                 let captured_piece =
                     Piece::new(collision_piece.meaning.captured(), collision_piece.num);
-                self.board.push_hand(&captured_piece);
+                self.board.push_to_hand(&captured_piece);
                 Some(collision_piece)
             } else {
                 None
@@ -292,7 +292,7 @@ impl Game {
                         // 打った場所に駒があるはずだぜ☆（＾～＾）
                         let piece = self.board.pop_from_board(&movement.destination).unwrap();
                         // 自分の持ち駒を増やそうぜ☆（＾～＾）！
-                        self.board.push_hand(&piece);
+                        self.board.push_to_hand(&piece);
                         Some(piece)
                     } else {
                         panic!(Beam::trouble(
@@ -304,7 +304,7 @@ impl Game {
                 if let Some(captured_piece_val) = captured {
                     // 自分の持ち駒を減らす
                     self.board
-                        .pop_hand(captured_piece_val.meaning.captured().hand_address());
+                        .pop_from_hand(captured_piece_val.meaning.captured().hand_address());
                     // 移動先の駒を、取った駒（あるいは空）に戻す
                     self.board.push_to_board(&movement.destination, captured);
                 }

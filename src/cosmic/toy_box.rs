@@ -224,29 +224,40 @@ impl Board {
         self.hands = board.hands.clone();
     }
 
-    /// 歩が置いてあるか確認
-    pub fn exists_pawn_on_file(&self, phase: Phase, file: usize) -> bool {
-        for rank in RANK_1..RANK_10 {
-            let adr = AbsoluteAddress::new(file, rank);
-            if let Some(piece) = self.piece_at(&adr) {
-                if piece.meaning.phase() == phase && piece.meaning.r#type() == PieceType::Pawn {
-                    return true;
-                }
-            }
+    /// 盤に駒を置く
+    pub fn push_to_board(&mut self, addr: &AbsoluteAddress, piece: Option<Piece>) {
+        if let Some(piece_val) = piece {
+            self.pieces[addr.address() as usize] = piece;
+            self.location[piece_val.num as usize] = Location::Board(*addr);
+        } else {
+            self.pieces[addr.address() as usize] = None;
         }
-        false
     }
-    /// 升で指定して駒を取得
-    pub fn piece_at(&self, adr: &AbsoluteAddress) -> Option<Piece> {
-        self.pieces[adr.address() as usize]
+    /// 台に駒を置く
+    pub fn push_to_hand(&mut self, piece: &Piece) {
+        let addr = piece.meaning.hand_address();
+        self.hands[addr as usize].push(piece);
+        self.location[piece.num as usize] = Location::Hand(addr);
+    }
+    /// 盤から駒を取りのぞく
+    pub fn pop_from_board(&mut self, adr: &AbsoluteAddress) -> Option<Piece> {
+        // 取り出すピースは複製するぜ☆（＾～＾）
+        let piece = self.pieces[adr.address() as usize].clone();
+        if let Some(piece_val) = piece {
+            self.pieces[adr.address() as usize] = None;
+            self.location[piece_val.num as usize] = Location::Busy;
+        }
+        piece
+    }
+    /// 台から駒を取りのぞく
+    pub fn pop_from_hand(&mut self, adr: HandAddress) -> Piece {
+        let piece = self.hands[adr as usize].pop();
+        self.location[piece.num as usize] = Location::Busy;
+        piece
     }
 
     /// 先手玉、後手玉なら、その位置を確定させます。背番号も付けます。
-    pub fn make_piece_number(
-        &mut self,
-        addr: &AbsoluteAddress,
-        piece_meaning: PieceMeaning,
-    ) -> Piece {
+    pub fn push_to_board_from_sfen(&mut self, addr: &AbsoluteAddress, piece_meaning: PieceMeaning) {
         if !(FILE_0 < addr.file()
             && addr.file() < FILE_10
             && RANK_0 < addr.rank()
@@ -278,52 +289,42 @@ impl Board {
                 pn
             }
         };
-        return Piece::new(piece_meaning, piece_num);
+
+        // 駒台に置くぜ☆（＾～＾）
+        let piece = Piece::new(piece_meaning, piece_num);
+        self.push_to_board(&addr, Some(piece));
     }
-    /// 升で指定して駒を置く
-    pub fn push_to_board(&mut self, addr: &AbsoluteAddress, piece: Option<Piece>) {
-        if let Some(piece_val) = piece {
-            self.pieces[addr.address() as usize] = piece;
-            self.location[piece_val.num as usize] = Location::Board(*addr);
-        } else {
-            self.pieces[addr.address() as usize] = None;
+
+    /// 持ち駒に背番号を付ける
+    pub fn push_to_hand_from_sfen(&mut self, piece_meaning: PieceMeaning, number: isize) {
+        for _i in 0..number {
+            // 駒に背番号を付けます。
+            let addr = piece_meaning.hand_address();
+            let hand_type = addr.r#type();
+            let hand_num = self.hand_index[hand_type as usize];
+            let piece = &Piece::new(piece_meaning, PieceNum::from_usize(hand_num).unwrap());
+            self.hand_index[hand_type as usize] += 1;
+
+            // 駒台に置く
+            self.push_to_hand(piece);
         }
     }
 
-    /// 盤上から駒を無くし、その駒を返り値で返すぜ☆（＾～＾）
-    pub fn pop_from_board(&mut self, adr: &AbsoluteAddress) -> Option<Piece> {
-        // 取り出すピースは複製するぜ☆（＾～＾）
-        let piece = self.pieces[adr.address() as usize].clone();
-        if let Some(piece_val) = piece {
-            self.pieces[adr.address() as usize] = None;
-            self.location[piece_val.num as usize] = Location::Busy;
+    /// 歩が置いてあるか確認
+    pub fn exists_pawn_on_file(&self, phase: Phase, file: usize) -> bool {
+        for rank in RANK_1..RANK_10 {
+            let adr = AbsoluteAddress::new(file, rank);
+            if let Some(piece) = self.piece_at(&adr) {
+                if piece.meaning.phase() == phase && piece.meaning.r#type() == PieceType::Pawn {
+                    return true;
+                }
+            }
         }
-        piece
+        false
     }
-    /// 駒台に置く
-    pub fn push_hand_on_init(&mut self, piece_meaning: PieceMeaning, number: isize) {
-        for _i in 0..number {
-            let adr = piece_meaning.hand_address();
-            let hand = piece_meaning.hand_address();
-            let hand_type = hand.r#type();
-            let cursor = self.hand_index[hand_type as usize];
-            self.location[cursor] = Location::Hand(adr);
-            self.hands[hand as usize].push(&Piece::new(
-                piece_meaning,
-                PieceNum::from_usize(cursor).unwrap(),
-            ));
-            self.hand_index[hand_type as usize] += 1;
-        }
-    }
-    pub fn push_hand(&mut self, hand: &Piece) {
-        let adr = hand.meaning.hand_address();
-        self.hands[adr as usize].push(hand);
-        self.location[hand.num as usize] = Location::Hand(adr);
-    }
-    pub fn pop_hand(&mut self, adr: HandAddress) -> Piece {
-        let piece = self.hands[adr as usize].pop();
-        self.location[piece.num as usize] = Location::Busy;
-        piece
+    /// 升で指定して駒を取得
+    pub fn piece_at(&self, adr: &AbsoluteAddress) -> Option<Piece> {
+        self.pieces[adr.address() as usize]
     }
     /// 指し手生成で使うぜ☆（＾～＾）
     pub fn last_hand(&self, adr: HandAddress) -> Option<&Piece> {

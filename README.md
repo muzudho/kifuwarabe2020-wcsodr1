@@ -4,7 +4,7 @@
 
 ## 直近のTODO
 
-* [ ] タイムマン(^_^)
+* [x] タイムマン(^_^)
   * `go btime 14000 wtime 203000 binc 5000 winc 5000`
 
 ## Compile
