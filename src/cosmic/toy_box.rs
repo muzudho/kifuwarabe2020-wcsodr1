@@ -231,6 +231,7 @@ impl Board {
             self.pieces[addr.address() as usize] = piece;
             self.location[piece_val.num as usize] = Location::Board(*addr);
         } else {
+            // マスを空にします。
             self.pieces[addr.address() as usize] = None;
         }
     }
@@ -258,25 +259,18 @@ impl Board {
     }
 
     /// 駒の新しい背番号を生成します。
-    pub fn make_piece_number(&mut self, piece_meaning: PieceMeaning) -> (usize, Piece) {
+    pub fn make_piece_number(&mut self, piece_meaning: PieceMeaning) -> Piece {
         match piece_meaning {
             // 玉だけ、先後は決まってるから従えだぜ☆（＾～＾）
-            PieceMeaning::King1 => {
-                let loca = PieceNum::King1 as usize;
-                (loca, Piece::new(piece_meaning, PieceNum::King1))
-            }
-            PieceMeaning::King2 => {
-                let loca = PieceNum::King2 as usize;
-                (loca, Piece::new(piece_meaning, PieceNum::King2))
-            }
+            PieceMeaning::King1 => Piece::new(piece_meaning, PieceNum::King1),
+            PieceMeaning::King2 => Piece::new(piece_meaning, PieceNum::King2),
             _ => {
-                let phy_pct = piece_meaning.physical_piece().r#type();
+                let phy_pct = piece_meaning.physical_piece().r#type() as usize;
                 // 玉以外の背番号は、先後に関わりなく SFENに書いてあった順で☆（＾～＾）
-                let loca = self.physical_piece_type_index[phy_pct as usize];
+                let pn = PieceNum::from_usize(self.physical_piece_type_index[phy_pct]).unwrap();
                 // カウントアップ☆（＾～＾）
-                let pn = PieceNum::from_usize(loca).unwrap();
-                self.physical_piece_type_index[phy_pct as usize] += 1;
-                (loca, Piece::new(piece_meaning, pn))
+                self.physical_piece_type_index[phy_pct] += 1;
+                Piece::new(piece_meaning, pn)
             }
         }
     }
@@ -295,19 +289,18 @@ impl Board {
             )))
         }
 
-        // 背番号を付けるぜ☆（＾～＾）
-        let (loca, piece) = self.make_piece_number(piece_meaning);
+        // 駒に背番号を付けるぜ☆（＾～＾）
+        let piece = self.make_piece_number(piece_meaning);
 
         // 盤に置くぜ☆（＾～＾）
-        self.location[loca] = Location::Board(*addr);
         self.push_to_board(&addr, Some(piece));
     }
 
     /// 持ち駒に背番号を付ける
     pub fn push_to_hand_from_sfen(&mut self, piece_meaning: PieceMeaning, number: isize) {
         for _i in 0..number {
-            // 駒に背番号を付けます。
-            let (_loca, piece) = self.make_piece_number(piece_meaning);
+            // 駒に背番号を付けるぜ☆（＾～＾）
+            let piece = self.make_piece_number(piece_meaning);
 
             // 駒台に置くぜ☆（＾～＾）
             self.push_to_hand(&piece);
