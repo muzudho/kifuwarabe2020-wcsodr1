@@ -209,7 +209,7 @@ impl Game {
         {
             // 動かす駒
             let moveing_piece: Option<Piece> = if let Some(source_val) = movement.source {
-                // 打でなければ、元の升に駒はあるので、それを消す。
+                // 盤上の移動なら、元の升に駒はあるので、それを消す。
                 let piece152: Option<Piece> = if movement.promote {
                     if let Some(piece) = self.board.pop_from_board(&source_val) {
                         // 成ったのなら、元のマスの駒を成らすぜ☆（＾～＾）
@@ -275,7 +275,7 @@ impl Game {
                     self.history.captured_pieces[self.history.ply as usize];
                 // 動いた駒
                 let moveing_piece: Option<Piece> = if let Some(_source_val) = movement.source {
-                    // 打でなければ
+                    // 盤上の移動なら
                     if movement.promote {
                         // 成ったなら、成る前へ
                         if let Some(source_piece) = self.board.pop_from_board(&movement.destination)
@@ -290,6 +290,7 @@ impl Game {
                         self.board.pop_from_board(&movement.destination)
                     }
                 } else {
+                    // 打なら
                     if let Some(_drp) = movement.drop {
                         // 打った場所に駒があるはずだぜ☆（＾～＾）
                         let piece = self.board.pop_from_board(&movement.destination).unwrap();
@@ -307,7 +308,7 @@ impl Game {
                     // 自分の持ち駒を減らす
                     self.board
                         .pop_from_hand(captured_piece_val.meaning.captured().physical_piece());
-                    // 移動先の駒を、取った駒（あるいは空）に戻す
+                    // 移動先の駒を、取った駒（あるいは空、ということがあるか？）に戻す
                     self.board.push_to_board(&movement.destination, captured);
                 }
 

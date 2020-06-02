@@ -4,6 +4,8 @@
 
 ## 直近のTODO
 
+* [ ] 最大手数 320 か 512 か☆（＾～＾）
+* [ ] 指し手の AbsoluteAddress と PhisicalPieceType を共有する型 AddressTypeOfPosition を作る。
 * [x] タイムマン(^_^)
   * `go btime 14000 wtime 203000 binc 5000 winc 5000`
 
