@@ -2,7 +2,7 @@
 //! 現局面を使った指し手生成☆（＾～＾）
 //!
 
-use crate::cosmic::recording::{Movement, Phase};
+use crate::cosmic::recording::{AddressTypeOnPosition, Movement, Phase};
 use crate::cosmic::smart::features::PhysicalPiece;
 use crate::cosmic::smart::features::PieceMeaning;
 use crate::cosmic::smart::features::PieceType;
@@ -185,68 +185,78 @@ impl PseudoLegalMoves {
         // TODO F1: FnMut(Option<Way>, &AbsoluteAddress),
         F1: FnMut(Way),
     {
-        let moving =
-            &mut |destination, promotability, _agility, move_permission: Option<MovePermission>| {
-                let pseudo_captured = board.piece_at(&destination);
+        let moving = &mut |destination,
+                           promotability,
+                           _agility,
+                           move_permission: Option<MovePermission>| {
+            let pseudo_captured = board.piece_at(&destination);
 
-                let (ok, space) = if let Some(pseudo_captured_val) = pseudo_captured {
-                    if pseudo_captured_val.meaning.phase() == friend {
-                        // 味方の駒を取った☆（＾～＾）なしだぜ☆（＾～＾）！
-                        (false, false)
-                    } else {
-                        (true, false)
-                    }
+            let (ok, space) = if let Some(pseudo_captured_val) = pseudo_captured {
+                if pseudo_captured_val.meaning.phase() == friend {
+                    // 味方の駒を取った☆（＾～＾）なしだぜ☆（＾～＾）！
+                    (false, false)
                 } else {
-                    (true, true)
+                    (true, false)
+                }
+            } else {
+                (true, true)
+            };
+
+            if ok {
+                // 成れるかどうかの判定☆（＾ｑ＾）
+                use crate::law::generate_move::Promotability::*;
+                let promotion = match &promotability {
+                    Forced => true,
+                    _ => false,
                 };
 
-                if ok {
-                    // 成れるかどうかの判定☆（＾ｑ＾）
-                    use crate::law::generate_move::Promotability::*;
-                    let promotion = match &promotability {
-                        Forced => true,
-                        _ => false,
-                    };
-
-                    // 成りじゃない場合は、行き先のない動きを制限されるぜ☆（＾～＾）
-                    let forbidden = if let Some(move_permission_val) = move_permission {
-                        if move_permission_val.check(&destination) {
-                            false
-                        } else {
-                            true
-                        }
-                    } else {
+                // 成りじゃない場合は、行き先のない動きを制限されるぜ☆（＾～＾）
+                let forbidden = if let Some(move_permission_val) = move_permission {
+                    if move_permission_val.check(&destination) {
                         false
-                    };
+                    } else {
+                        true
+                    }
+                } else {
+                    false
+                };
 
-                    match &promotability {
-                        Any => {
-                            // 成ったり、成れなかったりできるとき。
-                            if !forbidden {
-                                listen_move(Way::new(
-                                    Movement::new(Some(*source), destination, false, None),
-                                    pseudo_captured,
-                                ));
-                            }
+                match &promotability {
+                    Any => {
+                        // 成ったり、成れなかったりできるとき。
+                        if !forbidden {
                             listen_move(Way::new(
-                                Movement::new(Some(*source), destination, true, None),
+                                Movement::new(
+                                    AddressTypeOnPosition::Move(*source),
+                                    destination,
+                                    false,
+                                ),
                                 pseudo_captured,
                             ));
                         }
-                        _ => {
-                            // 成れるか、成れないかのどちらかのとき。
-                            if promotion || !forbidden {
-                                listen_move(Way::new(
-                                    Movement::new(Some(*source), destination, promotion, None),
-                                    pseudo_captured,
-                                ));
-                            }
+                        listen_move(Way::new(
+                            Movement::new(AddressTypeOnPosition::Move(*source), destination, true),
+                            pseudo_captured,
+                        ));
+                    }
+                    _ => {
+                        // 成れるか、成れないかのどちらかのとき。
+                        if promotion || !forbidden {
+                            listen_move(Way::new(
+                                Movement::new(
+                                    AddressTypeOnPosition::Move(*source),
+                                    destination,
+                                    promotion,
+                                ),
+                                pseudo_captured,
+                            ));
                         }
-                    };
-                }
+                    }
+                };
+            }
 
-                !space
-            };
+            !space
+        };
 
         Area::piece_of(piece.meaning.type_(), friend, &source, moving);
     }
@@ -282,10 +292,9 @@ impl PseudoLegalMoves {
                     }
                     listen_move(Way::new(
                         Movement::new(
-                            None,                                         // 駒台
-                            destination,                                  // どの升へ行きたいか
-                            false,                                        // 打に成りは無し
-                            Some(piece.meaning.physical_piece().type_()), // 打った駒種類
+                            AddressTypeOnPosition::Drop(piece.meaning.physical_piece().type_()), // 打った駒種類
+                            destination, // どの升へ行きたいか
+                            false,       // 打に成りは無し
                         ),
                         None,
                     ));

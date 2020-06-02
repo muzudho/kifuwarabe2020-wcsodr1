@@ -2,7 +2,7 @@
 //! USIプロトコル
 //!
 use crate::cosmic::playing::Game;
-use crate::cosmic::recording::Movement;
+use crate::cosmic::recording::{AddressTypeOnPosition, Movement};
 use crate::cosmic::smart::features::PhysicalPieceType;
 use crate::cosmic::smart::features::PieceMeaning;
 use crate::cosmic::smart::square::{AbsoluteAddress, FILE_9, RANK_1};
@@ -100,13 +100,11 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
     match source {
         Source::Move(file, rank) => {
             *starts += 1;
-            buffer.source = Some(AbsoluteAddress::new(file, rank));
-            buffer.drop = None;
+            buffer.source = AddressTypeOnPosition::Move(AbsoluteAddress::new(file, rank));
         }
         Source::Drop(hand) => {
             *starts += 2;
-            buffer.source = None;
-            buffer.drop = Some(hand);
+            buffer.source = AddressTypeOnPosition::Drop(hand);
         }
     }
 

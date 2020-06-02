@@ -52,44 +52,44 @@ impl History {
     }
 }
 
+#[derive(Clone, Copy)]
+pub enum AddressTypeOnPosition {
+    // 盤上の移動なら、移動元升。
+    Move(AbsoluteAddress),
+    // 打の場合、打った駒種類
+    Drop(PhysicalPieceType),
+    // 未設定ならこれ。
+    Busy,
+}
+
 /// 棋譜にも使うので、取った駒の情報を記憶しておくんだぜ☆（＾～＾）
 /// 投了なら これを使わず、None にしろだぜ☆（＾～＾）
 ///
 /// Copy: 配列の要素の初期化時に使う☆（＾～＾）
 #[derive(Clone, Copy)]
 pub struct Movement {
-    // 移動元升。Dropのときは None だぜ☆（＾～＾）
-    pub source: Option<AbsoluteAddress>,
+    pub source: AddressTypeOnPosition,
     // 移動先升。
     pub destination: AbsoluteAddress,
     // 移動後に成るなら真
     pub promote: bool,
-    // 打の場合、打った駒種類
-    pub drop: Option<PhysicalPieceType>,
 }
 impl Default for Movement {
     /// ゴミの値を作るぜ☆（＾～＾）
     fn default() -> Self {
         Movement {
-            source: None,
+            source: AddressTypeOnPosition::Busy,
             destination: AbsoluteAddress::default(),
             promote: false,
-            drop: None,
         }
     }
 }
 impl Movement {
-    pub fn new(
-        source: Option<AbsoluteAddress>,
-        destination: AbsoluteAddress,
-        promote: bool,
-        drop: Option<PhysicalPieceType>,
-    ) -> Self {
+    pub fn new(source: AddressTypeOnPosition, destination: AbsoluteAddress, promote: bool) -> Self {
         Movement {
             source: source,
             destination: destination,
             promote: promote,
-            drop: drop,
         }
     }
 
@@ -97,38 +97,37 @@ impl Movement {
         self.source = b.source;
         self.destination = b.destination;
         self.promote = b.promote;
-        self.drop = b.drop;
     }
 }
 impl fmt::Display for Movement {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let (dx, dy) = self.destination.to_file_rank();
 
-        if let Some(source_val) = self.source {
-            let (sx, sy) = source_val.to_file_rank();
-            write!(
-                f,
-                "{}{}{}{}{}",
-                sx,
-                num_to_lower_case(sy),
-                dx,
-                num_to_lower_case(dy),
-                if self.promote { "+" } else { "" }
-            )
-        } else {
-            const DROPS: [&str; 8] = ["?", "R", "B", "G", "S", "N", "L", "P"];
-            write!(
-                f,
-                "{}*{}{}{}",
-                if let Some(drp) = self.drop {
-                    DROPS[drp as usize]
-                } else {
-                    "?"
-                },
-                dx,
-                num_to_lower_case(dy),
-                if self.promote { "+" } else { "" }
-            )
+        match self.source {
+            AddressTypeOnPosition::Move(source_val) => {
+                let (sx, sy) = source_val.to_file_rank();
+                write!(
+                    f,
+                    "{}{}{}{}{}",
+                    sx,
+                    num_to_lower_case(sy),
+                    dx,
+                    num_to_lower_case(dy),
+                    if self.promote { "+" } else { "" }
+                )
+            }
+            AddressTypeOnPosition::Drop(drop) => {
+                const DROPS: [&str; 8] = ["?", "R", "B", "G", "S", "N", "L", "P"];
+                write!(
+                    f,
+                    "{}*{}{}{}",
+                    DROPS[drop as usize],
+                    dx,
+                    num_to_lower_case(dy),
+                    if self.promote { "+" } else { "" }
+                )
+            }
+            AddressTypeOnPosition::Busy => write!(f, "Busy",),
         }
     }
 }
@@ -136,19 +135,20 @@ impl fmt::Debug for Movement {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
-            "Movement({}{}{}{})",
-            if let Some(source_val) = self.source {
-                source_val.serial_number()
-            } else {
-                0
+            "Movement({}{}{})",
+            match self.source {
+                AddressTypeOnPosition::Move(source_val) => {
+                    source_val.serial_number().to_string()
+                }
+                AddressTypeOnPosition::Drop(drop) => {
+                    format!("{:?}", drop)
+                }
+                AddressTypeOnPosition::Busy => {
+                    "-".to_string()
+                }
             },
             self.destination.serial_number(),
             self.promote,
-            if let Some(drp) = self.drop {
-                format!("{:?}", drp)
-            } else {
-                "-".to_string()
-            }
         )
     }
 }
