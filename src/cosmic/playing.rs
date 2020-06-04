@@ -202,8 +202,6 @@ impl Game {
     ///
     /// Captured piece.
     pub fn read_move(&mut self, move_: &Movement) -> Option<Piece> {
-        let friend = self.history.get_friend();
-
         // 取った駒
         let cap: Option<Piece>;
         {
@@ -230,6 +228,7 @@ impl Game {
                 AddressTypeOnPosition::Drop(drop) => {
                     // 打なら
                     // 自分の持ち駒を減らす
+                    let friend = self.history.get_friend();
                     Some(
                         self.board
                             .pop_from_hand(PhysicalPiece::from_phase_and_type(friend, drop)),
@@ -255,6 +254,15 @@ impl Game {
             // 移動先升に駒を置く
             self.board.push_to_board(&move_.destination, moveing_piece);
         }
+
+        // TODO Debug
+        if move_.captured != cap {
+            panic!(Beam::trouble(
+                "(Err.261) 棋譜と盤上の取られた駒が違うぜ☆（＾～＾）！？"
+            ));
+        }
+
+        // 取った駒を棋譜に記録します。
         self.set_captured(self.history.ply as usize, cap);
 
         // 局面ハッシュを作り直す

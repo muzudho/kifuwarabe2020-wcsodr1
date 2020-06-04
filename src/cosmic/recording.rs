@@ -73,6 +73,8 @@ pub struct Movement {
     pub destination: AbsoluteAddress,
     // 移動後に成るなら真
     pub promote: bool,
+    // 取ることになる駒
+    pub captured: Option<Piece>,
 }
 impl Default for Movement {
     /// ゴミの値を作るぜ☆（＾～＾）
@@ -81,15 +83,22 @@ impl Default for Movement {
             source: AddressTypeOnPosition::Busy,
             destination: AbsoluteAddress::default(),
             promote: false,
+            captured: None,
         }
     }
 }
 impl Movement {
-    pub fn new(source: AddressTypeOnPosition, destination: AbsoluteAddress, promote: bool) -> Self {
+    pub fn new(
+        source: AddressTypeOnPosition,
+        destination: AbsoluteAddress,
+        promote: bool,
+        captured: Option<Piece>,
+    ) -> Self {
         Movement {
             source: source,
             destination: destination,
             promote: promote,
+            captured: captured,
         }
     }
 

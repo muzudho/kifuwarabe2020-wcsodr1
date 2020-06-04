@@ -156,6 +156,9 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
         *starts += 1;
     }
 
+    // TODO 取られる駒もセットしたいぜ☆（＾～＾）！
+    buffer.captured = game.board.piece_at(&buffer.destination);
+
     // 確定。
     game.set_move(&buffer);
 

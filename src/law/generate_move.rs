@@ -185,78 +185,83 @@ impl PseudoLegalMoves {
         // TODO F1: FnMut(Option<Way>, &AbsoluteAddress),
         F1: FnMut(Way),
     {
-        let moving = &mut |destination,
-                           promotability,
-                           _agility,
-                           move_permission: Option<MovePermission>| {
-            let pseudo_captured = board.piece_at(&destination);
+        let moving =
+            &mut |destination, promotability, _agility, move_permission: Option<MovePermission>| {
+                let pseudo_captured = board.piece_at(&destination);
 
-            let (ok, space) = if let Some(pseudo_captured_val) = pseudo_captured {
-                if pseudo_captured_val.meaning.phase() == friend {
-                    // 味方の駒を取った☆（＾～＾）なしだぜ☆（＾～＾）！
-                    (false, false)
-                } else {
-                    (true, false)
-                }
-            } else {
-                (true, true)
-            };
-
-            if ok {
-                // 成れるかどうかの判定☆（＾ｑ＾）
-                use crate::law::generate_move::Promotability::*;
-                let promotion = match &promotability {
-                    Forced => true,
-                    _ => false,
-                };
-
-                // 成りじゃない場合は、行き先のない動きを制限されるぜ☆（＾～＾）
-                let forbidden = if let Some(move_permission_val) = move_permission {
-                    if move_permission_val.check(&destination) {
-                        false
+                let (ok, space) = if let Some(pseudo_captured_val) = pseudo_captured {
+                    if pseudo_captured_val.meaning.phase() == friend {
+                        // 味方の駒を取った☆（＾～＾）なしだぜ☆（＾～＾）！
+                        (false, false)
                     } else {
-                        true
+                        (true, false)
                     }
                 } else {
-                    false
+                    (true, true)
                 };
 
-                match &promotability {
-                    Any => {
-                        // 成ったり、成れなかったりできるとき。
-                        if !forbidden {
+                if ok {
+                    // 成れるかどうかの判定☆（＾ｑ＾）
+                    use crate::law::generate_move::Promotability::*;
+                    let promotion = match &promotability {
+                        Forced => true,
+                        _ => false,
+                    };
+
+                    // 成りじゃない場合は、行き先のない動きを制限されるぜ☆（＾～＾）
+                    let forbidden = if let Some(move_permission_val) = move_permission {
+                        if move_permission_val.check(&destination) {
+                            false
+                        } else {
+                            true
+                        }
+                    } else {
+                        false
+                    };
+
+                    match &promotability {
+                        Any => {
+                            // 成ったり、成れなかったりできるとき。
+                            if !forbidden {
+                                listen_move(Way::new(
+                                    Movement::new(
+                                        AddressTypeOnPosition::Move(*source),
+                                        destination,
+                                        false,
+                                        pseudo_captured,
+                                    ),
+                                    pseudo_captured,
+                                ));
+                            }
                             listen_move(Way::new(
                                 Movement::new(
                                     AddressTypeOnPosition::Move(*source),
                                     destination,
-                                    false,
+                                    true,
+                                    pseudo_captured,
                                 ),
                                 pseudo_captured,
                             ));
                         }
-                        listen_move(Way::new(
-                            Movement::new(AddressTypeOnPosition::Move(*source), destination, true),
-                            pseudo_captured,
-                        ));
-                    }
-                    _ => {
-                        // 成れるか、成れないかのどちらかのとき。
-                        if promotion || !forbidden {
-                            listen_move(Way::new(
-                                Movement::new(
-                                    AddressTypeOnPosition::Move(*source),
-                                    destination,
-                                    promotion,
-                                ),
-                                pseudo_captured,
-                            ));
+                        _ => {
+                            // 成れるか、成れないかのどちらかのとき。
+                            if promotion || !forbidden {
+                                listen_move(Way::new(
+                                    Movement::new(
+                                        AddressTypeOnPosition::Move(*source),
+                                        destination,
+                                        promotion,
+                                        pseudo_captured,
+                                    ),
+                                    pseudo_captured,
+                                ));
+                            }
                         }
-                    }
-                };
-            }
+                    };
+                }
 
-            !space
-        };
+                !space
+            };
 
         Area::piece_of(piece.meaning.type_(), friend, &source, moving);
     }
@@ -295,6 +300,7 @@ impl PseudoLegalMoves {
                             AddressTypeOnPosition::Drop(piece.meaning.physical_piece().type_()), // 打った駒種類
                             destination, // どの升へ行きたいか
                             false,       // 打に成りは無し
+                            None,        // 打で取れる駒無し
                         ),
                         None,
                     ));
