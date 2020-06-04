@@ -1,7 +1,8 @@
 //! 局面ハッシュ。
 //!
 
-use crate::cosmic::recording::PHASE_LEN;
+use crate::cosmic::playing::Game;
+use crate::cosmic::recording::{PHASE_FIRST, PHASE_LEN, PHASE_SECOND};
 use crate::cosmic::smart::features::{HAND_MAX, PHYSICAL_PIECES_LEN, PIECE_MEANING_LEN};
 use crate::cosmic::smart::square::{BOARD_MEMORY_AREA, SQUARE_NONE};
 use rand::Rng;
@@ -52,5 +53,19 @@ impl GameHashSeed {
         for i_phase in 0..PHASE_LEN {
             self.phase[i_phase] = rand::thread_rng().gen_range(0, 18_446_744_073_709_551_615);
         }
+    }
+
+    /// 局面ハッシュを作り直す
+    pub fn create_current_position_hash(&self, game: &Game) -> u64 {
+        let mut hash = game.board.create_hash(game);
+
+        // 手番ハッシュ
+        use crate::cosmic::recording::Phase::*;
+        match game.history.get_friend() {
+            First => hash ^= self.phase[PHASE_FIRST],
+            Second => hash ^= self.phase[PHASE_SECOND],
+        }
+
+        hash
     }
 }
