@@ -91,9 +91,6 @@ impl Game {
     pub fn set_move(&mut self, move_: &Movement) {
         self.history.movements[self.history.ply as usize] = *move_; // クローンが入る☆（＾～＾）？
     }
-    pub fn get_move(&self) -> &Movement {
-        &self.history.movements[self.history.ply as usize]
-    }
     /// テスト用に棋譜表示☆（＾～＾）
     pub fn get_moves_history_text(&self) -> String {
         let mut s = String::new();
@@ -247,7 +244,7 @@ impl Game {
         if 0 < self.history.ply {
             // 棋譜から読取、手目も減る
             self.history.ply -= 1;
-            let move_ = &self.get_move().clone();
+            let move_ = &self.history.get_move();
             {
                 // 取った駒が有ったか。
                 let captured: Option<Piece> = move_.captured;

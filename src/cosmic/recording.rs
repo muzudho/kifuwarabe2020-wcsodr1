@@ -46,6 +46,10 @@ impl History {
             Phase::Second
         }
     }
+    /// 現在の指し手
+    pub fn get_move(&self) -> &Movement {
+        &self.movements[self.ply as usize]
+    }
 }
 
 /// 局面全体を範囲にして振られた番地。
