@@ -1,12 +1,8 @@
-use crate::cosmic::recording::{
-    AddressOnPosition, History, Movement, PHASE_FIRST, PHASE_LEN, PHASE_SECOND,
-};
-use crate::cosmic::smart::features::{HAND_MAX, PHYSICAL_PIECES_LEN, PIECE_MEANING_LEN};
-use crate::cosmic::smart::square::{BOARD_MEMORY_AREA, SQUARE_NONE};
+use crate::cosmic::pos_hash::pos_hash::*;
+use crate::cosmic::recording::{AddressOnPosition, History, Movement, PHASE_FIRST, PHASE_SECOND};
 use crate::cosmic::toy_box::Board;
 use crate::law::generate_move::Piece;
 use crate::spaceship::equipment::{Beam, DestinationDisplay};
-use rand::Rng;
 
 /// 局面
 pub enum PosNums {
@@ -16,22 +12,9 @@ pub enum PosNums {
     Start,
 }
 
-/// 現対局ハッシュ種
-/// ゾブリストハッシュを使って、局面の一致判定をするのに使う☆（＾～＾）
-pub struct GameHashSeed {
-    // 盤上の駒
-    pub piece: [[u64; PIECE_MEANING_LEN]; BOARD_MEMORY_AREA as usize],
-    // 持ち駒
-    pub hands: [[u64; HAND_MAX]; PHYSICAL_PIECES_LEN],
-    // 先後
-    pub phase: [u64; PHASE_LEN],
-}
-
 pub struct Game {
     /// 棋譜
     pub history: History,
-    /// 初期局面ハッシュ
-    pub starting_position_hash: u64,
     /// 初期盤面
     pub starting_board: Board,
     /// 現対局ハッシュ種☆（＾～＾）
@@ -45,16 +28,8 @@ impl Default for Game {
     fn default() -> Game {
         Game {
             history: History::default(),
-            starting_position_hash: 0,
             starting_board: Board::default(),
-            hash_seed: GameHashSeed {
-                // 盤上の駒
-                piece: [[0; PIECE_MEANING_LEN]; BOARD_MEMORY_AREA as usize],
-                // 持ち駒
-                hands: [[0; HAND_MAX]; PHYSICAL_PIECES_LEN],
-                // 先後
-                phase: [0; PHASE_LEN],
-            },
+            hash_seed: GameHashSeed::default(),
             board: Board::default(),
             info: DestinationDisplay::default(),
         }
@@ -64,27 +39,7 @@ impl Game {
     /// 宇宙誕生
     pub fn big_bang(&mut self) {
         // 局面ハッシュの種をリセット
-
-        // 盤上の駒
-        for i_square in SQUARE_NONE..BOARD_MEMORY_AREA {
-            for i_piece in 0..PIECE_MEANING_LEN {
-                // FIXME 18446744073709551615 が含まれないだろ、どうなってるんだぜ☆（＾～＾）！？
-                self.hash_seed.piece[i_square as usize][i_piece] =
-                    rand::thread_rng().gen_range(0, 18_446_744_073_709_551_615);
-            }
-        }
-        // 持ち駒
-        for i_piece in 0..PHYSICAL_PIECES_LEN {
-            for i_count in 0..HAND_MAX {
-                self.hash_seed.hands[i_piece][i_count] =
-                    rand::thread_rng().gen_range(0, 18_446_744_073_709_551_615);
-            }
-        }
-        // 先後
-        for i_phase in 0..PHASE_LEN {
-            self.hash_seed.phase[i_phase] =
-                rand::thread_rng().gen_range(0, 18_446_744_073_709_551_615);
-        }
+        self.hash_seed.big_bang();
     }
 
     /// 棋譜の作成
@@ -99,10 +54,6 @@ impl Game {
             s.push_str(&format!("[{}] {}", ply, movement));
         }
         s
-    }
-
-    pub fn set_position_hash(&mut self, hash: u64) {
-        self.history.position_hashs[self.history.ply as usize] = hash;
     }
 
     pub fn get_board(&self, num: PosNums) -> &Board {
@@ -126,7 +77,10 @@ impl Game {
     /// テスト用に局面ハッシュ☆（＾～＾）
     pub fn get_positions_hash_text(&self) -> String {
         let mut s = String::new();
-        s.push_str(&format!("[ini] {:20}\n", &self.starting_position_hash));
+        s.push_str(&format!(
+            "[ini] {:20}\n",
+            &self.history.starting_position_hash
+        ));
 
         for ply in 0..self.history.ply {
             let hash = &self.history.position_hashs[ply as usize];
@@ -181,7 +135,7 @@ impl Game {
         }
 
         // 初期局面のハッシュ
-        if self.starting_position_hash == self.history.position_hashs[last_ply as usize] {
+        if self.history.starting_position_hash == self.history.position_hashs[last_ply as usize] {
             count += 1;
         }
 
@@ -234,7 +188,7 @@ impl Game {
 
         // 局面ハッシュを作り直す
         let ky_hash = self.create_current_position_hash();
-        self.set_position_hash(ky_hash);
+        self.history.set_position_hash(ky_hash);
 
         self.history.ply += 1;
     }
@@ -293,6 +247,9 @@ impl Game {
                     self.board.push_to_board(&source_val, moveing_piece);
                 }
             }
+
+            // TODO 局面ハッシュを作り直したいぜ☆（＾～＾）
+
             // 棋譜にアンドゥした指し手がまだ残っているが、とりあえず残しとく
             true
         } else {

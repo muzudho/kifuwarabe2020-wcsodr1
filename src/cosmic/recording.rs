@@ -26,6 +26,8 @@ pub struct History {
     pub movements: [Movement; PLY_LEN],
     /// 棋譜に対応した各局面の局面ハッシュ
     pub position_hashs: [u64; PLY_LEN],
+    /// 初期局面ハッシュ
+    pub starting_position_hash: u64,
 }
 impl Default for History {
     fn default() -> History {
@@ -33,6 +35,7 @@ impl Default for History {
             ply: 0,
             movements: [Movement::default(); PLY_LEN],
             position_hashs: [0; PLY_LEN],
+            starting_position_hash: 0,
         }
     }
 }
@@ -49,6 +52,10 @@ impl History {
     /// 現在の指し手
     pub fn get_move(&self) -> &Movement {
         &self.movements[self.ply as usize]
+    }
+    /// 局面ハッシュを更新
+    pub fn set_position_hash(&mut self, hash: u64) {
+        self.position_hashs[self.ply as usize] = hash;
     }
 }
 
