@@ -91,7 +91,7 @@ impl Game {
 
     /// 棋譜の作成
     pub fn set_move(&mut self, move_: &Movement) {
-        self.history.movements[self.history.ply as usize] = move_.clone()
+        self.history.movements[self.history.ply as usize] = *move_; // クローンが入る☆（＾～＾）？
     }
     pub fn get_move(&self) -> &Movement {
         &self.history.movements[self.history.ply as usize]
