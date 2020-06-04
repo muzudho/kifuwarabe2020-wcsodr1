@@ -265,7 +265,7 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Game) {
     }
 
     // 初期局面ハッシュを作り直す
-    let ky_hash = game.create_starting_position_hash();
+    let ky_hash = game.hash_seed.starting_position(game);
     game.history.starting_position_hash = ky_hash;
 }
 

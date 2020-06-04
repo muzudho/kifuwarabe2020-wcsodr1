@@ -1,5 +1,5 @@
 use crate::cosmic::pos_hash::pos_hash::*;
-use crate::cosmic::recording::{AddressOnPosition, History, Movement, PHASE_SECOND};
+use crate::cosmic::recording::{AddressOnPosition, History, Movement};
 use crate::cosmic::toy_box::Board;
 use crate::law::generate_move::Piece;
 use crate::spaceship::equipment::{Beam, DestinationDisplay};
@@ -90,16 +90,6 @@ impl Game {
         s
     }
 
-    /// 初期局面ハッシュを作り直す
-    pub fn create_starting_position_hash(&self) -> u64 {
-        let mut hash = self.starting_board.create_hash(&self);
-
-        // 手番ハッシュ（後手固定）
-        hash ^= self.hash_seed.phase[PHASE_SECOND];
-
-        hash
-    }
-
     /// 千日手を調べるために、
     /// 現局面は、同一局面が何回目かを調べるぜ☆（＾～＾）
     /// TODO 初期局面を何に使ってるのか☆（＾～＾）？
@@ -173,7 +163,7 @@ impl Game {
         self.board.push_to_board(&move_.destination, moveing_piece);
 
         // 局面ハッシュを作り直す
-        let ky_hash = self.hash_seed.create_current_position_hash(&self);
+        let ky_hash = self.hash_seed.current_position(&self);
         self.history.set_position_hash(ky_hash);
 
         self.history.ply += 1;

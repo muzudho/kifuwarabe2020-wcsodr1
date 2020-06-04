@@ -1,16 +1,15 @@
 //!
 //! 駒 と 盤
 //!
-use crate::cosmic::playing::Game;
 use crate::cosmic::recording::{AddressOnPosition, Phase};
-use crate::cosmic::smart::features::PHYSICAL_PIECES_LEN;
-use crate::cosmic::smart::features::PHYSICAL_PIECE_TYPE_LEN;
-use crate::cosmic::smart::features::{PhysicalPiece, PieceMeaning, PieceType, HAND_MAX};
+use crate::cosmic::smart::features::{
+    PhysicalPiece, PieceMeaning, PieceType, HAND_MAX, PHYSICAL_PIECES_LEN, PHYSICAL_PIECE_TYPE_LEN,
+};
 use crate::cosmic::smart::square::{
-    AbsoluteAddress, BOARD_MEMORY_AREA, FILE_0, FILE_1, FILE_10, RANK_0, RANK_1, RANK_10,
+    AbsoluteAddress, BOARD_MEMORY_AREA, FILE_0, FILE_10, RANK_0, RANK_1, RANK_10,
 };
 use crate::law::generate_move::Piece;
-use crate::law::speed_of_light::{HandAddresses, Nine299792458};
+use crate::law::speed_of_light::Nine299792458;
 use crate::spaceship::equipment::Beam;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
@@ -328,39 +327,6 @@ impl Board {
     }
     pub fn count_hand(&self, adr: PhysicalPiece) -> usize {
         self.hands[adr as usize].len()
-    }
-
-    /// 局面ハッシュを作り直す
-    pub fn create_hash(&self, game: &Game) -> u64 {
-        let mut hash: u64 = 0;
-
-        // 盤上の駒
-        for rank in RANK_1..RANK_10 {
-            for file in (FILE_1..FILE_10).rev() {
-                let ab_adr = &AbsoluteAddress::new(file, rank);
-                if let Some(piece) = self.piece_at(ab_adr) {
-                    hash ^= game.hash_seed.piece[ab_adr.serial_number() as usize]
-                        [piece.meaning as usize];
-                }
-            }
-        }
-
-        // 持ち駒ハッシュ
-        HandAddresses::for_all(&mut |adr| {
-            let count = self.count_hand(adr);
-            debug_assert!(
-                count <= HAND_MAX,
-                "持ち駒 {:?} の枚数 {} <= {}",
-                adr,
-                count,
-                HAND_MAX
-            );
-            hash ^= game.hash_seed.hands[adr as usize][count as usize];
-        });
-
-        // 手番ハッシュ はここでは算出しないぜ☆（＾～＾）
-
-        hash
     }
 
     /// 盤上を検索するのではなく、４０個の駒を検索するぜ☆（＾～＾）
