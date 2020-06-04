@@ -109,9 +109,6 @@ impl Game {
     pub fn set_position_hash(&mut self, hash: u64) {
         self.history.position_hashs[self.history.ply as usize] = hash;
     }
-    pub fn set_captured(&mut self, ply1: usize, pc: Option<Piece>) {
-        self.history.captured_pieces[ply1] = pc
-    }
 
     pub fn get_board(&self, num: PosNums) -> &Board {
         match num {
@@ -197,80 +194,58 @@ impl Game {
     }
 
     /// 入れた指し手の通り指すぜ☆（＾～＾）
-    ///
-    /// # Returns
-    ///
-    /// Captured piece.
-    pub fn read_move(&mut self, move_: &Movement) -> Option<Piece> {
-        // 取った駒
-        let cap: Option<Piece>;
-        {
-            // 動かす駒。Noneなことは無いが、将棋盤にセットするとき結局 Some を付けることになるので、わざわざ省かないぜ☆（＾～＾）
-            let moveing_piece: Option<Piece> = match move_.source {
-                AddressTypeOnPosition::Move(source_val) => {
-                    // 盤上の移動なら、元の升に駒はあるので、それを消す。
-                    let piece152: Option<Piece> = if move_.promote {
-                        if let Some(piece) = self.board.pop_from_board(&source_val) {
-                            // 成ったのなら、元のマスの駒を成らすぜ☆（＾～＾）
-                            Some(Piece::new(piece.meaning.promoted(), piece.num))
-                        } else {
-                            panic!(Beam::trouble(
-                                "(Err.248) 成ったのに、元の升に駒がなかった☆（＾～＾）"
-                            ));
-                        }
+    pub fn read_move(&mut self, move_: &Movement) {
+        // 動かす駒。Noneなことは無いが、将棋盤にセットするとき結局 Some を付けることになるので、わざわざ省かないぜ☆（＾～＾）
+        let moveing_piece: Option<Piece> = match move_.source {
+            AddressTypeOnPosition::Move(source_val) => {
+                // 盤上の移動なら、元の升に駒はあるので、それを消す。
+                let piece152: Option<Piece> = if move_.promote {
+                    if let Some(piece) = self.board.pop_from_board(&source_val) {
+                        // 成ったのなら、元のマスの駒を成らすぜ☆（＾～＾）
+                        Some(Piece::new(piece.meaning.promoted(), piece.num))
                     } else {
-                        // 移動元の駒。
-                        self.board.pop_from_board(&source_val)
-                    };
+                        panic!(Beam::trouble(
+                            "(Err.248) 成ったのに、元の升に駒がなかった☆（＾～＾）"
+                        ));
+                    }
+                } else {
+                    // 移動元の駒。
+                    self.board.pop_from_board(&source_val)
+                };
 
-                    piece152
-                }
-                AddressTypeOnPosition::Drop(drop) => {
-                    // 打なら
-                    // 自分の持ち駒を減らす
-                    let friend = self.history.get_friend();
-                    Some(
-                        self.board
-                            .pop_from_hand(PhysicalPiece::from_phase_and_type(friend, drop)),
-                    )
-                }
-                AddressTypeOnPosition::Busy => {
-                    panic!(Beam::trouble(
-                        "(Err.246) 指し手のソースが設定されていないだって☆（＾～＾）！？"
-                    ));
-                }
-            };
-            // 移動先升に駒があるかどうか
-            cap = if let Some(collision_piece) = self.board.pop_from_board(&move_.destination) {
-                // 移動先升の駒を盤上から消し、自分の持ち駒に増やす
-                let captured_piece =
-                    Piece::new(collision_piece.meaning.captured(), collision_piece.num);
-                self.board.push_to_hand(&captured_piece);
-                Some(collision_piece)
-            } else {
-                None
-            };
-
-            // 移動先升に駒を置く
-            self.board.push_to_board(&move_.destination, moveing_piece);
+                piece152
+            }
+            AddressTypeOnPosition::Drop(drop) => {
+                // 打なら
+                // 自分の持ち駒を減らす
+                let friend = self.history.get_friend();
+                Some(
+                    self.board
+                        .pop_from_hand(PhysicalPiece::from_phase_and_type(friend, drop)),
+                )
+            }
+            AddressTypeOnPosition::Busy => {
+                panic!(Beam::trouble(
+                    "(Err.246) 指し手のソースが設定されていないだって☆（＾～＾）！？"
+                ));
+            }
+        };
+        // 移動先升に駒があるかどうか
+        if let Some(collision_piece) = self.board.pop_from_board(&move_.destination) {
+            // 移動先升の駒を盤上から消し、自分の持ち駒に増やす
+            let captured_piece =
+                Piece::new(collision_piece.meaning.captured(), collision_piece.num);
+            self.board.push_to_hand(&captured_piece);
         }
 
-        // TODO Debug
-        if move_.captured != cap {
-            panic!(Beam::trouble(
-                "(Err.261) 棋譜と盤上の取られた駒が違うぜ☆（＾～＾）！？"
-            ));
-        }
-
-        // 取った駒を棋譜に記録します。
-        self.set_captured(self.history.ply as usize, cap);
+        // 移動先升に駒を置く
+        self.board.push_to_board(&move_.destination, moveing_piece);
 
         // 局面ハッシュを作り直す
         let ky_hash = self.create_current_position_hash();
         self.set_position_hash(ky_hash);
 
         self.history.ply += 1;
-        cap
     }
 
     /// 逆順に指します。
@@ -281,8 +256,7 @@ impl Game {
             let move_ = &self.get_move().clone();
             {
                 // 取った駒が有ったか。
-                let captured: Option<Piece> =
-                    self.history.captured_pieces[self.history.ply as usize];
+                let captured: Option<Piece> = move_.captured;
                 // 動いた駒
                 let moveing_piece: Option<Piece> = match move_.source {
                     AddressTypeOnPosition::Move(_source_val) => {

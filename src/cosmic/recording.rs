@@ -26,8 +26,6 @@ pub struct History {
     pub movements: [Movement; PLY_LEN],
     /// 棋譜に対応した各局面の局面ハッシュ
     pub position_hashs: [u64; PLY_LEN],
-    /// 取った駒
-    pub captured_pieces: [Option<Piece>; PLY_LEN],
 }
 impl Default for History {
     fn default() -> History {
@@ -35,8 +33,6 @@ impl Default for History {
             ply: 0,
             movements: [Movement::default(); PLY_LEN],
             position_hashs: [0; PLY_LEN],
-            /// 取った駒
-            captured_pieces: [None; PLY_LEN],
         }
     }
 }

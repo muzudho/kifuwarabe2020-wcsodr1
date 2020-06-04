@@ -210,7 +210,12 @@ impl Tree {
 
             // 棋譜に入れる☆
             game.set_move(&move_);
-            let captured_piece: Option<Piece> = game.read_move(&move_);
+            game.read_move(&move_);
+            let captured_piece = if let Some(captured) = move_.captured {
+                Some(Piece::new(captured.meaning.captured(), captured.num))
+            } else {
+                None
+            };
 
             self.pv.push(&move_);
             let (captured_piece_centi_pawn, delta_promotion_bonus) =
