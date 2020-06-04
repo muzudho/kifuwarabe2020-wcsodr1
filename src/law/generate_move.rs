@@ -41,19 +41,19 @@ pub struct Ways {
     /// スワップしても割と速いだろ☆（＾～＾）
     pub indexes: Vec<usize>,
     /// こいつをスワップすると遅くなるぜ☆（＾～＾）
-    body: Vec<Way>,
+    body: Vec<Movement>,
 }
 impl Ways {
     /// この初期化が遅いかどうかだな☆（＾～＾）
     pub fn new() -> Self {
         Ways {
             indexes: Vec::<usize>::new(),
-            body: Vec::<Way>::new(),
+            body: Vec::<Movement>::new(),
         }
     }
-    pub fn push(&mut self, way: &Way) {
+    pub fn push(&mut self, move_: &Movement) {
         self.indexes.push(self.indexes.len());
-        self.body.push(*way);
+        self.body.push(*move_);
     }
     /// usize型のコピーなら、オブジェクトのコピーより少しは速いだろ☆（＾～＾）
     pub fn swap(&mut self, a: usize, b: usize) {
@@ -61,7 +61,7 @@ impl Ways {
         self.indexes[a] = self.indexes[b];
         self.indexes[b] = temp;
     }
-    pub fn get(&self, index: usize) -> Way {
+    pub fn get(&self, index: usize) -> Movement {
         self.body[self.indexes[index]]
     }
     pub fn len(&self) -> usize {
@@ -69,32 +69,6 @@ impl Ways {
     }
     pub fn is_empty(&self) -> bool {
         self.body.is_empty()
-    }
-}
-
-/// 局面の差分だぜ☆（＾～＾）
-#[derive(Clone, Copy)]
-pub struct Way {
-    /// 指し手☆（＾～＾）
-    pub movement: Movement,
-    /// 取った駒☆（＾～＾）
-    pub captured: Option<Piece>, // TODO これ要らなくなった☆（＾～＾）？
-}
-impl Default for Way {
-    /// ゴミ値☆（＾～＾）
-    fn default() -> Self {
-        Way {
-            movement: Movement::default(),
-            captured: None,
-        }
-    }
-}
-impl Way {
-    pub fn new(mov: Movement, cap: Option<Piece>) -> Self {
-        Way {
-            movement: mov,
-            captured: cap,
-        }
     }
 }
 
@@ -144,8 +118,7 @@ impl PseudoLegalMoves {
     /// * 移動先にあった駒
     pub fn make_move<F1>(friend: Phase, board: &Board, listen_move: &mut F1)
     where
-        // TODO F1: FnMut(Option<Way>, &AbsoluteAddress),
-        F1: FnMut(Way),
+        F1: FnMut(Movement),
     {
         board.for_some_pieces_on_list40(friend, &mut |location, piece| match location {
             AddressOnPosition::Board(source) => {
@@ -182,8 +155,7 @@ impl PseudoLegalMoves {
         board: &Board,
         listen_move: &mut F1,
     ) where
-        // TODO F1: FnMut(Option<Way>, &AbsoluteAddress),
-        F1: FnMut(Way),
+        F1: FnMut(Movement),
     {
         let moving =
             &mut |destination, promotability, _agility, move_permission: Option<MovePermission>| {
@@ -223,36 +195,27 @@ impl PseudoLegalMoves {
                         Any => {
                             // 成ったり、成れなかったりできるとき。
                             if !forbidden {
-                                listen_move(Way::new(
-                                    Movement::new(
-                                        AddressOnPosition::Board(*source),
-                                        destination,
-                                        false,
-                                        pseudo_captured,
-                                    ),
+                                listen_move(Movement::new(
+                                    AddressOnPosition::Board(*source),
+                                    destination,
+                                    false,
                                     pseudo_captured,
                                 ));
                             }
-                            listen_move(Way::new(
-                                Movement::new(
-                                    AddressOnPosition::Board(*source),
-                                    destination,
-                                    true,
-                                    pseudo_captured,
-                                ),
+                            listen_move(Movement::new(
+                                AddressOnPosition::Board(*source),
+                                destination,
+                                true,
                                 pseudo_captured,
                             ));
                         }
                         _ => {
                             // 成れるか、成れないかのどちらかのとき。
                             if promotion || !forbidden {
-                                listen_move(Way::new(
-                                    Movement::new(
-                                        AddressOnPosition::Board(*source),
-                                        destination,
-                                        promotion,
-                                        pseudo_captured,
-                                    ),
+                                listen_move(Movement::new(
+                                    AddressOnPosition::Board(*source),
+                                    destination,
+                                    promotion,
                                     pseudo_captured,
                                 ));
                             }
@@ -277,8 +240,7 @@ impl PseudoLegalMoves {
     /// * `listen_control` - 利きを受け取れだぜ☆（＾～＾）
     fn make_drop<F1>(friend: Phase, adr: PhysicalPiece, board: &Board, listen_move: &mut F1)
     where
-        // TODO F1: FnMut(Option<Way>, &AbsoluteAddress),
-        F1: FnMut(Way),
+        F1: FnMut(Movement),
     {
         if let Some(piece) = board.last_hand(adr) {
             // 打つぜ☆（＾～＾）
@@ -295,14 +257,11 @@ impl PseudoLegalMoves {
                         }
                         _ => {}
                     }
-                    listen_move(Way::new(
-                        Movement::new(
-                            AddressOnPosition::Hand(piece.meaning.physical_piece()), // 打った駒種類
-                            destination, // どの升へ行きたいか
-                            false,       // 打に成りは無し
-                            None,        // 打で取れる駒無し
-                        ),
-                        None,
+                    listen_move(Movement::new(
+                        AddressOnPosition::Hand(piece.meaning.physical_piece()), // 打った駒種類
+                        destination, // どの升へ行きたいか
+                        false,       // 打に成りは無し
+                        None,        // 打で取れる駒無し
                     ));
                 }
             };

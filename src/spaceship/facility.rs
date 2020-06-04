@@ -1,8 +1,8 @@
 use crate::cosmic::playing::{Game, PosNums};
+use crate::cosmic::recording::Movement;
 use crate::cosmic::smart::features::{PhysicalPiece, PIECE_WHITE_SPACE};
 use crate::cosmic::smart::square::*;
 use crate::law::generate_move::Piece;
-use crate::law::generate_move::Way;
 use crate::spaceship::equipment::Beam;
 
 /// 指令室はこちらだぜ☆（＾～＾）！
@@ -195,15 +195,15 @@ P x{87:2}   |{63}|{64}|{65}|{66}|{67}|{68}|{69}|{70}|{71}| h8   p x{94:2}
 pub struct Kitchen {}
 impl Kitchen {
     /// 現在の局面での、指し手の一覧を表示するぜ☆（＾～＾）
-    pub fn print_ways(ways: &Vec<Way>) {
+    pub fn print_ways(ways: &Vec<Movement>) {
         Beam::shoot(&format!("Moves count={}", ways.len()));
         // 辞書順ソート
         let mut move_names = Vec::new();
-        for way in ways {
+        for move_ in ways {
             let ss_str = format!(
                 "{}{}",
-                format!("{}", way.movement),
-                if let Some(psuedo_captured) = way.captured {
+                format!("{}", move_),
+                if let Some(psuedo_captured) = move_.captured {
                     format!(" ({})", psuedo_captured.meaning)
                 } else {
                     "".to_string()

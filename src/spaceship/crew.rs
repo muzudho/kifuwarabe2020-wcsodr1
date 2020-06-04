@@ -1,12 +1,12 @@
 use crate::config::*;
 use crate::cosmic::daydream::Tree;
 use crate::cosmic::playing::{Game, PosNums};
+use crate::cosmic::recording::Movement;
 use crate::cosmic::recording::Phase;
 use crate::cosmic::smart::square::{AbsoluteAddress, FILE_1};
 use crate::cosmic::universe::Universe;
 use crate::law::cryptographic::*;
 use crate::law::generate_move::PseudoLegalMoves;
-use crate::law::generate_move::Way;
 use crate::law::usi::*;
 use crate::spaceship::engine;
 use crate::spaceship::equipment::{Beam, PvString, Telescope};
@@ -190,7 +190,7 @@ impl Chiyuri {
     pub fn genmove(game: &Game) {
         // Generation move.
         // FIXME 合法手とは限らない
-        let mut ways = Vec::<Way>::new();
+        let mut ways = Vec::<Movement>::new();
         PseudoLegalMoves::make_move(game.history.get_friend(), &game.board, &mut |way| {
             ways.push(way);
         });

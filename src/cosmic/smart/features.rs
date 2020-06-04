@@ -220,7 +220,7 @@ impl fmt::Display for PhysicalPiece {
             Bishop1 => write!(f, "B*"),
             Gold1 => write!(f, "G*"),
             Silver1 => write!(f, "S*"),
-            Knight1 => write!(f, "K*"),
+            Knight1 => write!(f, "N*"),
             Lance1 => write!(f, "L*"),
             Pawn1 => write!(f, "P*"),
             King2 => write!(f, "?*"),

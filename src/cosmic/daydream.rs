@@ -183,7 +183,7 @@ impl Tree {
         };
         self.evaluation.add_control(coverage_sign, &ways);
         for index in ways.indexes.iter() {
-            let way = ways.get(*index);
+            let move_ = ways.get(*index);
             // 時間を見ようぜ☆（＾～＾）？
             if self.think_msec < self.msec() && self.depth_not_to_give_up <= self.max_depth0 {
                 // とりあえず ランダム秒で探索を打ち切ろうぜ☆（＾～＾）？
@@ -194,7 +194,6 @@ impl Tree {
 
             // 1手進めるぜ☆（＾～＾）
             self.state_nodes += 1;
-            let move_ = way.movement;
             let source_piece = match move_.source {
                 AddressOnPosition::Board(source_val) => game.board.piece_at(&source_val),
                 AddressOnPosition::Hand(_drop) => {
@@ -226,7 +225,7 @@ impl Tree {
             if let Some(captured_piece_val) = captured_piece {
                 if captured_piece_val.meaning.type_() == PieceType::King {
                     // 玉を取る手より強い手はないぜ☆（＾～＾）！探索終了～☆（＾～＾）！この手を選べだぜ☆（＾～＾）！
-                    ts.bestmove.catch_king(way.movement);
+                    ts.bestmove.catch_king(move_);
 
                     self.evaluation
                         .before_undo_move(captured_piece_centi_pawn, delta_promotion_bonus);
@@ -239,20 +238,17 @@ impl Tree {
             // 千日手かどうかを判定する☆（＾～＾）
             if SENNTITE_NUM <= game.count_same_position() {
                 // 千日手か……☆（＾～＾） 一応覚えておくぜ☆（＾～＾）
-                ts.repetition_movement = Some(way.movement);
+                ts.repetition_movement = Some(move_);
             } else if self.max_depth0 < self.pv.len() {
                 // 葉だぜ☆（＾～＾）
 
-                if let Some(_captured) = way.captured {
+                if let Some(_captured) = move_.captured {
                     // TODO SEEやろうぜ☆（＾～＾）
                     SEE::go(game, &move_.destination);
                 }
 
                 // 評価を集計するぜ☆（＾～＾）
-                ts.choice_friend(
-                    &Value::CentiPawn(self.evaluation.centi_pawn()),
-                    way.movement,
-                );
+                ts.choice_friend(&Value::CentiPawn(self.evaluation.centi_pawn()), move_);
 
                 if game.info.is_printable() {
                     // 何かあったタイミングで読み筋表示するのではなく、定期的に表示しようぜ☆（＾～＾）
@@ -297,11 +293,8 @@ impl Tree {
                 self.evaluation.after_search();
 
                 // 下の木の結果を、ひっくり返して、引き継ぎます。
-                exists_lose = ts.turn_over_and_choice(
-                    &opponent_ts,
-                    way.movement,
-                    self.evaluation.centi_pawn(),
-                );
+                exists_lose =
+                    ts.turn_over_and_choice(&opponent_ts, move_, self.evaluation.centi_pawn());
             }
 
             self.evaluation
