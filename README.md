@@ -115,4 +115,15 @@ position sfen 9/9/ppppppppp/9/9/9/9/9/9 b - 1
 
 ### 2020-06-01(mon) 香車が前に進まず、後に進む☆（＾～＾）？
 position sfen 4k4/9/9/9/3L1l3/9/9/9/4K4 b RB2G2S2NL9Prb2g2s2nl9p 1
+
+### 2020-06-04(thu) 棋譜読取で駒を取るとき。
+setoption name DepthNotToGiveUp value 5
+setoption name MaxDepth value 5
+setoption name MinThinkMsec value 15000
+setoption name MaxThinkMsec value 25000
+setoption name KomawariWeightPer1000 value 1000
+setoption name ManyWaysPer1000 value 90
+setoption name PromotionWeightPer1000 value 10
+position startpos moves 7g7f 8c8d 8h7g 3c3d 7g2b 3a2b
+go btime 311000 wtime 312000 binc 5000 winc 5000
 ```

@@ -209,6 +209,31 @@ pub enum PhysicalPiece {
     Lance2,
     Pawn2,
 }
+impl fmt::Display for PhysicalPiece {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        // 文字列リテラルでないとダメみたいなんで、他に似たようなコードがあるのに、また書くことに☆（＾～＾）
+        // USIの Drop に合わせるぜ☆（＾～＾） 先後を区別しないぜ☆（＾～＾）
+        use self::PhysicalPiece::*;
+        match *self {
+            King1 => write!(f, "?*"),
+            Rook1 => write!(f, "R*"),
+            Bishop1 => write!(f, "B*"),
+            Gold1 => write!(f, "G*"),
+            Silver1 => write!(f, "S*"),
+            Knight1 => write!(f, "K*"),
+            Lance1 => write!(f, "L*"),
+            Pawn1 => write!(f, "P*"),
+            King2 => write!(f, "?*"),
+            Rook2 => write!(f, "R*"),
+            Bishop2 => write!(f, "B*"),
+            Gold2 => write!(f, "G*"),
+            Silver2 => write!(f, "S*"),
+            Knight2 => write!(f, "N*"),
+            Lance2 => write!(f, "L*"),
+            Pawn2 => write!(f, "P*"),
+        }
+    }
+}
 
 // 利きボード☆（＾～＾）
 #[derive(Clone, Copy)]

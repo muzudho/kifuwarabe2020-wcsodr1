@@ -67,8 +67,8 @@ impl DestinationDisplay {
     ) {
         // TODO 評価値が自分のか相手のか調べてないぜ☆（＾～＾）
         Beam::shoot(&format!(
-            "info{}{}{}{} currmove {}{}",
-            // 思考を開始してからのミリ秒☆（＾～＾）
+            "info{}{}{}{}{}{}",
+            // 1. 思考を開始してからのミリ秒☆（＾～＾）
             if let Some(pv_string_val) = pv_string {
                 match pv_string_val {
                     PvString::PV(msec, _pv) => format!(" time {}", msec),
@@ -77,18 +77,20 @@ impl DestinationDisplay {
             } else {
                 "".to_string()
             },
+            // 2.
             if let Some(num) = cur_depth {
                 // 単に読み筋の長さ☆（＾～＾）
                 format!(" depth {}", num)
             } else {
                 "".to_string()
             },
+            // 3.
             if let Some((state_node, nps)) = state_nodes_nps {
                 format!(" nodes {} nps {}", state_node, nps)
             } else {
                 "".to_string()
             },
-            //if let Some(centi_pawn) = value {
+            // 4.
             if let Some(value_val) = value {
                 match value_val {
                     Value::Win => {
@@ -104,11 +106,13 @@ impl DestinationDisplay {
             } else {
                 "".to_string()
             },
+            // 5.
             if let Some(movement_val) = movement {
-                format!("{}", movement_val)
+                format!(" currmove {}", movement_val)
             } else {
                 "".to_string()
             },
+            // 6.
             if let Some(pv_string_val) = pv_string {
                 match pv_string_val {
                     PvString::PV(_sec, pv) => format!(" pv {}", pv),

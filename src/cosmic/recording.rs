@@ -4,7 +4,7 @@
 //! * Phase (先後。手番,相手番)
 //! * Person (先手,後手)
 //!
-use crate::cosmic::smart::features::PhysicalPieceType;
+use crate::cosmic::smart::features::PhysicalPiece;
 use crate::cosmic::smart::square::AbsoluteAddress;
 use crate::law::cryptographic::num_to_lower_case;
 use crate::law::generate_move::Piece;
@@ -48,13 +48,14 @@ impl History {
     }
 }
 
+/// 局面全体を範囲にして振られた番地。
 #[derive(Clone, Copy)]
-pub enum AddressTypeOnPosition {
-    // 盤上の移動なら、移動元升。
-    Move(AbsoluteAddress),
-    // 打の場合、打った駒種類
-    Drop(PhysicalPieceType),
-    // 未設定ならこれ。
+pub enum AddressOnPosition {
+    // 盤上の番地
+    Board(AbsoluteAddress),
+    // 持ち駒の種類
+    Hand(PhysicalPiece),
+    // 作業中のときは、これだぜ☆（＾～＾）
     Busy,
 }
 
@@ -64,7 +65,7 @@ pub enum AddressTypeOnPosition {
 /// Copy: 配列の要素の初期化時に使う☆（＾～＾）
 #[derive(Clone, Copy)]
 pub struct Movement {
-    pub source: AddressTypeOnPosition,
+    pub source: AddressOnPosition,
     // 移動先升。
     pub destination: AbsoluteAddress,
     // 移動後に成るなら真
@@ -76,7 +77,7 @@ impl Default for Movement {
     /// ゴミの値を作るぜ☆（＾～＾）
     fn default() -> Self {
         Movement {
-            source: AddressTypeOnPosition::Busy,
+            source: AddressOnPosition::Busy,
             destination: AbsoluteAddress::default(),
             promote: false,
             captured: None,
@@ -85,7 +86,7 @@ impl Default for Movement {
 }
 impl Movement {
     pub fn new(
-        source: AddressTypeOnPosition,
+        source: AddressOnPosition,
         destination: AbsoluteAddress,
         promote: bool,
         captured: Option<Piece>,
@@ -109,7 +110,7 @@ impl fmt::Display for Movement {
         let (dx, dy) = self.destination.to_file_rank();
 
         match self.source {
-            AddressTypeOnPosition::Move(source_val) => {
+            AddressOnPosition::Board(source_val) => {
                 let (sx, sy) = source_val.to_file_rank();
                 write!(
                     f,
@@ -121,18 +122,15 @@ impl fmt::Display for Movement {
                     if self.promote { "+" } else { "" }
                 )
             }
-            AddressTypeOnPosition::Drop(drop) => {
-                const DROPS: [&str; 8] = ["?", "R", "B", "G", "S", "N", "L", "P"];
-                write!(
-                    f,
-                    "{}*{}{}{}",
-                    DROPS[drop as usize],
-                    dx,
-                    num_to_lower_case(dy),
-                    if self.promote { "+" } else { "" }
-                )
-            }
-            AddressTypeOnPosition::Busy => write!(f, "Busy",),
+            AddressOnPosition::Hand(drop) => write!(
+                f,
+                "{}{}{}{}",
+                drop,
+                dx,
+                num_to_lower_case(dy),
+                if self.promote { "+" } else { "" }
+            ),
+            AddressOnPosition::Busy => write!(f, "Busy",),
         }
     }
 }
@@ -142,13 +140,13 @@ impl fmt::Debug for Movement {
             f,
             "Movement({}{}{})",
             match self.source {
-                AddressTypeOnPosition::Move(source_val) => {
+                AddressOnPosition::Board(source_val) => {
                     source_val.serial_number().to_string()
                 }
-                AddressTypeOnPosition::Drop(drop) => {
+                AddressOnPosition::Hand(drop) => {
                     format!("{:?}", drop)
                 }
-                AddressTypeOnPosition::Busy => {
+                AddressOnPosition::Busy => {
                     "-".to_string()
                 }
             },

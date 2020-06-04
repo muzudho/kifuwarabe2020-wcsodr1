@@ -2,7 +2,7 @@
 //! 現局面を使った指し手生成☆（＾～＾）
 //!
 
-use crate::cosmic::recording::{AddressTypeOnPosition, Movement, Phase};
+use crate::cosmic::recording::{AddressOnPosition, Movement, Phase};
 use crate::cosmic::smart::features::PhysicalPiece;
 use crate::cosmic::smart::features::PieceMeaning;
 use crate::cosmic::smart::features::PieceType;
@@ -10,8 +10,8 @@ use crate::cosmic::smart::square::{
     AbsoluteAddress, Angle, RelAdr, FILE_1, FILE_10, RANK_1, RANK_10, RANK_2, RANK_3, RANK_4,
     RANK_6, RANK_7, RANK_8, RANK_9,
 };
+use crate::cosmic::toy_box::Board;
 use crate::cosmic::toy_box::PieceNum;
-use crate::cosmic::toy_box::{AddressOnPosition, Board};
 use crate::spaceship::equipment::Beam;
 use std::fmt;
 
@@ -78,7 +78,7 @@ pub struct Way {
     /// 指し手☆（＾～＾）
     pub movement: Movement,
     /// 取った駒☆（＾～＾）
-    pub captured: Option<Piece>,
+    pub captured: Option<Piece>, // TODO これ要らなくなった☆（＾～＾）？
 }
 impl Default for Way {
     /// ゴミ値☆（＾～＾）
@@ -225,7 +225,7 @@ impl PseudoLegalMoves {
                             if !forbidden {
                                 listen_move(Way::new(
                                     Movement::new(
-                                        AddressTypeOnPosition::Move(*source),
+                                        AddressOnPosition::Board(*source),
                                         destination,
                                         false,
                                         pseudo_captured,
@@ -235,7 +235,7 @@ impl PseudoLegalMoves {
                             }
                             listen_move(Way::new(
                                 Movement::new(
-                                    AddressTypeOnPosition::Move(*source),
+                                    AddressOnPosition::Board(*source),
                                     destination,
                                     true,
                                     pseudo_captured,
@@ -248,7 +248,7 @@ impl PseudoLegalMoves {
                             if promotion || !forbidden {
                                 listen_move(Way::new(
                                     Movement::new(
-                                        AddressTypeOnPosition::Move(*source),
+                                        AddressOnPosition::Board(*source),
                                         destination,
                                         promotion,
                                         pseudo_captured,
@@ -297,7 +297,7 @@ impl PseudoLegalMoves {
                     }
                     listen_move(Way::new(
                         Movement::new(
-                            AddressTypeOnPosition::Drop(piece.meaning.physical_piece().type_()), // 打った駒種類
+                            AddressOnPosition::Hand(piece.meaning.physical_piece()), // 打った駒種類
                             destination, // どの升へ行きたいか
                             false,       // 打に成りは無し
                             None,        // 打で取れる駒無し

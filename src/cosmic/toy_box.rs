@@ -2,7 +2,7 @@
 //! 駒 と 盤
 //!
 use crate::cosmic::playing::Game;
-use crate::cosmic::recording::Phase;
+use crate::cosmic::recording::{AddressOnPosition, Phase};
 use crate::cosmic::smart::features::PHYSICAL_PIECES_LEN;
 use crate::cosmic::smart::features::PHYSICAL_PIECE_TYPE_LEN;
 use crate::cosmic::smart::features::{PhysicalPiece, PieceMeaning, PieceType, HAND_MAX};
@@ -102,17 +102,6 @@ pub enum PieceNum {
     Pawn39,
     // 40 歩
     Pawn40,
-}
-
-/// 局面全体を範囲にして振られた番地。
-#[derive(Clone, Copy)]
-pub enum AddressOnPosition {
-    // 盤上の番地
-    Board(AbsoluteAddress),
-    // 持ち駒の番地
-    Hand(PhysicalPiece),
-    // 作業中のときは、これだぜ☆（＾～＾）
-    Busy,
 }
 
 /// 現局面、または初期局面☆（＾～＾）
