@@ -415,6 +415,10 @@ pub fn set_position(line: &str, game: &mut Game) {
         game.history.ply -= 1;
         // 入っている指し手の通り指すぜ☆（＾～＾）
         let ply = game.history.ply;
-        game.do_move(&game.history.movements[ply as usize].clone());
+
+        // 棋譜に入れる☆
+        let move_ = game.history.movements[ply as usize].clone();
+        game.set_move(&move_);
+        game.read_move(&move_);
     }
 }

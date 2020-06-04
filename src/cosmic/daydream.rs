@@ -194,8 +194,8 @@ impl Tree {
 
             // 1手進めるぜ☆（＾～＾）
             self.state_nodes += 1;
-            let movement = way.movement;
-            let source_piece = match movement.source {
+            let move_ = way.movement;
+            let source_piece = match move_.source {
                 AddressTypeOnPosition::Move(source_val) => game.board.piece_at(&source_val),
                 AddressTypeOnPosition::Drop(_drop) => {
                     // 打
@@ -207,11 +207,15 @@ impl Tree {
                     ));
                 }
             };
-            let captured_piece: Option<Piece> = game.do_move(&movement);
-            self.pv.push(&movement);
+
+            // 棋譜に入れる☆
+            game.set_move(&move_);
+            let captured_piece: Option<Piece> = game.read_move(&move_);
+
+            self.pv.push(&move_);
             let (captured_piece_centi_pawn, delta_promotion_bonus) =
                 self.evaluation
-                    .after_do_move(&source_piece, &captured_piece, movement.promote);
+                    .after_do_move(&source_piece, &captured_piece, move_.promote);
 
             // TODO 廃止方針☆（＾～＾）
             if let Some(captured_piece_val) = captured_piece {
@@ -222,7 +226,7 @@ impl Tree {
                     self.evaluation
                         .before_undo_move(captured_piece_centi_pawn, delta_promotion_bonus);
                     self.pv.pop();
-                    game.undo_move();
+                    game.read_move_in_reverse();
                     break;
                 }
             }
@@ -236,7 +240,7 @@ impl Tree {
 
                 if let Some(_captured) = way.captured {
                     // TODO SEEやろうぜ☆（＾～＾）
-                    SEE::go(game, &movement.destination);
+                    SEE::go(game, &move_.destination);
                 }
 
                 // 評価を集計するぜ☆（＾～＾）
@@ -298,7 +302,7 @@ impl Tree {
             self.evaluation
                 .before_undo_move(captured_piece_centi_pawn, delta_promotion_bonus);
             self.pv.pop();
-            game.undo_move();
+            game.read_move_in_reverse();
 
             match ts.bestmove.value {
                 Value::Win => {

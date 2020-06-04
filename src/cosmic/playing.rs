@@ -201,19 +201,17 @@ impl Game {
     /// # Returns
     ///
     /// Captured piece.
-    pub fn do_move(&mut self, movement: &Movement) -> Option<Piece> {
-        // もう入っているかも知れないが、棋譜に入れる☆
-        self.set_move(movement);
+    pub fn read_move(&mut self, move_: &Movement) -> Option<Piece> {
         let friend = self.history.get_friend();
 
         // 取った駒
         let cap: Option<Piece>;
         {
-            // 動かす駒
-            let moveing_piece: Option<Piece> = match movement.source {
+            // 動かす駒。Noneなことは無いが、将棋盤にセットするとき結局 Some を付けることになるので、わざわざ省かないぜ☆（＾～＾）
+            let moveing_piece: Option<Piece> = match move_.source {
                 AddressTypeOnPosition::Move(source_val) => {
                     // 盤上の移動なら、元の升に駒はあるので、それを消す。
-                    let piece152: Option<Piece> = if movement.promote {
+                    let piece152: Option<Piece> = if move_.promote {
                         if let Some(piece) = self.board.pop_from_board(&source_val) {
                             // 成ったのなら、元のマスの駒を成らすぜ☆（＾～＾）
                             Some(Piece::new(piece.meaning.promoted(), piece.num))
@@ -244,7 +242,7 @@ impl Game {
                 }
             };
             // 移動先升に駒があるかどうか
-            cap = if let Some(collision_piece) = self.board.pop_from_board(&movement.destination) {
+            cap = if let Some(collision_piece) = self.board.pop_from_board(&move_.destination) {
                 // 移動先升の駒を盤上から消し、自分の持ち駒に増やす
                 let captured_piece =
                     Piece::new(collision_piece.meaning.captured(), collision_piece.num);
@@ -255,8 +253,7 @@ impl Game {
             };
 
             // 移動先升に駒を置く
-            self.board
-                .push_to_board(&movement.destination, moveing_piece);
+            self.board.push_to_board(&move_.destination, moveing_piece);
         }
         self.set_captured(self.history.ply as usize, cap);
 
@@ -268,23 +265,24 @@ impl Game {
         cap
     }
 
-    pub fn undo_move(&mut self) -> bool {
+    /// 逆順に指します。
+    pub fn read_move_in_reverse(&mut self) -> bool {
         if 0 < self.history.ply {
             // 棋譜から読取、手目も減る
             self.history.ply -= 1;
-            let movement = &self.get_move().clone();
+            let move_ = &self.get_move().clone();
             {
                 // 取った駒が有ったか。
                 let captured: Option<Piece> =
                     self.history.captured_pieces[self.history.ply as usize];
                 // 動いた駒
-                let moveing_piece: Option<Piece> = match movement.source {
+                let moveing_piece: Option<Piece> = match move_.source {
                     AddressTypeOnPosition::Move(_source_val) => {
                         // 盤上の移動なら
-                        if movement.promote {
+                        if move_.promote {
                             // 成ったなら、成る前へ
                             if let Some(source_piece) =
-                                self.board.pop_from_board(&movement.destination)
+                                self.board.pop_from_board(&move_.destination)
                             {
                                 Some(Piece::new(source_piece.meaning.demoted(), source_piece.num))
                             } else {
@@ -293,13 +291,13 @@ impl Game {
                                 ))
                             }
                         } else {
-                            self.board.pop_from_board(&movement.destination)
+                            self.board.pop_from_board(&move_.destination)
                         }
                     }
                     AddressTypeOnPosition::Drop(_drop) => {
                         // 打なら
                         // 打った場所に駒があるはずだぜ☆（＾～＾）
-                        let piece = self.board.pop_from_board(&movement.destination).unwrap();
+                        let piece = self.board.pop_from_board(&move_.destination).unwrap();
                         // 自分の持ち駒を増やそうぜ☆（＾～＾）！
                         self.board.push_to_hand(&piece);
                         Some(piece)
@@ -314,10 +312,10 @@ impl Game {
                     self.board
                         .pop_from_hand(captured_piece_val.meaning.captured().physical_piece());
                     // 移動先の駒を、取った駒（あるいは空、ということがあるか？）に戻す
-                    self.board.push_to_board(&movement.destination, captured);
+                    self.board.push_to_board(&move_.destination, captured);
                 }
 
-                if let AddressTypeOnPosition::Move(source_val) = movement.source {
+                if let AddressTypeOnPosition::Move(source_val) = move_.source {
                     // 打でなければ、移動元升に、動かした駒を置く☆（＾～＾）打なら何もしないぜ☆（＾～＾）
                     self.board.push_to_board(&source_val, moveing_piece);
                 }

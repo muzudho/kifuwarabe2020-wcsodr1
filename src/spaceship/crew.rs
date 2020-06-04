@@ -183,8 +183,11 @@ impl Chiyuri {
             universe.game.history.ply -= 1;
             // 入っている指し手の通り指すぜ☆（＾～＾）
             let ply = universe.game.history.ply;
-            let ss = universe.game.history.movements[ply as usize].clone();
-            universe.game.do_move(&ss);
+            let move_ = universe.game.history.movements[ply as usize].clone();
+
+            // 棋譜に入れる☆
+            universe.game.set_move(&move_);
+            universe.game.read_move(&move_);
         }
     }
     pub fn genmove(game: &Game) {
@@ -294,7 +297,7 @@ impl Chiyuri {
         }
     }
     pub fn undo(universe: &mut Universe) {
-        if !universe.game.undo_move() {
+        if !universe.game.read_move_in_reverse() {
             Beam::shoot(&format!(
                 "ply={} を、これより戻せません",
                 universe.game.history.ply

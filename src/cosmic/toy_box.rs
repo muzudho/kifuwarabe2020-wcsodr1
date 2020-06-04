@@ -228,7 +228,6 @@ impl Board {
         self.hands = board.hands.clone();
     }
 
-    /// 盤に駒を置く
     pub fn push_to_board(&mut self, addr: &AbsoluteAddress, piece: Option<Piece>) {
         if let Some(piece_val) = piece {
             // マスに駒を置きます。
