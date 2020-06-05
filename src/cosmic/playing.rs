@@ -120,6 +120,10 @@ impl Game {
 
     /// 入れた指し手の通り指すぜ☆（＾～＾）
     pub fn read_move(&mut self, move_: &Movement) {
+        // 局面ハッシュを作り直す
+        self.hash_seed
+            .update_by_do_move(&mut self.history, &self.board, move_);
+
         // 動かす駒。Noneなことは無いが、将棋盤にセットするとき結局 Some を付けることになるので、わざわざ省かないぜ☆（＾～＾）
         let moveing_piece: Option<Piece> = match move_.source {
             AddressOnPosition::Board(source_val) => {
@@ -162,9 +166,9 @@ impl Game {
         // 移動先升に駒を置く
         self.board.push_to_board(&move_.destination, moveing_piece);
 
-        // 局面ハッシュを作り直す
-        let ky_hash = self.hash_seed.current_position(&self);
-        self.history.set_position_hash(ky_hash);
+        // // 局面ハッシュを作り直す
+        // let ky_hash = self.hash_seed.current_position(&self);
+        // self.history.set_position_hash(ky_hash);
 
         self.history.ply += 1;
     }

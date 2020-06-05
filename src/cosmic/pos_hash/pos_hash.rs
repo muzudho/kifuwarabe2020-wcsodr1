@@ -2,9 +2,7 @@
 //!
 
 use crate::cosmic::playing::Game;
-use crate::cosmic::recording::{
-    AddressOnPosition, History, Movement, PHASE_FIRST, PHASE_LEN, PHASE_SECOND,
-};
+use crate::cosmic::recording::{AddressOnPosition, History, Movement, PHASE_LEN, PHASE_SECOND};
 use crate::cosmic::smart::features::{HAND_MAX, PHYSICAL_PIECES_LEN, PIECE_MEANING_LEN};
 use crate::cosmic::smart::square::{
     AbsoluteAddress, BOARD_MEMORY_AREA, FILE_1, FILE_10, RANK_1, RANK_10, SQUARE_NONE,
@@ -64,7 +62,8 @@ impl GameHashSeed {
 
     /// TODO 指し手を使って差分更新
     /// 駒を動かしたあとに使う。
-    pub fn update_by_diff(&self, history: &mut History, board: &Board, move_: &Movement) {
+    /// TODO 持ち駒の枚数がトグルになってないぜ☆（＾～＾）？
+    pub fn update_by_do_move(&self, history: &mut History, board: &Board, move_: &Movement) {
         // TODO １つ前の局面のハッシュ。
         let mut prev_hash = if history.ply == 0 {
             history.starting_position_hash
@@ -72,26 +71,44 @@ impl GameHashSeed {
             history.position_hashs[history.ply as usize - 1]
         };
         // TODO 指し手 で差分を適用
-        // TODO 移動前の駒
-        prev_hash ^= match move_.source {
+        // 移動する駒。
+        match move_.source {
             AddressOnPosition::Board(source) => {
-                let source_piece = board.piece_at(&source);
-                self.piece[source.serial_number()][source_piece.unwrap().meaning as usize]
+                let source_piece_meaning = board.piece_at(&source).unwrap().meaning as usize;
+                // 移動前マスに、動かしたい駒があるときのハッシュ。
+                prev_hash ^= self.piece[source.serial_number()][source_piece_meaning];
+                // 移動後マスに、動かしたい駒があるときのハッシュ。
+                prev_hash ^= self.piece[move_.destination.serial_number()][source_piece_meaning];
             }
             AddressOnPosition::Hand(physical_piece) => {
                 let count = board.count_hand(physical_piece);
-                self.hands[physical_piece as usize][count as usize]
+                // 打つ前の駒の枚数のハッシュ。
+                prev_hash ^= self.hands[physical_piece as usize][count as usize];
+                // 移動後マスに、打った駒があるときのハッシュ。
+                prev_hash ^= self.piece[move_.destination.serial_number()]
+                    [physical_piece.nonpromoted_meaning() as usize];
             }
             AddressOnPosition::Busy => panic!(Beam::trouble(
                 "(Err.85) 移動前の駒が設定されていないだって☆（＾～＾）！？"
             )),
-        };
-        // TODO 移動後の駒
-        // TODO 取られた駒
-        // TODO 駒台に乗った駒
+        }
+        // TODO 移動先にある駒
+        let dst = move_.destination;
+        let dst_piece = board.piece_at(&dst);
+        if let Some(dst_piece) = dst_piece {
+            prev_hash ^= self.piece[dst.serial_number()][dst_piece.meaning as usize];
+            // 持ち駒になるとき。
+            let physical_piece = dst_piece.meaning.physical_piece();
+            let count = board.count_hand(physical_piece);
+            // 打つ前の駒の枚数のハッシュ。
+            prev_hash ^= self.hands[physical_piece as usize][count as usize + 1];
+        }
+
         // TODO ハッシュ更新
+        history.position_hashs[history.ply as usize] = prev_hash;
     }
 
+    /*
     /// 局面ハッシュを作り直す
     pub fn current_position(&self, game: &Game) -> u64 {
         let mut hash = self.board(&game.board);
@@ -105,6 +122,7 @@ impl GameHashSeed {
 
         hash
     }
+    */
 
     /// 初期局面ハッシュを作り直す
     pub fn starting_position(&self, game: &Game) -> u64 {

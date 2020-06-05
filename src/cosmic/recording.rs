@@ -53,10 +53,12 @@ impl History {
     pub fn get_move(&self) -> &Movement {
         &self.movements[self.ply as usize]
     }
+    /*
     /// 局面ハッシュを更新
     pub fn set_position_hash(&mut self, hash: u64) {
         self.position_hashs[self.ply as usize] = hash;
     }
+    */
 }
 
 /// 局面全体を範囲にして振られた番地。
@@ -168,7 +170,7 @@ impl fmt::Debug for Movement {
 }
 
 /// 局面ハッシュを作るときに、フェーズ用に配列があって、それのサイズに使ってるぜ☆（＾～＾）
-pub const PHASE_FIRST: usize = 0;
+// pub const PHASE_FIRST: usize = 0;
 pub const PHASE_SECOND: usize = 1;
 pub const PHASE_LEN: usize = 2;
 

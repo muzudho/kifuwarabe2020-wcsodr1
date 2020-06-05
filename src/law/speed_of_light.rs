@@ -65,6 +65,7 @@ struct SpeedOfLight {
     physical_pieces: [[PhysicalPiece; PHYSICAL_PIECE_TYPE_LEN]; PHASE_LEN],
     physical_piece_to_type_table: [PhysicalPieceType; PHYSICAL_PIECES_LEN],
     physical_piece_to_captured_value: [isize; PHYSICAL_PIECE_TYPE_LEN],
+    physical_piece_to_nonpromoted_meaning: [PieceMeaning; PHYSICAL_PIECES_LEN],
 
     // 相対番地と角度☆（＾～＾）
     west_ccw: [RelAdr; ANGLE_LEN],
@@ -486,6 +487,25 @@ impl Default for SpeedOfLight {
                 PhysicalPieceType::Pawn,
             ],
 
+            physical_piece_to_nonpromoted_meaning: [
+                PieceMeaning::King1,
+                PieceMeaning::Rook1,
+                PieceMeaning::Bishop1,
+                PieceMeaning::Gold1,
+                PieceMeaning::Silver1,
+                PieceMeaning::Knight1,
+                PieceMeaning::Lance1,
+                PieceMeaning::Pawn1,
+                PieceMeaning::King2,
+                PieceMeaning::Rook2,
+                PieceMeaning::Bishop2,
+                PieceMeaning::Gold2,
+                PieceMeaning::Silver2,
+                PieceMeaning::Knight2,
+                PieceMeaning::Lance2,
+                PieceMeaning::Pawn2,
+            ],
+
             // よく使う、角度の付いた相対番地☆（＾～＾）
             west_ccw: [
                 RelAdr::new(1, 0),
@@ -616,6 +636,9 @@ impl PhysicalPiece {
     }
     pub fn type_(self) -> PhysicalPieceType {
         NINE_299792458.physical_piece_to_type_table[self as usize]
+    }
+    pub fn nonpromoted_meaning(self) -> PieceMeaning {
+        NINE_299792458.physical_piece_to_nonpromoted_meaning[self as usize]
     }
 }
 
