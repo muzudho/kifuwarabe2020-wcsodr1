@@ -38,7 +38,7 @@ use std::hash::Hash;
 ///
 /// 打はテストできない
 ///
-pub fn _assert_in_board_as_absolute(ab_adr: &AbsoluteAddress, hint: &str) {
+pub fn _assert_in_board_as_absolute(ab_adr: &AbsoluteAddress2D, hint: &str) {
     let adr = ab_adr.serial_number();
     debug_assert!(
         (10 < adr && adr < 20)
@@ -68,7 +68,7 @@ fn test_d45ort(test_name: &str, expected: &str, actual: &Degree45Orthant) {
         format!("{}: expected={} | actual={:?}", test_name, expected, actual)
     );
 }
-fn test_rsq(test_name: &str, expected: &str, actual: &RelAdr) {
+fn test_rsq(test_name: &str, expected: &str, actual: &RelAdr2D) {
     debug_assert!(
         format!("{:?}", actual) == expected,
         format!("{}: expected={} | actual={:?}", test_name, expected, actual)
@@ -98,37 +98,37 @@ pub fn test_rotation() {
     // 45°回転象限のテスト
     {
         // TODO speed_of_light に West とか相対座標を入れておきたい。
-        let mut ort = Degree45Orthant::new(&RelAdr::new(0, -1));
+        let mut ort = Degree45Orthant::new(&RelAdr2D::new(0, -1));
         test_d45ort("f1", "CoIIIOrCoIV", &ort);
-        ort = Degree45Orthant::new(&RelAdr::new(1, -1));
+        ort = Degree45Orthant::new(&RelAdr2D::new(1, -1));
         test_d45ort("f2", "IVOrI", &ort);
         ort = Degree45Orthant::new(&Nine299792458::west());
         test_d45ort("f3", "IVOrI", &ort);
-        ort = Degree45Orthant::new(&RelAdr::new(1, 1));
+        ort = Degree45Orthant::new(&RelAdr2D::new(1, 1));
         test_d45ort("f4", "IVOrI", &ort);
-        ort = Degree45Orthant::new(&RelAdr::new(0, 1));
+        ort = Degree45Orthant::new(&RelAdr2D::new(0, 1));
         test_d45ort("f5", "CoIOrCoII", &ort);
-        ort = Degree45Orthant::new(&RelAdr::new(-1, 1));
+        ort = Degree45Orthant::new(&RelAdr2D::new(-1, 1));
         test_d45ort("f6", "IIOrIII", &ort);
-        ort = Degree45Orthant::new(&RelAdr::new(-1, 0));
+        ort = Degree45Orthant::new(&RelAdr2D::new(-1, 0));
         test_d45ort("f7", "IIOrIII", &ort);
-        ort = Degree45Orthant::new(&RelAdr::new(-1, -1));
+        ort = Degree45Orthant::new(&RelAdr2D::new(-1, -1));
         test_d45ort("f8", "IIOrIII", &ort);
     }
     // 相対番地のテスト
     {
-        test_rsq("b1", "(0x -1y -1adr)", &RelAdr::new(0, -1));
-        test_rsq("b2", "(1x -1y 9adr)", &RelAdr::new(1, -1));
+        test_rsq("b1", "(0x -1y -1adr)", &RelAdr2D::new(0, -1));
+        test_rsq("b2", "(1x -1y 9adr)", &RelAdr2D::new(1, -1));
         test_rsq("b3", "(1x 0y 10adr)", &Nine299792458::west());
-        test_rsq("b4", "(1x 1y 11adr)", &RelAdr::new(1, 1));
-        test_rsq("b5", "(0x 1y 1adr)", &RelAdr::new(0, 1));
-        test_rsq("b6", "(-1x 1y -9adr)", &RelAdr::new(-1, 1));
-        test_rsq("b7", "(-1x 0y -10adr)", &RelAdr::new(-1, 0));
-        test_rsq("b8", "(-1x -1y -11adr)", &RelAdr::new(-1, -1));
+        test_rsq("b4", "(1x 1y 11adr)", &RelAdr2D::new(1, 1));
+        test_rsq("b5", "(0x 1y 1adr)", &RelAdr2D::new(0, 1));
+        test_rsq("b6", "(-1x 1y -9adr)", &RelAdr2D::new(-1, 1));
+        test_rsq("b7", "(-1x 0y -10adr)", &RelAdr2D::new(-1, 0));
+        test_rsq("b8", "(-1x -1y -11adr)", &RelAdr2D::new(-1, -1));
     }
     // 45°回転のテスト
     {
-        let mut r = RelAdr::new(0, -1);
+        let mut r = RelAdr2D::new(0, -1);
         test_rsq("a1", "(0x -1y -1adr)", &r);
         r.rotate_45_ccw();
         test_rsq("a2", "(1x -1y 9adr)", &r);
@@ -149,7 +149,7 @@ pub fn test_rotation() {
     }
     // 90°回転のテスト＜その１＞
     {
-        let mut r = RelAdr::new(0, -1);
+        let mut r = RelAdr2D::new(0, -1);
         test_rsq("c1", "(0x -1y -1adr)", &r);
         r.rotate_90_ccw();
         test_rsq("c2", "(1x 0y 10adr)", &r);
@@ -162,7 +162,7 @@ pub fn test_rotation() {
     }
     // 90°回転のテスト＜その２＞
     {
-        let mut r = RelAdr::new(1, -1);
+        let mut r = RelAdr2D::new(1, -1);
         test_rsq("d1", "(1x -1y 9adr)", &r);
         r.rotate_90_ccw();
         test_rsq("d2", "(1x 1y 11adr)", &r);
@@ -175,28 +175,28 @@ pub fn test_rotation() {
     }
     // 桂馬のテスト
     {
-        let mut r = RelAdr::new(0, -1);
+        let mut r = RelAdr2D::new(0, -1);
         test_rsq("g1", "(0x -1y -1adr)", &r);
         r.rotate(Angle::Ccw45);
         test_rsq("g2", "(1x -1y 9adr)", &r);
         r.double_rank();
         test_rsq("g3", "(1x -2y 8adr)", &r);
 
-        let mut r = RelAdr::new(0, -1);
+        let mut r = RelAdr2D::new(0, -1);
         test_rsq("g4", "(0x -1y -1adr)", &r);
         r.rotate(Angle::Ccw315);
         test_rsq("g5", "(-1x -1y -11adr)", &r);
         r.double_rank();
         test_rsq("g6", "(-1x -2y -12adr)", &r);
 
-        let mut r = RelAdr::new(0, 1);
+        let mut r = RelAdr2D::new(0, 1);
         test_rsq("g7", "(0x 1y 1adr)", &r);
         r.rotate(Angle::Ccw45);
         test_rsq("g8", "(-1x 1y -9adr)", &r);
         r.double_rank();
         test_rsq("g9", "(-1x 2y -8adr)", &r);
 
-        let mut r = RelAdr::new(0, 1);
+        let mut r = RelAdr2D::new(0, 1);
         test_rsq("g10", "(0x 1y 1adr)", &r);
         r.rotate(Angle::Ccw315);
         test_rsq("g11", "(1x 1y 11adr)", &r);
@@ -206,86 +206,86 @@ pub fn test_rotation() {
     // 角度指定回転のテスト(北から)
     {
         // 0
-        let mut r = RelAdr::new(0, -1);
+        let mut r = RelAdr2D::new(0, -1);
         test_rsq("h1", "(0x -1y -1adr)", &r);
         r.rotate(Angle::Ccw0);
         test_rsq("h2", "(0x -1y -1adr)", &r);
 
         // 45
-        r = RelAdr::new(0, -1);
+        r = RelAdr2D::new(0, -1);
         r.rotate(Angle::Ccw45);
         test_rsq("h3", "(1x -1y 9adr)", &r);
 
         // 90
-        r = RelAdr::new(0, -1);
+        r = RelAdr2D::new(0, -1);
         r.rotate(Angle::Ccw90);
         test_rsq("h4", "(1x 0y 10adr)", &r);
 
         // 135
-        r = RelAdr::new(0, -1);
+        r = RelAdr2D::new(0, -1);
         r.rotate(Angle::Ccw135);
         test_rsq("h5", "(1x 1y 11adr)", &r);
 
         // 180
-        r = RelAdr::new(0, -1);
+        r = RelAdr2D::new(0, -1);
         r.rotate(Angle::Ccw180);
         test_rsq("h6", "(0x 1y 1adr)", &r);
 
         // 225
-        r = RelAdr::new(0, -1);
+        r = RelAdr2D::new(0, -1);
         r.rotate(Angle::Ccw225);
         test_rsq("h7", "(-1x 1y -9adr)", &r);
 
         // 270
-        r = RelAdr::new(0, -1);
+        r = RelAdr2D::new(0, -1);
         r.rotate(Angle::Ccw270);
         test_rsq("h8", "(-1x 0y -10adr)", &r);
 
         // 315
-        r = RelAdr::new(0, -1);
+        r = RelAdr2D::new(0, -1);
         r.rotate(Angle::Ccw315);
         test_rsq("h9", "(-1x -1y -11adr)", &r);
     }
     // 角度指定回転のテスト(南から)
     {
         // 0
-        let mut r = RelAdr::new(0, 1);
+        let mut r = RelAdr2D::new(0, 1);
         test_rsq("h1", "(0x 1y 1adr)", &r);
         r.rotate(Angle::Ccw0);
         test_rsq("h2", "(0x 1y 1adr)", &r);
 
         // 45
-        r = RelAdr::new(0, 1);
+        r = RelAdr2D::new(0, 1);
         r.rotate(Angle::Ccw45);
         test_rsq("h3", "(-1x 1y -9adr)", &r);
 
         // 90
-        r = RelAdr::new(0, 1);
+        r = RelAdr2D::new(0, 1);
         r.rotate(Angle::Ccw90);
         test_rsq("h4", "(-1x 0y -10adr)", &r);
 
         // 135
-        r = RelAdr::new(0, 1);
+        r = RelAdr2D::new(0, 1);
         r.rotate(Angle::Ccw135);
         test_rsq("h5", "(-1x -1y -11adr)", &r);
 
         // 180
-        r = RelAdr::new(0, 1);
+        r = RelAdr2D::new(0, 1);
         r.rotate(Angle::Ccw180);
         test_rsq("h6", "(0x -1y -1adr)", &r);
 
         // 225
-        r = RelAdr::new(0, 1);
+        r = RelAdr2D::new(0, 1);
         r.rotate(Angle::Ccw225);
         test_rsq("h7", "(1x -1y 9adr)", &r);
 
         // 270
-        r = RelAdr::new(0, 1);
+        r = RelAdr2D::new(0, 1);
         r.rotate(Angle::Ccw270);
         test_rsq("h8", "(1x 0y 10adr)", &r);
 
         // 315
-        r = RelAdr::new(0, 1);
+        r = RelAdr2D::new(0, 1);
         r.rotate(Angle::Ccw315);
         test_rsq("h9", "(1x 1y 11adr)", &r);
     }
@@ -360,7 +360,7 @@ impl Degree45Orthant {
     /// Arguments
     /// ---------
     /// * `r` - (Relative file, relative rank).
-    pub fn new(r: &RelAdr) -> Self {
+    pub fn new(r: &RelAdr2D) -> Self {
         let range = max(r.file.abs(), r.rank.abs());
         if r.file == range {
             Degree45Orthant::IVOrI
@@ -409,13 +409,13 @@ pub enum Angle {
 ///
 /// メモリを使わないようにしようぜ☆（＾～＾）
 #[derive(Clone, Copy)]
-pub struct RelAdr {
+pub struct RelAdr2D {
     file: isize,
     rank: isize,
 }
-impl RelAdr {
+impl RelAdr2D {
     pub fn new(file: isize, rank: isize) -> Self {
-        RelAdr {
+        RelAdr2D {
             file: file,
             rank: rank,
         }
@@ -552,7 +552,7 @@ impl RelAdr {
     }
 }
 /// 回転してみるまで象限は分からないので、出せるのは筋、段、相対番地だけだぜ☆（＾～＾）
-impl fmt::Debug for RelAdr {
+impl fmt::Debug for RelAdr2D {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
@@ -570,7 +570,7 @@ impl fmt::Debug for RelAdr {
 ///
 /// Copy: 配列の要素の初期化時に使う☆（＾～＾）
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct AbsoluteAddress {
+pub struct AbsoluteAddress2D {
     /// Square is shogi coordinate. file*10+rank.
     ///
     ///           North
@@ -587,13 +587,13 @@ pub struct AbsoluteAddress {
     file: usize,
     rank: usize,
 }
-impl Default for AbsoluteAddress {
+impl Default for AbsoluteAddress2D {
     /// ゴミの値を作るぜ☆（＾～＾）
     fn default() -> Self {
-        AbsoluteAddress { file: 1, rank: 1 }
+        AbsoluteAddress2D { file: 1, rank: 1 }
     }
 }
-impl AbsoluteAddress {
+impl AbsoluteAddress2D {
     pub fn new(file: usize, rank: usize) -> Self {
         debug_assert!(
             FILE_0 as usize <= file && file < FILE_11 as usize,
@@ -603,13 +603,13 @@ impl AbsoluteAddress {
             RANK_0 as usize <= rank && rank < RANK_11 as usize,
             format!("rank={}", rank)
         );
-        AbsoluteAddress {
+        AbsoluteAddress2D {
             file: file,
             rank: rank,
         }
     }
 
-    pub fn from_absolute_address(address: usize) -> Option<AbsoluteAddress> {
+    pub fn from_absolute_address(address: usize) -> Option<AbsoluteAddress2D> {
         let file = (address / 10) % 10;
         let rank = address % 10;
         if address == 0 {
@@ -617,7 +617,7 @@ impl AbsoluteAddress {
         } else {
             debug_assert!(FILE_0 < file && file < FILE_10, format!("file={}", file));
             debug_assert!(RANK_0 < rank && rank < RANK_10, format!("rank={}", rank));
-            Some(AbsoluteAddress::new(file as usize, rank as usize))
+            Some(AbsoluteAddress2D::new(file as usize, rank as usize))
         }
     }
 
@@ -640,7 +640,7 @@ impl AbsoluteAddress {
         let rank = RANK_10 - self.rank;
         debug_assert!(FILE_0 < file && file < FILE_10, format!("file={}", file));
         debug_assert!(RANK_0 < rank && rank < RANK_10, format!("rank={}", rank));
-        AbsoluteAddress::new(file, rank)
+        AbsoluteAddress2D::new(file, rank)
     }
 
     /// 壁の中にいる☆（＾～＾）
@@ -653,7 +653,7 @@ impl AbsoluteAddress {
         self.file * 10 + self.rank
     }
 
-    pub fn offset(&mut self, r: &RelAdr) -> &mut Self {
+    pub fn offset(&mut self, r: &RelAdr2D) -> &mut Self {
         // TODO rankの符号はどうだったか……☆（＾～＾） 絶対番地の使い方をしてれば問題ないだろ☆（＾～＾）
         // TODO sum は負数になることもあり、そのときは明らかにイリーガルだぜ☆（＾～＾）
         let sum = (self.serial_number() as isize + r.get_address()) as usize;
@@ -676,12 +676,12 @@ impl AbsoluteAddress {
     }
 }
 /// USI向け。
-impl fmt::Display for AbsoluteAddress {
+impl fmt::Display for AbsoluteAddress2D {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}{}", self.file(), num_to_lower_case(self.rank()),)
     }
 }
-impl fmt::Debug for AbsoluteAddress {
+impl fmt::Debug for AbsoluteAddress2D {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,

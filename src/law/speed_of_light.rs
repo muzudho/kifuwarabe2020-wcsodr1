@@ -14,7 +14,7 @@ use crate::cosmic::smart::features::PHYSICAL_PIECE_TYPE_LEN;
 use crate::cosmic::smart::features::PIECE_MEANING_LEN;
 use crate::cosmic::smart::features::PIECE_TYPE_LEN;
 use crate::cosmic::smart::features::{PhysicalPiece, PhysicalPieceType, PieceMeaning, PieceType};
-use crate::cosmic::smart::square::{Angle, RelAdr, ANGLE_LEN};
+use crate::cosmic::smart::square::{Angle, RelAdr2D, ANGLE_LEN};
 use crate::cosmic::toy_box::PieceNum;
 use crate::law::generate_move::{Agility, Mobility};
 
@@ -68,8 +68,8 @@ struct SpeedOfLight {
     physical_piece_to_nonpromoted_meaning: [PieceMeaning; PHYSICAL_PIECES_LEN],
 
     // 相対番地と角度☆（＾～＾）
-    west_ccw: [RelAdr; ANGLE_LEN],
-    west_ccw_double_rank: [RelAdr; ANGLE_LEN],
+    west_ccw: [RelAdr2D; ANGLE_LEN],
+    west_ccw_double_rank: [RelAdr2D; ANGLE_LEN],
 
     /// 点対称☆（＾～＾）
     rotate180: [Angle; ANGLE_LEN],
@@ -79,7 +79,7 @@ struct SpeedOfLight {
     /// 大きくすると、歩と交換に角が成り込むぜ☆（＾～＾）
     promotion_value: [isize; PHYSICAL_PIECE_TYPE_LEN],
 
-    west: RelAdr,
+    west: RelAdr2D,
 }
 impl Default for SpeedOfLight {
     fn default() -> Self {
@@ -508,37 +508,43 @@ impl Default for SpeedOfLight {
 
             // よく使う、角度の付いた相対番地☆（＾～＾）
             west_ccw: [
-                RelAdr::new(1, 0),
-                RelAdr::new(1, 0).rotate(Angle::Ccw45).clone(),
-                RelAdr::new(1, 0).rotate(Angle::Ccw90).clone(),
-                RelAdr::new(1, 0).rotate(Angle::Ccw135).clone(),
-                RelAdr::new(1, 0).rotate(Angle::Ccw180).clone(),
-                RelAdr::new(1, 0).rotate(Angle::Ccw225).clone(),
-                RelAdr::new(1, 0).rotate(Angle::Ccw270).clone(),
-                RelAdr::new(1, 0).rotate(Angle::Ccw315).clone(),
+                RelAdr2D::new(1, 0),
+                RelAdr2D::new(1, 0).rotate(Angle::Ccw45).clone(),
+                RelAdr2D::new(1, 0).rotate(Angle::Ccw90).clone(),
+                RelAdr2D::new(1, 0).rotate(Angle::Ccw135).clone(),
+                RelAdr2D::new(1, 0).rotate(Angle::Ccw180).clone(),
+                RelAdr2D::new(1, 0).rotate(Angle::Ccw225).clone(),
+                RelAdr2D::new(1, 0).rotate(Angle::Ccw270).clone(),
+                RelAdr2D::new(1, 0).rotate(Angle::Ccw315).clone(),
             ],
             /// 回転してからダブル・ランクしろだぜ☆（＾～＾）逆だと結果が違う☆（＾～＾）非可換の群、知ってるだろ☆ｍ９（＾～＾）ルービック・キューブと同じだぜ☆（＾～＾）
             west_ccw_double_rank: [
-                RelAdr::new(1, 0).double_rank().clone(),
-                RelAdr::new(1, 0).rotate(Angle::Ccw45).double_rank().clone(),
-                RelAdr::new(1, 0).rotate(Angle::Ccw90).double_rank().clone(),
-                RelAdr::new(1, 0)
+                RelAdr2D::new(1, 0).double_rank().clone(),
+                RelAdr2D::new(1, 0)
+                    .rotate(Angle::Ccw45)
+                    .double_rank()
+                    .clone(),
+                RelAdr2D::new(1, 0)
+                    .rotate(Angle::Ccw90)
+                    .double_rank()
+                    .clone(),
+                RelAdr2D::new(1, 0)
                     .rotate(Angle::Ccw135)
                     .double_rank()
                     .clone(),
-                RelAdr::new(1, 0)
+                RelAdr2D::new(1, 0)
                     .rotate(Angle::Ccw180)
                     .double_rank()
                     .clone(),
-                RelAdr::new(1, 0)
+                RelAdr2D::new(1, 0)
                     .rotate(Angle::Ccw225)
                     .double_rank()
                     .clone(),
-                RelAdr::new(1, 0)
+                RelAdr2D::new(1, 0)
                     .rotate(Angle::Ccw270)
                     .double_rank()
                     .clone(),
-                RelAdr::new(1, 0)
+                RelAdr2D::new(1, 0)
                     .rotate(Angle::Ccw315)
                     .double_rank()
                     .clone(),
@@ -564,7 +570,7 @@ impl Default for SpeedOfLight {
                 1000, 900, 600, 500, 300, 200, 100,
             ],
             // 座標☆（＾～＾）
-            west: RelAdr::new(1, 0),
+            west: RelAdr2D::new(1, 0),
         }
     }
 }
@@ -574,7 +580,7 @@ impl Nine299792458 {
     pub fn piece_numbers() -> &'static Vec<PieceNum> {
         &NINE_299792458.piece_numbers
     }
-    pub fn west() -> RelAdr {
+    pub fn west() -> RelAdr2D {
         NINE_299792458.west
     }
 }
@@ -658,10 +664,10 @@ impl Angle {
     pub fn rotate180(self) -> Angle {
         NINE_299792458.rotate180[self as usize]
     }
-    pub fn west_ccw_double_rank(self) -> RelAdr {
+    pub fn west_ccw_double_rank(self) -> RelAdr2D {
         NINE_299792458.west_ccw_double_rank[self as usize]
     }
-    pub fn west_ccw(self) -> RelAdr {
+    pub fn west_ccw(self) -> RelAdr2D {
         NINE_299792458.west_ccw[self as usize]
     }
 }

@@ -2,10 +2,10 @@
 //! USIプロトコル
 //!
 use crate::cosmic::playing::Game;
-use crate::cosmic::recording::{AddressOnPosition, Movement};
+use crate::cosmic::recording::{AddressPos, Movement};
 use crate::cosmic::smart::features::PieceMeaning;
 use crate::cosmic::smart::features::{PhysicalPiece, PhysicalPieceType};
-use crate::cosmic::smart::square::{AbsoluteAddress, FILE_9, RANK_1};
+use crate::cosmic::smart::square::{AbsoluteAddress2D, FILE_9, RANK_1};
 use crate::spaceship::equipment::Beam;
 use atoi::atoi;
 
@@ -100,11 +100,11 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
     match source {
         Source::Move(file, rank) => {
             *starts += 1;
-            buffer.source = AddressOnPosition::Board(AbsoluteAddress::new(file, rank));
+            buffer.source = AddressPos::Board(AbsoluteAddress2D::new(file, rank));
         }
         Source::Drop(hand) => {
             *starts += 2;
-            buffer.source = AddressOnPosition::Hand(PhysicalPiece::from_phase_and_type(
+            buffer.source = AddressPos::Hand(PhysicalPiece::from_phase_and_type(
                 game.history.get_friend(),
                 hand,
             ));
@@ -144,7 +144,7 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
     *starts += 1;
 
     // 行き先。
-    buffer.destination = AddressOnPosition::Board(AbsoluteAddress::new(file, rank));
+    buffer.destination = AddressPos::Board(AbsoluteAddress2D::new(file, rank));
 
     // 5文字に「+」があれば成り。
     buffer.promote = if 0 < (len - *starts) && &line[*starts..=*starts] == "+" {
@@ -247,7 +247,7 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Game) {
         match board_part {
             BoardPart::Alphabet(piece_meaning) => {
                 *starts += 1;
-                let addr = AddressOnPosition::Board(AbsoluteAddress::new(file, rank));
+                let addr = AddressPos::Board(AbsoluteAddress2D::new(file, rank));
                 board.push_to_board_from_sfen(&addr, piece_meaning);
                 file -= 1;
             }

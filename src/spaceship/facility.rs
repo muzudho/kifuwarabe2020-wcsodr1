@@ -1,9 +1,8 @@
 use crate::cosmic::playing::{Game, PosNums};
-use crate::cosmic::recording::{AddressOnPosition, Movement};
+use crate::cosmic::recording::{AddressPos, Movement};
 use crate::cosmic::smart::features::{PhysicalPiece, PIECE_WHITE_SPACE};
 use crate::cosmic::smart::square::*;
 use crate::cosmic::toy_box::*;
-use crate::law::generate_move::Piece;
 use crate::spaceship::equipment::Beam;
 
 /// 指令室はこちらだぜ☆（＾～＾）！
@@ -49,12 +48,9 @@ impl CommandRoom {
 pub struct GameRoom {}
 impl GameRoom {
     fn to_string3(board: &Board, file: usize, rank: usize) -> String {
-        GameRoom::to_string2(
-            board.piece_at(&AddressOnPosition::Board(AbsoluteAddress::new(file, rank))),
-        )
-    }
-    fn to_string2(piece: Option<Piece>) -> String {
-        if let Some(piece_val) = piece {
+        if let Some(piece_val) =
+            board.piece_at(&AddressPos::Board(AbsoluteAddress2D::new(file, rank)))
+        {
             format!("{}", piece_val.meaning)
         } else {
             PIECE_WHITE_SPACE.to_string()

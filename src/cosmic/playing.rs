@@ -1,5 +1,5 @@
 use crate::cosmic::pos_hash::pos_hash::*;
-use crate::cosmic::recording::{AddressOnPosition, History, Movement};
+use crate::cosmic::recording::{AddressPos, History, Movement};
 use crate::cosmic::toy_box::Board;
 use crate::law::generate_move::Piece;
 use crate::spaceship::equipment::{Beam, DestinationDisplay};
@@ -126,7 +126,7 @@ impl Game {
 
         // 動かす駒。Noneなことは無いが、将棋盤にセットするとき結局 Some を付けることになるので、わざわざ省かないぜ☆（＾～＾）
         let moveing_piece: Option<Piece> = match move_.source {
-            AddressOnPosition::Board(_src_sq) => {
+            AddressPos::Board(_src_sq) => {
                 // 盤上の移動なら、元の升に駒はあるので、それを消す。
                 let piece152: Option<Piece> = if move_.promote {
                     if let Some(piece) = self.board.pop_from_board(&move_.source) {
@@ -144,12 +144,12 @@ impl Game {
 
                 piece152
             }
-            AddressOnPosition::Hand(drop) => {
+            AddressPos::Hand(drop) => {
                 // 打なら
                 // 自分の持ち駒を減らす
                 Some(self.board.pop_from_hand(drop))
             }
-            AddressOnPosition::Busy => {
+            AddressPos::Busy => {
                 panic!(Beam::trouble(
                     "(Err.246) 指し手のソースが設定されていないだって☆（＾～＾）！？"
                 ));
@@ -184,7 +184,7 @@ impl Game {
                 let captured: Option<Piece> = move_.captured;
                 // 動いた駒
                 let moveing_piece: Option<Piece> = match move_.source {
-                    AddressOnPosition::Board(_source_val) => {
+                    AddressPos::Board(_source_val) => {
                         // 盤上の移動なら
                         if move_.promote {
                             // 成ったなら、成る前へ
@@ -201,7 +201,7 @@ impl Game {
                             self.board.pop_from_board(&move_.destination)
                         }
                     }
-                    AddressOnPosition::Hand(_drop) => {
+                    AddressPos::Hand(_drop) => {
                         // 打なら
                         // 打った場所に駒があるはずだぜ☆（＾～＾）
                         let piece = self.board.pop_from_board(&move_.destination).unwrap();
@@ -209,7 +209,7 @@ impl Game {
                         self.board.push_to_hand(&piece);
                         Some(piece)
                     }
-                    AddressOnPosition::Busy => panic!(Beam::trouble(
+                    AddressPos::Busy => panic!(Beam::trouble(
                         "(Err.308) 指し手のソースが設定されていないだって☆（＾～＾）！？"
                     )),
                 };
@@ -222,7 +222,7 @@ impl Game {
                     self.board.push_to_board(&move_.destination, captured);
                 }
 
-                if let AddressOnPosition::Board(_src_sq) = move_.source {
+                if let AddressPos::Board(_src_sq) = move_.source {
                     // 打でなければ、移動元升に、動かした駒を置く☆（＾～＾）打なら何もしないぜ☆（＾～＾）
                     self.board.push_to_board(&move_.source, moveing_piece);
                 }

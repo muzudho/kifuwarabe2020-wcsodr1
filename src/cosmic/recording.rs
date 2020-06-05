@@ -5,7 +5,7 @@
 //! * Person (先手,後手)
 //!
 use crate::cosmic::smart::features::PhysicalPiece;
-use crate::cosmic::smart::square::AbsoluteAddress;
+use crate::cosmic::smart::square::AbsoluteAddress2D;
 use crate::law::cryptographic::num_to_lower_case;
 use crate::law::generate_move::Piece;
 use std::fmt;
@@ -61,48 +61,48 @@ impl History {
     */
 }
 
-/// 局面全体を範囲にして振られた番地。
+/// 局面(Position)全体を範囲にして振られた番地(Address)。
 #[derive(Clone, Copy)]
-pub enum AddressOnPosition {
+pub enum AddressPos {
     // 盤上の番地
-    Board(AbsoluteAddress),
+    Board(AbsoluteAddress2D),
     // 持ち駒の種類
     Hand(PhysicalPiece),
     // 作業中のときは、これだぜ☆（＾～＾）
     Busy,
 }
-impl fmt::Display for AddressOnPosition {
+impl fmt::Display for AddressPos {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
             "{}",
             match self {
-                AddressOnPosition::Board(addr) => {
+                AddressPos::Board(addr) => {
                     format!("{}", addr)
                 }
-                AddressOnPosition::Hand(drop) => {
+                AddressPos::Hand(drop) => {
                     format!("{}", drop)
                 }
-                AddressOnPosition::Busy => {
+                AddressPos::Busy => {
                     "-".to_string()
                 }
             },
         )
     }
 }
-impl fmt::Debug for AddressOnPosition {
+impl fmt::Debug for AddressPos {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
             "{}",
             match self {
-                AddressOnPosition::Board(addr) => {
+                AddressPos::Board(addr) => {
                     addr.serial_number().to_string()
                 }
-                AddressOnPosition::Hand(drop) => {
+                AddressPos::Hand(drop) => {
                     format!("{:?}", drop)
                 }
-                AddressOnPosition::Busy => {
+                AddressPos::Busy => {
                     "-".to_string()
                 }
             },
@@ -117,9 +117,9 @@ impl fmt::Debug for AddressOnPosition {
 #[derive(Clone, Copy)]
 pub struct Movement {
     /// 移動元マス。
-    pub source: AddressOnPosition,
+    pub source: AddressPos,
     /// 移動先マス。リバーシブルに作りたいので、駒台にも指せる。
-    pub destination: AddressOnPosition,
+    pub destination: AddressPos,
     /// 移動後に成るなら真
     pub promote: bool,
     /// 取ることになる駒
@@ -129,8 +129,8 @@ impl Default for Movement {
     /// ゴミの値を作るぜ☆（＾～＾）
     fn default() -> Self {
         Movement {
-            source: AddressOnPosition::Busy,
-            destination: AddressOnPosition::Busy,
+            source: AddressPos::Busy,
+            destination: AddressPos::Busy,
             promote: false,
             captured: None,
         }
@@ -138,8 +138,8 @@ impl Default for Movement {
 }
 impl Movement {
     pub fn new(
-        source: AddressOnPosition,
-        destination: AddressOnPosition,
+        source: AddressPos,
+        destination: AddressPos,
         promote: bool,
         captured: Option<Piece>,
     ) -> Self {
@@ -160,7 +160,7 @@ impl Movement {
 impl fmt::Display for Movement {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self.source {
-            AddressOnPosition::Board(source_val) => {
+            AddressPos::Board(source_val) => {
                 let (sx, sy) = source_val.to_file_rank();
                 write!(
                     f,
@@ -171,14 +171,14 @@ impl fmt::Display for Movement {
                     if self.promote { "+" } else { "" }
                 )
             }
-            AddressOnPosition::Hand(drop) => write!(
+            AddressPos::Hand(drop) => write!(
                 f,
                 "{}{}{}",
                 drop,
                 self.destination,
                 if self.promote { "+" } else { "" }
             ),
-            AddressOnPosition::Busy => write!(f, "Busy",),
+            AddressPos::Busy => write!(f, "Busy",),
         }
     }
 }

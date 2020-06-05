@@ -3,7 +3,7 @@
 //!
 
 use crate::cosmic::playing::Game;
-use crate::cosmic::recording::{AddressOnPosition, Movement, PLY_LEN, SENNTITE_NUM};
+use crate::cosmic::recording::{AddressPos, Movement, PLY_LEN, SENNTITE_NUM};
 use crate::cosmic::smart::evaluator::{Evaluation, REPITITION_VALUE};
 use crate::cosmic::smart::features::PieceType;
 use crate::cosmic::smart::see::SEE;
@@ -195,12 +195,12 @@ impl Tree {
             // 1手進めるぜ☆（＾～＾）
             self.state_nodes += 1;
             let source_piece = match move_.source {
-                AddressOnPosition::Board(_sq) => game.board.piece_at(&move_.source),
-                AddressOnPosition::Hand(_drop) => {
+                AddressPos::Board(_sq) => game.board.piece_at(&move_.source),
+                AddressPos::Hand(_drop) => {
                     // 打
                     None
                 }
-                AddressOnPosition::Busy => {
+                AddressPos::Busy => {
                     panic!(Beam::trouble(
                         "(Err.208) 指し手のソースが未設定☆（＾～＾）！？"
                     ));

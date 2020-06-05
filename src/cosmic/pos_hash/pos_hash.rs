@@ -2,10 +2,10 @@
 //!
 
 use crate::cosmic::playing::Game;
-use crate::cosmic::recording::{AddressOnPosition, History, Movement, PHASE_LEN, PHASE_SECOND};
+use crate::cosmic::recording::{AddressPos, History, Movement, PHASE_LEN, PHASE_SECOND};
 use crate::cosmic::smart::features::{HAND_MAX, PHYSICAL_PIECES_LEN, PIECE_MEANING_LEN};
 use crate::cosmic::smart::square::{
-    AbsoluteAddress, BOARD_MEMORY_AREA, FILE_1, FILE_10, RANK_1, RANK_10, SQUARE_NONE,
+    AbsoluteAddress2D, BOARD_MEMORY_AREA, FILE_1, FILE_10, RANK_1, RANK_10, SQUARE_NONE,
 };
 use crate::cosmic::toy_box::Board;
 use crate::law::speed_of_light::HandAddresses;
@@ -73,13 +73,13 @@ impl GameHashSeed {
         // TODO 指し手 で差分を適用
         // 移動する駒。
         match move_.source {
-            AddressOnPosition::Board(sq) => {
+            AddressPos::Board(sq) => {
                 let source_piece_meaning = board.piece_at(&move_.source).unwrap().meaning as usize;
                 // 移動前マスに、動かしたい駒があるときのハッシュ。
                 prev_hash ^= self.piece[sq.serial_number()][source_piece_meaning];
                 // 移動後マスに、動かしたい駒があるときのハッシュ。
                 match move_.destination {
-                    AddressOnPosition::Board(sq) => {
+                    AddressPos::Board(sq) => {
                         prev_hash ^= self.piece[sq.serial_number()][source_piece_meaning];
                     }
                     _ => panic!(Beam::trouble(&format!(
@@ -87,13 +87,13 @@ impl GameHashSeed {
                     ))),
                 }
             }
-            AddressOnPosition::Hand(physical_piece) => {
+            AddressPos::Hand(physical_piece) => {
                 let count = board.count_hand(physical_piece);
                 // 打つ前の駒の枚数のハッシュ。
                 prev_hash ^= self.hands[physical_piece as usize][count as usize];
                 // 移動後マスに、打った駒があるときのハッシュ。
                 match move_.destination {
-                    AddressOnPosition::Board(sq) => {
+                    AddressPos::Board(sq) => {
                         prev_hash ^= self.piece[sq.serial_number()]
                             [physical_piece.nonpromoted_meaning() as usize];
                     }
@@ -102,7 +102,7 @@ impl GameHashSeed {
                     ))),
                 }
             }
-            AddressOnPosition::Busy => panic!(Beam::trouble(
+            AddressPos::Busy => panic!(Beam::trouble(
                 "(Err.85) 移動前の駒が設定されていないだって☆（＾～＾）！？"
             )),
         }
@@ -111,7 +111,7 @@ impl GameHashSeed {
         let dst_piece = board.piece_at(&dst);
         if let Some(dst_piece) = dst_piece {
             match dst {
-                AddressOnPosition::Board(dst_sq) => {
+                AddressPos::Board(dst_sq) => {
                     prev_hash ^= self.piece[dst_sq.serial_number()][dst_piece.meaning as usize];
                     // 持ち駒になるとき。
                     let physical_piece = dst_piece.meaning.physical_piece();
@@ -162,8 +162,8 @@ impl GameHashSeed {
         // 盤上の駒
         for rank in RANK_1..RANK_10 {
             for file in (FILE_1..FILE_10).rev() {
-                let sq = AbsoluteAddress::new(file, rank);
-                if let Some(piece) = board.piece_at(&AddressOnPosition::Board(sq)) {
+                let sq = AbsoluteAddress2D::new(file, rank);
+                if let Some(piece) = board.piece_at(&AddressPos::Board(sq)) {
                     hash ^= self.piece[sq.serial_number()][piece.meaning as usize];
                 }
             }

@@ -2,12 +2,12 @@
 //! 現局面を使った指し手生成☆（＾～＾）
 //!
 
-use crate::cosmic::recording::{AddressOnPosition, Movement, Phase};
+use crate::cosmic::recording::{AddressPos, Movement, Phase};
 use crate::cosmic::smart::features::PhysicalPiece;
 use crate::cosmic::smart::features::PieceMeaning;
 use crate::cosmic::smart::features::PieceType;
 use crate::cosmic::smart::square::{
-    AbsoluteAddress, Angle, RelAdr, FILE_1, FILE_10, RANK_1, RANK_10, RANK_2, RANK_3, RANK_4,
+    AbsoluteAddress2D, Angle, RelAdr2D, FILE_1, FILE_10, RANK_1, RANK_10, RANK_2, RANK_3, RANK_4,
     RANK_6, RANK_7, RANK_8, RANK_9,
 };
 use crate::cosmic::toy_box::Board;
@@ -121,13 +121,13 @@ impl PseudoLegalMoves {
         F1: FnMut(Movement),
     {
         board.for_some_pieces_on_list40(friend, &mut |addr, piece| match addr {
-            AddressOnPosition::Board(_src_sq) => {
+            AddressPos::Board(_src_sq) => {
                 PseudoLegalMoves::start_on_board(friend, &addr, &piece, board, listen_move)
             }
-            AddressOnPosition::Hand(drop) => {
+            AddressPos::Hand(drop) => {
                 PseudoLegalMoves::make_drop(friend, drop, board, listen_move);
             }
-            AddressOnPosition::Busy => panic!(Beam::trouble(
+            AddressPos::Busy => panic!(Beam::trouble(
                 "(Err.94) なんで駒が作業中なんだぜ☆（＾～＾）！"
             )),
         });
@@ -150,7 +150,7 @@ impl PseudoLegalMoves {
     /// * 移動先にあった駒
     fn start_on_board<F1>(
         friend: Phase,
-        source: &AddressOnPosition,
+        source: &AddressPos,
         piece: &Piece,
         board: &Board,
         listen_move: &mut F1,
@@ -247,7 +247,7 @@ impl PseudoLegalMoves {
                         Pawn1 | Pawn2 => {
                             // ひよこ　は２歩できない☆（＾～＾）
                             match destination {
-                                AddressOnPosition::Board(dst_sq) => {
+                                AddressPos::Board(dst_sq) => {
                                     if board.exists_pawn_on_file(friend, dst_sq.file()) {
                                         return;
                                     }
@@ -260,10 +260,10 @@ impl PseudoLegalMoves {
                         _ => {}
                     }
                     listen_move(Movement::new(
-                        AddressOnPosition::Hand(piece.meaning.physical_piece()), // 打った駒種類
-                        destination, // どの升へ行きたいか
-                        false,       // 打に成りは無し
-                        None,        // 打で取れる駒無し
+                        AddressPos::Hand(piece.meaning.physical_piece()), // 打った駒種類
+                        destination,                                      // どの升へ行きたいか
+                        false,                                            // 打に成りは無し
+                        None,                                             // 打で取れる駒無し
                     ));
                 }
             };
@@ -293,11 +293,11 @@ impl Area {
     /// * `callback` - 絶対番地を受け取れだぜ☆（＾～＾）
     pub fn for_all<F1>(callback: &mut F1)
     where
-        F1: FnMut(AddressOnPosition),
+        F1: FnMut(AddressPos),
     {
         for rank in RANK_1..RANK_10 {
             for file in (FILE_1..FILE_10).rev() {
-                callback(AddressOnPosition::Board(AbsoluteAddress::new(file, rank)));
+                callback(AddressPos::Board(AbsoluteAddress2D::new(file, rank)));
             }
         }
     }
@@ -312,13 +312,9 @@ impl Area {
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `hopping` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     /// * `sliding` -
-    fn piece_of<F1>(
-        piece_type: PieceType,
-        friend: Phase,
-        source: &AddressOnPosition,
-        moving: &mut F1,
-    ) where
-        F1: FnMut(AddressOnPosition, Promotability, Agility, Option<MovePermission>) -> bool,
+    fn piece_of<F1>(piece_type: PieceType, friend: Phase, source: &AddressPos, moving: &mut F1)
+    where
+        F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         match piece_type {
             PieceType::Pawn => Area::pawn(friend, source, moving),
@@ -346,9 +342,9 @@ impl Area {
     /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn pawn<F1>(friend: Phase, source: &AddressOnPosition, moving: &mut F1)
+    fn pawn<F1>(friend: Phase, source: &AddressPos, moving: &mut F1)
     where
-        F1: FnMut(AddressOnPosition, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving = &mut |destination, _agility| {
             Promoting::pawn_lance(
@@ -372,9 +368,9 @@ impl Area {
     /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn lance<F1>(friend: Phase, source: &AddressOnPosition, moving: &mut F1)
+    fn lance<F1>(friend: Phase, source: &AddressPos, moving: &mut F1)
     where
-        F1: FnMut(AddressOnPosition, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving = &mut |destination, _agility| {
             Promoting::pawn_lance(
@@ -398,9 +394,9 @@ impl Area {
     /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn knight<F1>(friend: Phase, source: &AddressOnPosition, moving: &mut F1)
+    fn knight<F1>(friend: Phase, source: &AddressPos, moving: &mut F1)
     where
-        F1: FnMut(AddressOnPosition, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving = &mut |destination, _agility| {
             Promoting::knight(
@@ -424,9 +420,9 @@ impl Area {
     /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn silver<F1>(friend: Phase, source: &AddressOnPosition, moving: &mut F1)
+    fn silver<F1>(friend: Phase, source: &AddressPos, moving: &mut F1)
     where
-        F1: FnMut(AddressOnPosition, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving =
             &mut |destination, _agility| Promoting::silver(friend, &source, &destination, moving);
@@ -444,9 +440,9 @@ impl Area {
     /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn gold<F1>(friend: Phase, source: &AddressOnPosition, moving: &mut F1)
+    fn gold<F1>(friend: Phase, source: &AddressPos, moving: &mut F1)
     where
-        F1: FnMut(AddressOnPosition, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving = &mut |destination, _agility| {
             moving(destination, Promotability::Deny, Agility::Hopping, None)
@@ -464,9 +460,9 @@ impl Area {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn king<F1>(source: &AddressOnPosition, moving: &mut F1)
+    fn king<F1>(source: &AddressPos, moving: &mut F1)
     where
-        F1: FnMut(AddressOnPosition, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving = &mut |destination, _agility| {
             moving(destination, Promotability::Deny, Agility::Hopping, None)
@@ -484,9 +480,9 @@ impl Area {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn bishop<F1>(friend: Phase, source: &AddressOnPosition, moving: &mut F1)
+    fn bishop<F1>(friend: Phase, source: &AddressPos, moving: &mut F1)
     where
-        F1: FnMut(AddressOnPosition, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving = &mut |destination, _agility| {
             Promoting::bishop_rook(friend, &source, &destination, moving)
@@ -503,9 +499,9 @@ impl Area {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn rook<F1>(friend: Phase, source: &AddressOnPosition, moving: &mut F1)
+    fn rook<F1>(friend: Phase, source: &AddressPos, moving: &mut F1)
     where
-        F1: FnMut(AddressOnPosition, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving = &mut |destination, _agility| {
             Promoting::bishop_rook(friend, &source, &destination, moving)
@@ -522,9 +518,9 @@ impl Area {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn horse<F1>(source: &AddressOnPosition, moving: &mut F1)
+    fn horse<F1>(source: &AddressPos, moving: &mut F1)
     where
-        F1: FnMut(AddressOnPosition, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving =
             &mut |destination, agility| moving(destination, Promotability::Deny, agility, None);
@@ -541,9 +537,9 @@ impl Area {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn dragon<F1>(source: &AddressOnPosition, moving: &mut F1)
+    fn dragon<F1>(source: &AddressPos, moving: &mut F1)
     where
-        F1: FnMut(AddressOnPosition, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         {
             let moving =
@@ -564,7 +560,7 @@ impl Area {
     /// * `callback` - 絶対番地を受け取れだぜ☆（＾～＾）
     pub fn drop_pawn_lance<F1>(phase: Phase, callback: &mut F1)
     where
-        F1: FnMut(AddressOnPosition),
+        F1: FnMut(AddressPos),
     {
         // 180°回転とかするより、for文の方を変えた方が高速だろ……☆（＾～＾）
         let (min_rank, max_rank) = if phase == Phase::First {
@@ -575,7 +571,7 @@ impl Area {
 
         for rank in min_rank..max_rank {
             for file in (FILE_1..FILE_10).rev() {
-                callback(AddressOnPosition::Board(AbsoluteAddress::new(file, rank)));
+                callback(AddressPos::Board(AbsoluteAddress2D::new(file, rank)));
             }
         }
     }
@@ -589,16 +585,16 @@ impl Area {
     /// * `callback` - 絶対番地を受け取れだぜ☆（＾～＾）
     pub fn drop_knight<F1>(phase: Phase, callback: &mut F1)
     where
-        F1: FnMut(AddressOnPosition),
+        F1: FnMut(AddressPos),
     {
         for rank in RANK_3..RANK_10 {
             for file in (FILE_1..FILE_10).rev() {
-                let mut ab_adr = AbsoluteAddress::new(file, rank);
+                let mut ab_adr = AbsoluteAddress2D::new(file, rank);
                 if phase == Phase::Second {
                     ab_adr = ab_adr.rotate_180();
                 }
 
-                callback(AddressOnPosition::Board(ab_adr));
+                callback(AddressPos::Board(ab_adr));
             }
         }
     }
@@ -612,13 +608,9 @@ impl Area {
     /// * `angle` - 角度☆（＾～＾）
     /// * `agility` - 動き方☆（＾～＾）
     /// * `callback` - 絶対番地を受け取れだぜ☆（＾～＾）
-    fn move_<F1>(
-        friend: &Option<Phase>,
-        start: &AddressOnPosition,
-        mobility: Mobility,
-        moving: &mut F1,
-    ) where
-        F1: FnMut(AddressOnPosition, Agility) -> bool,
+    fn move_<F1>(friend: &Option<Phase>, start: &AddressPos, mobility: Mobility, moving: &mut F1)
+    where
+        F1: FnMut(AddressPos, Agility) -> bool,
     {
         let angle = if let Some(friend_val) = friend {
             // 先後同型でない駒は、後手なら１８０°回転だぜ☆（＾～＾）
@@ -633,17 +625,17 @@ impl Area {
         };
 
         match start {
-            AddressOnPosition::Board(start_sq) => {
+            AddressPos::Board(start_sq) => {
                 match mobility.agility {
                     Agility::Sliding => {
                         let mut cur = start_sq.clone();
-                        let r = RelAdr::new(1, 0).rotate(angle).clone();
+                        let r = RelAdr2D::new(1, 0).rotate(angle).clone();
                         loop {
                             // 西隣から反時計回りだぜ☆（＾～＾）
                             if cur.offset(&r).wall() {
                                 break;
                             }
-                            if moving(AddressOnPosition::Board(cur), mobility.agility) {
+                            if moving(AddressPos::Board(cur), mobility.agility) {
                                 break;
                             }
                         }
@@ -653,14 +645,14 @@ impl Area {
                         let mut cur = start_sq.clone();
                         // 西隣から反時計回りだぜ☆（＾～＾）
                         if !cur.offset(&angle.west_ccw_double_rank()).wall() {
-                            moving(AddressOnPosition::Board(cur), mobility.agility);
+                            moving(AddressPos::Board(cur), mobility.agility);
                         }
                     }
                     Agility::Hopping => {
                         let mut cur = start_sq.clone();
                         // 西隣から反時計回りだぜ☆（＾～＾）
                         if !cur.offset(&angle.west_ccw()).wall() {
-                            moving(AddressOnPosition::Board(cur), mobility.agility);
+                            moving(AddressPos::Board(cur), mobility.agility);
                         }
                     }
                 }
@@ -725,9 +717,9 @@ impl MovePermission {
             },
         }
     }
-    fn check(&self, dst_addr: &AddressOnPosition) -> bool {
+    fn check(&self, dst_addr: &AddressPos) -> bool {
         match dst_addr {
-            AddressOnPosition::Board(dst_sq) => {
+            AddressPos::Board(dst_sq) => {
                 if dst_sq.rank() < self.min_rank || self.max_rank < dst_sq.rank() {
                     return false;
                 }
@@ -759,12 +751,12 @@ impl Promoting {
     /// * `move_permission` - 成らずに一番奥の段に移動することはできません。
     fn pawn_lance<F1>(
         friend: Phase,
-        destinaion: &AddressOnPosition,
+        destinaion: &AddressPos,
         callback: &mut F1,
         move_permission: Option<MovePermission>,
     ) -> bool
     where
-        F1: FnMut(AddressOnPosition, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         if Promoting::is_farthest_rank_from_friend(friend, &destinaion) {
             // 自陣から見て一番奥の段
@@ -803,12 +795,12 @@ impl Promoting {
     /// * `move_permission` - 成らずに奥から２番目の段に移動することはできません。
     fn knight<F1>(
         friend: Phase,
-        destination: &AddressOnPosition,
+        destination: &AddressPos,
         callback: &mut F1,
         move_permission: Option<MovePermission>,
     ) -> bool
     where
-        F1: FnMut(AddressOnPosition, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         if Promoting::is_first_second_farthest_rank_from_friend(friend, &destination) {
             callback(
@@ -846,12 +838,12 @@ impl Promoting {
     /// * `callback` -
     fn silver<F1>(
         friend: Phase,
-        source: &AddressOnPosition,
-        destination: &AddressOnPosition,
+        source: &AddressPos,
+        destination: &AddressPos,
         callback: &mut F1,
     ) -> bool
     where
-        F1: FnMut(AddressOnPosition, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         if Promoting::is_third_farthest_rank_from_friend(friend, &source) {
             callback(*destination, Promotability::Any, Agility::Hopping, None)
@@ -874,12 +866,12 @@ impl Promoting {
     /// * `callback` -
     fn bishop_rook<F1>(
         friend: Phase,
-        source: &AddressOnPosition,
-        destination: &AddressOnPosition,
+        source: &AddressPos,
+        destination: &AddressPos,
         callback: &mut F1,
     ) -> bool
     where
-        F1: FnMut(AddressOnPosition, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         if Promoting::is_opponent_region(friend, &source)
             || Promoting::is_opponent_region(friend, &destination)
@@ -897,9 +889,9 @@ impl Promoting {
     ///
     /// * `friend` -
     /// * `destination` -
-    fn is_farthest_rank_from_friend(friend: Phase, destination: &AddressOnPosition) -> bool {
+    fn is_farthest_rank_from_friend(friend: Phase, destination: &AddressPos) -> bool {
         match destination {
-            AddressOnPosition::Board(dst_sq) => {
+            AddressPos::Board(dst_sq) => {
                 (friend == Phase::First && dst_sq.rank() < RANK_2)
                     || (friend == Phase::Second && RANK_8 < dst_sq.rank())
             }
@@ -915,12 +907,9 @@ impl Promoting {
     ///
     /// * `friend` -
     /// * `destination` -
-    fn is_first_second_farthest_rank_from_friend(
-        friend: Phase,
-        destination: &AddressOnPosition,
-    ) -> bool {
+    fn is_first_second_farthest_rank_from_friend(friend: Phase, destination: &AddressPos) -> bool {
         match destination {
-            AddressOnPosition::Board(dst_sq) => {
+            AddressPos::Board(dst_sq) => {
                 (friend == Phase::First && dst_sq.rank() < RANK_3)
                     || (friend == Phase::Second && RANK_7 < dst_sq.rank())
             }
@@ -936,12 +925,9 @@ impl Promoting {
     ///
     /// * `friend` -
     /// * `destination` -
-    fn is_second_third_farthest_rank_from_friend(
-        friend: Phase,
-        destination: &AddressOnPosition,
-    ) -> bool {
+    fn is_second_third_farthest_rank_from_friend(friend: Phase, destination: &AddressPos) -> bool {
         match destination {
-            AddressOnPosition::Board(dst_sq) => {
+            AddressPos::Board(dst_sq) => {
                 (friend == Phase::First && RANK_1 < dst_sq.rank() && dst_sq.rank() < RANK_4)
                     || (friend == Phase::Second && RANK_6 < dst_sq.rank() && dst_sq.rank() < RANK_9)
             }
@@ -957,9 +943,9 @@ impl Promoting {
     ///
     /// * `friend` -
     /// * `destination` -
-    fn is_third_farthest_rank_from_friend(friend: Phase, destination: &AddressOnPosition) -> bool {
+    fn is_third_farthest_rank_from_friend(friend: Phase, destination: &AddressPos) -> bool {
         match destination {
-            AddressOnPosition::Board(dst_sq) => {
+            AddressPos::Board(dst_sq) => {
                 (friend == Phase::First && dst_sq.rank() == RANK_3)
                     || (friend == Phase::Second && RANK_7 == dst_sq.rank())
             }
@@ -975,9 +961,9 @@ impl Promoting {
     ///
     /// * `friend` -
     /// * `destination` -
-    fn is_opponent_region(friend: Phase, destination: &AddressOnPosition) -> bool {
+    fn is_opponent_region(friend: Phase, destination: &AddressPos) -> bool {
         match destination {
-            AddressOnPosition::Board(dst_sq) => {
+            AddressPos::Board(dst_sq) => {
                 (friend == Phase::First && dst_sq.rank() < RANK_4)
                     || (friend == Phase::Second && RANK_6 < dst_sq.rank())
             }

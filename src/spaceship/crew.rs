@@ -3,7 +3,7 @@ use crate::cosmic::daydream::Tree;
 use crate::cosmic::playing::{Game, PosNums};
 use crate::cosmic::recording::Movement;
 use crate::cosmic::recording::Phase;
-use crate::cosmic::smart::square::{AbsoluteAddress, FILE_1};
+use crate::cosmic::smart::square::{AbsoluteAddress2D, FILE_1};
 use crate::cosmic::universe::Universe;
 use crate::law::cryptographic::*;
 use crate::law::generate_move::PseudoLegalMoves;
@@ -280,7 +280,7 @@ impl Chiyuri {
 
         for ms in 1..9 {
             for hash in 0..10 {
-                let sq = AbsoluteAddress::new(FILE_1, ms);
+                let sq = AbsoluteAddress2D::new(FILE_1, ms);
                 let next = push_sq_to_hash(hash, Some(&sq));
                 let (hash_orig, square_orig) = pop_sq_from_hash(next);
                 Beam::shoot( &format!("push_ms_to_hash(0b{:4b},0b{:5b})=0b{:11b} pop_sq_from_hash(...)=(0b{:4b},0b{:5b})"
