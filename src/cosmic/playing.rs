@@ -144,10 +144,10 @@ impl Game {
 
                 piece152
             }
-            AddressPos::Hand(drop) => {
+            AddressPos::Hand(_drop) => {
                 // 打なら
                 // 自分の持ち駒を減らす
-                Some(self.board.pop_from_hand(drop))
+                Some(self.board.pop_from_hand(move_.source).unwrap())
             }
         };
         // 移動先升に駒があるかどうか
@@ -208,8 +208,9 @@ impl Game {
                 let captured: Option<Piece> = move_.captured;
                 if let Some(captured_piece_val) = captured {
                     // 自分の持ち駒を減らす
-                    self.board
-                        .pop_from_hand(captured_piece_val.meaning.captured().physical_piece());
+                    self.board.pop_from_hand(AddressPos::Hand(
+                        captured_piece_val.meaning.captured().physical_piece(),
+                    ));
                     // 移動先の駒を、取った駒（あるいは空、ということがあるか？）に戻す
                     self.board.push_to_board(&move_.destination, captured);
                 }

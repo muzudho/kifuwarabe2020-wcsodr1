@@ -263,12 +263,19 @@ impl Board {
         }
     }
     /// 台から駒を取りのぞく
-    pub fn pop_from_hand(&mut self, adr: PhysicalPiece) -> Piece {
-        // 台から取りのぞきます。
-        let piece = self.hands[adr as usize].pop();
-        // TODO 背番号の番地に、ゴミ値を入れて消去するが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
-        self.address[piece.num as usize] = AddressPos::Board(AbsoluteAddress2D::default());
-        piece
+    pub fn pop_from_hand(&mut self, addr: AddressPos) -> Option<Piece> {
+        match addr {
+            AddressPos::Board(_sq) => panic!(Beam::trouble(&format!(
+                "(Err.254) まだ実装してないぜ☆（＾～＾）！",
+            ))),
+            AddressPos::Hand(drop) => {
+                // 台から取りのぞきます。
+                let piece = self.hands[drop as usize].pop();
+                // TODO 背番号の番地に、ゴミ値を入れて消去するが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
+                self.address[piece.num as usize] = AddressPos::Board(AbsoluteAddress2D::default());
+                Some(piece)
+            }
+        }
     }
 
     /// 駒の新しい背番号を生成します。
