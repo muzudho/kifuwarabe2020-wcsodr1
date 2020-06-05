@@ -127,9 +127,6 @@ impl PseudoLegalMoves {
             AddressPos::Hand(drop) => {
                 PseudoLegalMoves::make_drop(friend, drop, board, listen_move);
             }
-            AddressPos::Busy => panic!(Beam::trouble(
-                "(Err.94) なんで駒が作業中なんだぜ☆（＾～＾）！"
-            )),
         });
     }
 

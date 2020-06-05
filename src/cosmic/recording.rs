@@ -68,8 +68,6 @@ pub enum AddressPos {
     Board(AbsoluteAddress2D),
     // 持ち駒の種類
     Hand(PhysicalPiece),
-    // 作業中のときは、これだぜ☆（＾～＾）
-    Busy,
 }
 impl fmt::Display for AddressPos {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -82,9 +80,6 @@ impl fmt::Display for AddressPos {
                 }
                 AddressPos::Hand(drop) => {
                     format!("{}", drop)
-                }
-                AddressPos::Busy => {
-                    "-".to_string()
                 }
             },
         )
@@ -102,9 +97,6 @@ impl fmt::Debug for AddressPos {
                 AddressPos::Hand(drop) => {
                     format!("{:?}", drop)
                 }
-                AddressPos::Busy => {
-                    "-".to_string()
-                }
             },
         )
     }
@@ -112,6 +104,8 @@ impl fmt::Debug for AddressPos {
 
 /// 棋譜にも使うので、取った駒の情報を記憶しておくんだぜ☆（＾～＾）
 /// 投了なら これを使わず、None にしろだぜ☆（＾～＾）
+///
+/// 移動していないことを表すには、移動元と移動先を同じにすればいいんだぜ☆（＾～＾）
 ///
 /// Copy: 配列の要素の初期化時に使う☆（＾～＾）
 #[derive(Clone, Copy)]
@@ -124,13 +118,19 @@ pub struct Movement {
     pub promote: bool,
     /// 取ることになる駒
     pub captured: Option<Piece>,
+    /*
+    /// 取ることになる駒の、元あった所。
+    pub captured_source: AddressPos,
+    /// 取ることになる駒の、移動先。
+    pub captured_destination: AddressPos,
+    */
 }
 impl Default for Movement {
     /// ゴミの値を作るぜ☆（＾～＾）
     fn default() -> Self {
         Movement {
-            source: AddressPos::Busy,
-            destination: AddressPos::Busy,
+            source: AddressPos::Board(AbsoluteAddress2D::new(1, 1)),
+            destination: AddressPos::Board(AbsoluteAddress2D::new(1, 1)),
             promote: false,
             captured: None,
         }
@@ -178,7 +178,6 @@ impl fmt::Display for Movement {
                 self.destination,
                 if self.promote { "+" } else { "" }
             ),
-            AddressPos::Busy => write!(f, "Busy",),
         }
     }
 }

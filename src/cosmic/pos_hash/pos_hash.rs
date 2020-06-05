@@ -102,27 +102,23 @@ impl GameHashSeed {
                     ))),
                 }
             }
-            AddressPos::Busy => panic!(Beam::trouble(
-                "(Err.85) 移動前の駒が設定されていないだって☆（＾～＾）！？"
-            )),
         }
         // TODO 移動先にある駒
-        let dst = move_.destination;
-        let dst_piece = board.piece_at(&dst);
-        if let Some(dst_piece) = dst_piece {
-            match dst {
-                AddressPos::Board(dst_sq) => {
-                    prev_hash ^= self.piece[dst_sq.serial_number()][dst_piece.meaning as usize];
+        match move_.destination {
+            AddressPos::Board(dst_sq) => {
+                // 移動先にある駒があれば
+                if let Some(dst_piece_val) = board.piece_at(&move_.destination) {
+                    prev_hash ^= self.piece[dst_sq.serial_number()][dst_piece_val.meaning as usize];
                     // 持ち駒になるとき。
-                    let physical_piece = dst_piece.meaning.physical_piece();
+                    let physical_piece = dst_piece_val.meaning.physical_piece();
                     let count = board.count_hand(physical_piece);
                     // 打つ前の駒の枚数のハッシュ。
                     prev_hash ^= self.hands[physical_piece as usize][count as usize + 1];
                 }
-                _ => panic!(Beam::trouble(&format!(
-                    "(Err.123) まだ実装してないぜ☆（＾～＾）！",
-                ))),
             }
+            _ => panic!(Beam::trouble(&format!(
+                "(Err.123) まだ実装してないぜ☆（＾～＾）！",
+            ))),
         }
 
         // TODO ハッシュ更新

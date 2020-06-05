@@ -149,11 +149,6 @@ impl Game {
                 // 自分の持ち駒を減らす
                 Some(self.board.pop_from_hand(drop))
             }
-            AddressPos::Busy => {
-                panic!(Beam::trouble(
-                    "(Err.246) 指し手のソースが設定されていないだって☆（＾～＾）！？"
-                ));
-            }
         };
         // 移動先升に駒があるかどうか
         if let Some(collision_piece) = self.board.pop_from_board(&move_.destination) {
@@ -180,8 +175,6 @@ impl Game {
             self.history.ply -= 1;
             let move_ = &self.history.get_move();
             {
-                // 取った駒が有ったか。
-                let captured: Option<Piece> = move_.captured;
                 // 動いた駒
                 let moveing_piece: Option<Piece> = match move_.source {
                     AddressPos::Board(_source_val) => {
@@ -209,11 +202,10 @@ impl Game {
                         self.board.push_to_hand(&piece);
                         Some(piece)
                     }
-                    AddressPos::Busy => panic!(Beam::trouble(
-                        "(Err.308) 指し手のソースが設定されていないだって☆（＾～＾）！？"
-                    )),
                 };
 
+                // 取った駒が有ったか。
+                let captured: Option<Piece> = move_.captured;
                 if let Some(captured_piece_val) = captured {
                     // 自分の持ち駒を減らす
                     self.board

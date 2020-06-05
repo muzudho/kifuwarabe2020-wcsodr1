@@ -200,11 +200,6 @@ impl Tree {
                     // 打
                     None
                 }
-                AddressPos::Busy => {
-                    panic!(Beam::trouble(
-                        "(Err.208) 指し手のソースが未設定☆（＾～＾）！？"
-                    ));
-                }
             };
 
             // 棋譜に入れる☆

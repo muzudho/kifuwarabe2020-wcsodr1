@@ -129,7 +129,8 @@ impl Default for Board {
                 None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                 None, None, None, None, None, None, None, None, None, None, None, None, None,
             ],
-            address: [AddressPos::Busy; PIECE_NUM_LEN],
+            /// 初期値はゴミ値だぜ☆（＾～＾）上書きして消せだぜ☆（＾～＾）
+            address: [AddressPos::Board(AbsoluteAddress2D::default()); PIECE_NUM_LEN],
             physical_piece_type_index: [
                 PieceNum::King1 as usize,
                 PieceNum::Rook21 as usize,
@@ -174,7 +175,8 @@ impl Board {
             None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             None, None, None, None, None, None, None, None, None, None, None, None, None,
         ];
-        self.address = [AddressPos::Busy; PIECE_NUM_LEN];
+        // 初期値はゴミ値だぜ☆（＾～＾）上書きして消せだぜ☆（＾～＾）
+        self.address = [AddressPos::Board(AbsoluteAddress2D::default()); PIECE_NUM_LEN];
         self.physical_piece_type_index = [
             PieceNum::King1 as usize,
             PieceNum::Rook21 as usize,
@@ -249,8 +251,9 @@ impl Board {
                 if let Some(piece_val) = piece {
                     // マスを空にします。
                     self.pieces[sq.serial_number() as usize] = None;
-                    // 背番号の番地を消去します。
-                    self.address[piece_val.num as usize] = AddressPos::Busy;
+                    // TODO 背番号の番地を、ゴミ値で塗りつぶすが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
+                    self.address[piece_val.num as usize] =
+                        AddressPos::Board(AbsoluteAddress2D::default());
                 }
                 piece
             }
@@ -263,8 +266,8 @@ impl Board {
     pub fn pop_from_hand(&mut self, adr: PhysicalPiece) -> Piece {
         // 台から取りのぞきます。
         let piece = self.hands[adr as usize].pop();
-        // 背番号の番地を消去します。
-        self.address[piece.num as usize] = AddressPos::Busy;
+        // TODO 背番号の番地に、ゴミ値を入れて消去するが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
+        self.address[piece.num as usize] = AddressPos::Board(AbsoluteAddress2D::default());
         piece
     }
 
@@ -364,9 +367,6 @@ impl Board {
                     // TODO 持ち駒☆（＾～＾）
                     piece_get(i, None, None);
                 }
-                AddressPos::Busy => panic!(Beam::trouble(
-                    "(Err.624) なんで駒が作業中なんだぜ☆（＾～＾）！"
-                )),
             }
         }
     }
@@ -389,9 +389,6 @@ impl Board {
                 AddressPos::Hand(_drop) => {
                     // 持ち駒はここで調べるのは無駄な気がするよな☆（＾～＾）持ち駒に歩が１８個とか☆（＾～＾）
                 }
-                AddressPos::Busy => panic!(Beam::trouble(
-                    "(Err.650) なんで駒が作業中なんだぜ☆（＾～＾）！"
-                )),
             }
         }
 
