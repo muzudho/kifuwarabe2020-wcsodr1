@@ -153,13 +153,17 @@ impl Game {
         // 移動先升に駒があるかどうか
         if let Some(collision_piece) = self.board.pop_piece(&move_.destination) {
             // 移動先升の駒を盤上から消し、自分の持ち駒に増やす
+            // 先後ひっくり返す。
             let captured_piece =
                 Piece::new(collision_piece.meaning.captured(), collision_piece.num);
-            self.board.push_to_hand(&captured_piece);
+            self.board.push_piece(
+                &AddressPos::Hand(captured_piece.meaning.physical_piece()),
+                Some(captured_piece),
+            );
         }
 
         // 移動先升に駒を置く
-        self.board.push_to_board(&move_.destination, moveing_piece);
+        self.board.push_piece(&move_.destination, moveing_piece);
 
         // // 局面ハッシュを作り直す
         // let ky_hash = self.hash_seed.current_position(&self);
@@ -197,7 +201,10 @@ impl Game {
                         // 打った場所に駒があるはずだぜ☆（＾～＾）
                         let piece = self.board.pop_piece(&move_.destination).unwrap();
                         // 自分の持ち駒を増やそうぜ☆（＾～＾）！
-                        self.board.push_to_hand(&piece);
+                        self.board.push_piece(
+                            &AddressPos::Hand(piece.meaning.physical_piece()),
+                            Some(piece),
+                        );
                         Some(piece)
                     }
                 };
@@ -210,12 +217,12 @@ impl Game {
                         captured_piece_val.meaning.captured().physical_piece(),
                     ));
                     // 移動先の駒を、取った駒（あるいは空、ということがあるか？）に戻す
-                    self.board.push_to_board(&move_.destination, captured);
+                    self.board.push_piece(&move_.destination, captured);
                 }
 
                 if let AddressPos::Board(_src_sq) = move_.source {
                     // 打でなければ、移動元升に、動かした駒を置く☆（＾～＾）打なら何もしないぜ☆（＾～＾）
-                    self.board.push_to_board(&move_.source, moveing_piece);
+                    self.board.push_piece(&move_.source, moveing_piece);
                 }
             }
 

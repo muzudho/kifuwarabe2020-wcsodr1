@@ -216,7 +216,8 @@ impl Board {
         self.hands = board.hands.clone();
     }
 
-    pub fn push_to_board(&mut self, addr: &AddressPos, piece: Option<Piece>) {
+    /// 駒を置く。
+    pub fn push_piece(&mut self, addr: &AddressPos, piece: Option<Piece>) {
         match addr {
             AddressPos::Board(sq) => {
                 if let Some(piece_val) = piece {
@@ -229,20 +230,17 @@ impl Board {
                     self.pieces[sq.serial_number() as usize] = None;
                 }
             }
-            _ => panic!(Beam::trouble(&format!(
-                "(Err.233) まだ実装してないぜ☆（＾～＾）！",
-            ))),
+            AddressPos::Hand(drop) => {
+                if let Some(piece_val) = piece {
+                    // 持ち駒を１つ増やします。
+                    self.hands[*drop as usize].push(&piece_val);
+                    // 背番号に番地を紐づけます。
+                    self.address[piece_val.num as usize] = *addr;
+                }
+            }
         }
     }
-    /// 台に駒を置く
-    pub fn push_to_hand(&mut self, piece: &Piece) {
-        let pp = piece.meaning.physical_piece();
-        // 持ち駒を１つ増やします。
-        self.hands[pp as usize].push(piece);
-        // 背番号に番地を紐づけます。
-        self.address[piece.num as usize] = AddressPos::Hand(pp);
-    }
-    /// 駒を取りのぞく
+    /// 駒を取りのぞく。
     pub fn pop_piece(&mut self, addr: &AddressPos) -> Option<Piece> {
         match addr {
             AddressPos::Board(sq) => {
@@ -285,25 +283,11 @@ impl Board {
 
     /// 先手玉、後手玉なら、その位置を確定させます。背番号も付けます。
     pub fn push_to_board_from_sfen(&mut self, addr: &AddressPos, piece_meaning: PieceMeaning) {
-        /*
-        if !(FILE_0 < addr.file()
-            && addr.file() < FILE_10
-            && RANK_0 < addr.rank()
-            && addr.rank() < RANK_10)
-        {
-            panic!(Beam::trouble(&format!(
-                "(Err.323) 盤上の初期化で盤の外を指定するのは止めろだぜ☆（＾～＾）！ ({}, {})",
-                addr.file(),
-                addr.rank()
-            )))
-        }
-        */
-
         // 駒に背番号を付けるぜ☆（＾～＾）
         let piece = self.make_piece_number(piece_meaning);
 
         // 盤に置くぜ☆（＾～＾）
-        self.push_to_board(&addr, Some(piece));
+        self.push_piece(&addr, Some(piece));
     }
 
     /// 持ち駒に背番号を付ける
@@ -313,7 +297,10 @@ impl Board {
             let piece = self.make_piece_number(piece_meaning);
 
             // 駒台に置くぜ☆（＾～＾）
-            self.push_to_hand(&piece);
+            self.push_piece(
+                &AddressPos::Hand(piece.meaning.physical_piece()),
+                Some(piece),
+            );
         }
     }
 
