@@ -64,7 +64,11 @@ impl Kifuwarabe {
             Phase::First => go1.btime,
             Phase::Second => go1.wtime,
         };
-        tree.think_msec = if msec < universe.option_max_think_msec {
+        tree.think_msec = if msec < 1 {
+            // 持ち時間が 0 秒になったら。ヤケクソで 1ms秒指しをしてみようぜ☆（＾～＾）
+            1
+        } else if msec < universe.option_max_think_msec {
+            // 残りが 0ms だと、第一引数が範囲外エラーになるんで注意☆（＾～＾）
             rand::thread_rng().gen_range(msec - 1, msec) as u128
         } else {
             rand::thread_rng().gen_range(
