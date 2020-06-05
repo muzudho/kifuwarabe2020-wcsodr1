@@ -129,7 +129,7 @@ impl Game {
             AddressPos::Board(_src_sq) => {
                 // 盤上の移動なら、元の升に駒はあるので、それを消す。
                 let piece152: Option<Piece> = if move_.promote {
-                    if let Some(piece) = self.board.pop_from_board(&move_.source) {
+                    if let Some(piece) = self.board.pop_piece(&move_.source) {
                         // 成ったのなら、元のマスの駒を成らすぜ☆（＾～＾）
                         Some(Piece::new(piece.meaning.promoted(), piece.num))
                     } else {
@@ -139,7 +139,7 @@ impl Game {
                     }
                 } else {
                     // 移動元の駒。
-                    self.board.pop_from_board(&move_.source)
+                    self.board.pop_piece(&move_.source)
                 };
 
                 piece152
@@ -147,11 +147,11 @@ impl Game {
             AddressPos::Hand(_drop) => {
                 // 打なら
                 // 自分の持ち駒を減らす
-                Some(self.board.pop_from_hand(move_.source).unwrap())
+                Some(self.board.pop_piece(&move_.source).unwrap())
             }
         };
         // 移動先升に駒があるかどうか
-        if let Some(collision_piece) = self.board.pop_from_board(&move_.destination) {
+        if let Some(collision_piece) = self.board.pop_piece(&move_.destination) {
             // 移動先升の駒を盤上から消し、自分の持ち駒に増やす
             let captured_piece =
                 Piece::new(collision_piece.meaning.captured(), collision_piece.num);
@@ -181,9 +181,7 @@ impl Game {
                         // 盤上の移動なら
                         if move_.promote {
                             // 成ったなら、成る前へ
-                            if let Some(source_piece) =
-                                self.board.pop_from_board(&move_.destination)
-                            {
+                            if let Some(source_piece) = self.board.pop_piece(&move_.destination) {
                                 Some(Piece::new(source_piece.meaning.demoted(), source_piece.num))
                             } else {
                                 panic!(Beam::trouble(
@@ -191,13 +189,13 @@ impl Game {
                                 ))
                             }
                         } else {
-                            self.board.pop_from_board(&move_.destination)
+                            self.board.pop_piece(&move_.destination)
                         }
                     }
                     AddressPos::Hand(_drop) => {
                         // 打なら
                         // 打った場所に駒があるはずだぜ☆（＾～＾）
-                        let piece = self.board.pop_from_board(&move_.destination).unwrap();
+                        let piece = self.board.pop_piece(&move_.destination).unwrap();
                         // 自分の持ち駒を増やそうぜ☆（＾～＾）！
                         self.board.push_to_hand(&piece);
                         Some(piece)
@@ -208,7 +206,7 @@ impl Game {
                 let captured: Option<Piece> = move_.captured;
                 if let Some(captured_piece_val) = captured {
                     // 自分の持ち駒を減らす
-                    self.board.pop_from_hand(AddressPos::Hand(
+                    self.board.pop_piece(&AddressPos::Hand(
                         captured_piece_val.meaning.captured().physical_piece(),
                     ));
                     // 移動先の駒を、取った駒（あるいは空、ということがあるか？）に戻す

@@ -242,9 +242,8 @@ impl Board {
         // 背番号に番地を紐づけます。
         self.address[piece.num as usize] = AddressPos::Hand(pp);
     }
-    /// 盤から駒を取りのぞく
-    pub fn pop_from_board(&mut self, addr: &AddressPos) -> Option<Piece> {
-        // まず、駒があるか確認するぜ☆（＾～＾）
+    /// 駒を取りのぞく
+    pub fn pop_piece(&mut self, addr: &AddressPos) -> Option<Piece> {
         match addr {
             AddressPos::Board(sq) => {
                 let piece = self.pieces[sq.serial_number() as usize];
@@ -257,20 +256,9 @@ impl Board {
                 }
                 piece
             }
-            _ => panic!(Beam::trouble(&format!(
-                "(Err.254) まだ実装してないぜ☆（＾～＾）！",
-            ))),
-        }
-    }
-    /// 台から駒を取りのぞく
-    pub fn pop_from_hand(&mut self, addr: AddressPos) -> Option<Piece> {
-        match addr {
-            AddressPos::Board(_sq) => panic!(Beam::trouble(&format!(
-                "(Err.254) まだ実装してないぜ☆（＾～＾）！",
-            ))),
             AddressPos::Hand(drop) => {
                 // 台から取りのぞきます。
-                let piece = self.hands[drop as usize].pop();
+                let piece = self.hands[*drop as usize].pop();
                 // TODO 背番号の番地に、ゴミ値を入れて消去するが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
                 self.address[piece.num as usize] = AddressPos::Board(AbsoluteAddress2D::default());
                 Some(piece)
