@@ -71,6 +71,44 @@ pub enum AddressOnPosition {
     // 作業中のときは、これだぜ☆（＾～＾）
     Busy,
 }
+impl fmt::Display for AddressOnPosition {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                AddressOnPosition::Board(addr) => {
+                    format!("{}", addr)
+                }
+                AddressOnPosition::Hand(drop) => {
+                    format!("{}", drop)
+                }
+                AddressOnPosition::Busy => {
+                    "-".to_string()
+                }
+            },
+        )
+    }
+}
+impl fmt::Debug for AddressOnPosition {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                AddressOnPosition::Board(addr) => {
+                    addr.serial_number().to_string()
+                }
+                AddressOnPosition::Hand(drop) => {
+                    format!("{:?}", drop)
+                }
+                AddressOnPosition::Busy => {
+                    "-".to_string()
+                }
+            },
+        )
+    }
+}
 
 /// 棋譜にも使うので、取った駒の情報を記憶しておくんだぜ☆（＾～＾）
 /// 投了なら これを使わず、None にしろだぜ☆（＾～＾）
@@ -78,12 +116,13 @@ pub enum AddressOnPosition {
 /// Copy: 配列の要素の初期化時に使う☆（＾～＾）
 #[derive(Clone, Copy)]
 pub struct Movement {
+    /// 移動元マス。
     pub source: AddressOnPosition,
-    // 移動先升。
-    pub destination: AbsoluteAddress,
-    // 移動後に成るなら真
+    /// 移動先マス。リバーシブルに作りたいので、駒台にも指せる。
+    pub destination: AddressOnPosition,
+    /// 移動後に成るなら真
     pub promote: bool,
-    // 取ることになる駒
+    /// 取ることになる駒
     pub captured: Option<Piece>,
 }
 impl Default for Movement {
@@ -91,7 +130,7 @@ impl Default for Movement {
     fn default() -> Self {
         Movement {
             source: AddressOnPosition::Busy,
-            destination: AbsoluteAddress::default(),
+            destination: AddressOnPosition::Busy,
             promote: false,
             captured: None,
         }
@@ -100,7 +139,7 @@ impl Default for Movement {
 impl Movement {
     pub fn new(
         source: AddressOnPosition,
-        destination: AbsoluteAddress,
+        destination: AddressOnPosition,
         promote: bool,
         captured: Option<Piece>,
     ) -> Self {
@@ -120,27 +159,23 @@ impl Movement {
 }
 impl fmt::Display for Movement {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let (dx, dy) = self.destination.to_file_rank();
-
         match self.source {
             AddressOnPosition::Board(source_val) => {
                 let (sx, sy) = source_val.to_file_rank();
                 write!(
                     f,
-                    "{}{}{}{}{}",
+                    "{}{}{}{}",
                     sx,
                     num_to_lower_case(sy),
-                    dx,
-                    num_to_lower_case(dy),
+                    self.destination,
                     if self.promote { "+" } else { "" }
                 )
             }
             AddressOnPosition::Hand(drop) => write!(
                 f,
-                "{}{}{}{}",
+                "{}{}{}",
                 drop,
-                dx,
-                num_to_lower_case(dy),
+                self.destination,
                 if self.promote { "+" } else { "" }
             ),
             AddressOnPosition::Busy => write!(f, "Busy",),
@@ -151,20 +186,8 @@ impl fmt::Debug for Movement {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
-            "Movement({}{}{})",
-            match self.source {
-                AddressOnPosition::Board(source_val) => {
-                    source_val.serial_number().to_string()
-                }
-                AddressOnPosition::Hand(drop) => {
-                    format!("{:?}", drop)
-                }
-                AddressOnPosition::Busy => {
-                    "-".to_string()
-                }
-            },
-            self.destination.serial_number(),
-            self.promote,
+            "Movement({:?}{:?}{})",
+            self.source, self.destination, self.promote,
         )
     }
 }

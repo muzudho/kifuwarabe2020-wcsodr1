@@ -195,7 +195,7 @@ impl Tree {
             // 1手進めるぜ☆（＾～＾）
             self.state_nodes += 1;
             let source_piece = match move_.source {
-                AddressOnPosition::Board(source_val) => game.board.piece_at(&source_val),
+                AddressOnPosition::Board(_sq) => game.board.piece_at(&move_.source),
                 AddressOnPosition::Hand(_drop) => {
                     // 打
                     None

@@ -209,10 +209,10 @@ pub enum PhysicalPiece {
     Lance2,
     Pawn2,
 }
+/// USIの Drop に合わせるぜ☆（＾～＾） 先後を区別しないぜ☆（＾～＾）
 impl fmt::Display for PhysicalPiece {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         // 文字列リテラルでないとダメみたいなんで、他に似たようなコードがあるのに、また書くことに☆（＾～＾）
-        // USIの Drop に合わせるぜ☆（＾～＾） 先後を区別しないぜ☆（＾～＾）
         use self::PhysicalPiece::*;
         match *self {
             King1 => write!(f, "?*"),

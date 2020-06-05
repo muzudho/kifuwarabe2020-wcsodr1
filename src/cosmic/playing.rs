@@ -126,10 +126,10 @@ impl Game {
 
         // 動かす駒。Noneなことは無いが、将棋盤にセットするとき結局 Some を付けることになるので、わざわざ省かないぜ☆（＾～＾）
         let moveing_piece: Option<Piece> = match move_.source {
-            AddressOnPosition::Board(source_val) => {
+            AddressOnPosition::Board(_src_sq) => {
                 // 盤上の移動なら、元の升に駒はあるので、それを消す。
                 let piece152: Option<Piece> = if move_.promote {
-                    if let Some(piece) = self.board.pop_from_board(&source_val) {
+                    if let Some(piece) = self.board.pop_from_board(&move_.source) {
                         // 成ったのなら、元のマスの駒を成らすぜ☆（＾～＾）
                         Some(Piece::new(piece.meaning.promoted(), piece.num))
                     } else {
@@ -139,7 +139,7 @@ impl Game {
                     }
                 } else {
                     // 移動元の駒。
-                    self.board.pop_from_board(&source_val)
+                    self.board.pop_from_board(&move_.source)
                 };
 
                 piece152
@@ -222,9 +222,9 @@ impl Game {
                     self.board.push_to_board(&move_.destination, captured);
                 }
 
-                if let AddressOnPosition::Board(source_val) = move_.source {
+                if let AddressOnPosition::Board(_src_sq) = move_.source {
                     // 打でなければ、移動元升に、動かした駒を置く☆（＾～＾）打なら何もしないぜ☆（＾～＾）
-                    self.board.push_to_board(&source_val, moveing_piece);
+                    self.board.push_to_board(&move_.source, moveing_piece);
                 }
             }
 

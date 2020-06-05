@@ -27,6 +27,7 @@
 //!              Source
 //!
 //! None is 0.
+use crate::law::cryptographic::num_to_lower_case;
 use crate::law::speed_of_light::Nine299792458;
 use std::cmp::max;
 use std::cmp::Eq;
@@ -672,6 +673,12 @@ impl AbsoluteAddress {
         }
 
         self
+    }
+}
+/// USI向け。
+impl fmt::Display for AbsoluteAddress {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}{}", self.file(), num_to_lower_case(self.rank()),)
     }
 }
 impl fmt::Debug for AbsoluteAddress {

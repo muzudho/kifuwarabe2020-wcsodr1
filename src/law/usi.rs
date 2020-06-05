@@ -144,7 +144,7 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
     *starts += 1;
 
     // 行き先。
-    buffer.destination = AbsoluteAddress::new(file, rank);
+    buffer.destination = AddressOnPosition::Board(AbsoluteAddress::new(file, rank));
 
     // 5文字に「+」があれば成り。
     buffer.promote = if 0 < (len - *starts) && &line[*starts..=*starts] == "+" {
@@ -247,7 +247,7 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Game) {
         match board_part {
             BoardPart::Alphabet(piece_meaning) => {
                 *starts += 1;
-                let addr = AbsoluteAddress::new(file, rank);
+                let addr = AddressOnPosition::Board(AbsoluteAddress::new(file, rank));
                 board.push_to_board_from_sfen(&addr, piece_meaning);
                 file -= 1;
             }

@@ -73,20 +73,34 @@ impl GameHashSeed {
         // TODO 指し手 で差分を適用
         // 移動する駒。
         match move_.source {
-            AddressOnPosition::Board(source) => {
-                let source_piece_meaning = board.piece_at(&source).unwrap().meaning as usize;
+            AddressOnPosition::Board(sq) => {
+                let source_piece_meaning = board.piece_at(&move_.source).unwrap().meaning as usize;
                 // 移動前マスに、動かしたい駒があるときのハッシュ。
-                prev_hash ^= self.piece[source.serial_number()][source_piece_meaning];
+                prev_hash ^= self.piece[sq.serial_number()][source_piece_meaning];
                 // 移動後マスに、動かしたい駒があるときのハッシュ。
-                prev_hash ^= self.piece[move_.destination.serial_number()][source_piece_meaning];
+                match move_.destination {
+                    AddressOnPosition::Board(sq) => {
+                        prev_hash ^= self.piece[sq.serial_number()][source_piece_meaning];
+                    }
+                    _ => panic!(Beam::trouble(&format!(
+                        "(Err.87) まだ実装してないぜ☆（＾～＾）！",
+                    ))),
+                }
             }
             AddressOnPosition::Hand(physical_piece) => {
                 let count = board.count_hand(physical_piece);
                 // 打つ前の駒の枚数のハッシュ。
                 prev_hash ^= self.hands[physical_piece as usize][count as usize];
                 // 移動後マスに、打った駒があるときのハッシュ。
-                prev_hash ^= self.piece[move_.destination.serial_number()]
-                    [physical_piece.nonpromoted_meaning() as usize];
+                match move_.destination {
+                    AddressOnPosition::Board(sq) => {
+                        prev_hash ^= self.piece[sq.serial_number()]
+                            [physical_piece.nonpromoted_meaning() as usize];
+                    }
+                    _ => panic!(Beam::trouble(&format!(
+                        "(Err.101) まだ実装してないぜ☆（＾～＾）！",
+                    ))),
+                }
             }
             AddressOnPosition::Busy => panic!(Beam::trouble(
                 "(Err.85) 移動前の駒が設定されていないだって☆（＾～＾）！？"
@@ -96,12 +110,19 @@ impl GameHashSeed {
         let dst = move_.destination;
         let dst_piece = board.piece_at(&dst);
         if let Some(dst_piece) = dst_piece {
-            prev_hash ^= self.piece[dst.serial_number()][dst_piece.meaning as usize];
-            // 持ち駒になるとき。
-            let physical_piece = dst_piece.meaning.physical_piece();
-            let count = board.count_hand(physical_piece);
-            // 打つ前の駒の枚数のハッシュ。
-            prev_hash ^= self.hands[physical_piece as usize][count as usize + 1];
+            match dst {
+                AddressOnPosition::Board(dst_sq) => {
+                    prev_hash ^= self.piece[dst_sq.serial_number()][dst_piece.meaning as usize];
+                    // 持ち駒になるとき。
+                    let physical_piece = dst_piece.meaning.physical_piece();
+                    let count = board.count_hand(physical_piece);
+                    // 打つ前の駒の枚数のハッシュ。
+                    prev_hash ^= self.hands[physical_piece as usize][count as usize + 1];
+                }
+                _ => panic!(Beam::trouble(&format!(
+                    "(Err.123) まだ実装してないぜ☆（＾～＾）！",
+                ))),
+            }
         }
 
         // TODO ハッシュ更新
@@ -141,9 +162,9 @@ impl GameHashSeed {
         // 盤上の駒
         for rank in RANK_1..RANK_10 {
             for file in (FILE_1..FILE_10).rev() {
-                let ab_adr = &AbsoluteAddress::new(file, rank);
-                if let Some(piece) = board.piece_at(ab_adr) {
-                    hash ^= self.piece[ab_adr.serial_number()][piece.meaning as usize];
+                let sq = AbsoluteAddress::new(file, rank);
+                if let Some(piece) = board.piece_at(&AddressOnPosition::Board(sq)) {
+                    hash ^= self.piece[sq.serial_number()][piece.meaning as usize];
                 }
             }
         }
