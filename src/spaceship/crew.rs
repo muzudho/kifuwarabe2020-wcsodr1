@@ -59,11 +59,19 @@ impl Kifuwarabe {
             universe.option_promotion_weight,
             universe.option_depth_not_to_give_up,
         );
+
         // 残り時間と、追加時間☆（＾～＾）
+        fn margined_msec(msec: u64) -> u64 {
+            if 2000 < msec {
+                msec - 2000
+            } else {
+                0
+            }
+        }
         let (msec, _minc) = match universe.game.history.get_friend() {
-            // 2秒余裕を見ておけば、探索を中断できるだろ……☆（＾～＾）
-            Phase::First => (go1.btime - 2000, go1.binc),
-            Phase::Second => (go1.wtime - 2000, go1.winc),
+            // 2秒余裕を見ておけば、探索を中断できるだろ……☆（＾～＾）負の数になったらエラーな☆（＾～＾）
+            Phase::First => (margined_msec(go1.btime), go1.binc),
+            Phase::Second => (margined_msec(go1.wtime), go1.winc),
         };
         tree.think_msec = if universe.option_max_think_msec < msec {
             // 残り時間が、最大思考時間より長ければ充分だぜ☆（＾～＾）
@@ -79,8 +87,8 @@ impl Kifuwarabe {
             // 第一引数が負の数にならないように注意☆（＾～＾）
             rand::thread_rng().gen_range(0, msec - 2000) as u128
         } else {
-            // ヤケクソの 500msec 指しだぜ☆（＾～＾）
-            500
+            // ヤケクソの 1msec 指しだぜ☆（＾～＾）
+            1
         };
 
         let ts = tree.iteration_deeping(universe);
