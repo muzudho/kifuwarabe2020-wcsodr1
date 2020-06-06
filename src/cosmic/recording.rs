@@ -105,17 +105,17 @@ impl fmt::Debug for AddressPos {
 pub struct CapturedMove {
     /// 取ることになる駒
     pub piece: Piece,
-    /*
     /// TODO 元あった所。
     pub source: AddressPos,
-    */
-    /// 移動先。
+    /*
+    /// TODO 移動先。
     pub destination: AddressPos,
+    */
 }
 impl CapturedMove {
-    pub fn new(destination: &AddressPos, piece: Piece) -> Self {
+    pub fn new(source: &AddressPos, piece: Piece) -> Self {
         CapturedMove {
-            destination: *destination,
+            source: *source,
             piece: piece,
         }
     }
