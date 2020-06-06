@@ -13,12 +13,12 @@ use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 use std::fmt;
 
-/// 背番号付きの駒の数。
-pub const PIECE_NUM_LEN: usize = 40;
+/// 背番号(名前)付きの駒の数。
+pub const NAMED_PIECES_LEN: usize = 40;
 
-/// 駒に背番号を付けたものだぜ☆（＾～＾）
+/// 駒の背番号（名前）だぜ☆（＾～＾）
 #[derive(Clone, Copy, FromPrimitive, Debug, PartialEq)]
-pub enum PieceNum {
+pub enum PieceName {
     // 1 先手玉
     King1,
     // 2 後手玉
@@ -101,15 +101,15 @@ pub enum PieceNum {
     Pawn40,
 }
 
-/// 現局面、または初期局面☆（＾～＾）
+/// 卓☆（＾～＾）
 /// でかいのでコピーもクローンも不可☆（＾～＾）！
 /// 10の位を筋、1の位を段とする。
 /// 0筋、0段は未使用
 pub struct GameTable {
-    // いわゆる盤☆（＾～＾）
-    pieces: [Option<Piece>; BOARD_MEMORY_AREA as usize],
-    /// 駒の居場所☆（＾～＾）
-    address: [AddressPos; PIECE_NUM_LEN],
+    // 盤の上の駒とその有無だぜ☆（＾～＾）
+    board: [Option<Piece>; BOARD_MEMORY_AREA as usize],
+    /// 背番号付きの駒がずらっと並んでるぜ☆（＾～＾）
+    named_pieces: [AddressPos; NAMED_PIECES_LEN],
     /// 駒の背番号を付けるのに使うぜ☆（＾～＾）
     physical_piece_type_index: [usize; PHYSICAL_PIECE_TYPE_LEN],
     /// 持ち駒☆（＾～＾）TODO 固定長サイズのスタックを用意したいぜ☆（＾～＾）
@@ -119,7 +119,7 @@ impl Default for GameTable {
     fn default() -> Self {
         GameTable {
             // 盤上
-            pieces: [
+            board: [
                 None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                 None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                 None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -130,16 +130,16 @@ impl Default for GameTable {
                 None, None, None, None, None, None, None, None, None, None, None, None, None,
             ],
             /// 初期値はゴミ値だぜ☆（＾～＾）上書きして消せだぜ☆（＾～＾）
-            address: [AddressPos::Board(AbsoluteAddress2D::default()); PIECE_NUM_LEN],
+            named_pieces: [AddressPos::Board(AbsoluteAddress2D::default()); NAMED_PIECES_LEN],
             physical_piece_type_index: [
-                PieceNum::King1 as usize,
-                PieceNum::Rook21 as usize,
-                PieceNum::Bishop19 as usize,
-                PieceNum::Gold3 as usize,
-                PieceNum::Silver7 as usize,
-                PieceNum::Knight11 as usize,
-                PieceNum::Lance15 as usize,
-                PieceNum::Pawn23 as usize,
+                PieceName::King1 as usize,
+                PieceName::Rook21 as usize,
+                PieceName::Bishop19 as usize,
+                PieceName::Gold3 as usize,
+                PieceName::Silver7 as usize,
+                PieceName::Knight11 as usize,
+                PieceName::Lance15 as usize,
+                PieceName::Pawn23 as usize,
             ],
             // 持ち駒
             hands: [
@@ -165,7 +165,7 @@ impl Default for GameTable {
 }
 impl GameTable {
     pub fn clear(&mut self) {
-        self.pieces = [
+        self.board = [
             None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -176,16 +176,16 @@ impl GameTable {
             None, None, None, None, None, None, None, None, None, None, None, None, None,
         ];
         // 初期値はゴミ値だぜ☆（＾～＾）上書きして消せだぜ☆（＾～＾）
-        self.address = [AddressPos::Board(AbsoluteAddress2D::default()); PIECE_NUM_LEN];
+        self.named_pieces = [AddressPos::Board(AbsoluteAddress2D::default()); NAMED_PIECES_LEN];
         self.physical_piece_type_index = [
-            PieceNum::King1 as usize,
-            PieceNum::Rook21 as usize,
-            PieceNum::Bishop19 as usize,
-            PieceNum::Gold3 as usize,
-            PieceNum::Silver7 as usize,
-            PieceNum::Knight11 as usize,
-            PieceNum::Lance15 as usize,
-            PieceNum::Pawn23 as usize,
+            PieceName::King1 as usize,
+            PieceName::Rook21 as usize,
+            PieceName::Bishop19 as usize,
+            PieceName::Gold3 as usize,
+            PieceName::Silver7 as usize,
+            PieceName::Knight11 as usize,
+            PieceName::Lance15 as usize,
+            PieceName::Pawn23 as usize,
         ];
         // 持ち駒☆（＾～＾）
         self.hands = [
@@ -210,8 +210,8 @@ impl GameTable {
 
     /// 開始盤面を、現盤面にコピーしたいときに使うぜ☆（＾～＾）
     pub fn copy_from(&mut self, table: &GameTable) {
-        self.pieces = table.pieces.clone();
-        self.address = table.address.clone();
+        self.board = table.board.clone();
+        self.named_pieces = table.named_pieces.clone();
         self.physical_piece_type_index = table.physical_piece_type_index.clone();
         self.hands = table.hands.clone();
     }
@@ -222,12 +222,12 @@ impl GameTable {
             AddressPos::Board(sq) => {
                 if let Some(piece_val) = piece {
                     // マスに駒を置きます。
-                    self.pieces[sq.serial_number() as usize] = piece;
+                    self.board[sq.serial_number() as usize] = piece;
                     // 背番号に番地を紐づけます。
-                    self.address[piece_val.num as usize] = AddressPos::Board(*sq);
+                    self.named_pieces[piece_val.num as usize] = AddressPos::Board(*sq);
                 } else {
                     // マスを空にします。
-                    self.pieces[sq.serial_number() as usize] = None;
+                    self.board[sq.serial_number() as usize] = None;
                 }
             }
             AddressPos::Hand(drop) => {
@@ -235,7 +235,7 @@ impl GameTable {
                     // 持ち駒を１つ増やします。
                     self.hands[*drop as usize].push(&piece_val);
                     // 背番号に番地を紐づけます。
-                    self.address[piece_val.num as usize] = *addr;
+                    self.named_pieces[piece_val.num as usize] = *addr;
                 }
             }
         }
@@ -244,12 +244,12 @@ impl GameTable {
     pub fn pop_piece(&mut self, addr: &AddressPos) -> Option<Piece> {
         match addr {
             AddressPos::Board(sq) => {
-                let piece = self.pieces[sq.serial_number() as usize];
+                let piece = self.board[sq.serial_number() as usize];
                 if let Some(piece_val) = piece {
                     // マスを空にします。
-                    self.pieces[sq.serial_number() as usize] = None;
+                    self.board[sq.serial_number() as usize] = None;
                     // TODO 背番号の番地を、ゴミ値で塗りつぶすが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
-                    self.address[piece_val.num as usize] =
+                    self.named_pieces[piece_val.num as usize] =
                         AddressPos::Board(AbsoluteAddress2D::default());
                 }
                 piece
@@ -258,22 +258,23 @@ impl GameTable {
                 // 台から取りのぞきます。
                 let piece = self.hands[*drop as usize].pop();
                 // TODO 背番号の番地に、ゴミ値を入れて消去するが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
-                self.address[piece.num as usize] = AddressPos::Board(AbsoluteAddress2D::default());
+                self.named_pieces[piece.num as usize] =
+                    AddressPos::Board(AbsoluteAddress2D::default());
                 Some(piece)
             }
         }
     }
 
     /// 駒の新しい背番号を生成します。
-    pub fn make_piece_number(&mut self, piece_meaning: PieceMeaning) -> Piece {
+    pub fn naming_piece(&mut self, piece_meaning: PieceMeaning) -> Piece {
         match piece_meaning {
             // 玉だけ、先後は決まってるから従えだぜ☆（＾～＾）
-            PieceMeaning::King1 => Piece::new(piece_meaning, PieceNum::King1),
-            PieceMeaning::King2 => Piece::new(piece_meaning, PieceNum::King2),
+            PieceMeaning::King1 => Piece::new(piece_meaning, PieceName::King1),
+            PieceMeaning::King2 => Piece::new(piece_meaning, PieceName::King2),
             _ => {
                 let phy_pct = piece_meaning.physical_piece().type_() as usize;
                 // 玉以外の背番号は、先後に関わりなく SFENに書いてあった順で☆（＾～＾）
-                let pn = PieceNum::from_usize(self.physical_piece_type_index[phy_pct]).unwrap();
+                let pn = PieceName::from_usize(self.physical_piece_type_index[phy_pct]).unwrap();
                 // カウントアップ☆（＾～＾）
                 self.physical_piece_type_index[phy_pct] += 1;
                 Piece::new(piece_meaning, pn)
@@ -296,7 +297,7 @@ impl GameTable {
     /// 升で指定して駒を取得
     pub fn piece_at(&self, addr: &AddressPos) -> Option<Piece> {
         match addr {
-            AddressPos::Board(sq) => self.pieces[sq.serial_number() as usize],
+            AddressPos::Board(sq) => self.board[sq.serial_number() as usize],
             _ => panic!(Beam::trouble(&format!(
                 "(Err.254) まだ実装してないぜ☆（＾～＾）！",
             ))),
@@ -315,7 +316,7 @@ impl GameTable {
     where
         F: FnMut(usize, Option<&AbsoluteAddress2D>, Option<Piece>),
     {
-        for (i, addr) in self.address.iter().enumerate() {
+        for (i, addr) in self.named_pieces.iter().enumerate() {
             match addr {
                 AddressPos::Board(sq) => {
                     // 盤上の駒☆（＾～＾）
@@ -335,8 +336,8 @@ impl GameTable {
     where
         F: FnMut(AddressPos, Piece),
     {
-        for piece_num in Nine299792458::piece_numbers().iter() {
-            let addr = self.address[*piece_num as usize];
+        for piece_name in Nine299792458::piece_names().iter() {
+            let addr = self.named_pieces[*piece_name as usize];
             match addr {
                 AddressPos::Board(_sq) => {
                     // 盤上の駒☆（＾～＾）
@@ -390,7 +391,7 @@ impl Default for HandAddressTypeStack {
     fn default() -> Self {
         HandAddressTypeStack {
             // ゴミ値で埋めるぜ☆（＾～＾）
-            items: [Piece::new(PieceMeaning::King1, PieceNum::King1); HAND_MAX],
+            items: [Piece::new(PieceMeaning::King1, PieceName::King1); HAND_MAX],
             count: 0,
         }
     }

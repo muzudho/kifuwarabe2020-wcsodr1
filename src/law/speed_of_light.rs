@@ -15,7 +15,7 @@ use crate::cosmic::smart::features::PIECE_MEANING_LEN;
 use crate::cosmic::smart::features::PIECE_TYPE_LEN;
 use crate::cosmic::smart::features::{PhysicalPiece, PhysicalPieceType, PieceMeaning, PieceType};
 use crate::cosmic::smart::square::{Angle, RelAdr2D, ANGLE_LEN};
-use crate::cosmic::toy_box::PieceNum;
+use crate::cosmic::toy_box::PieceName;
 use crate::law::generate_move::{Agility, Mobility};
 
 // グローバル定数
@@ -42,7 +42,7 @@ lazy_static! {
 /// こいつが早引き表なわけだぜ☆（＾～＾）
 struct SpeedOfLight {
     /// 駒構造体・マスター☆（＾～＾）イミュータブルなんでアクセッサなんか要らないぜ☆（＾～＾）
-    piece_numbers: Vec<PieceNum>,
+    piece_names: Vec<PieceName>,
 
     /// 先後付きの駒☆（＾～＾）
     piece_meaning_to_phase_table: [Phase; PIECE_MEANING_LEN],
@@ -88,47 +88,47 @@ impl Default for SpeedOfLight {
         use crate::cosmic::smart::features::PieceType::*;
         SpeedOfLight {
             /// ピースの早見表の生成は、アプリケーション開始時に全部済ませておけだぜ☆（＾～＾）
-            piece_numbers: [
-                PieceNum::King1,    // 1 先手玉
-                PieceNum::King2,    // 2 後手玉
-                PieceNum::Gold3,    // 3 金
-                PieceNum::Gold4,    // 4 金
-                PieceNum::Gold5,    // 5 金
-                PieceNum::Gold6,    // 6 金
-                PieceNum::Silver7,  // 7 銀
-                PieceNum::Silver8,  // 8 銀
-                PieceNum::Silver9,  // 9 銀
-                PieceNum::Silver10, // 10 銀
-                PieceNum::Knight11, // 11 桂
-                PieceNum::Knight12, // 12 桂
-                PieceNum::Knight13, // 13 桂
-                PieceNum::Knight14, // 14 桂
-                PieceNum::Lance15,  // 15 香
-                PieceNum::Lance16,  // 16 香
-                PieceNum::Lance17,  // 17 香
-                PieceNum::Lance18,  // 18 香
-                PieceNum::Bishop19, // 19 角
-                PieceNum::Bishop20, // 20 角
-                PieceNum::Rook21,   // 21 飛
-                PieceNum::Rook22,   // 22 飛
-                PieceNum::Pawn23,   // 23 歩
-                PieceNum::Pawn24,   // 24 歩
-                PieceNum::Pawn25,   // 25 歩
-                PieceNum::Pawn26,   // 26 歩
-                PieceNum::Pawn27,   // 27 歩
-                PieceNum::Pawn28,   // 28 歩
-                PieceNum::Pawn29,   // 29 歩
-                PieceNum::Pawn30,   // 30 歩
-                PieceNum::Pawn31,   // 31 歩
-                PieceNum::Pawn32,   // 32 歩
-                PieceNum::Pawn33,   // 33 歩
-                PieceNum::Pawn34,   // 34 歩
-                PieceNum::Pawn35,   // 35 歩
-                PieceNum::Pawn36,   // 36 歩
-                PieceNum::Pawn37,   // 37 歩
-                PieceNum::Pawn38,   // 38 歩
-                PieceNum::Pawn39,   // 39 歩
-                PieceNum::Pawn40,   // 40 歩
+            piece_names: [
+                PieceName::King1,    // 1 先手玉
+                PieceName::King2,    // 2 後手玉
+                PieceName::Gold3,    // 3 金
+                PieceName::Gold4,    // 4 金
+                PieceName::Gold5,    // 5 金
+                PieceName::Gold6,    // 6 金
+                PieceName::Silver7,  // 7 銀
+                PieceName::Silver8,  // 8 銀
+                PieceName::Silver9,  // 9 銀
+                PieceName::Silver10, // 10 銀
+                PieceName::Knight11, // 11 桂
+                PieceName::Knight12, // 12 桂
+                PieceName::Knight13, // 13 桂
+                PieceName::Knight14, // 14 桂
+                PieceName::Lance15,  // 15 香
+                PieceName::Lance16,  // 16 香
+                PieceName::Lance17,  // 17 香
+                PieceName::Lance18,  // 18 香
+                PieceName::Bishop19, // 19 角
+                PieceName::Bishop20, // 20 角
+                PieceName::Rook21,   // 21 飛
+                PieceName::Rook22,   // 22 飛
+                PieceName::Pawn23,   // 23 歩
+                PieceName::Pawn24,   // 24 歩
+                PieceName::Pawn25,   // 25 歩
+                PieceName::Pawn26,   // 26 歩
+                PieceName::Pawn27,   // 27 歩
+                PieceName::Pawn28,   // 28 歩
+                PieceName::Pawn29,   // 29 歩
+                PieceName::Pawn30,   // 30 歩
+                PieceName::Pawn31,   // 31 歩
+                PieceName::Pawn32,   // 32 歩
+                PieceName::Pawn33,   // 33 歩
+                PieceName::Pawn34,   // 34 歩
+                PieceName::Pawn35,   // 35 歩
+                PieceName::Pawn36,   // 36 歩
+                PieceName::Pawn37,   // 37 歩
+                PieceName::Pawn38,   // 38 歩
+                PieceName::Pawn39,   // 39 歩
+                PieceName::Pawn40,   // 40 歩
             ]
             .to_vec(),
 
@@ -577,8 +577,8 @@ impl Default for SpeedOfLight {
 /// コーディングを短くするためのものだぜ☆（＾～＾）
 pub struct Nine299792458 {}
 impl Nine299792458 {
-    pub fn piece_numbers() -> &'static Vec<PieceNum> {
-        &NINE_299792458.piece_numbers
+    pub fn piece_names() -> &'static Vec<PieceName> {
+        &NINE_299792458.piece_names
     }
     pub fn west() -> RelAdr2D {
         NINE_299792458.west

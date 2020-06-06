@@ -11,7 +11,7 @@ use crate::cosmic::smart::square::{
     RANK_6, RANK_7, RANK_8, RANK_9,
 };
 use crate::cosmic::toy_box::GameTable;
-use crate::cosmic::toy_box::PieceNum;
+use crate::cosmic::toy_box::PieceName;
 use crate::spaceship::equipment::Beam;
 use std::fmt;
 
@@ -20,10 +20,10 @@ pub struct Piece {
     /// Stockfish系コンピューター将棋ソフトが言う Piece は、きふわらべでは PieceMeaning に名前を変えているぜ☆（＾～＾）
     pub meaning: PieceMeaning,
     /// 将棋の駒の背番号だぜ☆（＾～＾）
-    pub num: PieceNum,
+    pub num: PieceName,
 }
 impl Piece {
-    pub fn new(meaning: PieceMeaning, num: PieceNum) -> Self {
+    pub fn new(meaning: PieceMeaning, num: PieceName) -> Self {
         Piece {
             meaning: meaning,
             num: num,
