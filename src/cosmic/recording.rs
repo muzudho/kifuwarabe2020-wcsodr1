@@ -100,20 +100,24 @@ impl fmt::Debug for AddressPos {
     }
 }
 
+/// 取ることになる駒の移動。
 #[derive(Clone, Copy)]
 pub struct CapturedMove {
     /// 取ることになる駒
     pub piece: Piece,
     /*
-    /// TODO 取ることになる駒の、元あった所。
-    pub captured_source: AddressPos,
-    /// TODO 取ることになる駒の、移動先。
-    pub captured_destination: AddressPos,
+    /// TODO 元あった所。
+    pub source: AddressPos,
     */
+    /// 移動先。
+    pub destination: AddressPos,
 }
 impl CapturedMove {
-    pub fn new(piece: Piece) -> Self {
-        CapturedMove { piece: piece }
+    pub fn new(destination: &AddressPos, piece: Piece) -> Self {
+        CapturedMove {
+            destination: *destination,
+            piece: piece,
+        }
     }
 }
 

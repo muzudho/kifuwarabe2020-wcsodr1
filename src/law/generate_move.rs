@@ -195,7 +195,7 @@ impl PseudoLegalMoves {
                                     destination,
                                     false,
                                     if let Some(piece) = pseudo_captured {
-                                        Some(CapturedMove::new(piece))
+                                        Some(CapturedMove::new(&destination, piece))
                                     } else {
                                         None
                                     },
@@ -206,7 +206,7 @@ impl PseudoLegalMoves {
                                 destination,
                                 true,
                                 if let Some(piece) = pseudo_captured {
-                                    Some(CapturedMove::new(piece))
+                                    Some(CapturedMove::new(&destination, piece))
                                 } else {
                                     None
                                 },
@@ -220,7 +220,7 @@ impl PseudoLegalMoves {
                                     destination,
                                     promotion,
                                     if let Some(piece) = pseudo_captured {
-                                        Some(CapturedMove::new(piece))
+                                        Some(CapturedMove::new(&destination, piece))
                                     } else {
                                         None
                                     },
