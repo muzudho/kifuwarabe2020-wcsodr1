@@ -7,7 +7,7 @@ use crate::cosmic::smart::features::{HAND_MAX, PHYSICAL_PIECES_LEN, PIECE_MEANIN
 use crate::cosmic::smart::square::{
     AbsoluteAddress2D, BOARD_MEMORY_AREA, FILE_1, FILE_10, RANK_1, RANK_10, SQUARE_NONE,
 };
-use crate::cosmic::toy_box::Board;
+use crate::cosmic::toy_box::GameTable;
 use crate::law::speed_of_light::HandAddresses;
 use crate::spaceship::equipment::Beam;
 use rand::Rng;
@@ -63,7 +63,7 @@ impl GameHashSeed {
     /// TODO 指し手を使って差分更新
     /// 駒を動かしたあとに使う。
     /// TODO 持ち駒の枚数がトグルになってないぜ☆（＾～＾）？
-    pub fn update_by_do_move(&self, history: &mut History, board: &Board, move_: &Movement) {
+    pub fn update_by_do_move(&self, history: &mut History, table: &GameTable, move_: &Movement) {
         // TODO １つ前の局面のハッシュ。
         let mut prev_hash = if history.ply == 0 {
             history.starting_position_hash
@@ -74,7 +74,7 @@ impl GameHashSeed {
         // 移動する駒。
         match move_.source {
             AddressPos::Board(sq) => {
-                let source_piece_meaning = board.piece_at(&move_.source).unwrap().meaning as usize;
+                let source_piece_meaning = table.piece_at(&move_.source).unwrap().meaning as usize;
                 // 移動前マスに、動かしたい駒があるときのハッシュ。
                 prev_hash ^= self.piece[sq.serial_number()][source_piece_meaning];
                 // 移動後マスに、動かしたい駒があるときのハッシュ。
@@ -88,7 +88,7 @@ impl GameHashSeed {
                 }
             }
             AddressPos::Hand(physical_piece) => {
-                let count = board.count_hand(physical_piece);
+                let count = table.count_hand(physical_piece);
                 // 打つ前の駒の枚数のハッシュ。
                 prev_hash ^= self.hands[physical_piece as usize][count as usize];
                 // 移動後マスに、打った駒があるときのハッシュ。
@@ -107,11 +107,11 @@ impl GameHashSeed {
         match move_.destination {
             AddressPos::Board(dst_sq) => {
                 // 移動先にある駒があれば
-                if let Some(dst_piece_val) = board.piece_at(&move_.destination) {
+                if let Some(dst_piece_val) = table.piece_at(&move_.destination) {
                     prev_hash ^= self.piece[dst_sq.serial_number()][dst_piece_val.meaning as usize];
                     // 持ち駒になるとき。
                     let physical_piece = dst_piece_val.meaning.physical_piece();
-                    let count = board.count_hand(physical_piece);
+                    let count = table.count_hand(physical_piece);
                     // 打つ前の駒の枚数のハッシュ。
                     prev_hash ^= self.hands[physical_piece as usize][count as usize + 1];
                 }
@@ -128,7 +128,7 @@ impl GameHashSeed {
     /*
     /// 局面ハッシュを作り直す
     pub fn current_position(&self, game: &Game) -> u64 {
-        let mut hash = self.board(&game.board);
+        let mut hash = self.table(&game.table);
 
         // 手番ハッシュ
         use crate::cosmic::recording::Phase::*;
@@ -143,7 +143,7 @@ impl GameHashSeed {
 
     /// 初期局面ハッシュを作り直す
     pub fn starting_position(&self, game: &Game) -> u64 {
-        let mut hash = self.board(&game.starting_board);
+        let mut hash = self.from_table(&game.starting_table);
 
         // 手番ハッシュ（後手固定）
         hash ^= self.phase[PHASE_SECOND];
@@ -152,14 +152,14 @@ impl GameHashSeed {
     }
 
     /// 盤面からハッシュ作成
-    fn board(&self, board: &Board) -> u64 {
+    fn from_table(&self, table: &GameTable) -> u64 {
         let mut hash: u64 = 0;
 
         // 盤上の駒
         for rank in RANK_1..RANK_10 {
             for file in (FILE_1..FILE_10).rev() {
                 let sq = AbsoluteAddress2D::new(file, rank);
-                if let Some(piece) = board.piece_at(&AddressPos::Board(sq)) {
+                if let Some(piece) = table.piece_at(&AddressPos::Board(sq)) {
                     hash ^= self.piece[sq.serial_number()][piece.meaning as usize];
                 }
             }
@@ -167,7 +167,7 @@ impl GameHashSeed {
 
         // 持ち駒ハッシュ
         HandAddresses::for_all(&mut |adr| {
-            let count = board.count_hand(adr);
+            let count = table.count_hand(adr);
             debug_assert!(
                 count <= HAND_MAX,
                 "持ち駒 {:?} の枚数 {} <= {}",

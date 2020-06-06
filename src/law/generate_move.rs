@@ -10,7 +10,7 @@ use crate::cosmic::smart::square::{
     AbsoluteAddress2D, Angle, RelAdr2D, FILE_1, FILE_10, RANK_1, RANK_10, RANK_2, RANK_3, RANK_4,
     RANK_6, RANK_7, RANK_8, RANK_9,
 };
-use crate::cosmic::toy_box::Board;
+use crate::cosmic::toy_box::GameTable;
 use crate::cosmic::toy_box::PieceNum;
 use crate::spaceship::equipment::Beam;
 use std::fmt;
@@ -108,7 +108,7 @@ impl PseudoLegalMoves {
     /// Arguments
     /// ---------
     /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
-    /// * `board` - 現局面の盤上だぜ☆（＾～＾）
+    /// * `table` - 現局面の盤上だぜ☆（＾～＾）
     /// * `listen_move` - 指し手を受け取れだぜ☆（＾～＾）
     ///
     /// Returns
@@ -116,16 +116,16 @@ impl PseudoLegalMoves {
     /// F1:
     /// * 指し手ハッシュ
     /// * 移動先にあった駒
-    pub fn make_move<F1>(friend: Phase, board: &Board, listen_move: &mut F1)
+    pub fn make_move<F1>(friend: Phase, table: &GameTable, listen_move: &mut F1)
     where
         F1: FnMut(Movement),
     {
-        board.for_some_pieces_on_list40(friend, &mut |addr, piece| match addr {
+        table.for_some_pieces_on_list40(friend, &mut |addr, piece| match addr {
             AddressPos::Board(_src_sq) => {
-                PseudoLegalMoves::start_on_board(friend, &addr, &piece, board, listen_move)
+                PseudoLegalMoves::start_on_board(friend, &addr, &piece, table, listen_move)
             }
             AddressPos::Hand(drop) => {
-                PseudoLegalMoves::make_drop(friend, drop, board, listen_move);
+                PseudoLegalMoves::make_drop(friend, drop, table, listen_move);
             }
         });
     }
@@ -137,7 +137,7 @@ impl PseudoLegalMoves {
     /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `piece` - 駒だぜ☆（＾～＾）
-    /// * `board` - 現局面の盤上だぜ☆（＾～＾）
+    /// * `table` - 現局面の盤上だぜ☆（＾～＾）
     /// * `listen_move` - 指し手を受け取れだぜ☆（＾～＾）
     ///
     /// Returns
@@ -149,14 +149,14 @@ impl PseudoLegalMoves {
         friend: Phase,
         source: &AddressPos,
         piece: &Piece,
-        board: &Board,
+        table: &GameTable,
         listen_move: &mut F1,
     ) where
         F1: FnMut(Movement),
     {
         let moving =
             &mut |destination, promotability, _agility, move_permission: Option<MovePermission>| {
-                let pseudo_captured = board.piece_at(&destination);
+                let pseudo_captured = table.piece_at(&destination);
 
                 let (ok, space) = if let Some(pseudo_captured_val) = pseudo_captured {
                     if pseudo_captured_val.meaning.phase() == friend {
@@ -227,17 +227,17 @@ impl PseudoLegalMoves {
     /// ---------
     ///
     /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
-    /// * `board` - 現局面の盤上だぜ☆（＾～＾）
+    /// * `table` - 現局面の盤上だぜ☆（＾～＾）
     /// * `listen_move` - 指し手を受け取れだぜ☆（＾～＾）
     /// * `listen_control` - 利きを受け取れだぜ☆（＾～＾）
-    fn make_drop<F1>(friend: Phase, adr: PhysicalPiece, board: &Board, listen_move: &mut F1)
+    fn make_drop<F1>(friend: Phase, adr: PhysicalPiece, table: &GameTable, listen_move: &mut F1)
     where
         F1: FnMut(Movement),
     {
-        if let Some(piece) = board.last_hand(adr) {
+        if let Some(piece) = table.last_hand(adr) {
             // 打つぜ☆（＾～＾）
             let drop = &mut |destination| {
-                if let None = board.piece_at(&destination) {
+                if let None = table.piece_at(&destination) {
                     // 駒が無いところに打つ
                     use crate::cosmic::smart::features::PieceMeaning::*;
                     match piece.meaning {
@@ -245,7 +245,7 @@ impl PseudoLegalMoves {
                             // ひよこ　は２歩できない☆（＾～＾）
                             match destination {
                                 AddressPos::Board(dst_sq) => {
-                                    if board.exists_pawn_on_file(friend, dst_sq.file()) {
+                                    if table.exists_pawn_on_file(friend, dst_sq.file()) {
                                         return;
                                     }
                                 }

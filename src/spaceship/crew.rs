@@ -59,22 +59,28 @@ impl Kifuwarabe {
             universe.option_promotion_weight,
             universe.option_depth_not_to_give_up,
         );
-        // TODO 自分が黒手番か、白手番かどうやって調べるんだぜ☆（＾～＾）？
-        let msec: u64 = match universe.game.history.get_friend() {
-            Phase::First => go1.btime,
-            Phase::Second => go1.wtime,
+        // 残り時間と、追加時間☆（＾～＾）
+        let (msec, _minc) = match universe.game.history.get_friend() {
+            // 2秒余裕を見ておけば、探索を中断できるだろ……☆（＾～＾）
+            Phase::First => (go1.btime - 2000, go1.binc),
+            Phase::Second => (go1.wtime - 2000, go1.winc),
         };
-        tree.think_msec = if msec < 1 {
-            // 持ち時間が 0 秒になったら。ヤケクソで 1ms秒指しをしてみようぜ☆（＾～＾）
-            1
-        } else if msec < universe.option_max_think_msec {
-            // 残りが 0ms だと、第一引数が範囲外エラーになるんで注意☆（＾～＾）
-            rand::thread_rng().gen_range(msec - 1, msec) as u128
-        } else {
+        tree.think_msec = if universe.option_max_think_msec < msec {
+            // 残り時間が、最大思考時間より長ければ充分だぜ☆（＾～＾）
             rand::thread_rng().gen_range(
                 universe.option_min_think_msec,
                 universe.option_max_think_msec,
             ) as u128
+        } else if universe.option_min_think_msec < msec {
+            // 残り時間が、最小思考時間より長いが、最長思考時間まで考えてられないな☆（＾～＾）
+            rand::thread_rng().gen_range(universe.option_min_think_msec, msec) as u128
+        } else if 3000 < msec {
+            // 持ち時間が、最小思考時間未満、3秒より多いになったら☆（＾～＾）
+            // 第一引数が負の数にならないように注意☆（＾～＾）
+            rand::thread_rng().gen_range(0, msec - 2000) as u128
+        } else {
+            // ヤケクソの 500msec 指しだぜ☆（＾～＾）
+            500
         };
 
         let ts = tree.iteration_deeping(universe);
@@ -195,7 +201,7 @@ impl Chiyuri {
         // Generation move.
         // FIXME 合法手とは限らない
         let mut ways = Vec::<Movement>::new();
-        PseudoLegalMoves::make_move(game.history.get_friend(), &game.board, &mut |way| {
+        PseudoLegalMoves::make_move(game.history.get_friend(), &game.table, &mut |way| {
             ways.push(way);
         });
         Beam::shoot("----指し手生成(合法手とは限らない) ここから----");
@@ -221,8 +227,8 @@ impl Chiyuri {
         Beam::shoot("----駒リスト40表示 ここから----");
         universe
             .game
-            .board
-            .for_all_pieces_on_board(&mut |i, adr, piece| {
+            .table
+            .for_all_pieces_on_table(&mut |i, adr, piece| {
                 Beam::shoot(&format!(
                     "[{}]{}{}",
                     i,

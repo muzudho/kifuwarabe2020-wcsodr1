@@ -160,7 +160,7 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
     }
 
     // 取られる駒を事前に調べてセットするぜ☆（＾～＾）！
-    buffer.captured = game.board.piece_at(&buffer.destination);
+    buffer.captured = game.table.piece_at(&buffer.destination);
 
     // 確定。
     game.set_move(&buffer);
@@ -173,7 +173,7 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
 /// 初期化は既に終わらせてあります。
 pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Game) {
     // 初期盤面
-    let board = game.mut_starting();
+    let table = game.mut_starting();
     let mut file = FILE_9; //９筋から右方向へ読取
     let mut rank = RANK_1;
 
@@ -248,7 +248,12 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Game) {
             BoardPart::Alphabet(piece_meaning) => {
                 *starts += 1;
                 let addr = AddressPos::Board(AbsoluteAddress2D::new(file, rank));
-                board.push_to_board_from_sfen(&addr, piece_meaning);
+
+                // 駒に背番号を付けるぜ☆（＾～＾）
+                let piece = table.make_piece_number(piece_meaning);
+                // 盤に置くぜ☆（＾～＾）
+                table.push_piece(&addr, Some(piece));
+
                 file -= 1;
             }
             BoardPart::Number(space_num) => {
@@ -370,7 +375,7 @@ pub fn set_position(line: &str, game: &mut Game) {
                     };
 
                     use crate::cosmic::smart::features::PieceMeaning::*;
-                    let hand = match &line[starts..=starts] {
+                    let hand_meaning = match &line[starts..=starts] {
                         "R" => Rook1,
                         "B" => Bishop1,
                         "G" => Gold1,
@@ -391,7 +396,15 @@ pub fn set_position(line: &str, game: &mut Game) {
                     };
                     starts += 1;
 
-                    game.mut_starting().push_to_hand_from_sfen(hand, hand_num);
+                    for _i in 0..hand_num {
+                        // 駒に背番号を付けるぜ☆（＾～＾）
+                        let piece = game.mut_starting().make_piece_number(hand_meaning);
+                        // 駒台に置くぜ☆（＾～＾）
+                        game.mut_starting().push_piece(
+                            &AddressPos::Hand(piece.meaning.physical_piece()),
+                            Some(piece),
+                        );
+                    }
                 } //if
             } //loop
         } //else
@@ -413,7 +426,7 @@ pub fn set_position(line: &str, game: &mut Game) {
     }
 
     // 初期局面を、現局面にコピーします
-    game.board.copy_from(&game.starting_board);
+    game.table.copy_from(&game.starting_table);
 
     // 指し手を全部読んでいくぜ☆（＾～＾）手目のカウントも増えていくぜ☆（＾～＾）
     while read_sasite(line, &mut starts, len, game) {

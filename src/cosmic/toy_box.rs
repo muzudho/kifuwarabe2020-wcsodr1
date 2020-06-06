@@ -105,7 +105,7 @@ pub enum PieceNum {
 /// でかいのでコピーもクローンも不可☆（＾～＾）！
 /// 10の位を筋、1の位を段とする。
 /// 0筋、0段は未使用
-pub struct Board {
+pub struct GameTable {
     // いわゆる盤☆（＾～＾）
     pieces: [Option<Piece>; BOARD_MEMORY_AREA as usize],
     /// 駒の居場所☆（＾～＾）
@@ -115,9 +115,9 @@ pub struct Board {
     /// 持ち駒☆（＾～＾）TODO 固定長サイズのスタックを用意したいぜ☆（＾～＾）
     pub hands: [HandAddressTypeStack; PHYSICAL_PIECES_LEN],
 }
-impl Default for Board {
+impl Default for GameTable {
     fn default() -> Self {
-        Board {
+        GameTable {
             // 盤上
             pieces: [
                 None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -163,7 +163,7 @@ impl Default for Board {
         }
     }
 }
-impl Board {
+impl GameTable {
     pub fn clear(&mut self) {
         self.pieces = [
             None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -209,11 +209,11 @@ impl Board {
     }
 
     /// 開始盤面を、現盤面にコピーしたいときに使うぜ☆（＾～＾）
-    pub fn copy_from(&mut self, board: &Board) {
-        self.pieces = board.pieces.clone();
-        self.address = board.address.clone();
-        self.physical_piece_type_index = board.physical_piece_type_index.clone();
-        self.hands = board.hands.clone();
+    pub fn copy_from(&mut self, table: &GameTable) {
+        self.pieces = table.pieces.clone();
+        self.address = table.address.clone();
+        self.physical_piece_type_index = table.physical_piece_type_index.clone();
+        self.hands = table.hands.clone();
     }
 
     /// 駒を置く。
@@ -281,29 +281,6 @@ impl Board {
         }
     }
 
-    /// 先手玉、後手玉なら、その位置を確定させます。背番号も付けます。
-    pub fn push_to_board_from_sfen(&mut self, addr: &AddressPos, piece_meaning: PieceMeaning) {
-        // 駒に背番号を付けるぜ☆（＾～＾）
-        let piece = self.make_piece_number(piece_meaning);
-
-        // 盤に置くぜ☆（＾～＾）
-        self.push_piece(&addr, Some(piece));
-    }
-
-    /// 持ち駒に背番号を付ける
-    pub fn push_to_hand_from_sfen(&mut self, piece_meaning: PieceMeaning, number: isize) {
-        for _i in 0..number {
-            // 駒に背番号を付けるぜ☆（＾～＾）
-            let piece = self.make_piece_number(piece_meaning);
-
-            // 駒台に置くぜ☆（＾～＾）
-            self.push_piece(
-                &AddressPos::Hand(piece.meaning.physical_piece()),
-                Some(piece),
-            );
-        }
-    }
-
     /// 歩が置いてあるか確認
     pub fn exists_pawn_on_file(&self, phase: Phase, file: usize) -> bool {
         for rank in RANK_1..RANK_10 {
@@ -334,7 +311,7 @@ impl Board {
     }
 
     /// 盤上を検索するのではなく、４０個の駒を検索するぜ☆（＾～＾）
-    pub fn for_all_pieces_on_board<F>(&self, piece_get: &mut F)
+    pub fn for_all_pieces_on_table<F>(&self, piece_get: &mut F)
     where
         F: FnMut(usize, Option<&AbsoluteAddress2D>, Option<Piece>),
     {

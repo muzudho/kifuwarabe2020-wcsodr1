@@ -1,6 +1,6 @@
 use crate::cosmic::pos_hash::pos_hash::*;
 use crate::cosmic::recording::{AddressPos, History, Movement};
-use crate::cosmic::toy_box::Board;
+use crate::cosmic::toy_box::GameTable;
 use crate::law::generate_move::Piece;
 use crate::spaceship::equipment::{Beam, DestinationDisplay};
 
@@ -15,12 +15,12 @@ pub enum PosNums {
 pub struct Game {
     /// 棋譜
     pub history: History,
-    /// 初期盤面
-    pub starting_board: Board,
+    /// 初期の卓
+    pub starting_table: GameTable,
     /// 現対局ハッシュ種☆（＾～＾）
     pub hash_seed: GameHashSeed,
-    /// 現盤面
-    pub board: Board,
+    /// 現在の卓
+    pub table: GameTable,
     /// 情報表示担当
     pub info: DestinationDisplay,
 }
@@ -28,9 +28,9 @@ impl Default for Game {
     fn default() -> Game {
         Game {
             history: History::default(),
-            starting_board: Board::default(),
+            starting_table: GameTable::default(),
             hash_seed: GameHashSeed::default(),
-            board: Board::default(),
+            table: GameTable::default(),
             info: DestinationDisplay::default(),
         }
     }
@@ -56,21 +56,21 @@ impl Game {
         s
     }
 
-    pub fn get_board(&self, num: PosNums) -> &Board {
+    pub fn get_table(&self, num: PosNums) -> &GameTable {
         match num {
-            PosNums::Current => &self.board,
-            PosNums::Start => &self.starting_board,
+            PosNums::Current => &self.table,
+            PosNums::Start => &self.starting_table,
         }
     }
-    pub fn mut_starting(&mut self) -> &mut Board {
-        &mut self.starting_board
+    pub fn mut_starting(&mut self) -> &mut GameTable {
+        &mut self.starting_table
     }
 
     /// 初期局面、現局面ともにクリアーします。
     /// 手目も 0 に戻します。
     pub fn clear(&mut self) {
-        self.starting_board.clear();
-        self.board.clear();
+        self.starting_table.clear();
+        self.table.clear();
         self.history.ply = 0;
     }
 
@@ -122,14 +122,14 @@ impl Game {
     pub fn read_move(&mut self, move_: &Movement) {
         // 局面ハッシュを作り直す
         self.hash_seed
-            .update_by_do_move(&mut self.history, &self.board, move_);
+            .update_by_do_move(&mut self.history, &self.table, move_);
 
         // 動かす駒。Noneなことは無いが、将棋盤にセットするとき結局 Some を付けることになるので、わざわざ省かないぜ☆（＾～＾）
         let moveing_piece: Option<Piece> = match move_.source {
             AddressPos::Board(_src_sq) => {
                 // 盤上の移動なら、元の升に駒はあるので、それを消す。
                 let piece152: Option<Piece> = if move_.promote {
-                    if let Some(piece) = self.board.pop_piece(&move_.source) {
+                    if let Some(piece) = self.table.pop_piece(&move_.source) {
                         // 成ったのなら、元のマスの駒を成らすぜ☆（＾～＾）
                         Some(Piece::new(piece.meaning.promoted(), piece.num))
                     } else {
@@ -139,7 +139,7 @@ impl Game {
                     }
                 } else {
                     // 移動元の駒。
-                    self.board.pop_piece(&move_.source)
+                    self.table.pop_piece(&move_.source)
                 };
 
                 piece152
@@ -147,23 +147,23 @@ impl Game {
             AddressPos::Hand(_drop) => {
                 // 打なら
                 // 自分の持ち駒を減らす
-                Some(self.board.pop_piece(&move_.source).unwrap())
+                Some(self.table.pop_piece(&move_.source).unwrap())
             }
         };
         // 移動先升に駒があるかどうか
-        if let Some(collision_piece) = self.board.pop_piece(&move_.destination) {
+        if let Some(collision_piece) = self.table.pop_piece(&move_.destination) {
             // 移動先升の駒を盤上から消し、自分の持ち駒に増やす
             // 先後ひっくり返す。
             let captured_piece =
                 Piece::new(collision_piece.meaning.captured(), collision_piece.num);
-            self.board.push_piece(
+            self.table.push_piece(
                 &AddressPos::Hand(captured_piece.meaning.physical_piece()),
                 Some(captured_piece),
             );
         }
 
         // 移動先升に駒を置く
-        self.board.push_piece(&move_.destination, moveing_piece);
+        self.table.push_piece(&move_.destination, moveing_piece);
 
         // // 局面ハッシュを作り直す
         // let ky_hash = self.hash_seed.current_position(&self);
@@ -185,7 +185,7 @@ impl Game {
                         // 盤上の移動なら
                         if move_.promote {
                             // 成ったなら、成る前へ
-                            if let Some(source_piece) = self.board.pop_piece(&move_.destination) {
+                            if let Some(source_piece) = self.table.pop_piece(&move_.destination) {
                                 Some(Piece::new(source_piece.meaning.demoted(), source_piece.num))
                             } else {
                                 panic!(Beam::trouble(
@@ -193,15 +193,15 @@ impl Game {
                                 ))
                             }
                         } else {
-                            self.board.pop_piece(&move_.destination)
+                            self.table.pop_piece(&move_.destination)
                         }
                     }
                     AddressPos::Hand(_drop) => {
                         // 打なら
                         // 打った場所に駒があるはずだぜ☆（＾～＾）
-                        let piece = self.board.pop_piece(&move_.destination).unwrap();
+                        let piece = self.table.pop_piece(&move_.destination).unwrap();
                         // 自分の持ち駒を増やそうぜ☆（＾～＾）！
-                        self.board.push_piece(
+                        self.table.push_piece(
                             &AddressPos::Hand(piece.meaning.physical_piece()),
                             Some(piece),
                         );
@@ -213,16 +213,16 @@ impl Game {
                 let captured: Option<Piece> = move_.captured;
                 if let Some(captured_piece_val) = captured {
                     // 自分の持ち駒を減らす
-                    self.board.pop_piece(&AddressPos::Hand(
+                    self.table.pop_piece(&AddressPos::Hand(
                         captured_piece_val.meaning.captured().physical_piece(),
                     ));
                     // 移動先の駒を、取った駒（あるいは空、ということがあるか？）に戻す
-                    self.board.push_piece(&move_.destination, captured);
+                    self.table.push_piece(&move_.destination, captured);
                 }
 
                 if let AddressPos::Board(_src_sq) = move_.source {
                     // 打でなければ、移動元升に、動かした駒を置く☆（＾～＾）打なら何もしないぜ☆（＾～＾）
-                    self.board.push_piece(&move_.source, moveing_piece);
+                    self.table.push_piece(&move_.source, moveing_piece);
                 }
             }
 
