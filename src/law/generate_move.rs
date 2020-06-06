@@ -9,7 +9,7 @@ use crate::cosmic::smart::square::{
     RANK_6, RANK_7, RANK_8, RANK_9,
 };
 use crate::cosmic::toy_box::GameTable;
-use crate::cosmic::toy_box::PieceName;
+use crate::cosmic::toy_box::PieceNum;
 use crate::spaceship::equipment::Beam;
 use std::fmt;
 
@@ -18,19 +18,19 @@ pub struct Piece {
     /// Stockfish系コンピューター将棋ソフトが言う Piece は、きふわらべでは PieceMeaning に名前を変えているぜ☆（＾～＾）
     pub meaning: PieceMeaning,
     /// 将棋の駒の背番号だぜ☆（＾～＾）
-    pub name: PieceName,
+    pub num: PieceNum,
 }
 impl Piece {
-    pub fn new(meaning: PieceMeaning, name: PieceName) -> Self {
+    pub fn new(meaning: PieceMeaning, num: PieceNum) -> Self {
         Piece {
             meaning: meaning,
-            name: name,
+            num: num,
         }
     }
 }
 impl fmt::Debug for Piece {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Piece({} {:?})", self.meaning, self.name)
+        write!(f, "Piece({} {:?})", self.meaning, self.num)
     }
 }
 

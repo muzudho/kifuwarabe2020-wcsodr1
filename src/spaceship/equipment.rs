@@ -207,13 +207,13 @@ impl Beam {
 /// ちゆり「駒そのものではなく、駒の情報が欲しいだけなら、これだぜ☆」
 pub struct PieceInfo {
     pub meaning: String,
-    pub name: String,
+    pub num: String,
 }
 impl PieceInfo {
     pub fn new(piece: &Piece) -> Self {
         PieceInfo {
             meaning: format!("{}", piece.meaning),
-            name: format!("{:?}", piece.name),
+            num: format!("{:?}", piece.num),
         }
     }
 }

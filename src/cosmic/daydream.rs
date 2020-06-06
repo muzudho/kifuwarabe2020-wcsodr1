@@ -211,7 +211,7 @@ impl Tree {
             let captured_piece = if let Some(captured) = move_.captured {
                 Some(Piece::new(
                     captured.piece.meaning.captured(),
-                    captured.piece.name,
+                    captured.piece.num,
                 ))
             } else {
                 None
