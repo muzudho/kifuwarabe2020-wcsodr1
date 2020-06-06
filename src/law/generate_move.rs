@@ -18,19 +18,19 @@ pub struct Piece {
     /// Stockfish系コンピューター将棋ソフトが言う Piece は、きふわらべでは PieceMeaning に名前を変えているぜ☆（＾～＾）
     pub meaning: PieceMeaning,
     /// 将棋の駒の背番号だぜ☆（＾～＾）
-    pub num: PieceName,
+    pub name: PieceName,
 }
 impl Piece {
-    pub fn new(meaning: PieceMeaning, num: PieceName) -> Self {
+    pub fn new(meaning: PieceMeaning, name: PieceName) -> Self {
         Piece {
             meaning: meaning,
-            num: num,
+            name: name,
         }
     }
 }
 impl fmt::Debug for Piece {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Piece({} {:?})", self.meaning, self.num)
+        write!(f, "Piece({} {:?})", self.meaning, self.name)
     }
 }
 

@@ -132,7 +132,7 @@ impl Game {
                 let piece152: Option<Piece> = if move_.promote {
                     if let Some(piece) = self.table.pop_piece(&move_.source) {
                         // 成ったのなら、元のマスの駒を成らすぜ☆（＾～＾）
-                        Some(Piece::new(piece.meaning.promoted(), piece.num))
+                        Some(Piece::new(piece.meaning.promoted(), piece.name))
                     } else {
                         panic!(Beam::trouble(
                             "(Err.248) 成ったのに、元の升に駒がなかった☆（＾～＾）"
@@ -156,7 +156,7 @@ impl Game {
             // 移動先升の駒を盤上から消し、自分の持ち駒に増やす
             // 先後ひっくり返す。
             let captured_piece =
-                Piece::new(collision_piece.meaning.captured(), collision_piece.num);
+                Piece::new(collision_piece.meaning.captured(), collision_piece.name);
             self.table.push_piece(
                 &AddressPos::Hand(captured_piece.meaning.physical_piece()),
                 Some(captured_piece),
@@ -187,7 +187,10 @@ impl Game {
                         if move_.promote {
                             // 成ったなら、成る前へ
                             if let Some(source_piece) = self.table.pop_piece(&move_.destination) {
-                                Some(Piece::new(source_piece.meaning.demoted(), source_piece.num))
+                                Some(Piece::new(
+                                    source_piece.meaning.demoted(),
+                                    source_piece.name,
+                                ))
                             } else {
                                 panic!(Beam::trouble(
                                     "(Err.305) 成ったのに移動先に駒が無いぜ☆（＾～＾）！"

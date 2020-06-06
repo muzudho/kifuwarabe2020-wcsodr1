@@ -57,11 +57,13 @@ impl Evaluation {
         self.promotion_value *= -1;
     }
 
+    /// # Arguments
+    ///
+    /// * `promotion_value` - 成ったら加点☆（＾～＾）
     pub fn after_do_move(
         &mut self,
-        source_piece1: &Option<Piece>,
         captured_piece: &Option<Piece>,
-        promotion: bool,
+        promotion_value: isize,
     ) -> (isize, isize) {
         // 取った駒の価値を評価するぜ☆（＾～＾）
         let delta_captured_piece = Evaluation::caputured_piece_value(captured_piece);
@@ -82,16 +84,7 @@ impl Evaluation {
         }
         // 進めた駒が成っても、評価値追加だぜ☆（＾～＾）
         +
-        if let Some(source_piece_val) = source_piece1 {
-            if promotion {
-                source_piece_val.meaning.physical_piece().type_().promotion_value()
-            } else {
-                0
-            }
-        } else {
-            // 打なら成りは無いぜ☆（＾～＾）
-            0
-        };
+        promotion_value;
         self.promotion_value += delta_promotion;
 
         (delta_captured_piece, delta_promotion)

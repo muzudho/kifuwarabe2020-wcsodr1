@@ -3,7 +3,7 @@
 //!
 
 use crate::cosmic::playing::Game;
-use crate::cosmic::recording::{AddressPos, Movement, PLY_SIZE, SENNTITE_NUM};
+use crate::cosmic::recording::{Movement, PLY_SIZE, SENNTITE_NUM};
 use crate::cosmic::smart::evaluator::{Evaluation, REPITITION_VALUE};
 use crate::cosmic::smart::features::PieceType;
 use crate::cosmic::smart::see::SEE;
@@ -198,13 +198,11 @@ impl Tree {
 
             // 1手進めるぜ☆（＾～＾）
             self.state_nodes += 1;
-            // 何に使ってる？
-            let source_piece1 = match move_.source {
-                AddressPos::Board(_sq) => game.table.piece_at(&move_.source),
-                AddressPos::Hand(_drop) => {
-                    // 打
-                    None
-                }
+            // * `promotion_value` - 評価値用。成ったら加点☆（＾～＾）
+            let promotion_value = if move_.promote {
+                game.table.promotion_value_at(&move_.source)
+            } else {
+                0
             };
 
             // 棋譜に入れる☆
@@ -213,16 +211,16 @@ impl Tree {
             let captured_piece = if let Some(captured) = move_.captured {
                 Some(Piece::new(
                     captured.piece.meaning.captured(),
-                    captured.piece.num,
+                    captured.piece.name,
                 ))
             } else {
                 None
             };
 
             self.pv.push(&move_);
-            let (captured_piece_centi_pawn, delta_promotion_bonus) =
-                self.evaluation
-                    .after_do_move(&source_piece1, &captured_piece, move_.promote);
+            let (captured_piece_centi_pawn, delta_promotion_bonus) = self
+                .evaluation
+                .after_do_move(&captured_piece, promotion_value);
 
             // TODO 廃止方針☆（＾～＾）
             if let Some(captured_piece_val) = captured_piece {

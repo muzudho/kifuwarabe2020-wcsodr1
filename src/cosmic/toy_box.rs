@@ -225,7 +225,7 @@ impl GameTable {
                     // マスに駒を置きます。
                     self.board[sq.serial_number() as usize] = piece;
                     // 背番号に番地を紐づけます。
-                    self.named_pieces[piece_val.num as usize] = AddressPos::Board(*sq);
+                    self.named_pieces[piece_val.name as usize] = AddressPos::Board(*sq);
                 } else {
                     // マスを空にします。
                     self.board[sq.serial_number() as usize] = None;
@@ -236,7 +236,7 @@ impl GameTable {
                     // 持ち駒を１つ増やします。
                     self.hands[*drop as usize].push(&piece_val);
                     // 背番号に番地を紐づけます。
-                    self.named_pieces[piece_val.num as usize] = *addr;
+                    self.named_pieces[piece_val.name as usize] = *addr;
                 }
             }
         }
@@ -250,7 +250,7 @@ impl GameTable {
                     // マスを空にします。
                     self.board[sq.serial_number() as usize] = None;
                     // TODO 背番号の番地を、ゴミ値で塗りつぶすが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
-                    self.named_pieces[piece_val.num as usize] =
+                    self.named_pieces[piece_val.name as usize] =
                         AddressPos::Board(AbsoluteAddress2D::default());
                 }
                 piece
@@ -259,7 +259,7 @@ impl GameTable {
                 // 台から取りのぞきます。
                 let piece = self.hands[*drop as usize].pop();
                 // TODO 背番号の番地に、ゴミ値を入れて消去するが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
-                self.named_pieces[piece.num as usize] =
+                self.named_pieces[piece.name as usize] =
                     AddressPos::Board(AbsoluteAddress2D::default());
                 Some(piece)
             }
@@ -317,6 +317,22 @@ impl GameTable {
                 }
             }
             _ => panic!(Beam::trouble(&format!(
+                "(Err.254) まだ実装してないぜ☆（＾～＾）！",
+            ))),
+        }
+    }
+    pub fn promotion_value_at(&self, addr: &AddressPos) -> isize {
+        match addr {
+            AddressPos::Board(sq) => {
+                let piece = self.board[sq.serial_number() as usize];
+                if let Some(piece_val) = piece {
+                    piece_val.meaning.physical_piece().type_().promotion_value()
+                } else {
+                    // 打なら成りは無いぜ☆（＾～＾）
+                    0
+                }
+            }
+            AddressPos::Hand(_drop) => panic!(Beam::trouble(&format!(
                 "(Err.254) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
@@ -446,7 +462,7 @@ impl fmt::Display for HandAddressTypeStack {
         for i in 0..=self.count {
             buffer.push_str(&format!(
                 "({}, {:?}) ",
-                self.items[i].meaning, self.items[i].num
+                self.items[i].meaning, self.items[i].name
             ));
         }
         write!(f, "{}", buffer.trim_end())

@@ -113,6 +113,7 @@ pub struct CapturedMove {
     */
 }
 impl CapturedMove {
+    // TODO Piece を持ちまわすのは止めたいが……☆（＾～＾）
     pub fn new(source: &AddressPos, piece: Piece) -> Self {
         CapturedMove {
             source: *source,

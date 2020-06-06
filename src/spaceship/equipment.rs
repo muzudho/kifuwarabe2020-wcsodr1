@@ -213,7 +213,7 @@ impl PieceInfo {
     pub fn new(piece: &Piece) -> Self {
         PieceInfo {
             meaning: format!("{}", piece.meaning),
-            name: format!("{:?}", piece.num),
+            name: format!("{:?}", piece.name),
         }
     }
 }
