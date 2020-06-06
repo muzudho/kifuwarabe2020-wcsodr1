@@ -120,6 +120,9 @@ impl Kifuwarabe {
             let value = &line[(label1_width + name_width + label2_width)..];
             // IO::writeln(&format!("Debug value=|{}|", value));
             match name {
+                "MaxPly" => {
+                    universe.option_max_ply = value.parse().unwrap();
+                }
                 "ManyWaysPer1000" => {
                     universe.option_many_ways_weight = value.parse().unwrap();
                 }
@@ -159,6 +162,8 @@ impl Kifuwarabe {
         IO::writeln("option name LearningFile type filename default <empty>");
         */
         // アルファベット順ではなく、将棋所のダイアログボックスが見やすくなるように並べろだぜ☆（＾～＾）
+        // 大会ルール関連☆（＾～＾）
+        Beam::shoot("option name MaxPly type spin default 320 min 1 max 10000");
         // 読みの深さ関連☆（＾～＾）
         Beam::shoot("option name DepthNotToGiveUp type spin default 4 min 1 max 8");
         Beam::shoot("option name MaxDepth type spin default 7 min 1 max 15");

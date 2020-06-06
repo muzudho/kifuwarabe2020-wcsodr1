@@ -3,7 +3,7 @@
 //!
 
 use crate::cosmic::playing::Game;
-use crate::cosmic::recording::{AddressPos, Movement, PLY_LEN, SENNTITE_NUM};
+use crate::cosmic::recording::{AddressPos, Movement, PLY_SIZE, SENNTITE_NUM};
 use crate::cosmic::smart::evaluator::{Evaluation, REPITITION_VALUE};
 use crate::cosmic::smart::features::PieceType;
 use crate::cosmic::smart::see::SEE;
@@ -53,6 +53,10 @@ impl Tree {
     pub fn iteration_deeping(&mut self, universe: &mut Universe) -> TreeState {
         universe.game.info.clear();
 
+        let max_ply = std::cmp::max(
+            universe.option_max_depth,
+            universe.option_max_ply - universe.game.history.ply as usize,
+        );
         // とりあえず 1手読み を叩き台にするぜ☆（＾～＾）
         // 初手の３０手が葉になるぜ☆（＾～＾）
         self.evaluation.before_search();
@@ -61,7 +65,7 @@ impl Tree {
         self.evaluation.after_search();
 
         // 一番深く潜ったときの最善手を選ぼうぜ☆（＾～＾）
-        for id in 1..universe.option_max_depth {
+        for id in 1..max_ply {
             self.max_depth0 = id;
             // 現在のベストムーブ表示☆（＾～＾） PV にすると将棋所は符号を日本語に翻訳してくれるぜ☆（＾～＾）
             let movement = best_ts.bestmove.movement;
@@ -529,14 +533,14 @@ pub enum Value {
 
 #[derive(Clone)]
 pub struct PrincipalVariation {
-    moves: [Movement; PLY_LEN],
+    moves: [Movement; PLY_SIZE],
     ply: usize,
 }
 impl Default for PrincipalVariation {
     fn default() -> Self {
         PrincipalVariation {
             // ゴミの値で埋めるぜ☆（＾～＾）
-            moves: [Movement::default(); PLY_LEN],
+            moves: [Movement::default(); PLY_SIZE],
             ply: 0,
         }
     }

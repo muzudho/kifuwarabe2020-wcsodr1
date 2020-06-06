@@ -10,6 +10,8 @@ pub struct Universe {
     pub game: Game,
     /// 対話モード
     pub dialogue_mode: bool,
+    /// 大会ルールの最大手数☆（＾～＾）
+    pub option_max_ply: usize,
     /// 読みの最大深さ。
     pub option_max_depth: usize,
     /// 思考時間の最小秒☆（＾～＾）
@@ -30,6 +32,7 @@ impl Default for Universe {
         Universe {
             game: Game::default(),
             dialogue_mode: false,
+            option_max_ply: 320,
             option_max_depth: 1,
             option_depth_not_to_give_up: 2,
             /// min < max にしろだぜ☆（＾～＾）

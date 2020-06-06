@@ -10,10 +10,8 @@ use crate::law::cryptographic::num_to_lower_case;
 use crate::law::generate_move::Piece;
 use std::fmt;
 
-/// 手目数。何手目まで指せるか。
-/// 棋譜を残す配列のサイズでもある。
-/// 大会ルールで 320手が上限なので、終端子として投了を１個入れておけるように +1 する。
-pub const PLY_LEN: usize = 321;
+/// 手数☆（＾～＾） 大会ルールとは別で、このプログラムが対応できる上限値☆（＾～＾）
+pub const PLY_SIZE: usize = 2048;
 
 /// 同一局面何回で千日手
 pub const SENNTITE_NUM: isize = 4;
@@ -23,9 +21,9 @@ pub struct History {
     pub ply: isize,
     /// 棋譜
     /// TODO 0手目を初期局面にしたいので、最初にパスを入れてほしい☆（＾～＾）
-    pub movements: [Movement; PLY_LEN],
+    pub movements: [Movement; PLY_SIZE],
     /// 棋譜に対応した各局面の局面ハッシュ
-    pub position_hashs: [u64; PLY_LEN],
+    pub position_hashs: [u64; PLY_SIZE],
     /// 初期局面ハッシュ
     pub starting_position_hash: u64,
 }
@@ -33,8 +31,8 @@ impl Default for History {
     fn default() -> History {
         History {
             ply: 0,
-            movements: [Movement::default(); PLY_LEN],
-            position_hashs: [0; PLY_LEN],
+            movements: [Movement::default(); PLY_SIZE],
+            position_hashs: [0; PLY_SIZE],
             starting_position_hash: 0,
         }
     }
@@ -101,6 +99,12 @@ impl fmt::Debug for AddressPos {
         )
     }
 }
+
+/* TODO
+pub struct CapturedMove {
+
+}
+*/
 
 /// 棋譜にも使うので、取った駒の情報を記憶しておくんだぜ☆（＾～＾）
 /// 投了なら これを使わず、None にしろだぜ☆（＾～＾）
