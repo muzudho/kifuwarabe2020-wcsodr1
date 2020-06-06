@@ -59,7 +59,7 @@ impl Evaluation {
 
     pub fn after_do_move(
         &mut self,
-        source_piece: &Option<Piece>,
+        source_piece1: &Option<Piece>,
         captured_piece: &Option<Piece>,
         promotion: bool,
     ) -> (isize, isize) {
@@ -82,7 +82,7 @@ impl Evaluation {
         }
         // 進めた駒が成っても、評価値追加だぜ☆（＾～＾）
         +
-        if let Some(source_piece_val) = source_piece {
+        if let Some(source_piece_val) = source_piece1 {
             if promotion {
                 source_piece_val.meaning.physical_piece().type_().promotion_value()
             } else {

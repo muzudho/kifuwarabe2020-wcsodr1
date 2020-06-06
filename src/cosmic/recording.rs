@@ -105,7 +105,7 @@ impl fmt::Debug for AddressPos {
 pub struct CapturedMove {
     /// 取ることになる駒
     pub piece: Piece,
-    /// TODO 元あった所。
+    /// 元あった所。
     pub source: AddressPos,
     /*
     /// TODO 移動先。

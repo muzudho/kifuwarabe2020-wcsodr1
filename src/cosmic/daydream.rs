@@ -198,7 +198,8 @@ impl Tree {
 
             // 1手進めるぜ☆（＾～＾）
             self.state_nodes += 1;
-            let source_piece = match move_.source {
+            // 何に使ってる？
+            let source_piece1 = match move_.source {
                 AddressPos::Board(_sq) => game.table.piece_at(&move_.source),
                 AddressPos::Hand(_drop) => {
                     // 打
@@ -221,7 +222,7 @@ impl Tree {
             self.pv.push(&move_);
             let (captured_piece_centi_pawn, delta_promotion_bonus) =
                 self.evaluation
-                    .after_do_move(&source_piece, &captured_piece, move_.promote);
+                    .after_do_move(&source_piece1, &captured_piece, move_.promote);
 
             // TODO 廃止方針☆（＾～＾）
             if let Some(captured_piece_val) = captured_piece {

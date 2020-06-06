@@ -236,6 +236,7 @@ impl Chiyuri {
         let s = universe.game.get_moves_history_text();
         Beam::shoot(&s);
     }
+    /// 表示するだけ☆（＾～＾）
     pub fn list40(universe: &Universe) {
         Beam::shoot("----駒リスト40表示 ここから----");
         universe
@@ -251,7 +252,7 @@ impl Chiyuri {
                         " --".to_string()
                     },
                     if let Some(piece_val) = piece {
-                        format!(" {} {:?}", piece_val.meaning, piece_val.num)
+                        format!(" {} {:?}", piece_val.meaning, piece_val.name)
                     } else {
                         " --".to_string()
                     }

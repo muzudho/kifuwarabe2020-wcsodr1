@@ -3,6 +3,7 @@ use crate::config::*;
 use crate::cosmic::daydream::Value;
 use crate::cosmic::recording::Movement;
 use crate::cosmic::smart::square::test_rotation;
+use crate::law::generate_move::Piece;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
@@ -200,5 +201,19 @@ impl Beam {
         let s2 = Log::writeln(&format!("info string panic! {}", s)).to_string();
         println!("{}", s2);
         s2
+    }
+}
+
+/// ちゆり「駒そのものではなく、駒の情報が欲しいだけなら、これだぜ☆」
+pub struct PieceInfo {
+    pub meaning: String,
+    pub name: String,
+}
+impl PieceInfo {
+    pub fn new(piece: &Piece) -> Self {
+        PieceInfo {
+            meaning: format!("{}", piece.meaning),
+            name: format!("{:?}", piece.num),
+        }
     }
 }

@@ -48,10 +48,10 @@ impl CommandRoom {
 pub struct GameRoom {}
 impl GameRoom {
     fn to_string3(table: &GameTable, file: usize, rank: usize) -> String {
-        if let Some(piece_val) =
-            table.piece_at(&AddressPos::Board(AbsoluteAddress2D::new(file, rank)))
+        if let Some(piece_info_val) =
+            table.piece_info_at(&AddressPos::Board(AbsoluteAddress2D::new(file, rank)))
         {
-            format!("{}", piece_val.meaning)
+            format!("{}", piece_info_val.meaning)
         } else {
             PIECE_WHITE_SPACE.to_string()
         }

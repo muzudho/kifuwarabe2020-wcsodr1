@@ -9,6 +9,7 @@ use crate::cosmic::smart::square::{AbsoluteAddress2D, BOARD_MEMORY_AREA, RANK_1,
 use crate::law::generate_move::Piece;
 use crate::law::speed_of_light::Nine299792458;
 use crate::spaceship::equipment::Beam;
+use crate::spaceship::equipment::PieceInfo;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 use std::fmt;
@@ -294,10 +295,27 @@ impl GameTable {
         }
         false
     }
-    /// 升で指定して駒を取得
+    /// 升で指定して駒を取得。
+    /// 駒台には対応してない。 -> 何に使っている？
     pub fn piece_at(&self, addr: &AddressPos) -> Option<Piece> {
         match addr {
             AddressPos::Board(sq) => self.board[sq.serial_number() as usize],
+            _ => panic!(Beam::trouble(&format!(
+                "(Err.254) まだ実装してないぜ☆（＾～＾）！",
+            ))),
+        }
+    }
+    /// 駒台には対応してない。 -> 何に使っている？
+    pub fn piece_info_at(&self, addr: &AddressPos) -> Option<PieceInfo> {
+        match addr {
+            AddressPos::Board(sq) => {
+                let piece = self.board[sq.serial_number() as usize];
+                if let Some(piece_val) = piece {
+                    Some(PieceInfo::new(&piece_val))
+                } else {
+                    None
+                }
+            }
             _ => panic!(Beam::trouble(&format!(
                 "(Err.254) まだ実装してないぜ☆（＾～＾）！",
             ))),
@@ -311,17 +329,18 @@ impl GameTable {
         self.hands[adr as usize].len()
     }
 
+    /// 表示に使うだけ☆（＾～＾）
     /// 盤上を検索するのではなく、４０個の駒を検索するぜ☆（＾～＾）
     pub fn for_all_pieces_on_table<F>(&self, piece_get: &mut F)
     where
-        F: FnMut(usize, Option<&AbsoluteAddress2D>, Option<Piece>),
+        F: FnMut(usize, Option<&AbsoluteAddress2D>, Option<PieceInfo>),
     {
         for (i, addr) in self.named_pieces.iter().enumerate() {
             match addr {
                 AddressPos::Board(sq) => {
                     // 盤上の駒☆（＾～＾）
-                    let piece = self.piece_at(addr).unwrap();
-                    piece_get(i, Some(sq), Some(piece));
+                    let piece_info = self.piece_info_at(addr).unwrap();
+                    piece_get(i, Some(sq), Some(piece_info));
                 }
                 AddressPos::Hand(_drop) => {
                     // TODO 持ち駒☆（＾～＾）
