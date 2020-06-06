@@ -287,14 +287,17 @@ impl GameTable {
     pub fn exists_pawn_on_file(&self, phase: Phase, file: usize) -> bool {
         for rank in RANK_1..RANK_10 {
             let addr = AddressPos::Board(AbsoluteAddress2D::new(file, rank));
-            if let Some(piece) = self.piece_at(&addr) {
-                if piece.meaning.phase() == phase && piece.meaning.type_() == PieceType::Pawn {
+            if let Some(piece_meaning_val) = self.piece_meaning_at(&addr) {
+                if piece_meaning_val.phase() == phase
+                    && piece_meaning_val.type_() == PieceType::Pawn
+                {
                     return true;
                 }
             }
         }
         false
     }
+    /// TODO Piece をカプセル化したい。外に出したくないぜ☆（＾～＾）
     /// 升で指定して駒を取得。
     /// 駒台には対応してない。 -> 何に使っている？
     pub fn piece_at(&self, addr: &AddressPos) -> Option<Piece> {
@@ -317,7 +320,7 @@ impl GameTable {
                 }
             }
             _ => panic!(Beam::trouble(&format!(
-                "(Err.254) まだ実装してないぜ☆（＾～＾）！",
+                "(Err.321) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
     }
@@ -334,6 +337,20 @@ impl GameTable {
             }
             AddressPos::Hand(_drop) => panic!(Beam::trouble(&format!(
                 "(Err.254) まだ実装してないぜ☆（＾～＾）！",
+            ))),
+        }
+    }
+    pub fn piece_meaning_at(&self, addr: &AddressPos) -> Option<PieceMeaning> {
+        match addr {
+            AddressPos::Board(sq) => {
+                if let Some(piece) = self.board[sq.serial_number() as usize] {
+                    Some(piece.meaning)
+                } else {
+                    None
+                }
+            }
+            AddressPos::Hand(_drop) => panic!(Beam::trouble(&format!(
+                "(Err.345) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
     }
