@@ -205,8 +205,8 @@ impl Kitchen {
             let ss_str = format!(
                 "{}{}",
                 format!("{}", move_),
-                if let Some(psuedo_captured) = move_.captured {
-                    format!(" ({})", psuedo_captured.meaning)
+                if let Some(captured_move) = move_.captured {
+                    format!(" ({})", captured_move.piece.meaning)
                 } else {
                     "".to_string()
                 }

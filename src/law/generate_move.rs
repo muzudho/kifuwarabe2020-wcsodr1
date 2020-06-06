@@ -2,10 +2,8 @@
 //! 現局面を使った指し手生成☆（＾～＾）
 //!
 
-use crate::cosmic::recording::{AddressPos, Movement, Phase};
-use crate::cosmic::smart::features::PhysicalPiece;
-use crate::cosmic::smart::features::PieceMeaning;
-use crate::cosmic::smart::features::PieceType;
+use crate::cosmic::recording::{AddressPos, CapturedMove, Movement, Phase};
+use crate::cosmic::smart::features::{PhysicalPiece, PieceMeaning, PieceType};
 use crate::cosmic::smart::square::{
     AbsoluteAddress2D, Angle, RelAdr2D, FILE_1, FILE_10, RANK_1, RANK_10, RANK_2, RANK_3, RANK_4,
     RANK_6, RANK_7, RANK_8, RANK_9,
@@ -196,10 +194,23 @@ impl PseudoLegalMoves {
                                     *source,
                                     destination,
                                     false,
-                                    pseudo_captured,
+                                    if let Some(piece) = pseudo_captured {
+                                        Some(CapturedMove::new(piece))
+                                    } else {
+                                        None
+                                    },
                                 ));
                             }
-                            listen_move(Movement::new(*source, destination, true, pseudo_captured));
+                            listen_move(Movement::new(
+                                *source,
+                                destination,
+                                true,
+                                if let Some(piece) = pseudo_captured {
+                                    Some(CapturedMove::new(piece))
+                                } else {
+                                    None
+                                },
+                            ));
                         }
                         _ => {
                             // 成れるか、成れないかのどちらかのとき。
@@ -208,7 +219,11 @@ impl PseudoLegalMoves {
                                     *source,
                                     destination,
                                     promotion,
-                                    pseudo_captured,
+                                    if let Some(piece) = pseudo_captured {
+                                        Some(CapturedMove::new(piece))
+                                    } else {
+                                        None
+                                    },
                                 ));
                             }
                         }

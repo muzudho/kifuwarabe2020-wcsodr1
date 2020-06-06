@@ -100,11 +100,22 @@ impl fmt::Debug for AddressPos {
     }
 }
 
-/* TODO
+#[derive(Clone, Copy)]
 pub struct CapturedMove {
-
+    /// 取ることになる駒
+    pub piece: Piece,
+    /*
+    /// TODO 取ることになる駒の、元あった所。
+    pub captured_source: AddressPos,
+    /// TODO 取ることになる駒の、移動先。
+    pub captured_destination: AddressPos,
+    */
 }
-*/
+impl CapturedMove {
+    pub fn new(piece: Piece) -> Self {
+        CapturedMove { piece: piece }
+    }
+}
 
 /// 棋譜にも使うので、取った駒の情報を記憶しておくんだぜ☆（＾～＾）
 /// 投了なら これを使わず、None にしろだぜ☆（＾～＾）
@@ -121,12 +132,10 @@ pub struct Movement {
     /// 移動後に成るなら真
     pub promote: bool,
     /// 取ることになる駒
-    pub captured: Option<Piece>,
+    pub captured: Option<CapturedMove>,
     /*
-    /// 取ることになる駒の、元あった所。
-    pub captured_source: AddressPos,
-    /// 取ることになる駒の、移動先。
-    pub captured_destination: AddressPos,
+    /// 取ることになる駒
+    pub captured: Option<Piece>,
     */
 }
 impl Default for Movement {
@@ -145,7 +154,7 @@ impl Movement {
         source: AddressPos,
         destination: AddressPos,
         promote: bool,
-        captured: Option<Piece>,
+        captured: Option<CapturedMove>,
     ) -> Self {
         Movement {
             source: source,

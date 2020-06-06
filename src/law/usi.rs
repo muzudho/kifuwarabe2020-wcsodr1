@@ -2,9 +2,8 @@
 //! USIプロトコル
 //!
 use crate::cosmic::playing::Game;
-use crate::cosmic::recording::{AddressPos, Movement};
-use crate::cosmic::smart::features::PieceMeaning;
-use crate::cosmic::smart::features::{PhysicalPiece, PhysicalPieceType};
+use crate::cosmic::recording::{AddressPos, CapturedMove, Movement};
+use crate::cosmic::smart::features::{PhysicalPiece, PhysicalPieceType, PieceMeaning};
 use crate::cosmic::smart::square::{AbsoluteAddress2D, FILE_9, RANK_1};
 use crate::spaceship::equipment::Beam;
 use atoi::atoi;
@@ -160,7 +159,12 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
     }
 
     // 取られる駒を事前に調べてセットするぜ☆（＾～＾）！
-    buffer.captured = game.table.piece_at(&buffer.destination);
+    let captured_piece = game.table.piece_at(&buffer.destination);
+    buffer.captured = if let Some(captured_piece_val) = captured_piece {
+        Some(CapturedMove::new(captured_piece_val))
+    } else {
+        None
+    };
 
     // 確定。
     game.set_move(&buffer);

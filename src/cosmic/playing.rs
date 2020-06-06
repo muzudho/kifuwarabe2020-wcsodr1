@@ -1,4 +1,5 @@
 use crate::cosmic::pos_hash::pos_hash::*;
+use crate::cosmic::recording::CapturedMove;
 use crate::cosmic::recording::{AddressPos, History, Movement};
 use crate::cosmic::toy_box::GameTable;
 use crate::law::generate_move::Piece;
@@ -210,14 +211,15 @@ impl Game {
                 };
 
                 // 取った駒が有ったか。
-                let captured: Option<Piece> = move_.captured;
-                if let Some(captured_piece_val) = captured {
+                let captured_move: Option<CapturedMove> = move_.captured;
+                if let Some(captured_move_val) = captured_move {
                     // 自分の持ち駒を減らす
                     self.table.pop_piece(&AddressPos::Hand(
-                        captured_piece_val.meaning.captured().physical_piece(),
+                        captured_move_val.piece.meaning.captured().physical_piece(),
                     ));
                     // 移動先の駒を、取った駒（あるいは空、ということがあるか？）に戻す
-                    self.table.push_piece(&move_.destination, captured);
+                    self.table
+                        .push_piece(&move_.destination, Some(captured_move_val.piece));
                 }
 
                 if let AddressPos::Board(_src_sq) = move_.source {
