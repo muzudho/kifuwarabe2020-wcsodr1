@@ -380,6 +380,14 @@ impl GameTable {
     pub fn last_hand(&self, adr: PhysicalPiece) -> Option<&OldPiece> {
         self.hands[adr as usize].last()
     }
+    /// 指し手生成で使うぜ☆（＾～＾）
+    pub fn last_hand_meaning(&self, table: &GameTable, adr: PhysicalPiece) -> Option<PieceMeaning> {
+        if let Some(old_piece) = self.hands[adr as usize].last() {
+            Some(table.get_meaning(old_piece))
+        } else {
+            None
+        }
+    }
     pub fn count_hand(&self, adr: PhysicalPiece) -> usize {
         self.hands[adr as usize].len()
     }

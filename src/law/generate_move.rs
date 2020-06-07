@@ -246,13 +246,13 @@ impl PseudoLegalMoves {
     where
         F1: FnMut(Movement),
     {
-        if let Some(piece) = table.last_hand(adr) {
+        if let Some(meaning) = table.last_hand_meaning(table, adr) {
             // 打つぜ☆（＾～＾）
             let drop = &mut |destination| {
                 if let None = table.piece_at(&destination) {
                     // 駒が無いところに打つ
                     use crate::cosmic::smart::features::PieceMeaning::*;
-                    match table.get_meaning(piece) {
+                    match meaning {
                         Pawn1 | Pawn2 => {
                             // ひよこ　は２歩できない☆（＾～＾）
                             match destination {
@@ -269,10 +269,10 @@ impl PseudoLegalMoves {
                         _ => {}
                     }
                     listen_move(Movement::new(
-                        AddressPos::Hand(table.get_meaning(piece).physical_piece()), // 打った駒種類
-                        destination, // どの升へ行きたいか
-                        false,       // 打に成りは無し
-                        None,        // 打で取れる駒無し
+                        AddressPos::Hand(meaning.physical_piece()), // 打った駒種類
+                        destination,                                // どの升へ行きたいか
+                        false,                                      // 打に成りは無し
+                        None,                                       // 打で取れる駒無し
                     ));
                 }
             };
