@@ -139,4 +139,20 @@ setoption name ManyWaysPer1000 value 20
 setoption name PromotionWeightPer1000 value 10
 position startpos moves 7g7f 8c8d 8h5e 5c5d 5e6f 4a3b 6f7e 6a5b 5i4h 3c3d 9i9h 2b9i+ 7i7h 9i9h 7e6f 3a2b 4h5h L*8h 8i7g 8h8i+ 7g6e 6c6d 6e7c 8a7c 5h6h 7c8e 6f7e N*5e 7e6d 8b8a 6d9a+ 8a9a L*7c B*9e 6h5h 7a8b 9g9f 9e7g+ 7h8i 5e6g+ 5h4h 9h8i L*9b 9a9b 7c7b+ 8e9g+ 7b8b 9b8b S*9d 9c9d
 go btime 0 wtime 400000 binc 5000 winc 5000
+
+### 2020-06-07(sun)
+usi
+isready
+setoption name USI_Ponder value true
+setoption name USI_Hash value 256
+setoption name MaxPly value 512
+setoption name DepthNotToGiveUp value 5
+setoption name MaxDepth value 7
+setoption name MinThinkMsec value 10000
+setoption name MaxThinkMsec value 15000
+setoption name KomawariWeightPer1000 value 1000
+setoption name ManyWaysPer1000 value 60
+setoption name PromotionWeightPer1000 value 1000
+position startpos
+go btime 300000 wtime 300000 binc 5000 winc 5000
 ```

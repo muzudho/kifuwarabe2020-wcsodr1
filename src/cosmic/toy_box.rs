@@ -111,7 +111,7 @@ pub struct GameTable {
     /// 背番号付きの駒に、番地が紐づいているぜ☆（＾～＾）
     old_address_list: [AddressPos; NAMED_PIECES_LEN],
     /// 駒の背番号に、駒が紐づくぜ☆（＾～＾）
-    pub new_piece_list: [PieceMeaning; NAMED_PIECES_LEN],
+    new_piece_list: [PieceMeaning; NAMED_PIECES_LEN],
     /// 駒の背番号を付けるのに使うぜ☆（＾～＾）
     physical_piece_type_index: [usize; PHYSICAL_PIECE_TYPE_LEN],
     /// 持ち駒☆（＾～＾）TODO 固定長サイズのスタックを用意したいぜ☆（＾～＾）
@@ -181,6 +181,8 @@ impl GameTable {
         ];
         // 初期値はゴミ値だぜ☆（＾～＾）上書きして消せだぜ☆（＾～＾）
         self.old_address_list = [AddressPos::Board(AbsoluteAddress2D::default()); NAMED_PIECES_LEN];
+        // 初期値はゴミ値だぜ☆（＾～＾）上書きして消せだぜ☆（＾～＾）
+        self.new_piece_list = [PieceMeaning::King1; NAMED_PIECES_LEN];
         self.physical_piece_type_index = [
             PieceNum::King1 as usize,
             PieceNum::Rook21 as usize,
