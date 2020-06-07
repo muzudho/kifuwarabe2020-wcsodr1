@@ -290,6 +290,7 @@ impl GameTable {
                 piece_num
             }
             AddressPos::Hand(drop) => {
+                // 場所で指定します。
                 // 台から取りのぞきます。
                 let piece_num = self.hands.pop(*drop);
                 // TODO 背番号の番地に、ゴミ値を入れて消去するが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
@@ -377,7 +378,7 @@ impl GameTable {
                     0
                 }
             }
-            AddressPos::Hand(_drop) => panic!(Beam::trouble(&format!(
+            AddressPos::Hand(_old_drop) => panic!(Beam::trouble(&format!(
                 "(Err.254) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
@@ -391,7 +392,7 @@ impl GameTable {
                     None
                 }
             }
-            AddressPos::Hand(_drop) => panic!(Beam::trouble(&format!(
+            AddressPos::Hand(_old_drop) => panic!(Beam::trouble(&format!(
                 "(Err.345) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
@@ -425,7 +426,7 @@ impl GameTable {
                     let piece_info = self.piece_info_at(addr).unwrap();
                     piece_get(i, Some(sq), Some(piece_info));
                 }
-                AddressPos::Hand(_drop) => {
+                AddressPos::Hand(_old_drop) => {
                     // TODO 持ち駒☆（＾～＾）
                     piece_get(i, None, None);
                 }
@@ -448,7 +449,7 @@ impl GameTable {
                         piece_get(addr, piece);
                     }
                 }
-                AddressPos::Hand(_drop) => {
+                AddressPos::Hand(_old_drop) => {
                     // 持ち駒はここで調べるのは無駄な気がするよな☆（＾～＾）持ち駒に歩が１８個とか☆（＾～＾）
                 }
             }
@@ -476,9 +477,9 @@ impl GameTable {
                 PhysicalPiece::Pawn2,
             ],
         ];
-        for addr in &FIRST_SECOND[friend as usize] {
-            if let Some(piece_num) = self.last_hand(*addr) {
-                piece_get(AddressPos::Hand(*addr), piece_num);
+        for old_drop in &FIRST_SECOND[friend as usize] {
+            if let Some(piece_num) = self.last_hand(*old_drop) {
+                piece_get(AddressPos::Hand(*old_drop), piece_num);
             }
         }
     }

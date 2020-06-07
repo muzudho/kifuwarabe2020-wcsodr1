@@ -101,8 +101,8 @@ impl PseudoLegalMoves {
             AddressPos::Board(_src_sq) => {
                 PseudoLegalMoves::start_on_board(friend, &addr, piece_num, table, listen_move)
             }
-            AddressPos::Hand(drop) => {
-                PseudoLegalMoves::make_drop(friend, drop, table, listen_move);
+            AddressPos::Hand(old_drop) => {
+                PseudoLegalMoves::make_drop(friend, old_drop, table, listen_move);
             }
         });
     }

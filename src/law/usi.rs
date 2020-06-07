@@ -407,9 +407,9 @@ pub fn set_position(line: &str, game: &mut Game) {
                         // 駒に背番号を付けるぜ☆（＾～＾）
                         let piece_num = game.mut_starting().naming_piece(hand_meaning);
                         // 駒台に置くぜ☆（＾～＾）
-                        let addr =
-                            &AddressPos::Hand(game.table.get_meaning(piece_num).physical_piece());
-                        game.mut_starting().push_piece(addr, Some(piece_num));
+                        let old_drop =
+                            AddressPos::Hand(game.table.get_meaning(piece_num).physical_piece());
+                        game.mut_starting().push_piece(&old_drop, Some(piece_num));
                     }
                 } //if
             } //loop
