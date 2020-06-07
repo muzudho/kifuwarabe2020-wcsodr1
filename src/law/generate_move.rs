@@ -28,11 +28,11 @@ impl Piece {
             num: num,
         }
     }
-}
-impl fmt::Debug for Piece {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Piece({} {:?})", self.meaning, self.num)
+    /*
+    pub fn to_debug(&self, table: &GameTable) -> String {
+        format!("Piece({} {:?})", self.meaning, self.num)
     }
+    */
 }
 
 /// ソートを高速にするためのものだぜ☆（＾～＾）

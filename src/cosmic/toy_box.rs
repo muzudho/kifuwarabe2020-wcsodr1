@@ -12,7 +12,6 @@ use crate::spaceship::equipment::Beam;
 use crate::spaceship::equipment::PieceInfo;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
-use std::fmt;
 
 /// 背番号(名前)付きの駒の数。
 pub const NAMED_PIECES_LEN: usize = 40;
@@ -221,11 +220,6 @@ impl GameTable {
         self.hands = table.hands.clone();
     }
 
-    /*
-    pub fn get_mut_meaning(&mut self, piece: Piece) -> PieceMeaning {
-        piece.meaning
-    }
-    */
     pub fn get_meaning(&self, piece: Piece) -> PieceMeaning {
         piece.meaning
     }
@@ -489,9 +483,9 @@ impl HandAddressTypeStack {
     fn len(&self) -> usize {
         self.count
     }
-}
-impl fmt::Display for HandAddressTypeStack {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+
+    /*
+    fn to_debug(&self, table: &GameTable) -> String {
         let mut buffer = String::new();
         for i in 0..=self.count {
             buffer.push_str(&format!(
@@ -499,6 +493,7 @@ impl fmt::Display for HandAddressTypeStack {
                 self.items[i].meaning, self.items[i].num
             ));
         }
-        write!(f, "{}", buffer.trim_end())
+        buffer.trim_end().to_string()
     }
+    */
 }
