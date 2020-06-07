@@ -187,8 +187,21 @@ impl GameTable {
         self.hands = table.hands.clone();
     }
 
+    /// TODO 駒はカプセル化したいんで、なるべく他のメソッド使えだぜ☆（＾～＾）
     pub fn get_piece(&self, num: PieceNum) -> Piece {
         self.piece_list[num as usize]
+    }
+    pub fn get_captured(&self, num: PieceNum) -> Piece {
+        self.piece_list[num as usize].captured()
+    }
+    pub fn get_phase(&self, num: PieceNum) -> Phase {
+        self.piece_list[num as usize].phase()
+    }
+    pub fn get_type(&self, num: PieceNum) -> PieceType {
+        self.piece_list[num as usize].type_()
+    }
+    pub fn get_double_faced_piece(&self, num: PieceNum) -> DoubleFacedPiece {
+        self.piece_list[num as usize].double_faced_piece()
     }
     pub fn new_piece_num(&mut self, piece: Piece, num: PieceNum) -> PieceNum {
         self.piece_list[num as usize] = piece;
@@ -215,11 +228,11 @@ impl GameTable {
             // 先後ひっくり返す。
             // TODO 元データを反転させたいぜ☆（＾～＾）
             let captured_piece_num = self.new_piece_num(
-                self.get_piece(collision_piece_num_val).captured(),
+                self.get_captured(collision_piece_num_val),
                 collision_piece_num_val,
             );
             self.push_piece(
-                &AddressPos::Hand(self.get_piece(captured_piece_num).double_faced_piece()),
+                &AddressPos::Hand(self.get_double_faced_piece(captured_piece_num)),
                 Some(captured_piece_num),
             );
         }
@@ -267,7 +280,7 @@ impl GameTable {
             AddressPos::Hand(_old_drop) => {
                 if let Some(piece_num_val) = piece_num {
                     // 持ち駒を１つ増やします。
-                    let new_drop = self.get_piece(piece_num_val).double_faced_piece();
+                    let new_drop = self.get_double_faced_piece(piece_num_val);
                     self.hands.push(new_drop /* *drop*/, piece_num_val);
                     // 背番号に番地を紐づけます。
                     self.address_list[piece_num_val as usize] = *addr;
@@ -364,8 +377,7 @@ impl GameTable {
                 let piece_num = self.board[sq.serial_number() as usize];
                 if let Some(piece_num_val) = piece_num {
                     table
-                        .get_piece(piece_num_val)
-                        .double_faced_piece()
+                        .get_double_faced_piece(piece_num_val)
                         .type_()
                         .promotion_value()
                 } else {
@@ -397,9 +409,10 @@ impl GameTable {
         self.hands.last(drop)
     }
     /// 指し手生成で使うぜ☆（＾～＾）
-    pub fn last_hand(&self, table: &GameTable, drop: DoubleFacedPiece) -> Option<Piece> {
-        if let Some(old_piece) = self.hands.last(drop) {
-            Some(table.get_piece(old_piece))
+    pub fn last_hand(&self, drop: DoubleFacedPiece) -> Option<(PieceType, DoubleFacedPiece)> {
+        if let Some(piece_num) = self.hands.last(drop) {
+            let piece = self.get_piece(piece_num);
+            Some((piece.type_(), piece.double_faced_piece()))
         } else {
             None
         }
@@ -440,7 +453,7 @@ impl GameTable {
                 AddressPos::Board(_sq) => {
                     // 盤上の駒☆（＾～＾）
                     let piece = self.piece_num_at(&addr).unwrap();
-                    if self.get_piece(*piece_num).phase() == friend {
+                    if self.get_phase(*piece_num) == friend {
                         piece_get(addr, piece);
                     }
                 }

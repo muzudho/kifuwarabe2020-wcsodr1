@@ -163,7 +163,7 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
     buffer.captured = if let Some(captured_piece_num_val) = captured_piece_num {
         Some(CapturedMove::new(
             &buffer.destination,
-            game.table.get_piece(captured_piece_num_val).type_(),
+            game.table.get_type(captured_piece_num_val),
         ))
     } else {
         None
@@ -408,7 +408,7 @@ pub fn set_position(line: &str, game: &mut Game) {
                         let piece_num = game.mut_starting().naming_piece(hand);
                         // 駒台に置くぜ☆（＾～＾）
                         let old_drop =
-                            AddressPos::Hand(game.table.get_piece(piece_num).double_faced_piece());
+                            AddressPos::Hand(game.table.get_double_faced_piece(piece_num));
                         game.mut_starting().push_piece(&old_drop, Some(piece_num));
                     }
                 } //if

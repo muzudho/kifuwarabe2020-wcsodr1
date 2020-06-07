@@ -136,7 +136,7 @@ impl PseudoLegalMoves {
                 let pseudo_captured_num = table.piece_num_at(&destination);
 
                 let (ok, space) = if let Some(pseudo_captured_num_val) = pseudo_captured_num {
-                    if table.get_piece(pseudo_captured_num_val).phase() == friend {
+                    if table.get_phase(pseudo_captured_num_val) == friend {
                         // 味方の駒を取った☆（＾～＾）なしだぜ☆（＾～＾）！
                         (false, false)
                     } else {
@@ -176,7 +176,7 @@ impl PseudoLegalMoves {
                                     if let Some(piece_num_val) = pseudo_captured_num {
                                         Some(CapturedMove::new(
                                             &destination,
-                                            table.get_piece(piece_num_val).type_(),
+                                            table.get_type(piece_num_val),
                                         ))
                                     } else {
                                         None
@@ -190,7 +190,7 @@ impl PseudoLegalMoves {
                                 if let Some(piece_num_val) = pseudo_captured_num {
                                     Some(CapturedMove::new(
                                         &destination,
-                                        table.get_piece(piece_num_val).type_(),
+                                        table.get_type(piece_num_val),
                                     ))
                                 } else {
                                     None
@@ -207,7 +207,7 @@ impl PseudoLegalMoves {
                                     if let Some(piece_num_val) = pseudo_captured_num {
                                         Some(CapturedMove::new(
                                             &destination,
-                                            table.get_piece(piece_num_val).type_(),
+                                            table.get_type(piece_num_val),
                                         ))
                                     } else {
                                         None
@@ -221,7 +221,7 @@ impl PseudoLegalMoves {
                 !space
             };
 
-        Area::piece_of(table.get_piece(piece_num).type_(), friend, &source, moving);
+        Area::piece_of(table.get_type(piece_num), friend, &source, moving);
     }
 
     /// 駒台を見ようぜ☆（＾～＾） 駒台の駒の動きを作るぜ☆（＾～＾）
@@ -233,18 +233,18 @@ impl PseudoLegalMoves {
     /// * `table` - 現局面の盤上だぜ☆（＾～＾）
     /// * `listen_move` - 指し手を受け取れだぜ☆（＾～＾）
     /// * `listen_control` - 利きを受け取れだぜ☆（＾～＾）
-    fn make_drop<F1>(friend: Phase, adr: DoubleFacedPiece, table: &GameTable, listen_move: &mut F1)
+    fn make_drop<F1>(friend: Phase, drop: DoubleFacedPiece, table: &GameTable, listen_move: &mut F1)
     where
         F1: FnMut(Movement),
     {
-        if let Some(piece) = table.last_hand(table, adr) {
+        if let Some((piece_type, double_faced_piece)) = table.last_hand(drop) {
             // 打つぜ☆（＾～＾）
-            let drop = &mut |destination| {
+            let drop_fn = &mut |destination| {
                 if let None = table.piece_num_at(&destination) {
                     // 駒が無いところに打つ
-                    use crate::cosmic::smart::features::Piece::*;
-                    match piece {
-                        Pawn1 | Pawn2 => {
+                    use crate::cosmic::smart::features::PieceType::*;
+                    match piece_type {
+                        Pawn => {
                             // ひよこ　は２歩できない☆（＾～＾）
                             match destination {
                                 AddressPos::Board(dst_sq) => {
@@ -260,24 +260,24 @@ impl PseudoLegalMoves {
                         _ => {}
                     }
                     listen_move(Movement::new(
-                        AddressPos::Hand(piece.double_faced_piece()), // 打った駒種類
-                        destination,                                  // どの升へ行きたいか
-                        false,                                        // 打に成りは無し
-                        None,                                         // 打で取れる駒無し
+                        AddressPos::Hand(double_faced_piece), // 打った駒種類
+                        destination,                          // どの升へ行きたいか
+                        false,                                // 打に成りは無し
+                        None,                                 // 打で取れる駒無し
                     ));
                 }
             };
 
             // 駒を持っていれば
-            let ty = adr.type_();
+            let ty = drop.type_();
             use crate::cosmic::smart::features::DoubleFacedPieceType::*;
             match ty {
                 // 歩、香
-                Pawn | Lance => Area::drop_pawn_lance(friend, drop),
+                Pawn | Lance => Area::drop_pawn_lance(friend, drop_fn),
                 // 桂
-                Knight => Area::drop_knight(friend, drop),
+                Knight => Area::drop_knight(friend, drop_fn),
                 // それ以外の駒が打てる範囲は盤面全体。
-                _ => Area::for_all(drop),
+                _ => Area::for_all(drop_fn),
             }
         }
     }
