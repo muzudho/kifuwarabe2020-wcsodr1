@@ -9,7 +9,6 @@ use crate::cosmic::smart::square::{
     RANK_6, RANK_7, RANK_8, RANK_9,
 };
 use crate::cosmic::toy_box::GameTable;
-use crate::cosmic::toy_box::PieceNum;
 use crate::spaceship::equipment::Beam;
 use std::fmt;
 
@@ -97,9 +96,9 @@ impl PseudoLegalMoves {
     where
         F1: FnMut(Movement),
     {
-        table.for_some_pieces_on_list40(friend, &mut |addr, piece_num| match addr {
+        table.for_some_pieces_on_list40(friend, &mut |addr, piece_type| match addr {
             AddressPos::Board(_src_sq) => {
-                PseudoLegalMoves::start_on_board(friend, &addr, piece_num, table, listen_move)
+                PseudoLegalMoves::start_on_board(friend, &addr, piece_type, table, listen_move)
             }
             AddressPos::Hand(drop) => {
                 PseudoLegalMoves::make_drop(friend, drop, table, listen_move);
@@ -125,7 +124,7 @@ impl PseudoLegalMoves {
     fn start_on_board<F1>(
         friend: Phase,
         source: &AddressPos,
-        piece_num: PieceNum,
+        piece_type: PieceType,
         table: &GameTable,
         listen_move: &mut F1,
     ) where
@@ -221,7 +220,7 @@ impl PseudoLegalMoves {
                 !space
             };
 
-        Area::piece_of(table.get_type(piece_num), friend, &source, moving);
+        Area::piece_of(piece_type, friend, &source, moving);
     }
 
     /// 駒台を見ようぜ☆（＾～＾） 駒台の駒の動きを作るぜ☆（＾～＾）

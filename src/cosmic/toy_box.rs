@@ -516,9 +516,13 @@ impl GameTable {
             ))),
         }
     }
-    /// 指し手生成で使うぜ☆（＾～＾）
-    pub fn last_hand_num(&self, drop: DoubleFacedPiece) -> Option<PieceNum> {
-        self.hands.last(drop)
+    /// 指し手生成で使うぜ☆（＾～＾）有無を調べるぜ☆（＾～＾）
+    pub fn last_hand_type(&self, drop: DoubleFacedPiece) -> Option<PieceType> {
+        if let Some(piece_num) = self.hands.last(drop) {
+            Some(self.get_type(piece_num))
+        } else {
+            None
+        }
     }
     /// 指し手生成で使うぜ☆（＾～＾）
     pub fn last_hand(&self, drop: DoubleFacedPiece) -> Option<(PieceType, DoubleFacedPiece)> {
@@ -555,18 +559,20 @@ impl GameTable {
     }
 
     /// 盤上を検索するのではなく、４０個の駒を検索するぜ☆（＾～＾）
+    /// TODO 自分、相手で分けて持っておけば２倍ぐらい短縮できないか☆（＾～＾）？
+    /// TODO できれば、「自分の盤上の駒」「自分の持ち駒」「相手の盤上の駒」「相手の持ち駒」の４チャンネルで分けておけないか☆（＾～＾）？
     pub fn for_some_pieces_on_list40<F>(&self, friend: Phase, piece_get: &mut F)
     where
-        F: FnMut(AddressPos, PieceNum),
+        F: FnMut(AddressPos, PieceType),
     {
         for piece_num in Nine299792458::piece_numbers().iter() {
+            // 盤上の駒だけを調べようぜ☆（＾～＾）
             let addr = self.address_list[*piece_num as usize];
             match addr {
                 AddressPos::Board(_sq) => {
-                    // 盤上の駒☆（＾～＾）
-                    let piece = self.piece_num_at(&addr).unwrap();
+                    // let piece_num = self.piece_num_at(&addr).unwrap();
                     if self.get_phase(*piece_num) == friend {
-                        piece_get(addr, piece);
+                        piece_get(addr, self.get_type(*piece_num));
                     }
                 }
                 AddressPos::Hand(_drop) => {
@@ -598,8 +604,8 @@ impl GameTable {
             ],
         ];
         for drop in &FIRST_SECOND[friend as usize] {
-            if let Some(piece_num) = self.last_hand_num(*drop) {
-                piece_get(AddressPos::Hand(*drop), piece_num);
+            if let Some(piece_type) = self.last_hand_type(*drop) {
+                piece_get(AddressPos::Hand(*drop), piece_type);
             }
         }
     }

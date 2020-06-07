@@ -4,8 +4,9 @@
 
 ## 直近のTODO
 
-* [ ] 最大手数 320 か 512 か☆（＾～＾）
-* [ ] 指し手の AbsoluteAddress と PhisicalPieceType を共有する型 AddressTypeOfPosition を作る。
+* [ ] できれば、「自分の盤上の駒」「自分の持ち駒」「相手の盤上の駒」「相手の持ち駒」の４チャンネルでミーシーに分けておけないか☆（＾～＾）？
+* [x] 最大手数 320 か 512 か☆（＾～＾）
+* [x] 指し手の AbsoluteAddress と PhisicalPieceType を共有する型 AddressTypeOfPosition を作る。
 * [x] タイムマン(^_^)
   * `go btime 14000 wtime 203000 binc 5000 winc 5000`
 
