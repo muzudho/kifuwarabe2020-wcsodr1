@@ -3,13 +3,131 @@
 //!
 use crate::cosmic::recording::Movement;
 use crate::cosmic::recording::{AddressPos, Phase};
-use crate::cosmic::smart::features::{DoubleFacedPiece, Piece, PieceType, PHYSICAL_PIECE_TYPE_LEN};
+use crate::cosmic::smart::features::{DoubleFacedPiece, PieceType, PHYSICAL_PIECE_TYPE_LEN};
 use crate::cosmic::smart::square::{AbsoluteAddress2D, BOARD_MEMORY_AREA, RANK_1, RANK_10};
 use crate::law::speed_of_light::Nine299792458;
 use crate::spaceship::equipment::Beam;
-use crate::spaceship::equipment::PieceInfo;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
+use std::*;
+
+pub const PIECE_LEN: usize = 28;
+
+/// 先後付きの駒と空白。
+/// 接尾辞の 1 は先手、 2 は後手。
+///
+/// Copy: 配列の要素の初期化のために利用。
+#[derive(Copy, Clone, PartialEq, FromPrimitive)]
+pub enum Piece {
+    // ▲玉
+    King1,
+    // ▲きりん
+    Rook1,
+    // ▲ぞう
+    Bishop1,
+    // ▲いぬ
+    Gold1,
+    // ▲ねこ
+    Silver1,
+    // ▲うさぎ
+    Knight1,
+    // ▲いのしし
+    Lance1,
+    // ▲ひよこ
+    Pawn1,
+    // ▲ぱわーあっぷきりん
+    Dragon1,
+    // ▲ぱわーあっぷぞう
+    Horse1,
+    // ▲ぱわーあっぷねこ
+    PromotedSilver1,
+    // ▲ぱわーあっぷうさぎ
+    PromotedKnight1,
+    // ▲ぱわーあっぷいのしし
+    PromotedLance1,
+    // ▲ぱわーあっぷひよこ
+    PromotedPawn1,
+    // ▽ライオン
+    King2,
+    // ▽キリン
+    Rook2,
+    // ▽ゾウ
+    Bishop2,
+    // ▽イヌ
+    Gold2,
+    // ▽ネコ
+    Silver2,
+    // ▽ウサギ
+    Knight2,
+    // ▽イノシシ
+    Lance2,
+    // ▽ヒヨコ
+    Pawn2,
+    // ▽パワーアップキリン
+    Dragon2,
+    // ▽パワーアップゾウ
+    Horse2,
+    // ▽パワーアップネコ
+    PromotedSilver2,
+    // ▽パワーアップウサギ
+    PromotedKnight2,
+    // ▽パワーアップイノシシ
+    PromotedLance2,
+    // ▽パワーアップヒヨコ
+    PromotedPawn2,
+}
+pub static PIECE_WHITE_SPACE: &str = "    ";
+impl fmt::Display for Piece {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        // 文字列リテラルでないとダメみたいなんで、他に似たようなコードがあるのに、また書くことに☆（＾～＾）
+        // ▲、▽ が半角サイズなのは、Windows Terminal の担当者 いい加減だぜ☆（＾～＾）
+        use crate::cosmic::toy_box::Piece::*;
+        match *self {
+            King1 => write!(f, " ▲K "),
+            Rook1 => write!(f, " ▲R "),
+            Bishop1 => write!(f, " ▲B "),
+            Gold1 => write!(f, " ▲G "),
+            Silver1 => write!(f, " ▲S "),
+            Knight1 => write!(f, " ▲N "),
+            Lance1 => write!(f, " ▲L "),
+            Pawn1 => write!(f, " ▲P "),
+            Dragon1 => write!(f, " ▲PR"),
+            Horse1 => write!(f, " ▲PB"),
+            PromotedSilver1 => write!(f, " ▲PS"),
+            PromotedKnight1 => write!(f, " ▲PN"),
+            PromotedLance1 => write!(f, " ▲PL"),
+            PromotedPawn1 => write!(f, " ▲PP"),
+            King2 => write!(f, " ▽k "),
+            Rook2 => write!(f, " ▽r "),
+            Bishop2 => write!(f, " ▽b "),
+            Gold2 => write!(f, " ▽g "),
+            Silver2 => write!(f, " ▽s "),
+            Knight2 => write!(f, " ▽n "),
+            Lance2 => write!(f, " ▽l "),
+            Pawn2 => write!(f, " ▽p "),
+            Dragon2 => write!(f, " ▽pr"),
+            Horse2 => write!(f, " ▽pb"),
+            PromotedSilver2 => write!(f, " ▽ps"),
+            PromotedKnight2 => write!(f, " ▽pn"),
+            PromotedLance2 => write!(f, " ▽pl"),
+            PromotedPawn2 => write!(f, " ▽pp"),
+        }
+    }
+}
+
+/// ちゆり「駒そのものではなく、駒の情報が欲しいだけなら、これだぜ☆」
+pub struct PieceInfo {
+    pub piece: String,
+    pub num: String,
+}
+impl PieceInfo {
+    pub fn new(piece: Piece, num: PieceNum) -> Self {
+        PieceInfo {
+            piece: format!("{}", piece),
+            num: format!("{:?}", num),
+        }
+    }
+}
 
 /// 背番号(名前)付きの駒の数。
 pub const NAMED_PIECES_LEN: usize = 40;

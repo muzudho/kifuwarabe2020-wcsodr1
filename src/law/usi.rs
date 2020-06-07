@@ -3,8 +3,9 @@
 //!
 use crate::cosmic::playing::Game;
 use crate::cosmic::recording::{AddressPos, CapturedMove, Movement};
-use crate::cosmic::smart::features::{DoubleFacedPiece, DoubleFacedPieceType, Piece};
+use crate::cosmic::smart::features::{DoubleFacedPiece, DoubleFacedPieceType};
 use crate::cosmic::smart::square::{AbsoluteAddress2D, FILE_9, RANK_1};
+use crate::cosmic::toy_box::Piece;
 use crate::spaceship::equipment::Beam;
 use atoi::atoi;
 
@@ -381,7 +382,7 @@ pub fn set_position(line: &str, game: &mut Game) {
                         }
                     };
 
-                    use crate::cosmic::smart::features::Piece::*;
+                    use crate::cosmic::toy_box::Piece::*;
                     let hand = match &line[starts..=starts] {
                         "R" => Rook1,
                         "B" => Bishop1,

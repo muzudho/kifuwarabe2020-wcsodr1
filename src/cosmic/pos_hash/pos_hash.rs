@@ -3,11 +3,11 @@
 
 use crate::cosmic::playing::Game;
 use crate::cosmic::recording::{AddressPos, History, Movement, PHASE_LEN, PHASE_SECOND};
-use crate::cosmic::smart::features::{HAND_MAX, PHYSICAL_PIECES_LEN, PIECE_MEANING_LEN};
+use crate::cosmic::smart::features::{HAND_MAX, PHYSICAL_PIECES_LEN};
 use crate::cosmic::smart::square::{
     AbsoluteAddress2D, BOARD_MEMORY_AREA, FILE_1, FILE_10, RANK_1, RANK_10, SQUARE_NONE,
 };
-use crate::cosmic::toy_box::GameTable;
+use crate::cosmic::toy_box::{GameTable, PIECE_LEN};
 use crate::law::speed_of_light::HandAddresses;
 use crate::spaceship::equipment::Beam;
 use rand::Rng;
@@ -16,7 +16,7 @@ use rand::Rng;
 /// ゾブリストハッシュを使って、局面の一致判定をするのに使う☆（＾～＾）
 pub struct GameHashSeed {
     // 盤上の駒
-    pub piece: [[u64; PIECE_MEANING_LEN]; BOARD_MEMORY_AREA as usize],
+    pub piece: [[u64; PIECE_LEN]; BOARD_MEMORY_AREA as usize],
     // 持ち駒
     pub hands: [[u64; HAND_MAX]; PHYSICAL_PIECES_LEN],
     // 先後
@@ -26,7 +26,7 @@ impl Default for GameHashSeed {
     fn default() -> Self {
         GameHashSeed {
             // 盤上の駒
-            piece: [[0; PIECE_MEANING_LEN]; BOARD_MEMORY_AREA as usize],
+            piece: [[0; PIECE_LEN]; BOARD_MEMORY_AREA as usize],
             // 持ち駒
             hands: [[0; HAND_MAX]; PHYSICAL_PIECES_LEN],
             // 先後
@@ -41,7 +41,7 @@ impl GameHashSeed {
 
         // 盤上の駒
         for i_square in SQUARE_NONE..BOARD_MEMORY_AREA {
-            for i_piece in 0..PIECE_MEANING_LEN {
+            for i_piece in 0..PIECE_LEN {
                 // FIXME 18446744073709551615 が含まれないだろ、どうなってるんだぜ☆（＾～＾）！？
                 self.piece[i_square as usize][i_piece] =
                     rand::thread_rng().gen_range(0, 18_446_744_073_709_551_615);

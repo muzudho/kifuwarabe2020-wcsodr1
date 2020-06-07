@@ -1,8 +1,8 @@
 use crate::cosmic::playing::{Game, PosNums};
 use crate::cosmic::recording::{AddressPos, Movement};
-use crate::cosmic::smart::features::{DoubleFacedPiece, PIECE_WHITE_SPACE};
+use crate::cosmic::smart::features::DoubleFacedPiece;
 use crate::cosmic::smart::square::*;
-use crate::cosmic::toy_box::*;
+use crate::cosmic::toy_box::{GameTable, PIECE_WHITE_SPACE};
 use crate::spaceship::equipment::Beam;
 
 /// 指令室はこちらだぜ☆（＾～＾）！

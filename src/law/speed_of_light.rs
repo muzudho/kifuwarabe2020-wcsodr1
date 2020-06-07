@@ -11,11 +11,10 @@ use crate::cosmic::recording::Phase;
 use crate::cosmic::recording::PHASE_LEN;
 use crate::cosmic::smart::features::PHYSICAL_PIECES_LEN;
 use crate::cosmic::smart::features::PHYSICAL_PIECE_TYPE_LEN;
-use crate::cosmic::smart::features::PIECE_MEANING_LEN;
 use crate::cosmic::smart::features::PIECE_TYPE_LEN;
-use crate::cosmic::smart::features::{DoubleFacedPiece, DoubleFacedPieceType, Piece, PieceType};
+use crate::cosmic::smart::features::{DoubleFacedPiece, DoubleFacedPieceType, PieceType};
 use crate::cosmic::smart::square::{Angle, RelAdr2D, ANGLE_LEN};
-use crate::cosmic::toy_box::PieceNum;
+use crate::cosmic::toy_box::{Piece, PieceNum, PIECE_LEN};
 use crate::law::generate_move::{Agility, Mobility};
 
 // グローバル定数
@@ -45,16 +44,16 @@ struct SpeedOfLight {
     piece_numbers: Vec<PieceNum>,
 
     /// 先後付きの駒☆（＾～＾）
-    piece_to_phase_table: [Phase; PIECE_MEANING_LEN],
-    piece_type_table: [PieceType; PIECE_MEANING_LEN],
+    piece_to_phase_table: [Phase; PIECE_LEN],
+    piece_type_table: [PieceType; PIECE_LEN],
     /// 駒→成駒　（成れない駒は、そのまま）
-    piece_promoted_table: [Piece; PIECE_MEANING_LEN],
+    piece_promoted_table: [Piece; PIECE_LEN],
     /// 成駒→駒　（成っていない駒は、そのまま）
-    piece_demoted_table: [Piece; PIECE_MEANING_LEN],
+    piece_demoted_table: [Piece; PIECE_LEN],
     /// この駒を取ったら、先後が反転して、相手の駒になる、というリンクだぜ☆（＾～＾）
     /// 探索部では、玉のような取れない駒も　らいおんきゃっち　しているので、玉も取れるように作っておけだぜ☆（＾～＾）
-    piece_captured_table: [Piece; PIECE_MEANING_LEN],
-    piece_double_faced_table: [DoubleFacedPiece; PIECE_MEANING_LEN],
+    piece_captured_table: [Piece; PIECE_LEN],
+    piece_double_faced_table: [DoubleFacedPiece; PIECE_LEN],
 
     /// 駒種類☆（＾～＾）
     piece_type_to_promoted_table: [bool; PIECE_TYPE_LEN],
@@ -85,8 +84,8 @@ struct SpeedOfLight {
 impl Default for SpeedOfLight {
     fn default() -> Self {
         use crate::cosmic::recording::Phase::*;
-        use crate::cosmic::smart::features::Piece::*;
         use crate::cosmic::smart::features::PieceType::*;
+        use crate::cosmic::toy_box::Piece::*;
         SpeedOfLight {
             /// ピースの早見表の生成は、アプリケーション開始時に全部済ませておけだぜ☆（＾～＾）
             piece_numbers: [
