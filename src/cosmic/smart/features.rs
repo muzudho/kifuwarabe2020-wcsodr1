@@ -9,11 +9,12 @@ use std::fmt;
 
 pub const PIECE_MEANING_LEN: usize = 28;
 
+/// Stockfish系コンピューター将棋ソフトが言う Piece は、きふわらべでは PieceMeaning に名前を変えているぜ☆（＾～＾）
 ///
 /// 先後付きの駒と空白。
 /// 接尾辞の 1 は先手、 2 は後手。
 ///
-// Copy: 配列の要素の初期化のために利用。
+/// Copy: 配列の要素の初期化のために利用。
 #[derive(Copy, Clone, PartialEq, FromPrimitive)]
 pub enum PieceMeaning {
     // ▲玉

@@ -214,6 +214,7 @@ impl Tree {
             game.read_move(&move_);
             let captured_piece = if let Some(captured) = move_.captured {
                 Some(Piece::new(
+                    &game.table,
                     game.table.get_meaning(captured.piece).captured(),
                     captured.piece.num,
                 ))

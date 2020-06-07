@@ -139,6 +139,7 @@ impl Game {
                     if let Some(piece) = self.table.pop_piece(&move_.source) {
                         // 成ったのなら、元のマスの駒を成らすぜ☆（＾～＾）
                         Some(Piece::new(
+                            &self.table,
                             self.table.get_meaning(piece).promoted(),
                             piece.num,
                         ))
@@ -165,6 +166,7 @@ impl Game {
             // 移動先升の駒を盤上から消し、自分の持ち駒に増やす
             // 先後ひっくり返す。
             let captured_piece = Piece::new(
+                &self.table,
                 self.table.get_meaning(collision_piece).captured(),
                 collision_piece.num,
             );
@@ -199,6 +201,7 @@ impl Game {
                             // 成ったなら、成る前へ
                             if let Some(source_piece) = self.table.pop_piece(&move_.destination) {
                                 Some(Piece::new(
+                                    &self.table,
                                     self.table.get_meaning(source_piece).demoted(),
                                     source_piece.num,
                                 ))

@@ -277,15 +277,15 @@ impl GameTable {
     pub fn naming_piece(&mut self, piece_meaning: PieceMeaning) -> Piece {
         match piece_meaning {
             // 玉だけ、先後は決まってるから従えだぜ☆（＾～＾）
-            PieceMeaning::King1 => Piece::new(piece_meaning, PieceNum::King1),
-            PieceMeaning::King2 => Piece::new(piece_meaning, PieceNum::King2),
+            PieceMeaning::King1 => Piece::new(&self, piece_meaning, PieceNum::King1),
+            PieceMeaning::King2 => Piece::new(&self, piece_meaning, PieceNum::King2),
             _ => {
                 let phy_pct = piece_meaning.physical_piece().type_() as usize;
                 // 玉以外の背番号は、先後に関わりなく SFENに書いてあった順で☆（＾～＾）
                 let pn = PieceNum::from_usize(self.physical_piece_type_index[phy_pct]).unwrap();
                 // カウントアップ☆（＾～＾）
                 self.physical_piece_type_index[phy_pct] += 1;
-                Piece::new(piece_meaning, pn)
+                Piece::new(&self, piece_meaning, pn)
             }
         }
     }
@@ -454,7 +454,7 @@ impl Default for HandAddressTypeStack {
     fn default() -> Self {
         HandAddressTypeStack {
             // ゴミ値で埋めるぜ☆（＾～＾）
-            items: [Piece::new(PieceMeaning::King1, PieceNum::King1); HAND_MAX],
+            items: [Piece::default(); HAND_MAX],
             count: 0,
         }
     }

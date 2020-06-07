@@ -21,8 +21,17 @@ pub struct Piece {
     /// 将棋の駒の背番号だぜ☆（＾～＾）
     pub num: PieceNum,
 }
+impl Default for Piece {
+    /// これはゴミ値だぜ☆（＾～＾）上書きして消せだぜ☆（＾～＾）
+    fn default() -> Self {
+        Piece {
+            meaning: PieceMeaning::King1,
+            num: PieceNum::King1,
+        }
+    }
+}
 impl Piece {
-    pub fn new(meaning: PieceMeaning, num: PieceNum) -> Self {
+    pub fn new(_table: &GameTable, meaning: PieceMeaning, num: PieceNum) -> Self {
         Piece {
             meaning: meaning,
             num: num,
