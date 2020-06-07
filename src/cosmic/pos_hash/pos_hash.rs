@@ -74,13 +74,13 @@ impl GameHashSeed {
         // 移動する駒。
         match move_.source {
             AddressPos::Board(sq) => {
-                let source_piece_meaning = table.piece_meaning_at(&move_.source).unwrap() as usize;
+                let source_piece = table.piece_at(&move_.source).unwrap() as usize;
                 // 移動前マスに、動かしたい駒があるときのハッシュ。
-                prev_hash ^= self.piece[sq.serial_number()][source_piece_meaning];
+                prev_hash ^= self.piece[sq.serial_number()][source_piece];
                 // 移動後マスに、動かしたい駒があるときのハッシュ。
                 match move_.destination {
                     AddressPos::Board(sq) => {
-                        prev_hash ^= self.piece[sq.serial_number()][source_piece_meaning];
+                        prev_hash ^= self.piece[sq.serial_number()][source_piece];
                     }
                     _ => panic!(Beam::trouble(&format!(
                         "(Err.87) まだ実装してないぜ☆（＾～＾）！",
@@ -95,7 +95,7 @@ impl GameHashSeed {
                 match move_.destination {
                     AddressPos::Board(sq) => {
                         prev_hash ^=
-                            self.piece[sq.serial_number()][old_drop.nonpromoted_meaning() as usize];
+                            self.piece[sq.serial_number()][old_drop.nonpromoted_piece() as usize];
                     }
                     _ => panic!(Beam::trouble(&format!(
                         "(Err.101) まだ実装してないぜ☆（＾～＾）！",
@@ -107,13 +107,13 @@ impl GameHashSeed {
         match move_.destination {
             AddressPos::Board(dst_sq) => {
                 // 移動先にある駒があれば
-                if let Some(dst_piece_meaning_val) = table.piece_meaning_at(&move_.destination) {
-                    prev_hash ^= self.piece[dst_sq.serial_number()][dst_piece_meaning_val as usize];
+                if let Some(dst_piece_val) = table.piece_at(&move_.destination) {
+                    prev_hash ^= self.piece[dst_sq.serial_number()][dst_piece_val as usize];
                     // 持ち駒になるとき。
-                    let physical_piece = dst_piece_meaning_val.physical_piece();
-                    let count = table.count_hand(physical_piece);
+                    let double_faced_piece = dst_piece_val.double_faced_piece();
+                    let count = table.count_hand(double_faced_piece);
                     // 打つ前の駒の枚数のハッシュ。
-                    prev_hash ^= self.hands[physical_piece as usize][count as usize + 1];
+                    prev_hash ^= self.hands[double_faced_piece as usize][count as usize + 1];
                 }
             }
             _ => panic!(Beam::trouble(&format!(
@@ -159,8 +159,8 @@ impl GameHashSeed {
         for rank in RANK_1..RANK_10 {
             for file in (FILE_1..FILE_10).rev() {
                 let sq = AbsoluteAddress2D::new(file, rank);
-                if let Some(piece_meaning_val) = table.piece_meaning_at(&AddressPos::Board(sq)) {
-                    hash ^= self.piece[sq.serial_number()][piece_meaning_val as usize];
+                if let Some(piece_val) = table.piece_at(&AddressPos::Board(sq)) {
+                    hash ^= self.piece[sq.serial_number()][piece_val as usize];
                 }
             }
         }

@@ -3,7 +3,7 @@
 //!
 use crate::cosmic::playing::Game;
 use crate::cosmic::recording::{AddressPos, CapturedMove, Movement};
-use crate::cosmic::smart::features::{PhysicalPiece, PhysicalPieceType, Piece};
+use crate::cosmic::smart::features::{DoubleFacedPiece, DoubleFacedPieceType, Piece};
 use crate::cosmic::smart::square::{AbsoluteAddress2D, FILE_9, RANK_1};
 use crate::spaceship::equipment::Beam;
 use atoi::atoi;
@@ -51,18 +51,18 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
     // 移動元とドロップ。
     enum Source {
         Move(usize, usize),
-        Drop(PhysicalPieceType),
+        Drop(DoubleFacedPieceType),
     }
 
     let source = match &line[*starts..=*starts] {
         // 1文字目が駒だったら打。2文字目は必ず「*」なはずなので読み飛ばす。
-        "R" => Source::Drop(PhysicalPieceType::Rook),
-        "B" => Source::Drop(PhysicalPieceType::Bishop),
-        "G" => Source::Drop(PhysicalPieceType::Gold),
-        "S" => Source::Drop(PhysicalPieceType::Silver),
-        "N" => Source::Drop(PhysicalPieceType::Knight),
-        "L" => Source::Drop(PhysicalPieceType::Lance),
-        "P" => Source::Drop(PhysicalPieceType::Pawn),
+        "R" => Source::Drop(DoubleFacedPieceType::Rook),
+        "B" => Source::Drop(DoubleFacedPieceType::Bishop),
+        "G" => Source::Drop(DoubleFacedPieceType::Gold),
+        "S" => Source::Drop(DoubleFacedPieceType::Silver),
+        "N" => Source::Drop(DoubleFacedPieceType::Knight),
+        "L" => Source::Drop(DoubleFacedPieceType::Lance),
+        "P" => Source::Drop(DoubleFacedPieceType::Pawn),
         _ => {
             // 残りは「筋の数字」、「段のアルファベット」のはず。
             // 数字じゃないものが入ったら強制終了するんじゃないか☆（＾～＾）
@@ -103,7 +103,7 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
         }
         Source::Drop(hand) => {
             *starts += 2;
-            buffer.source = AddressPos::Hand(PhysicalPiece::from_phase_and_type(
+            buffer.source = AddressPos::Hand(DoubleFacedPiece::from_phase_and_type(
                 game.history.get_friend(),
                 hand,
             ));
@@ -159,11 +159,11 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
     }
 
     // 取られる駒を事前に調べてセットするぜ☆（＾～＾）！
-    let captured_piece_num = game.table.piece_at(&buffer.destination);
+    let captured_piece_num = game.table.piece_num_at(&buffer.destination);
     buffer.captured = if let Some(captured_piece_num_val) = captured_piece_num {
         Some(CapturedMove::new(
             &buffer.destination,
-            game.table.get_meaning(captured_piece_num_val).type_(),
+            game.table.get_piece(captured_piece_num_val).type_(),
         ))
     } else {
         None
@@ -382,7 +382,7 @@ pub fn set_position(line: &str, game: &mut Game) {
                     };
 
                     use crate::cosmic::smart::features::Piece::*;
-                    let hand_meaning = match &line[starts..=starts] {
+                    let hand = match &line[starts..=starts] {
                         "R" => Rook1,
                         "B" => Bishop1,
                         "G" => Gold1,
@@ -405,10 +405,10 @@ pub fn set_position(line: &str, game: &mut Game) {
 
                     for _i in 0..hand_num {
                         // 駒に背番号を付けるぜ☆（＾～＾）
-                        let piece_num = game.mut_starting().naming_piece(hand_meaning);
+                        let piece_num = game.mut_starting().naming_piece(hand);
                         // 駒台に置くぜ☆（＾～＾）
                         let old_drop =
-                            AddressPos::Hand(game.table.get_meaning(piece_num).physical_piece());
+                            AddressPos::Hand(game.table.get_piece(piece_num).double_faced_piece());
                         game.mut_starting().push_piece(&old_drop, Some(piece_num));
                     }
                 } //if

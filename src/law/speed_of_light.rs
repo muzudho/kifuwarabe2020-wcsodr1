@@ -13,7 +13,7 @@ use crate::cosmic::smart::features::PHYSICAL_PIECES_LEN;
 use crate::cosmic::smart::features::PHYSICAL_PIECE_TYPE_LEN;
 use crate::cosmic::smart::features::PIECE_MEANING_LEN;
 use crate::cosmic::smart::features::PIECE_TYPE_LEN;
-use crate::cosmic::smart::features::{PhysicalPiece, PhysicalPieceType, Piece, PieceType};
+use crate::cosmic::smart::features::{DoubleFacedPiece, DoubleFacedPieceType, Piece, PieceType};
 use crate::cosmic::smart::square::{Angle, RelAdr2D, ANGLE_LEN};
 use crate::cosmic::toy_box::PieceNum;
 use crate::law::generate_move::{Agility, Mobility};
@@ -45,28 +45,28 @@ struct SpeedOfLight {
     piece_numbers: Vec<PieceNum>,
 
     /// 先後付きの駒☆（＾～＾）
-    piece_meaning_to_phase_table: [Phase; PIECE_MEANING_LEN],
-    piece_meaning_type_table: [PieceType; PIECE_MEANING_LEN],
+    piece_to_phase_table: [Phase; PIECE_MEANING_LEN],
+    piece_type_table: [PieceType; PIECE_MEANING_LEN],
     /// 駒→成駒　（成れない駒は、そのまま）
-    piece_meaning_promoted_table: [Piece; PIECE_MEANING_LEN],
+    piece_promoted_table: [Piece; PIECE_MEANING_LEN],
     /// 成駒→駒　（成っていない駒は、そのまま）
-    piece_meaning_demoted_table: [Piece; PIECE_MEANING_LEN],
+    piece_demoted_table: [Piece; PIECE_MEANING_LEN],
     /// この駒を取ったら、先後が反転して、相手の駒になる、というリンクだぜ☆（＾～＾）
     /// 探索部では、玉のような取れない駒も　らいおんきゃっち　しているので、玉も取れるように作っておけだぜ☆（＾～＾）
-    piece_meaning_captured_table: [Piece; PIECE_MEANING_LEN],
-    piece_meaning_physical_table: [PhysicalPiece; PIECE_MEANING_LEN],
+    piece_captured_table: [Piece; PIECE_MEANING_LEN],
+    piece_double_faced_table: [DoubleFacedPiece; PIECE_MEANING_LEN],
 
     /// 駒種類☆（＾～＾）
     piece_type_to_promoted_table: [bool; PIECE_TYPE_LEN],
     piece_type_to_mobility_table: [Vec<Mobility>; PIECE_TYPE_LEN],
-    piece_type_to_physical_piece_type: [PhysicalPieceType; PIECE_TYPE_LEN],
+    piece_type_to_double_faced_piece_type: [DoubleFacedPieceType; PIECE_TYPE_LEN],
     /// 持ち駒☆（＾～＾）
     /// 玉２枚引く☆（＾～＾）
-    physical_pieces_legal_all: [PhysicalPiece; PHYSICAL_PIECES_LEN - 2],
-    physical_pieces: [[PhysicalPiece; PHYSICAL_PIECE_TYPE_LEN]; PHASE_LEN],
-    physical_piece_to_type_table: [PhysicalPieceType; PHYSICAL_PIECES_LEN],
-    physical_piece_to_captured_value: [isize; PHYSICAL_PIECE_TYPE_LEN],
-    physical_piece_to_nonpromoted_meaning: [Piece; PHYSICAL_PIECES_LEN],
+    double_faced_pieces_legal_all: [DoubleFacedPiece; PHYSICAL_PIECES_LEN - 2],
+    double_faced_pieces: [[DoubleFacedPiece; PHYSICAL_PIECE_TYPE_LEN]; PHASE_LEN],
+    double_faced_piece_to_type_table: [DoubleFacedPieceType; PHYSICAL_PIECES_LEN],
+    double_faced_piece_to_captured_value: [isize; PHYSICAL_PIECE_TYPE_LEN],
+    double_faced_piece_to_nonpromoted_piece: [Piece; PHYSICAL_PIECES_LEN],
 
     // 相対番地と角度☆（＾～＾）
     west_ccw: [RelAdr2D; ANGLE_LEN],
@@ -134,7 +134,7 @@ impl Default for SpeedOfLight {
             .to_vec(),
 
             /// 先後付きの駒☆（＾～＾）
-            piece_meaning_to_phase_table: [
+            piece_to_phase_table: [
                 First,  // King1
                 First,  // Rook1
                 First,  // Bishop1
@@ -164,7 +164,7 @@ impl Default for SpeedOfLight {
                 Second, // PromotedLance2
                 Second, // PromotedPawn2
             ],
-            piece_meaning_type_table: [
+            piece_type_table: [
                 King,           // King1
                 Rook,           // Rook1
                 Bishop,         // Bishop1
@@ -194,7 +194,7 @@ impl Default for SpeedOfLight {
                 PromotedLance,  // PromotedLance2
                 PromotedPawn,   // PromotedPawn2
             ],
-            piece_meaning_promoted_table: [
+            piece_promoted_table: [
                 King1,           // King1
                 Dragon1,         // Rook1
                 Horse1,          // Bishop1
@@ -224,7 +224,7 @@ impl Default for SpeedOfLight {
                 PromotedLance2,  // PromotedLance2
                 PromotedPawn2,   // PromotedPawn2
             ],
-            piece_meaning_demoted_table: [
+            piece_demoted_table: [
                 King1,   // King1
                 Rook1,   // Rook1
                 Bishop1, // Bishop1
@@ -254,7 +254,7 @@ impl Default for SpeedOfLight {
                 Lance2,  // PromotedLance2
                 Pawn2,   // PromotedPawn2
             ],
-            piece_meaning_captured_table: [
+            piece_captured_table: [
                 King2,   // King1
                 Rook2,   // Rook1
                 Bishop2, // Bishop1
@@ -284,35 +284,35 @@ impl Default for SpeedOfLight {
                 Lance1,  // PromotedLance2
                 Pawn1,   // PromotedPawn2
             ],
-            piece_meaning_physical_table: [
-                PhysicalPiece::King1,   // King1
-                PhysicalPiece::Rook1,   // Rook1
-                PhysicalPiece::Bishop1, // Bishop1
-                PhysicalPiece::Gold1,   // Gold1
-                PhysicalPiece::Silver1, // Silver1
-                PhysicalPiece::Knight1, // Knight1
-                PhysicalPiece::Lance1,  // Lance1
-                PhysicalPiece::Pawn1,   // Pawn1
-                PhysicalPiece::Rook1,   // Dragon1
-                PhysicalPiece::Bishop1, // Horse1
-                PhysicalPiece::Silver1, // PromotedSilver1
-                PhysicalPiece::Knight1, // PromotedKnight1
-                PhysicalPiece::Lance1,  // PromotedLance1
-                PhysicalPiece::Pawn1,   // PromotedPawn1
-                PhysicalPiece::King2,   // King2
-                PhysicalPiece::Rook2,   // Rook2
-                PhysicalPiece::Bishop2, // Bishop2
-                PhysicalPiece::Gold2,   // Gold2
-                PhysicalPiece::Silver2, // Silver2
-                PhysicalPiece::Knight2, // Knight2
-                PhysicalPiece::Lance2,  // Lance2
-                PhysicalPiece::Pawn2,   // Pawn2
-                PhysicalPiece::Rook2,   // Dragon2
-                PhysicalPiece::Bishop2, // Horse2
-                PhysicalPiece::Silver2, // PromotedSilver2
-                PhysicalPiece::Knight2, // PromotedKnight2
-                PhysicalPiece::Lance2,  // PromotedLance2
-                PhysicalPiece::Pawn2,   // PromotedPawn2
+            piece_double_faced_table: [
+                DoubleFacedPiece::King1,   // King1
+                DoubleFacedPiece::Rook1,   // Rook1
+                DoubleFacedPiece::Bishop1, // Bishop1
+                DoubleFacedPiece::Gold1,   // Gold1
+                DoubleFacedPiece::Silver1, // Silver1
+                DoubleFacedPiece::Knight1, // Knight1
+                DoubleFacedPiece::Lance1,  // Lance1
+                DoubleFacedPiece::Pawn1,   // Pawn1
+                DoubleFacedPiece::Rook1,   // Dragon1
+                DoubleFacedPiece::Bishop1, // Horse1
+                DoubleFacedPiece::Silver1, // PromotedSilver1
+                DoubleFacedPiece::Knight1, // PromotedKnight1
+                DoubleFacedPiece::Lance1,  // PromotedLance1
+                DoubleFacedPiece::Pawn1,   // PromotedPawn1
+                DoubleFacedPiece::King2,   // King2
+                DoubleFacedPiece::Rook2,   // Rook2
+                DoubleFacedPiece::Bishop2, // Bishop2
+                DoubleFacedPiece::Gold2,   // Gold2
+                DoubleFacedPiece::Silver2, // Silver2
+                DoubleFacedPiece::Knight2, // Knight2
+                DoubleFacedPiece::Lance2,  // Lance2
+                DoubleFacedPiece::Pawn2,   // Pawn2
+                DoubleFacedPiece::Rook2,   // Dragon2
+                DoubleFacedPiece::Bishop2, // Horse2
+                DoubleFacedPiece::Silver2, // PromotedSilver2
+                DoubleFacedPiece::Knight2, // PromotedKnight2
+                DoubleFacedPiece::Lance2,  // PromotedLance2
+                DoubleFacedPiece::Pawn2,   // PromotedPawn2
             ],
 
             // 成り駒か☆（＾～＾）？
@@ -429,82 +429,82 @@ impl Default for SpeedOfLight {
                     Mobility::new(Angle::Ccw225, Agility::Hopping),
                 ], // PromotedPawn
             ],
-            piece_type_to_physical_piece_type: [
-                PhysicalPieceType::King,   // King
-                PhysicalPieceType::Rook,   // Rook
-                PhysicalPieceType::Bishop, // Bishop
-                PhysicalPieceType::Gold,   // Gold
-                PhysicalPieceType::Silver, // Silver
-                PhysicalPieceType::Knight, // Knight
-                PhysicalPieceType::Lance,  // Lance
-                PhysicalPieceType::Pawn,   // Pawn
-                PhysicalPieceType::Rook,   // Dragon
-                PhysicalPieceType::Bishop, // Horse
-                PhysicalPieceType::Silver, // PromotedSilver
-                PhysicalPieceType::Knight, // PromotedKnight
-                PhysicalPieceType::Lance,  // PromotedLance
-                PhysicalPieceType::Pawn,   // PromotedPawn
+            piece_type_to_double_faced_piece_type: [
+                DoubleFacedPieceType::King,   // King
+                DoubleFacedPieceType::Rook,   // Rook
+                DoubleFacedPieceType::Bishop, // Bishop
+                DoubleFacedPieceType::Gold,   // Gold
+                DoubleFacedPieceType::Silver, // Silver
+                DoubleFacedPieceType::Knight, // Knight
+                DoubleFacedPieceType::Lance,  // Lance
+                DoubleFacedPieceType::Pawn,   // Pawn
+                DoubleFacedPieceType::Rook,   // Dragon
+                DoubleFacedPieceType::Bishop, // Horse
+                DoubleFacedPieceType::Silver, // PromotedSilver
+                DoubleFacedPieceType::Knight, // PromotedKnight
+                DoubleFacedPieceType::Lance,  // PromotedLance
+                DoubleFacedPieceType::Pawn,   // PromotedPawn
             ],
             // 持ち駒☆（＾～＾）
-            physical_pieces_legal_all: [
-                PhysicalPiece::Rook1,
-                PhysicalPiece::Bishop1,
-                PhysicalPiece::Gold1,
-                PhysicalPiece::Silver1,
-                PhysicalPiece::Knight1,
-                PhysicalPiece::Lance1,
-                PhysicalPiece::Pawn1,
-                PhysicalPiece::Rook2,
-                PhysicalPiece::Bishop2,
-                PhysicalPiece::Gold2,
-                PhysicalPiece::Silver2,
-                PhysicalPiece::Knight2,
-                PhysicalPiece::Lance2,
-                PhysicalPiece::Pawn2,
+            double_faced_pieces_legal_all: [
+                DoubleFacedPiece::Rook1,
+                DoubleFacedPiece::Bishop1,
+                DoubleFacedPiece::Gold1,
+                DoubleFacedPiece::Silver1,
+                DoubleFacedPiece::Knight1,
+                DoubleFacedPiece::Lance1,
+                DoubleFacedPiece::Pawn1,
+                DoubleFacedPiece::Rook2,
+                DoubleFacedPiece::Bishop2,
+                DoubleFacedPiece::Gold2,
+                DoubleFacedPiece::Silver2,
+                DoubleFacedPiece::Knight2,
+                DoubleFacedPiece::Lance2,
+                DoubleFacedPiece::Pawn2,
             ],
-            physical_pieces: [
+            double_faced_pieces: [
                 [
-                    PhysicalPiece::King1,
-                    PhysicalPiece::Rook1,
-                    PhysicalPiece::Bishop1,
-                    PhysicalPiece::Gold1,
-                    PhysicalPiece::Silver1,
-                    PhysicalPiece::Knight1,
-                    PhysicalPiece::Lance1,
-                    PhysicalPiece::Pawn1,
+                    DoubleFacedPiece::King1,
+                    DoubleFacedPiece::Rook1,
+                    DoubleFacedPiece::Bishop1,
+                    DoubleFacedPiece::Gold1,
+                    DoubleFacedPiece::Silver1,
+                    DoubleFacedPiece::Knight1,
+                    DoubleFacedPiece::Lance1,
+                    DoubleFacedPiece::Pawn1,
                 ],
                 [
-                    PhysicalPiece::King2,
-                    PhysicalPiece::Rook2,
-                    PhysicalPiece::Bishop2,
-                    PhysicalPiece::Gold2,
-                    PhysicalPiece::Silver2,
-                    PhysicalPiece::Knight2,
-                    PhysicalPiece::Lance2,
-                    PhysicalPiece::Pawn2,
+                    DoubleFacedPiece::King2,
+                    DoubleFacedPiece::Rook2,
+                    DoubleFacedPiece::Bishop2,
+                    DoubleFacedPiece::Gold2,
+                    DoubleFacedPiece::Silver2,
+                    DoubleFacedPiece::Knight2,
+                    DoubleFacedPiece::Lance2,
+                    DoubleFacedPiece::Pawn2,
                 ],
             ],
 
-            physical_piece_to_type_table: [
-                PhysicalPieceType::King,
-                PhysicalPieceType::Rook,
-                PhysicalPieceType::Bishop,
-                PhysicalPieceType::Gold,
-                PhysicalPieceType::Silver,
-                PhysicalPieceType::Knight,
-                PhysicalPieceType::Lance,
-                PhysicalPieceType::Pawn,
-                PhysicalPieceType::King,
-                PhysicalPieceType::Rook,
-                PhysicalPieceType::Bishop,
-                PhysicalPieceType::Gold,
-                PhysicalPieceType::Silver,
-                PhysicalPieceType::Knight,
-                PhysicalPieceType::Lance,
-                PhysicalPieceType::Pawn,
+            double_faced_piece_to_type_table: [
+                DoubleFacedPieceType::King,
+                DoubleFacedPieceType::Rook,
+                DoubleFacedPieceType::Bishop,
+                DoubleFacedPieceType::Gold,
+                DoubleFacedPieceType::Silver,
+                DoubleFacedPieceType::Knight,
+                DoubleFacedPieceType::Lance,
+                DoubleFacedPieceType::Pawn,
+                DoubleFacedPieceType::King,
+                DoubleFacedPieceType::Rook,
+                DoubleFacedPieceType::Bishop,
+                DoubleFacedPieceType::Gold,
+                DoubleFacedPieceType::Silver,
+                DoubleFacedPieceType::Knight,
+                DoubleFacedPieceType::Lance,
+                DoubleFacedPieceType::Pawn,
             ],
 
-            physical_piece_to_nonpromoted_meaning: [
+            double_faced_piece_to_nonpromoted_piece: [
                 Piece::King1,
                 Piece::Rook1,
                 Piece::Bishop1,
@@ -580,7 +580,7 @@ impl Default for SpeedOfLight {
 
             // 評価値☆（＾～＾）
             promotion_value: [0, 1, 1, 0, 0, 1, 1, 1],
-            physical_piece_to_captured_value: [
+            double_faced_piece_to_captured_value: [
                 // 玉を取った時の評価は別にするから、ここではしないぜ☆（＾～＾）
                 15000, // TODO 玉は 0 にしたい,
                 // 駒割は取ったときにカウントしているので、成りを考慮しないぜ☆（＾～＾）
@@ -605,27 +605,27 @@ impl Nine299792458 {
 /// コーディングを短くするためのものだぜ☆（＾～＾）
 impl Piece {
     pub fn phase(self) -> Phase {
-        NINE_299792458.piece_meaning_to_phase_table[self as usize]
+        NINE_299792458.piece_to_phase_table[self as usize]
     }
 
     pub fn type_(self) -> PieceType {
-        NINE_299792458.piece_meaning_type_table[self as usize]
+        NINE_299792458.piece_type_table[self as usize]
     }
 
     pub fn promoted(self) -> Piece {
-        NINE_299792458.piece_meaning_promoted_table[self as usize]
+        NINE_299792458.piece_promoted_table[self as usize]
     }
 
     pub fn demoted(self) -> Piece {
-        NINE_299792458.piece_meaning_demoted_table[self as usize]
+        NINE_299792458.piece_demoted_table[self as usize]
     }
 
     pub fn captured(self) -> Piece {
-        NINE_299792458.piece_meaning_captured_table[self as usize]
+        NINE_299792458.piece_captured_table[self as usize]
     }
 
-    pub fn physical_piece(self) -> PhysicalPiece {
-        NINE_299792458.piece_meaning_physical_table[self as usize]
+    pub fn double_faced_piece(self) -> DoubleFacedPiece {
+        NINE_299792458.piece_double_faced_table[self as usize]
     }
 }
 
@@ -637,8 +637,8 @@ impl PieceType {
     pub fn mobility(self) -> &'static Vec<Mobility> {
         &NINE_299792458.piece_type_to_mobility_table[self as usize]
     }
-    pub fn physical_piece_type(self) -> PhysicalPieceType {
-        NINE_299792458.piece_type_to_physical_piece_type[self as usize]
+    pub fn double_faced_piece_type(self) -> DoubleFacedPieceType {
+        NINE_299792458.piece_type_to_double_faced_piece_type[self as usize]
     }
 }
 
@@ -647,34 +647,34 @@ pub struct HandAddresses {}
 impl HandAddresses {
     pub fn for_all<F1>(callback: &mut F1)
     where
-        F1: FnMut(PhysicalPiece),
+        F1: FnMut(DoubleFacedPiece),
     {
-        for adr in &NINE_299792458.physical_pieces_legal_all {
+        for adr in &NINE_299792458.double_faced_pieces_legal_all {
             callback(*adr);
         }
     }
 }
 
 /// コーディングを短くするためのものだぜ☆（＾～＾）
-impl PhysicalPiece {
-    pub fn from_phase_and_type(phase: Phase, adr: PhysicalPieceType) -> Self {
-        NINE_299792458.physical_pieces[phase as usize][adr as usize]
+impl DoubleFacedPiece {
+    pub fn from_phase_and_type(phase: Phase, adr: DoubleFacedPieceType) -> Self {
+        NINE_299792458.double_faced_pieces[phase as usize][adr as usize]
     }
-    pub fn type_(self) -> PhysicalPieceType {
-        NINE_299792458.physical_piece_to_type_table[self as usize]
+    pub fn type_(self) -> DoubleFacedPieceType {
+        NINE_299792458.double_faced_piece_to_type_table[self as usize]
     }
-    pub fn nonpromoted_meaning(self) -> Piece {
-        NINE_299792458.physical_piece_to_nonpromoted_meaning[self as usize]
+    pub fn nonpromoted_piece(self) -> Piece {
+        NINE_299792458.double_faced_piece_to_nonpromoted_piece[self as usize]
     }
 }
 
 /// コーディングを短くするためのものだぜ☆（＾～＾）
-impl PhysicalPieceType {
+impl DoubleFacedPieceType {
     pub fn promotion_value(self) -> isize {
         NINE_299792458.promotion_value[self as usize]
     }
     pub fn captured_value(self) -> isize {
-        NINE_299792458.physical_piece_to_captured_value[self as usize]
+        NINE_299792458.double_faced_piece_to_captured_value[self as usize]
     }
 }
 

@@ -3,7 +3,7 @@
 //!
 
 use crate::cosmic::recording::{AddressPos, CapturedMove, Movement, Phase};
-use crate::cosmic::smart::features::{PhysicalPiece, PieceType};
+use crate::cosmic::smart::features::{DoubleFacedPiece, PieceType};
 use crate::cosmic::smart::square::{
     AbsoluteAddress2D, Angle, RelAdr2D, FILE_1, FILE_10, RANK_1, RANK_10, RANK_2, RANK_3, RANK_4,
     RANK_6, RANK_7, RANK_8, RANK_9,
@@ -133,10 +133,10 @@ impl PseudoLegalMoves {
     {
         let moving =
             &mut |destination, promotability, _agility, move_permission: Option<MovePermission>| {
-                let pseudo_captured_num = table.piece_at(&destination);
+                let pseudo_captured_num = table.piece_num_at(&destination);
 
                 let (ok, space) = if let Some(pseudo_captured_num_val) = pseudo_captured_num {
-                    if table.get_meaning(pseudo_captured_num_val).phase() == friend {
+                    if table.get_piece(pseudo_captured_num_val).phase() == friend {
                         // 味方の駒を取った☆（＾～＾）なしだぜ☆（＾～＾）！
                         (false, false)
                     } else {
@@ -176,7 +176,7 @@ impl PseudoLegalMoves {
                                     if let Some(piece_num_val) = pseudo_captured_num {
                                         Some(CapturedMove::new(
                                             &destination,
-                                            table.get_meaning(piece_num_val).type_(),
+                                            table.get_piece(piece_num_val).type_(),
                                         ))
                                     } else {
                                         None
@@ -190,7 +190,7 @@ impl PseudoLegalMoves {
                                 if let Some(piece_num_val) = pseudo_captured_num {
                                     Some(CapturedMove::new(
                                         &destination,
-                                        table.get_meaning(piece_num_val).type_(),
+                                        table.get_piece(piece_num_val).type_(),
                                     ))
                                 } else {
                                     None
@@ -207,7 +207,7 @@ impl PseudoLegalMoves {
                                     if let Some(piece_num_val) = pseudo_captured_num {
                                         Some(CapturedMove::new(
                                             &destination,
-                                            table.get_meaning(piece_num_val).type_(),
+                                            table.get_piece(piece_num_val).type_(),
                                         ))
                                     } else {
                                         None
@@ -221,12 +221,7 @@ impl PseudoLegalMoves {
                 !space
             };
 
-        Area::piece_of(
-            table.get_meaning(piece_num).type_(),
-            friend,
-            &source,
-            moving,
-        );
+        Area::piece_of(table.get_piece(piece_num).type_(), friend, &source, moving);
     }
 
     /// 駒台を見ようぜ☆（＾～＾） 駒台の駒の動きを作るぜ☆（＾～＾）
@@ -238,14 +233,14 @@ impl PseudoLegalMoves {
     /// * `table` - 現局面の盤上だぜ☆（＾～＾）
     /// * `listen_move` - 指し手を受け取れだぜ☆（＾～＾）
     /// * `listen_control` - 利きを受け取れだぜ☆（＾～＾）
-    fn make_drop<F1>(friend: Phase, adr: PhysicalPiece, table: &GameTable, listen_move: &mut F1)
+    fn make_drop<F1>(friend: Phase, adr: DoubleFacedPiece, table: &GameTable, listen_move: &mut F1)
     where
         F1: FnMut(Movement),
     {
-        if let Some(piece) = table.last_hand_meaning(table, adr) {
+        if let Some(piece) = table.last_hand(table, adr) {
             // 打つぜ☆（＾～＾）
             let drop = &mut |destination| {
-                if let None = table.piece_at(&destination) {
+                if let None = table.piece_num_at(&destination) {
                     // 駒が無いところに打つ
                     use crate::cosmic::smart::features::Piece::*;
                     match piece {
@@ -265,17 +260,17 @@ impl PseudoLegalMoves {
                         _ => {}
                     }
                     listen_move(Movement::new(
-                        AddressPos::Hand(piece.physical_piece()), // 打った駒種類
-                        destination,                              // どの升へ行きたいか
-                        false,                                    // 打に成りは無し
-                        None,                                     // 打で取れる駒無し
+                        AddressPos::Hand(piece.double_faced_piece()), // 打った駒種類
+                        destination,                                  // どの升へ行きたいか
+                        false,                                        // 打に成りは無し
+                        None,                                         // 打で取れる駒無し
                     ));
                 }
             };
 
             // 駒を持っていれば
             let ty = adr.type_();
-            use crate::cosmic::smart::features::PhysicalPieceType::*;
+            use crate::cosmic::smart::features::DoubleFacedPieceType::*;
             match ty {
                 // 歩、香
                 Pawn | Lance => Area::drop_pawn_lance(friend, drop),

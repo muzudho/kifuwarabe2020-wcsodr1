@@ -1,6 +1,6 @@
 use crate::cosmic::playing::{Game, PosNums};
 use crate::cosmic::recording::{AddressPos, Movement};
-use crate::cosmic::smart::features::{PhysicalPiece, PIECE_WHITE_SPACE};
+use crate::cosmic::smart::features::{DoubleFacedPiece, PIECE_WHITE_SPACE};
 use crate::cosmic::smart::square::*;
 use crate::cosmic::toy_box::*;
 use crate::spaceship::equipment::Beam;
@@ -171,21 +171,21 @@ P x{87:2}   |{63}|{64}|{65}|{66}|{67}|{68}|{69}|{70}|{71}| h8   p x{94:2}
             GameRoom::to_string3(table, 2, 9),
             GameRoom::to_string3(table, 1, 9),
             //                   ▲き,　                   ▲ぞ,                     ▲い,                     ▲ね,                     ▲う,                     ▲し,                     ▲ひ,
-            table.count_hand(PhysicalPiece::Rook1),
-            table.count_hand(PhysicalPiece::Bishop1),
-            table.count_hand(PhysicalPiece::Gold1),
-            table.count_hand(PhysicalPiece::Silver1),
-            table.count_hand(PhysicalPiece::Knight1),
-            table.count_hand(PhysicalPiece::Lance1),
-            table.count_hand(PhysicalPiece::Pawn1),
+            table.count_hand(DoubleFacedPiece::Rook1),
+            table.count_hand(DoubleFacedPiece::Bishop1),
+            table.count_hand(DoubleFacedPiece::Gold1),
+            table.count_hand(DoubleFacedPiece::Silver1),
+            table.count_hand(DoubleFacedPiece::Knight1),
+            table.count_hand(DoubleFacedPiece::Lance1),
+            table.count_hand(DoubleFacedPiece::Pawn1),
             //                   ▽キ,                     ▽ゾ,                     ▽イ,                     ▽ネ,                     ▽ウ,                     ▽シ,                     ▽ヒ,
-            table.count_hand(PhysicalPiece::Rook2),
-            table.count_hand(PhysicalPiece::Bishop2),
-            table.count_hand(PhysicalPiece::Gold2),
-            table.count_hand(PhysicalPiece::Silver2),
-            table.count_hand(PhysicalPiece::Knight2),
-            table.count_hand(PhysicalPiece::Lance2),
-            table.count_hand(PhysicalPiece::Pawn2),
+            table.count_hand(DoubleFacedPiece::Rook2),
+            table.count_hand(DoubleFacedPiece::Bishop2),
+            table.count_hand(DoubleFacedPiece::Gold2),
+            table.count_hand(DoubleFacedPiece::Silver2),
+            table.count_hand(DoubleFacedPiece::Knight2),
+            table.count_hand(DoubleFacedPiece::Lance2),
+            table.count_hand(DoubleFacedPiece::Pawn2),
             ply,
             phase,
             same_pos_count

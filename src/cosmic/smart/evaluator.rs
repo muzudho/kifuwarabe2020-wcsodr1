@@ -74,7 +74,7 @@ impl Evaluation {
             if captured_piece_type_val
                 .promoted()
             {
-                captured_piece_type_val.physical_piece_type().promotion_value()
+                captured_piece_type_val.double_faced_piece_type().promotion_value()
             } else {
                 0
             }
@@ -104,7 +104,7 @@ impl Evaluation {
     fn caputured_piece_type_value(captured_piece_type: Option<PieceType>) -> isize {
         if let Some(captured_piece_type_val) = captured_piece_type {
             captured_piece_type_val
-                .physical_piece_type()
+                .double_faced_piece_type()
                 .captured_value()
         } else {
             0

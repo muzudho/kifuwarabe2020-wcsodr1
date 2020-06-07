@@ -174,7 +174,7 @@ impl fmt::Display for PieceType {
 pub const PHYSICAL_PIECE_TYPE_LEN: usize = 8;
 #[derive(Clone, Copy, Debug, FromPrimitive)]
 /// 物理的な駒の種類。玉を除けば、持ち駒の種類。
-pub enum PhysicalPieceType {
+pub enum DoubleFacedPieceType {
     King,
     Rook,
     Bishop,
@@ -190,7 +190,7 @@ pub const PHYSICAL_PIECES_LEN: usize = 16;
 
 #[derive(Clone, Copy, Debug)]
 /// 表面と裏面の組み合わせで１つとしたときの種類。先後区別。玉を除けば、持ち駒の種類。
-pub enum PhysicalPiece {
+pub enum DoubleFacedPiece {
     // ▲ 玉と印字無し
     King1,
     // ▲ 飛と竜
@@ -225,10 +225,10 @@ pub enum PhysicalPiece {
     Pawn2,
 }
 /// USIの Drop に合わせるぜ☆（＾～＾） 先後を区別しないぜ☆（＾～＾）
-impl fmt::Display for PhysicalPiece {
+impl fmt::Display for DoubleFacedPiece {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         // 文字列リテラルでないとダメみたいなんで、他に似たようなコードがあるのに、また書くことに☆（＾～＾）
-        use self::PhysicalPiece::*;
+        use self::DoubleFacedPiece::*;
         match *self {
             King1 => write!(f, "?*"),
             Rook1 => write!(f, "R*"),

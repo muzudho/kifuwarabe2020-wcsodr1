@@ -4,7 +4,7 @@
 //! * Phase (先後。手番,相手番)
 //! * Person (先手,後手)
 //!
-use crate::cosmic::smart::features::PhysicalPiece;
+use crate::cosmic::smart::features::DoubleFacedPiece;
 use crate::cosmic::smart::features::PieceType;
 use crate::cosmic::smart::square::AbsoluteAddress2D;
 use crate::law::cryptographic::num_to_lower_case;
@@ -66,7 +66,7 @@ pub enum AddressPos {
     // 盤上の番地
     Board(AbsoluteAddress2D),
     // 持ち駒の種類
-    Hand(PhysicalPiece),
+    Hand(DoubleFacedPiece),
 }
 impl fmt::Display for AddressPos {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

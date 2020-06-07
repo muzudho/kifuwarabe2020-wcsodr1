@@ -3,7 +3,7 @@
 //!
 use crate::cosmic::recording::Movement;
 use crate::cosmic::recording::{AddressPos, Phase};
-use crate::cosmic::smart::features::{PhysicalPiece, Piece, PieceType, PHYSICAL_PIECE_TYPE_LEN};
+use crate::cosmic::smart::features::{DoubleFacedPiece, Piece, PieceType, PHYSICAL_PIECE_TYPE_LEN};
 use crate::cosmic::smart::square::{AbsoluteAddress2D, BOARD_MEMORY_AREA, RANK_1, RANK_10};
 use crate::law::speed_of_light::Nine299792458;
 use crate::spaceship::equipment::Beam;
@@ -111,9 +111,9 @@ pub struct GameTable {
     /// 駒の背番号に、駒が紐づくぜ☆（＾～＾）
     piece_list: [Piece; NAMED_PIECES_LEN],
     /// 駒の背番号を付けるのに使うぜ☆（＾～＾）
-    physical_piece_type_index: [usize; PHYSICAL_PIECE_TYPE_LEN],
+    double_faced_piece_type_index: [usize; PHYSICAL_PIECE_TYPE_LEN],
     /// 持ち駒☆（＾～＾）TODO 固定長サイズのスタックを用意したいぜ☆（＾～＾）
-    pub hands: NewHandStack,
+    pub hands: HandStack,
 }
 impl Default for GameTable {
     fn default() -> Self {
@@ -133,7 +133,7 @@ impl Default for GameTable {
             address_list: [AddressPos::Board(AbsoluteAddress2D::default()); NAMED_PIECES_LEN],
             /// 初期値はゴミ値だぜ☆（＾～＾）上書きして消せだぜ☆（＾～＾）
             piece_list: [Piece::King1; NAMED_PIECES_LEN],
-            physical_piece_type_index: [
+            double_faced_piece_type_index: [
                 PieceNum::King1 as usize,
                 PieceNum::Rook21 as usize,
                 PieceNum::Bishop19 as usize,
@@ -144,7 +144,7 @@ impl Default for GameTable {
                 PieceNum::Pawn23 as usize,
             ],
             // 持ち駒
-            hands: NewHandStack::default(),
+            hands: HandStack::default(),
         }
     }
 }
@@ -164,7 +164,7 @@ impl GameTable {
         self.address_list = [AddressPos::Board(AbsoluteAddress2D::default()); NAMED_PIECES_LEN];
         // 初期値はゴミ値だぜ☆（＾～＾）上書きして消せだぜ☆（＾～＾）
         self.piece_list = [Piece::King1; NAMED_PIECES_LEN];
-        self.physical_piece_type_index = [
+        self.double_faced_piece_type_index = [
             PieceNum::King1 as usize,
             PieceNum::Rook21 as usize,
             PieceNum::Bishop19 as usize,
@@ -175,7 +175,7 @@ impl GameTable {
             PieceNum::Pawn23 as usize,
         ];
         // 持ち駒☆（＾～＾）
-        self.hands = NewHandStack::default();
+        self.hands = HandStack::default();
     }
 
     /// 開始盤面を、現盤面にコピーしたいときに使うぜ☆（＾～＾）
@@ -183,14 +183,14 @@ impl GameTable {
         self.board = table.board.clone();
         self.address_list = table.address_list.clone();
         self.piece_list = table.piece_list.clone();
-        self.physical_piece_type_index = table.physical_piece_type_index.clone();
+        self.double_faced_piece_type_index = table.double_faced_piece_type_index.clone();
         self.hands = table.hands.clone();
     }
 
-    pub fn get_meaning(&self, num: PieceNum) -> Piece {
+    pub fn get_piece(&self, num: PieceNum) -> Piece {
         self.piece_list[num as usize]
     }
-    pub fn new_piece(&mut self, piece: Piece, num: PieceNum) -> PieceNum {
+    pub fn new_piece_num(&mut self, piece: Piece, num: PieceNum) -> PieceNum {
         self.piece_list[num as usize] = piece;
         num
     }
@@ -214,12 +214,12 @@ impl GameTable {
             // 移動先升の駒を盤上から消し、自分の持ち駒に増やす
             // 先後ひっくり返す。
             // TODO 元データを反転させたいぜ☆（＾～＾）
-            let captured_piece_num = self.new_piece(
-                self.get_meaning(collision_piece_num_val).captured(),
+            let captured_piece_num = self.new_piece_num(
+                self.get_piece(collision_piece_num_val).captured(),
                 collision_piece_num_val,
             );
             self.push_piece(
-                &AddressPos::Hand(self.get_meaning(captured_piece_num).physical_piece()),
+                &AddressPos::Hand(self.get_piece(captured_piece_num).double_faced_piece()),
                 Some(captured_piece_num),
             );
         }
@@ -232,9 +232,9 @@ impl GameTable {
             // 取った方の駒台の先後に合わせるぜ☆（＾～＾）
             // 取った方の持ち駒を減らす
             let piece_num = self
-                .pop_piece(&AddressPos::Hand(PhysicalPiece::from_phase_and_type(
+                .pop_piece(&AddressPos::Hand(DoubleFacedPiece::from_phase_and_type(
                     friend, //.turn(),
-                    move2_val.piece_type.physical_piece_type(),
+                    move2_val.piece_type.double_faced_piece_type(),
                 )))
                 .unwrap();
             // 先後をひっくり返す。
@@ -267,7 +267,7 @@ impl GameTable {
             AddressPos::Hand(_old_drop) => {
                 if let Some(piece_num_val) = piece_num {
                     // 持ち駒を１つ増やします。
-                    let new_drop = self.get_meaning(piece_num_val).physical_piece();
+                    let new_drop = self.get_piece(piece_num_val).double_faced_piece();
                     self.hands.push(new_drop /* *drop*/, piece_num_val);
                     // 背番号に番地を紐づけます。
                     self.address_list[piece_num_val as usize] = *addr;
@@ -305,16 +305,16 @@ impl GameTable {
     pub fn naming_piece(&mut self, piece: Piece) -> PieceNum {
         match piece {
             // 玉だけ、先後は決まってるから従えだぜ☆（＾～＾）
-            Piece::King1 => self.new_piece(piece, PieceNum::King1),
-            Piece::King2 => self.new_piece(piece, PieceNum::King2),
+            Piece::King1 => self.new_piece_num(piece, PieceNum::King1),
+            Piece::King2 => self.new_piece_num(piece, PieceNum::King2),
             _ => {
-                let drop_type = piece.physical_piece().type_() as usize;
+                let drop_type = piece.double_faced_piece().type_() as usize;
                 // 玉以外の背番号は、先後に関わりなく SFENに書いてあった順で☆（＾～＾）
                 let piece_num =
-                    PieceNum::from_usize(self.physical_piece_type_index[drop_type]).unwrap();
+                    PieceNum::from_usize(self.double_faced_piece_type_index[drop_type]).unwrap();
                 // カウントアップ☆（＾～＾）
-                self.physical_piece_type_index[drop_type] += 1;
-                self.new_piece(piece, piece_num)
+                self.double_faced_piece_type_index[drop_type] += 1;
+                self.new_piece_num(piece, piece_num)
             }
         }
     }
@@ -323,10 +323,8 @@ impl GameTable {
     pub fn exists_pawn_on_file(&self, phase: Phase, file: usize) -> bool {
         for rank in RANK_1..RANK_10 {
             let addr = AddressPos::Board(AbsoluteAddress2D::new(file, rank));
-            if let Some(piece_meaning_val) = self.piece_meaning_at(&addr) {
-                if piece_meaning_val.phase() == phase
-                    && piece_meaning_val.type_() == PieceType::Pawn
-                {
+            if let Some(piece_val) = self.piece_at(&addr) {
+                if piece_val.phase() == phase && piece_val.type_() == PieceType::Pawn {
                     return true;
                 }
             }
@@ -336,7 +334,7 @@ impl GameTable {
     /// TODO Piece をカプセル化したい。外に出したくないぜ☆（＾～＾）
     /// 升で指定して駒を取得。
     /// 駒台には対応してない。 -> 何に使っている？
-    pub fn piece_at(&self, addr: &AddressPos) -> Option<PieceNum> {
+    pub fn piece_num_at(&self, addr: &AddressPos) -> Option<PieceNum> {
         match addr {
             AddressPos::Board(sq) => self.board[sq.serial_number() as usize],
             _ => panic!(Beam::trouble(&format!(
@@ -350,10 +348,7 @@ impl GameTable {
             AddressPos::Board(sq) => {
                 let piece_num = self.board[sq.serial_number() as usize];
                 if let Some(piece_num_val) = piece_num {
-                    Some(PieceInfo::new(
-                        self.get_meaning(piece_num_val),
-                        piece_num_val,
-                    ))
+                    Some(PieceInfo::new(self.get_piece(piece_num_val), piece_num_val))
                 } else {
                     None
                 }
@@ -369,8 +364,8 @@ impl GameTable {
                 let piece_num = self.board[sq.serial_number() as usize];
                 if let Some(piece_num_val) = piece_num {
                     table
-                        .get_meaning(piece_num_val)
-                        .physical_piece()
+                        .get_piece(piece_num_val)
+                        .double_faced_piece()
                         .type_()
                         .promotion_value()
                 } else {
@@ -383,11 +378,11 @@ impl GameTable {
             ))),
         }
     }
-    pub fn piece_meaning_at(&self, addr: &AddressPos) -> Option<Piece> {
+    pub fn piece_at(&self, addr: &AddressPos) -> Option<Piece> {
         match addr {
             AddressPos::Board(sq) => {
                 if let Some(piece_num) = self.board[sq.serial_number() as usize] {
-                    Some(self.get_meaning(piece_num))
+                    Some(self.get_piece(piece_num))
                 } else {
                     None
                 }
@@ -398,18 +393,18 @@ impl GameTable {
         }
     }
     /// 指し手生成で使うぜ☆（＾～＾）
-    pub fn last_hand(&self, drop: PhysicalPiece) -> Option<PieceNum> {
+    pub fn last_hand_num(&self, drop: DoubleFacedPiece) -> Option<PieceNum> {
         self.hands.last(drop)
     }
     /// 指し手生成で使うぜ☆（＾～＾）
-    pub fn last_hand_meaning(&self, table: &GameTable, phy: PhysicalPiece) -> Option<Piece> {
+    pub fn last_hand(&self, table: &GameTable, phy: DoubleFacedPiece) -> Option<Piece> {
         if let Some(old_piece) = self.hands.last(phy) {
-            Some(table.get_meaning(old_piece))
+            Some(table.get_piece(old_piece))
         } else {
             None
         }
     }
-    pub fn count_hand(&self, phy: PhysicalPiece) -> usize {
+    pub fn count_hand(&self, phy: DoubleFacedPiece) -> usize {
         self.hands.len(phy)
     }
 
@@ -444,8 +439,8 @@ impl GameTable {
             match addr {
                 AddressPos::Board(_sq) => {
                     // 盤上の駒☆（＾～＾）
-                    let piece = self.piece_at(&addr).unwrap();
-                    if self.get_meaning(*piece_num).phase() == friend {
+                    let piece = self.piece_num_at(&addr).unwrap();
+                    if self.get_piece(*piece_num).phase() == friend {
                         piece_get(addr, piece);
                     }
                 }
@@ -455,30 +450,30 @@ impl GameTable {
             }
         }
 
-        const FIRST_SECOND: [[PhysicalPiece; PHYSICAL_PIECE_TYPE_LEN - 1]; 2] = [
+        const FIRST_SECOND: [[DoubleFacedPiece; PHYSICAL_PIECE_TYPE_LEN - 1]; 2] = [
             [
                 // King なし
-                PhysicalPiece::Rook1,
-                PhysicalPiece::Bishop1,
-                PhysicalPiece::Gold1,
-                PhysicalPiece::Silver1,
-                PhysicalPiece::Knight1,
-                PhysicalPiece::Lance1,
-                PhysicalPiece::Pawn1,
+                DoubleFacedPiece::Rook1,
+                DoubleFacedPiece::Bishop1,
+                DoubleFacedPiece::Gold1,
+                DoubleFacedPiece::Silver1,
+                DoubleFacedPiece::Knight1,
+                DoubleFacedPiece::Lance1,
+                DoubleFacedPiece::Pawn1,
             ],
             [
                 // King なし
-                PhysicalPiece::Rook2,
-                PhysicalPiece::Bishop2,
-                PhysicalPiece::Gold2,
-                PhysicalPiece::Silver2,
-                PhysicalPiece::Knight2,
-                PhysicalPiece::Lance2,
-                PhysicalPiece::Pawn2,
+                DoubleFacedPiece::Rook2,
+                DoubleFacedPiece::Bishop2,
+                DoubleFacedPiece::Gold2,
+                DoubleFacedPiece::Silver2,
+                DoubleFacedPiece::Knight2,
+                DoubleFacedPiece::Lance2,
+                DoubleFacedPiece::Pawn2,
             ],
         ];
         for old_drop in &FIRST_SECOND[friend as usize] {
-            if let Some(piece_num) = self.last_hand(*old_drop) {
+            if let Some(piece_num) = self.last_hand_num(*old_drop) {
                 piece_get(AddressPos::Hand(*old_drop), piece_num);
             }
         }
@@ -487,7 +482,7 @@ impl GameTable {
 
 /// 駒台だぜ☆（＾～＾）これ１つで２人分あるんで☆（＾～＾）
 #[derive(Clone)]
-pub struct NewHandStack {
+pub struct HandStack {
     king: Hand2Piece,
     gold: Hand4Piece,
     silver: Hand4Piece,
@@ -497,10 +492,10 @@ pub struct NewHandStack {
     bishop: Hand2Piece,
     pawn: Hand18Piece,
 }
-impl Default for NewHandStack {
+impl Default for HandStack {
     // ゴミ値で埋めるぜ☆（＾～＾）
     fn default() -> Self {
-        NewHandStack {
+        HandStack {
             king: Hand2Piece::default(),
             gold: Hand4Piece::default(),
             silver: Hand4Piece::default(),
@@ -512,122 +507,122 @@ impl Default for NewHandStack {
         }
     }
 }
-impl NewHandStack {
+impl HandStack {
     /// ひっくり返してから入れてください。
-    fn push(&mut self, drop: PhysicalPiece, num: PieceNum) {
+    fn push(&mut self, drop: DoubleFacedPiece, num: PieceNum) {
         match drop {
-            PhysicalPiece::King1 => {
+            DoubleFacedPiece::King1 => {
                 self.king.push_head(num);
             }
-            PhysicalPiece::King2 => {
+            DoubleFacedPiece::King2 => {
                 self.king.push_tail(num);
             }
-            PhysicalPiece::Gold1 => {
+            DoubleFacedPiece::Gold1 => {
                 self.gold.push_head(num);
             }
-            PhysicalPiece::Gold2 => {
+            DoubleFacedPiece::Gold2 => {
                 self.gold.push_tail(num);
             }
-            PhysicalPiece::Silver1 => {
+            DoubleFacedPiece::Silver1 => {
                 self.silver.push_head(num);
             }
-            PhysicalPiece::Silver2 => {
+            DoubleFacedPiece::Silver2 => {
                 self.silver.push_tail(num);
             }
-            PhysicalPiece::Knight1 => {
+            DoubleFacedPiece::Knight1 => {
                 self.knight.push_head(num);
             }
-            PhysicalPiece::Knight2 => {
+            DoubleFacedPiece::Knight2 => {
                 self.knight.push_tail(num);
             }
-            PhysicalPiece::Lance1 => {
+            DoubleFacedPiece::Lance1 => {
                 self.lance.push_head(num);
             }
-            PhysicalPiece::Lance2 => {
+            DoubleFacedPiece::Lance2 => {
                 self.lance.push_tail(num);
             }
-            PhysicalPiece::Rook1 => {
+            DoubleFacedPiece::Rook1 => {
                 self.rook.push_head(num);
             }
-            PhysicalPiece::Rook2 => {
+            DoubleFacedPiece::Rook2 => {
                 self.rook.push_tail(num);
             }
-            PhysicalPiece::Bishop1 => {
+            DoubleFacedPiece::Bishop1 => {
                 self.bishop.push_head(num);
             }
-            PhysicalPiece::Bishop2 => {
+            DoubleFacedPiece::Bishop2 => {
                 self.bishop.push_tail(num);
             }
-            PhysicalPiece::Pawn1 => {
+            DoubleFacedPiece::Pawn1 => {
                 self.pawn.push_head(num);
             }
-            PhysicalPiece::Pawn2 => {
+            DoubleFacedPiece::Pawn2 => {
                 self.pawn.push_tail(num);
             }
         }
     }
 
     /// ゴミ値は消さないぜ☆（＾～＾）
-    fn pop(&mut self, drop: PhysicalPiece) -> PieceNum {
+    fn pop(&mut self, drop: DoubleFacedPiece) -> PieceNum {
         match drop {
-            PhysicalPiece::King1 => self.king.pop_head(),
-            PhysicalPiece::King2 => self.king.pop_tail(),
-            PhysicalPiece::Gold1 => self.gold.pop_head(),
-            PhysicalPiece::Gold2 => self.gold.pop_tail(),
-            PhysicalPiece::Silver1 => self.silver.pop_head(),
-            PhysicalPiece::Silver2 => self.silver.pop_tail(),
-            PhysicalPiece::Knight1 => self.knight.pop_head(),
-            PhysicalPiece::Knight2 => self.knight.pop_tail(),
-            PhysicalPiece::Lance1 => self.lance.pop_head(),
-            PhysicalPiece::Lance2 => self.lance.pop_tail(),
-            PhysicalPiece::Rook1 => self.rook.pop_head(),
-            PhysicalPiece::Rook2 => self.rook.pop_tail(),
-            PhysicalPiece::Bishop1 => self.bishop.pop_head(),
-            PhysicalPiece::Bishop2 => self.bishop.pop_tail(),
-            PhysicalPiece::Pawn1 => self.pawn.pop_head(),
-            PhysicalPiece::Pawn2 => self.pawn.pop_tail(),
+            DoubleFacedPiece::King1 => self.king.pop_head(),
+            DoubleFacedPiece::King2 => self.king.pop_tail(),
+            DoubleFacedPiece::Gold1 => self.gold.pop_head(),
+            DoubleFacedPiece::Gold2 => self.gold.pop_tail(),
+            DoubleFacedPiece::Silver1 => self.silver.pop_head(),
+            DoubleFacedPiece::Silver2 => self.silver.pop_tail(),
+            DoubleFacedPiece::Knight1 => self.knight.pop_head(),
+            DoubleFacedPiece::Knight2 => self.knight.pop_tail(),
+            DoubleFacedPiece::Lance1 => self.lance.pop_head(),
+            DoubleFacedPiece::Lance2 => self.lance.pop_tail(),
+            DoubleFacedPiece::Rook1 => self.rook.pop_head(),
+            DoubleFacedPiece::Rook2 => self.rook.pop_tail(),
+            DoubleFacedPiece::Bishop1 => self.bishop.pop_head(),
+            DoubleFacedPiece::Bishop2 => self.bishop.pop_tail(),
+            DoubleFacedPiece::Pawn1 => self.pawn.pop_head(),
+            DoubleFacedPiece::Pawn2 => self.pawn.pop_tail(),
         }
     }
 
-    fn last(&self, drop: PhysicalPiece) -> Option<PieceNum> {
+    fn last(&self, drop: DoubleFacedPiece) -> Option<PieceNum> {
         match drop {
-            PhysicalPiece::King1 => self.king.last_head(),
-            PhysicalPiece::King2 => self.king.last_tail(),
-            PhysicalPiece::Gold1 => self.gold.last_head(),
-            PhysicalPiece::Gold2 => self.gold.last_tail(),
-            PhysicalPiece::Silver1 => self.silver.last_head(),
-            PhysicalPiece::Silver2 => self.silver.last_tail(),
-            PhysicalPiece::Knight1 => self.knight.last_head(),
-            PhysicalPiece::Knight2 => self.knight.last_tail(),
-            PhysicalPiece::Lance1 => self.lance.last_head(),
-            PhysicalPiece::Lance2 => self.lance.last_tail(),
-            PhysicalPiece::Rook1 => self.rook.last_head(),
-            PhysicalPiece::Rook2 => self.rook.last_tail(),
-            PhysicalPiece::Bishop1 => self.bishop.last_head(),
-            PhysicalPiece::Bishop2 => self.bishop.last_tail(),
-            PhysicalPiece::Pawn1 => self.pawn.last_head(),
-            PhysicalPiece::Pawn2 => self.pawn.last_tail(),
+            DoubleFacedPiece::King1 => self.king.last_head(),
+            DoubleFacedPiece::King2 => self.king.last_tail(),
+            DoubleFacedPiece::Gold1 => self.gold.last_head(),
+            DoubleFacedPiece::Gold2 => self.gold.last_tail(),
+            DoubleFacedPiece::Silver1 => self.silver.last_head(),
+            DoubleFacedPiece::Silver2 => self.silver.last_tail(),
+            DoubleFacedPiece::Knight1 => self.knight.last_head(),
+            DoubleFacedPiece::Knight2 => self.knight.last_tail(),
+            DoubleFacedPiece::Lance1 => self.lance.last_head(),
+            DoubleFacedPiece::Lance2 => self.lance.last_tail(),
+            DoubleFacedPiece::Rook1 => self.rook.last_head(),
+            DoubleFacedPiece::Rook2 => self.rook.last_tail(),
+            DoubleFacedPiece::Bishop1 => self.bishop.last_head(),
+            DoubleFacedPiece::Bishop2 => self.bishop.last_tail(),
+            DoubleFacedPiece::Pawn1 => self.pawn.last_head(),
+            DoubleFacedPiece::Pawn2 => self.pawn.last_tail(),
         }
     }
 
-    fn len(&self, drop: PhysicalPiece) -> usize {
+    fn len(&self, drop: DoubleFacedPiece) -> usize {
         match drop {
-            PhysicalPiece::King1 => self.king.len_head(),
-            PhysicalPiece::King2 => self.king.len_tail(),
-            PhysicalPiece::Gold1 => self.gold.len_head(),
-            PhysicalPiece::Gold2 => self.gold.len_tail(),
-            PhysicalPiece::Silver1 => self.silver.len_head(),
-            PhysicalPiece::Silver2 => self.silver.len_tail(),
-            PhysicalPiece::Knight1 => self.knight.len_head(),
-            PhysicalPiece::Knight2 => self.knight.len_tail(),
-            PhysicalPiece::Lance1 => self.lance.len_head(),
-            PhysicalPiece::Lance2 => self.lance.len_tail(),
-            PhysicalPiece::Rook1 => self.rook.len_head(),
-            PhysicalPiece::Rook2 => self.rook.len_tail(),
-            PhysicalPiece::Bishop1 => self.bishop.len_head(),
-            PhysicalPiece::Bishop2 => self.bishop.len_tail(),
-            PhysicalPiece::Pawn1 => self.pawn.len_head(),
-            PhysicalPiece::Pawn2 => self.pawn.len_tail(),
+            DoubleFacedPiece::King1 => self.king.len_head(),
+            DoubleFacedPiece::King2 => self.king.len_tail(),
+            DoubleFacedPiece::Gold1 => self.gold.len_head(),
+            DoubleFacedPiece::Gold2 => self.gold.len_tail(),
+            DoubleFacedPiece::Silver1 => self.silver.len_head(),
+            DoubleFacedPiece::Silver2 => self.silver.len_tail(),
+            DoubleFacedPiece::Knight1 => self.knight.len_head(),
+            DoubleFacedPiece::Knight2 => self.knight.len_tail(),
+            DoubleFacedPiece::Lance1 => self.lance.len_head(),
+            DoubleFacedPiece::Lance2 => self.lance.len_tail(),
+            DoubleFacedPiece::Rook1 => self.rook.len_head(),
+            DoubleFacedPiece::Rook2 => self.rook.len_tail(),
+            DoubleFacedPiece::Bishop1 => self.bishop.len_head(),
+            DoubleFacedPiece::Bishop2 => self.bishop.len_tail(),
+            DoubleFacedPiece::Pawn1 => self.pawn.len_head(),
+            DoubleFacedPiece::Pawn2 => self.pawn.len_tail(),
         }
     }
 
