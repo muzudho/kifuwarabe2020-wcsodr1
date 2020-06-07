@@ -115,7 +115,7 @@ pub struct GameTable {
     /// 駒の背番号を付けるのに使うぜ☆（＾～＾）
     physical_piece_type_index: [usize; PHYSICAL_PIECE_TYPE_LEN],
     /// 持ち駒☆（＾～＾）TODO 固定長サイズのスタックを用意したいぜ☆（＾～＾）
-    pub hands: [HandStack; PHYSICAL_PIECES_LEN],
+    pub hands: [OldHandStack; PHYSICAL_PIECES_LEN],
 }
 impl Default for GameTable {
     fn default() -> Self {
@@ -147,22 +147,22 @@ impl Default for GameTable {
             ],
             // 持ち駒
             hands: [
-                HandStack::default(),
-                HandStack::default(),
-                HandStack::default(),
-                HandStack::default(),
-                HandStack::default(),
-                HandStack::default(),
-                HandStack::default(),
-                HandStack::default(),
-                HandStack::default(),
-                HandStack::default(),
-                HandStack::default(),
-                HandStack::default(),
-                HandStack::default(),
-                HandStack::default(),
-                HandStack::default(),
-                HandStack::default(),
+                OldHandStack::default(),
+                OldHandStack::default(),
+                OldHandStack::default(),
+                OldHandStack::default(),
+                OldHandStack::default(),
+                OldHandStack::default(),
+                OldHandStack::default(),
+                OldHandStack::default(),
+                OldHandStack::default(),
+                OldHandStack::default(),
+                OldHandStack::default(),
+                OldHandStack::default(),
+                OldHandStack::default(),
+                OldHandStack::default(),
+                OldHandStack::default(),
+                OldHandStack::default(),
             ],
         }
     }
@@ -195,22 +195,22 @@ impl GameTable {
         ];
         // 持ち駒☆（＾～＾）
         self.hands = [
-            HandStack::default(),
-            HandStack::default(),
-            HandStack::default(),
-            HandStack::default(),
-            HandStack::default(),
-            HandStack::default(),
-            HandStack::default(),
-            HandStack::default(),
-            HandStack::default(),
-            HandStack::default(),
-            HandStack::default(),
-            HandStack::default(),
-            HandStack::default(),
-            HandStack::default(),
-            HandStack::default(),
-            HandStack::default(),
+            OldHandStack::default(),
+            OldHandStack::default(),
+            OldHandStack::default(),
+            OldHandStack::default(),
+            OldHandStack::default(),
+            OldHandStack::default(),
+            OldHandStack::default(),
+            OldHandStack::default(),
+            OldHandStack::default(),
+            OldHandStack::default(),
+            OldHandStack::default(),
+            OldHandStack::default(),
+            OldHandStack::default(),
+            OldHandStack::default(),
+            OldHandStack::default(),
+            OldHandStack::default(),
         ];
     }
 
@@ -464,157 +464,21 @@ impl GameTable {
     }
 }
 
-/// 駒台だぜ☆（＾～＾）
 #[derive(Clone)]
-pub struct HandUniverse {
-    king: Hand2Piece,
-    gold: Hand4Piece,
-    silver: Hand4Piece,
-    knight: Hand4Piece,
-    lance: Hand4Piece,
-    rook: Hand2Piece,
-    bishop: Hand2Piece,
-    pawn: Hand18Piece,
-}
-impl Default for HandUniverse {
-    /// ゴミ値だぜ☆（＾～＾）
-    fn default() -> Self {
-        HandUniverse {
-            king: Hand2Piece::default(),
-            gold: Hand4Piece::default(),
-            silver: Hand4Piece::default(),
-            knight: Hand4Piece::default(),
-            lance: Hand4Piece::default(),
-            rook: Hand2Piece::default(),
-            bishop: Hand2Piece::default(),
-            pawn: Hand18Piece::default(),
-        }
-    }
-}
-#[derive(Clone)]
-pub struct Hand2Piece {
-    items: [PieceNum; 2],
-    head: usize,
-    tail: usize,
-}
-impl Default for Hand2Piece {
-    /// ゴミ値だぜ☆（＾～＾）
-    fn default() -> Self {
-        Hand2Piece {
-            items: [PieceNum::Rook21; 2],
-            head: 0,
-            tail: 1,
-        }
-    }
-}
-impl Hand2Piece {
-    pub fn push_head(&mut self, num: PieceNum) {
-        self.items[self.head] = num;
-        self.head += 1;
-    }
-    pub fn push_tail(&mut self, num: PieceNum) {
-        self.items[self.tail] = num;
-        self.head -= 1;
-    }
-    pub fn pop_head(&mut self) -> PieceNum {
-        let num = self.items[self.head];
-        self.head -= 1;
-        num
-    }
-    pub fn pop_tail(&mut self) -> PieceNum {
-        let num = self.items[self.tail];
-        self.tail += 1;
-        num
-    }
-}
-#[derive(Clone)]
-pub struct Hand4Piece {
-    items: [PieceNum; 4],
-    head: usize,
-    tail: usize,
-}
-impl Default for Hand4Piece {
-    /// ゴミ値だぜ☆（＾～＾）
-    fn default() -> Self {
-        Hand4Piece {
-            items: [PieceNum::Gold3; 4],
-            head: 0,
-            tail: 3,
-        }
-    }
-}
-impl Hand4Piece {
-    pub fn push_head(&mut self, num: PieceNum) {
-        self.items[self.head] = num;
-        self.head += 1;
-    }
-    pub fn push_tail(&mut self, num: PieceNum) {
-        self.items[self.tail] = num;
-        self.head -= 1;
-    }
-    pub fn pop_head(&mut self) -> PieceNum {
-        let num = self.items[self.head];
-        self.head -= 1;
-        num
-    }
-    pub fn pop_tail(&mut self) -> PieceNum {
-        let num = self.items[self.tail];
-        self.tail += 1;
-        num
-    }
-}
-#[derive(Clone)]
-pub struct Hand18Piece {
-    items: [PieceNum; 18],
-    head: usize,
-    tail: usize,
-}
-impl Default for Hand18Piece {
-    /// ゴミ値だぜ☆（＾～＾）
-    fn default() -> Self {
-        Hand18Piece {
-            items: [PieceNum::Pawn23; 18],
-            head: 0,
-            tail: 17,
-        }
-    }
-}
-impl Hand18Piece {
-    pub fn push_head(&mut self, num: PieceNum) {
-        self.items[self.head] = num;
-        self.head += 1;
-    }
-    pub fn push_tail(&mut self, num: PieceNum) {
-        self.items[self.tail] = num;
-        self.head -= 1;
-    }
-    pub fn pop_head(&mut self) -> PieceNum {
-        let num = self.items[self.head];
-        self.head -= 1;
-        num
-    }
-    pub fn pop_tail(&mut self) -> PieceNum {
-        let num = self.items[self.tail];
-        self.tail += 1;
-        num
-    }
-}
-
-#[derive(Clone)]
-pub struct HandStack {
+pub struct OldHandStack {
     items: [OldPiece; HAND_MAX],
     count: usize,
 }
-impl Default for HandStack {
+impl Default for OldHandStack {
     fn default() -> Self {
-        HandStack {
+        OldHandStack {
             // ゴミ値で埋めるぜ☆（＾～＾）
             items: [OldPiece::default(); HAND_MAX],
             count: 0,
         }
     }
 }
-impl HandStack {
+impl OldHandStack {
     fn push(&mut self, piece: &OldPiece) {
         self.items[self.count] = *piece;
         self.count += 1;
@@ -651,4 +515,333 @@ impl HandStack {
         buffer.trim_end().to_string()
     }
     */
+}
+
+/// 駒台だぜ☆（＾～＾）これ１つで２人分あるんで☆（＾～＾）
+#[derive(Clone)]
+pub struct NewHandStack {
+    king: Hand2Piece,
+    gold: Hand4Piece,
+    silver: Hand4Piece,
+    knight: Hand4Piece,
+    lance: Hand4Piece,
+    rook: Hand2Piece,
+    bishop: Hand2Piece,
+    pawn: Hand18Piece,
+}
+impl Default for NewHandStack {
+    // ゴミ値で埋めるぜ☆（＾～＾）
+    fn default() -> Self {
+        NewHandStack {
+            king: Hand2Piece::default(),
+            gold: Hand4Piece::default(),
+            silver: Hand4Piece::default(),
+            knight: Hand4Piece::default(),
+            lance: Hand4Piece::default(),
+            rook: Hand2Piece::default(),
+            bishop: Hand2Piece::default(),
+            pawn: Hand18Piece::default(),
+        }
+    }
+}
+impl NewHandStack {
+    /// ひっくり返してから入れてください。
+    fn push(&mut self, old_piece: &OldPiece) {
+        match (*old_piece).old_meaning.physical_piece() {
+            PhysicalPiece::King1 => {
+                self.king.push_head(*old_piece);
+            }
+            PhysicalPiece::King2 => {
+                self.king.push_tail(*old_piece);
+            }
+            PhysicalPiece::Gold1 => {
+                self.gold.push_head(*old_piece);
+            }
+            PhysicalPiece::Gold2 => {
+                self.gold.push_tail(*old_piece);
+            }
+            PhysicalPiece::Silver1 => {
+                self.silver.push_head(*old_piece);
+            }
+            PhysicalPiece::Silver2 => {
+                self.silver.push_tail(*old_piece);
+            }
+            PhysicalPiece::Knight1 => {
+                self.knight.push_head(*old_piece);
+            }
+            PhysicalPiece::Knight2 => {
+                self.knight.push_tail(*old_piece);
+            }
+            PhysicalPiece::Lance1 => {
+                self.lance.push_head(*old_piece);
+            }
+            PhysicalPiece::Lance2 => {
+                self.lance.push_tail(*old_piece);
+            }
+            PhysicalPiece::Rook1 => {
+                self.rook.push_head(*old_piece);
+            }
+            PhysicalPiece::Rook2 => {
+                self.rook.push_tail(*old_piece);
+            }
+            PhysicalPiece::Bishop1 => {
+                self.bishop.push_head(*old_piece);
+            }
+            PhysicalPiece::Bishop2 => {
+                self.bishop.push_tail(*old_piece);
+            }
+            PhysicalPiece::Pawn1 => {
+                self.pawn.push_head(*old_piece);
+            }
+            PhysicalPiece::Pawn2 => {
+                self.pawn.push_tail(*old_piece);
+            }
+        }
+    }
+
+    /// ゴミ値は消さないぜ☆（＾～＾）
+    fn pop(&mut self, phy: PhysicalPiece) -> OldPiece {
+        match phy {
+            PhysicalPiece::King1 => self.king.pop_head(),
+            PhysicalPiece::King2 => self.king.pop_tail(),
+            PhysicalPiece::Gold1 => self.gold.pop_head(),
+            PhysicalPiece::Gold2 => self.gold.pop_tail(),
+            PhysicalPiece::Silver1 => self.silver.pop_head(),
+            PhysicalPiece::Silver2 => self.silver.pop_tail(),
+            PhysicalPiece::Knight1 => self.knight.pop_head(),
+            PhysicalPiece::Knight2 => self.knight.pop_tail(),
+            PhysicalPiece::Lance1 => self.lance.pop_head(),
+            PhysicalPiece::Lance2 => self.lance.pop_tail(),
+            PhysicalPiece::Rook1 => self.rook.pop_head(),
+            PhysicalPiece::Rook2 => self.rook.pop_tail(),
+            PhysicalPiece::Bishop1 => self.bishop.pop_head(),
+            PhysicalPiece::Bishop2 => self.bishop.pop_tail(),
+            PhysicalPiece::Pawn1 => self.pawn.pop_head(),
+            PhysicalPiece::Pawn2 => self.pawn.pop_tail(),
+        }
+    }
+
+    fn last(&self, phy: PhysicalPiece) -> Option<&OldPiece> {
+        match phy {
+            PhysicalPiece::King1 => self.king.last_head(),
+            PhysicalPiece::King2 => self.king.last_tail(),
+            PhysicalPiece::Gold1 => self.gold.last_head(),
+            PhysicalPiece::Gold2 => self.gold.last_tail(),
+            PhysicalPiece::Silver1 => self.silver.last_head(),
+            PhysicalPiece::Silver2 => self.silver.last_tail(),
+            PhysicalPiece::Knight1 => self.knight.last_head(),
+            PhysicalPiece::Knight2 => self.knight.last_tail(),
+            PhysicalPiece::Lance1 => self.lance.last_head(),
+            PhysicalPiece::Lance2 => self.lance.last_tail(),
+            PhysicalPiece::Rook1 => self.rook.last_head(),
+            PhysicalPiece::Rook2 => self.rook.last_tail(),
+            PhysicalPiece::Bishop1 => self.bishop.last_head(),
+            PhysicalPiece::Bishop2 => self.bishop.last_tail(),
+            PhysicalPiece::Pawn1 => self.pawn.last_head(),
+            PhysicalPiece::Pawn2 => self.pawn.last_tail(),
+        }
+    }
+
+    fn len(&self, phy: PhysicalPiece) -> usize {
+        match phy {
+            PhysicalPiece::King1 => self.king.len_head(),
+            PhysicalPiece::King2 => self.king.len_tail(),
+            PhysicalPiece::Gold1 => self.gold.len_head(),
+            PhysicalPiece::Gold2 => self.gold.len_tail(),
+            PhysicalPiece::Silver1 => self.silver.len_head(),
+            PhysicalPiece::Silver2 => self.silver.len_tail(),
+            PhysicalPiece::Knight1 => self.knight.len_head(),
+            PhysicalPiece::Knight2 => self.knight.len_tail(),
+            PhysicalPiece::Lance1 => self.lance.len_head(),
+            PhysicalPiece::Lance2 => self.lance.len_tail(),
+            PhysicalPiece::Rook1 => self.rook.len_head(),
+            PhysicalPiece::Rook2 => self.rook.len_tail(),
+            PhysicalPiece::Bishop1 => self.bishop.len_head(),
+            PhysicalPiece::Bishop2 => self.bishop.len_tail(),
+            PhysicalPiece::Pawn1 => self.pawn.len_head(),
+            PhysicalPiece::Pawn2 => self.pawn.len_tail(),
+        }
+    }
+
+    /*
+    fn to_debug(&self, table: &GameTable) -> String {
+        let mut buffer = String::new();
+        for i in 0..=self.count {
+            buffer.push_str(&format!(
+                "({}, {:?}) ",
+                self.items[i].meaning, self.items[i].num
+            ));
+        }
+        buffer.trim_end().to_string()
+    }
+    */
+}
+
+#[derive(Clone)]
+pub struct Hand2Piece {
+    items: [OldPiece; 2],
+    head: usize,
+    tail: usize,
+}
+impl Default for Hand2Piece {
+    /// ゴミ値だぜ☆（＾～＾）
+    fn default() -> Self {
+        Hand2Piece {
+            items: [OldPiece::default(); 2],
+            head: 0,
+            tail: 1,
+        }
+    }
+}
+impl Hand2Piece {
+    pub fn push_head(&mut self, num: OldPiece) {
+        self.items[self.head] = num;
+        self.head += 1;
+    }
+    pub fn push_tail(&mut self, num: OldPiece) {
+        self.items[self.tail] = num;
+        self.tail -= 1;
+    }
+    pub fn pop_head(&mut self) -> OldPiece {
+        let num = self.items[self.head];
+        self.head -= 1;
+        num
+    }
+    pub fn pop_tail(&mut self) -> OldPiece {
+        let num = self.items[self.tail];
+        self.tail += 1;
+        num
+    }
+    pub fn last_head(&self) -> Option<&OldPiece> {
+        if 0 < self.head {
+            Some(&self.items[self.head - 1])
+        } else {
+            None
+        }
+    }
+    pub fn last_tail(&self) -> Option<&OldPiece> {
+        if self.tail < 1 {
+            Some(&self.items[self.tail + 1])
+        } else {
+            None
+        }
+    }
+    pub fn len_head(&self) -> usize {
+        self.head
+    }
+    pub fn len_tail(&self) -> usize {
+        1 - self.tail
+    }
+}
+#[derive(Clone)]
+pub struct Hand4Piece {
+    items: [OldPiece; 4],
+    head: usize,
+    tail: usize,
+}
+impl Default for Hand4Piece {
+    /// ゴミ値だぜ☆（＾～＾）
+    fn default() -> Self {
+        Hand4Piece {
+            items: [OldPiece::default(); 4],
+            head: 0,
+            tail: 3,
+        }
+    }
+}
+impl Hand4Piece {
+    pub fn push_head(&mut self, num: OldPiece) {
+        self.items[self.head] = num;
+        self.head += 1;
+    }
+    pub fn push_tail(&mut self, num: OldPiece) {
+        self.items[self.tail] = num;
+        self.tail -= 1;
+    }
+    pub fn pop_head(&mut self) -> OldPiece {
+        let num = self.items[self.head];
+        self.head -= 1;
+        num
+    }
+    pub fn pop_tail(&mut self) -> OldPiece {
+        let num = self.items[self.tail];
+        self.tail += 1;
+        num
+    }
+    pub fn last_head(&self) -> Option<&OldPiece> {
+        if 0 < self.head {
+            Some(&self.items[self.head - 1])
+        } else {
+            None
+        }
+    }
+    pub fn last_tail(&self) -> Option<&OldPiece> {
+        if self.tail < 3 {
+            Some(&self.items[self.tail + 1])
+        } else {
+            None
+        }
+    }
+    pub fn len_head(&self) -> usize {
+        self.head
+    }
+    pub fn len_tail(&self) -> usize {
+        3 - self.tail
+    }
+}
+#[derive(Clone)]
+pub struct Hand18Piece {
+    items: [OldPiece; 18],
+    head: usize,
+    tail: usize,
+}
+impl Default for Hand18Piece {
+    /// ゴミ値だぜ☆（＾～＾）
+    fn default() -> Self {
+        Hand18Piece {
+            items: [OldPiece::default(); 18],
+            head: 0,
+            tail: 17,
+        }
+    }
+}
+impl Hand18Piece {
+    pub fn push_head(&mut self, num: OldPiece) {
+        self.items[self.head] = num;
+        self.head += 1;
+    }
+    pub fn push_tail(&mut self, num: OldPiece) {
+        self.items[self.tail] = num;
+        self.tail -= 1;
+    }
+    pub fn pop_head(&mut self) -> OldPiece {
+        let num = self.items[self.head];
+        self.head -= 1;
+        num
+    }
+    pub fn pop_tail(&mut self) -> OldPiece {
+        let num = self.items[self.tail];
+        self.tail += 1;
+        num
+    }
+    pub fn last_head(&self) -> Option<&OldPiece> {
+        if 0 < self.head {
+            Some(&self.items[self.head - 1])
+        } else {
+            None
+        }
+    }
+    pub fn last_tail(&self) -> Option<&OldPiece> {
+        if self.tail < 17 {
+            Some(&self.items[self.tail + 1])
+        } else {
+            None
+        }
+    }
+    pub fn len_head(&self) -> usize {
+        self.head
+    }
+    pub fn len_tail(&self) -> usize {
+        17 - self.tail
+    }
 }
