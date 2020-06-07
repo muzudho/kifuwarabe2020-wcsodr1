@@ -2,7 +2,7 @@
 use crate::config::*;
 use crate::cosmic::daydream::Value;
 use crate::cosmic::recording::Movement;
-use crate::cosmic::smart::features::PieceMeaning;
+use crate::cosmic::smart::features::Piece;
 use crate::cosmic::smart::square::test_rotation;
 use crate::cosmic::toy_box::PieceNum;
 use std::fs::File;
@@ -207,13 +207,13 @@ impl Beam {
 
 /// ちゆり「駒そのものではなく、駒の情報が欲しいだけなら、これだぜ☆」
 pub struct PieceInfo {
-    pub meaning: String,
+    pub piece: String,
     pub num: String,
 }
 impl PieceInfo {
-    pub fn new(meaning: PieceMeaning, num: PieceNum) -> Self {
+    pub fn new(piece: Piece, num: PieceNum) -> Self {
         PieceInfo {
-            meaning: format!("{}", meaning),
+            piece: format!("{}", piece),
             num: format!("{:?}", num),
         }
     }

@@ -137,8 +137,8 @@ impl Game {
                 let piece_num152: Option<PieceNum> = if move_.promote {
                     if let Some(piece_num) = self.table.pop_piece(&move_.source) {
                         // 成ったのなら、元のマスの駒を成らすぜ☆（＾～＾）
-                        let meaning = self.table.get_meaning(piece_num).promoted();
-                        Some(self.table.new_piece(meaning, piece_num))
+                        let piece = self.table.get_meaning(piece_num).promoted();
+                        Some(self.table.new_piece(piece, piece_num))
                     } else {
                         panic!(Beam::trouble(
                             "(Err.248) 成ったのに、元の升に駒がなかった☆（＾～＾）"
@@ -186,8 +186,8 @@ impl Game {
                             // 成ったなら、成る前へ
                             if let Some(source_piece_num) = self.table.pop_piece(&move_.destination)
                             {
-                                let meaning = self.table.get_meaning(source_piece_num).demoted();
-                                Some(self.table.new_piece(meaning, source_piece_num))
+                                let piece = self.table.get_meaning(source_piece_num).demoted();
+                                Some(self.table.new_piece(piece, source_piece_num))
                             } else {
                                 panic!(Beam::trouble(
                                     "(Err.305) 成ったのに移動先に駒が無いぜ☆（＾～＾）！"

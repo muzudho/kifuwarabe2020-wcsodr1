@@ -51,7 +51,7 @@ impl GameRoom {
         if let Some(piece_info_val) =
             table.piece_info_at(&AddressPos::Board(AbsoluteAddress2D::new(file, rank)))
         {
-            format!("{}", piece_info_val.meaning)
+            format!("{}", piece_info_val.piece)
         } else {
             PIECE_WHITE_SPACE.to_string()
         }

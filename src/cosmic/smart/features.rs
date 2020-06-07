@@ -9,14 +9,12 @@ use std::fmt;
 
 pub const PIECE_MEANING_LEN: usize = 28;
 
-/// Stockfish系コンピューター将棋ソフトが言う Piece は、きふわらべでは PieceMeaning に名前を変えているぜ☆（＾～＾）
-///
 /// 先後付きの駒と空白。
 /// 接尾辞の 1 は先手、 2 は後手。
 ///
 /// Copy: 配列の要素の初期化のために利用。
 #[derive(Copy, Clone, PartialEq, FromPrimitive)]
-pub enum PieceMeaning {
+pub enum Piece {
     // ▲玉
     King1,
     // ▲きりん
@@ -78,11 +76,11 @@ pub enum PieceMeaning {
 // 持ち駒の駒のうち、最大の枚数は歩の 18。
 pub const HAND_MAX: usize = 18;
 pub static PIECE_WHITE_SPACE: &str = "    ";
-impl fmt::Display for PieceMeaning {
+impl fmt::Display for Piece {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         // 文字列リテラルでないとダメみたいなんで、他に似たようなコードがあるのに、また書くことに☆（＾～＾）
         // ▲、▽ が半角サイズなのは、Windows Terminal の担当者 いい加減だぜ☆（＾～＾）
-        use crate::cosmic::smart::features::PieceMeaning::*;
+        use crate::cosmic::smart::features::Piece::*;
         match *self {
             King1 => write!(f, " ▲K "),
             Rook1 => write!(f, " ▲R "),

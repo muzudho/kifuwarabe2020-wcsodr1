@@ -13,7 +13,7 @@ use crate::cosmic::smart::features::PHYSICAL_PIECES_LEN;
 use crate::cosmic::smart::features::PHYSICAL_PIECE_TYPE_LEN;
 use crate::cosmic::smart::features::PIECE_MEANING_LEN;
 use crate::cosmic::smart::features::PIECE_TYPE_LEN;
-use crate::cosmic::smart::features::{PhysicalPiece, PhysicalPieceType, PieceMeaning, PieceType};
+use crate::cosmic::smart::features::{PhysicalPiece, PhysicalPieceType, Piece, PieceType};
 use crate::cosmic::smart::square::{Angle, RelAdr2D, ANGLE_LEN};
 use crate::cosmic::toy_box::PieceNum;
 use crate::law::generate_move::{Agility, Mobility};
@@ -48,12 +48,12 @@ struct SpeedOfLight {
     piece_meaning_to_phase_table: [Phase; PIECE_MEANING_LEN],
     piece_meaning_type_table: [PieceType; PIECE_MEANING_LEN],
     /// 駒→成駒　（成れない駒は、そのまま）
-    piece_meaning_promoted_table: [PieceMeaning; PIECE_MEANING_LEN],
+    piece_meaning_promoted_table: [Piece; PIECE_MEANING_LEN],
     /// 成駒→駒　（成っていない駒は、そのまま）
-    piece_meaning_demoted_table: [PieceMeaning; PIECE_MEANING_LEN],
+    piece_meaning_demoted_table: [Piece; PIECE_MEANING_LEN],
     /// この駒を取ったら、先後が反転して、相手の駒になる、というリンクだぜ☆（＾～＾）
     /// 探索部では、玉のような取れない駒も　らいおんきゃっち　しているので、玉も取れるように作っておけだぜ☆（＾～＾）
-    piece_meaning_captured_table: [PieceMeaning; PIECE_MEANING_LEN],
+    piece_meaning_captured_table: [Piece; PIECE_MEANING_LEN],
     piece_meaning_physical_table: [PhysicalPiece; PIECE_MEANING_LEN],
 
     /// 駒種類☆（＾～＾）
@@ -66,7 +66,7 @@ struct SpeedOfLight {
     physical_pieces: [[PhysicalPiece; PHYSICAL_PIECE_TYPE_LEN]; PHASE_LEN],
     physical_piece_to_type_table: [PhysicalPieceType; PHYSICAL_PIECES_LEN],
     physical_piece_to_captured_value: [isize; PHYSICAL_PIECE_TYPE_LEN],
-    physical_piece_to_nonpromoted_meaning: [PieceMeaning; PHYSICAL_PIECES_LEN],
+    physical_piece_to_nonpromoted_meaning: [Piece; PHYSICAL_PIECES_LEN],
 
     // 相対番地と角度☆（＾～＾）
     west_ccw: [RelAdr2D; ANGLE_LEN],
@@ -85,7 +85,7 @@ struct SpeedOfLight {
 impl Default for SpeedOfLight {
     fn default() -> Self {
         use crate::cosmic::recording::Phase::*;
-        use crate::cosmic::smart::features::PieceMeaning::*;
+        use crate::cosmic::smart::features::Piece::*;
         use crate::cosmic::smart::features::PieceType::*;
         SpeedOfLight {
             /// ピースの早見表の生成は、アプリケーション開始時に全部済ませておけだぜ☆（＾～＾）
@@ -505,22 +505,22 @@ impl Default for SpeedOfLight {
             ],
 
             physical_piece_to_nonpromoted_meaning: [
-                PieceMeaning::King1,
-                PieceMeaning::Rook1,
-                PieceMeaning::Bishop1,
-                PieceMeaning::Gold1,
-                PieceMeaning::Silver1,
-                PieceMeaning::Knight1,
-                PieceMeaning::Lance1,
-                PieceMeaning::Pawn1,
-                PieceMeaning::King2,
-                PieceMeaning::Rook2,
-                PieceMeaning::Bishop2,
-                PieceMeaning::Gold2,
-                PieceMeaning::Silver2,
-                PieceMeaning::Knight2,
-                PieceMeaning::Lance2,
-                PieceMeaning::Pawn2,
+                Piece::King1,
+                Piece::Rook1,
+                Piece::Bishop1,
+                Piece::Gold1,
+                Piece::Silver1,
+                Piece::Knight1,
+                Piece::Lance1,
+                Piece::Pawn1,
+                Piece::King2,
+                Piece::Rook2,
+                Piece::Bishop2,
+                Piece::Gold2,
+                Piece::Silver2,
+                Piece::Knight2,
+                Piece::Lance2,
+                Piece::Pawn2,
             ],
 
             // よく使う、角度の付いた相対番地☆（＾～＾）
@@ -603,7 +603,7 @@ impl Nine299792458 {
 }
 
 /// コーディングを短くするためのものだぜ☆（＾～＾）
-impl PieceMeaning {
+impl Piece {
     pub fn phase(self) -> Phase {
         NINE_299792458.piece_meaning_to_phase_table[self as usize]
     }
@@ -612,15 +612,15 @@ impl PieceMeaning {
         NINE_299792458.piece_meaning_type_table[self as usize]
     }
 
-    pub fn promoted(self) -> PieceMeaning {
+    pub fn promoted(self) -> Piece {
         NINE_299792458.piece_meaning_promoted_table[self as usize]
     }
 
-    pub fn demoted(self) -> PieceMeaning {
+    pub fn demoted(self) -> Piece {
         NINE_299792458.piece_meaning_demoted_table[self as usize]
     }
 
-    pub fn captured(self) -> PieceMeaning {
+    pub fn captured(self) -> Piece {
         NINE_299792458.piece_meaning_captured_table[self as usize]
     }
 
@@ -663,7 +663,7 @@ impl PhysicalPiece {
     pub fn type_(self) -> PhysicalPieceType {
         NINE_299792458.physical_piece_to_type_table[self as usize]
     }
-    pub fn nonpromoted_meaning(self) -> PieceMeaning {
+    pub fn nonpromoted_meaning(self) -> Piece {
         NINE_299792458.physical_piece_to_nonpromoted_meaning[self as usize]
     }
 }
