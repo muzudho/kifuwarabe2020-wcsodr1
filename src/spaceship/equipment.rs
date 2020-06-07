@@ -3,6 +3,7 @@ use crate::config::*;
 use crate::cosmic::daydream::Value;
 use crate::cosmic::recording::Movement;
 use crate::cosmic::smart::square::test_rotation;
+use crate::cosmic::toy_box::GameTable;
 use crate::law::generate_move::Piece;
 use std::fs::File;
 use std::io::Write;
@@ -210,9 +211,9 @@ pub struct PieceInfo {
     pub num: String,
 }
 impl PieceInfo {
-    pub fn new(piece: &Piece) -> Self {
+    pub fn new(table: &GameTable, piece: &Piece) -> Self {
         PieceInfo {
-            meaning: format!("{}", piece.meaning),
+            meaning: format!("{}", table.get_meaning(*piece)),
             num: format!("{:?}", piece.num),
         }
     }

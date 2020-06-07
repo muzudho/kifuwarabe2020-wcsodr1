@@ -166,7 +166,11 @@ impl Tree {
             // 次は駒を取ったグループの中で、玉を取った手をグループの先頭に集めるぜ☆（＾～＾）
             let mut king = 0;
             for i in 0..cap {
-                match ways.get(i).captured.unwrap().piece.meaning.type_() {
+                match game
+                    .table
+                    .get_meaning(ways.get(i).captured.unwrap().piece)
+                    .type_()
+                {
                     PieceType::King => {
                         // 玉を取った手は、リストの先頭に集めるぜ☆（＾～＾）
                         // TODO .clone()いやなんで、インデックスだけソートした方がいいのか☆（＾～＾）？
@@ -200,7 +204,7 @@ impl Tree {
             self.state_nodes += 1;
             // * `promotion_value` - 評価値用。成ったら加点☆（＾～＾）
             let promotion_value = if move_.promote {
-                game.table.promotion_value_at(&move_.source)
+                game.table.promotion_value_at(&game.table, &move_.source)
             } else {
                 0
             };
@@ -210,7 +214,7 @@ impl Tree {
             game.read_move(&move_);
             let captured_piece = if let Some(captured) = move_.captured {
                 Some(Piece::new(
-                    captured.piece.meaning.captured(),
+                    game.table.get_meaning(captured.piece).captured(),
                     captured.piece.num,
                 ))
             } else {
@@ -218,13 +222,13 @@ impl Tree {
             };
 
             self.pv.push(&move_);
-            let (captured_piece_centi_pawn, delta_promotion_bonus) = self
-                .evaluation
-                .after_do_move(&captured_piece, promotion_value);
+            let (captured_piece_centi_pawn, delta_promotion_bonus) =
+                self.evaluation
+                    .after_do_move(&game.table, &captured_piece, promotion_value);
 
             // TODO 廃止方針☆（＾～＾）
             if let Some(captured_piece_val) = captured_piece {
-                if captured_piece_val.meaning.type_() == PieceType::King {
+                if game.table.get_meaning(captured_piece_val).type_() == PieceType::King {
                     // 玉を取る手より強い手はないぜ☆（＾～＾）！探索終了～☆（＾～＾）！この手を選べだぜ☆（＾～＾）！
                     ts.bestmove.catch_king(move_);
 

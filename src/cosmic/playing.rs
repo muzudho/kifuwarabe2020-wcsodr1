@@ -43,6 +43,12 @@ impl Game {
         self.hash_seed.big_bang();
     }
 
+    /*
+    pub fn get_meaning(&self, piece: Piece) -> PieceMeaning {
+        self.table.get_meaning(piece)
+    }
+    */
+
     /// 棋譜の作成
     pub fn set_move(&mut self, move_: &Movement) {
         self.history.movements[self.history.ply as usize] = *move_; // クローンが入る☆（＾～＾）？
@@ -132,7 +138,10 @@ impl Game {
                 let piece152: Option<Piece> = if move_.promote {
                     if let Some(piece) = self.table.pop_piece(&move_.source) {
                         // 成ったのなら、元のマスの駒を成らすぜ☆（＾～＾）
-                        Some(Piece::new(piece.meaning.promoted(), piece.num))
+                        Some(Piece::new(
+                            self.table.get_meaning(piece).promoted(),
+                            piece.num,
+                        ))
                     } else {
                         panic!(Beam::trouble(
                             "(Err.248) 成ったのに、元の升に駒がなかった☆（＾～＾）"
@@ -155,10 +164,12 @@ impl Game {
         if let Some(collision_piece) = self.table.pop_piece(&move_.destination) {
             // 移動先升の駒を盤上から消し、自分の持ち駒に増やす
             // 先後ひっくり返す。
-            let captured_piece =
-                Piece::new(collision_piece.meaning.captured(), collision_piece.num);
+            let captured_piece = Piece::new(
+                self.table.get_meaning(collision_piece).captured(),
+                collision_piece.num,
+            );
             self.table.push_piece(
-                &AddressPos::Hand(captured_piece.meaning.physical_piece()),
+                &AddressPos::Hand(self.table.get_meaning(captured_piece).physical_piece()),
                 Some(captured_piece),
             );
         }
@@ -187,7 +198,10 @@ impl Game {
                         if move_.promote {
                             // 成ったなら、成る前へ
                             if let Some(source_piece) = self.table.pop_piece(&move_.destination) {
-                                Some(Piece::new(source_piece.meaning.demoted(), source_piece.num))
+                                Some(Piece::new(
+                                    self.table.get_meaning(source_piece).demoted(),
+                                    source_piece.num,
+                                ))
                             } else {
                                 panic!(Beam::trouble(
                                     "(Err.305) 成ったのに移動先に駒が無いぜ☆（＾～＾）！"
@@ -203,7 +217,7 @@ impl Game {
                         let piece = self.table.pop_piece(&move_.destination).unwrap();
                         // 自分の持ち駒を増やそうぜ☆（＾～＾）！
                         self.table.push_piece(
-                            &AddressPos::Hand(piece.meaning.physical_piece()),
+                            &AddressPos::Hand(self.table.get_meaning(piece).physical_piece()),
                             Some(piece),
                         );
                         Some(piece)
@@ -215,7 +229,10 @@ impl Game {
                 if let Some(captured_move_val) = captured_move {
                     // 自分の持ち駒を減らす
                     self.table.pop_piece(&AddressPos::Hand(
-                        captured_move_val.piece.meaning.captured().physical_piece(),
+                        self.table
+                            .get_meaning(captured_move_val.piece)
+                            .captured()
+                            .physical_piece(),
                     ));
                     // 移動先の駒を、取った駒（あるいは空、ということがあるか？）に戻す
                     self.table

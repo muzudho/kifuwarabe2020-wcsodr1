@@ -1,6 +1,7 @@
 //!
 //! １手指して、何点動いたかを評価するぜ☆（＾～＾）
 //!
+use crate::cosmic::toy_box::GameTable;
 use crate::law::generate_move::Piece;
 use crate::law::generate_move::Ways;
 
@@ -62,20 +63,21 @@ impl Evaluation {
     /// * `promotion_value` - 成ったら加点☆（＾～＾）
     pub fn after_do_move(
         &mut self,
+        table: &GameTable,
         captured_piece: &Option<Piece>,
         promotion_value: isize,
     ) -> (isize, isize) {
         // 取った駒の価値を評価するぜ☆（＾～＾）
-        let delta_captured_piece = Evaluation::caputured_piece_value(captured_piece);
+        let delta_captured_piece = Evaluation::caputured_piece_value(table, captured_piece);
         self.piece_allocation_value += delta_captured_piece;
 
         // 成り駒を取って降格させたら、成り駒評価値追加だぜ☆（＾～＾）
         let delta_promotion = if let Some(captured_piece_val) = captured_piece {
-            if captured_piece_val.meaning
+            if table.get_meaning( *captured_piece_val)
                 .type_()
                 .promoted()
             {
-                captured_piece_val.meaning.physical_piece().type_().promotion_value()
+                table.get_meaning(* captured_piece_val).physical_piece().type_().promotion_value()
             } else {
                 0
             }
@@ -102,10 +104,10 @@ impl Evaluation {
     /// Returns
     /// -------
     /// Centi pawn.
-    fn caputured_piece_value(captured_piece: &Option<Piece>) -> isize {
+    fn caputured_piece_value(table: &GameTable, captured_piece: &Option<Piece>) -> isize {
         if let Some(captured_piece_val) = captured_piece {
-            captured_piece_val
-                .meaning
+            table
+                .get_meaning(*captured_piece_val)
                 .physical_piece()
                 .type_()
                 .captured_value()

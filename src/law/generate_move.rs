@@ -158,7 +158,7 @@ impl PseudoLegalMoves {
                 let pseudo_captured = table.piece_at(&destination);
 
                 let (ok, space) = if let Some(pseudo_captured_val) = pseudo_captured {
-                    if pseudo_captured_val.meaning.phase() == friend {
+                    if table.get_meaning(pseudo_captured_val).phase() == friend {
                         // 味方の駒を取った☆（＾～＾）なしだぜ☆（＾～＾）！
                         (false, false)
                     } else {
@@ -234,7 +234,7 @@ impl PseudoLegalMoves {
                 !space
             };
 
-        Area::piece_of(piece.meaning.type_(), friend, &source, moving);
+        Area::piece_of(table.get_meaning(*piece).type_(), friend, &source, moving);
     }
 
     /// 駒台を見ようぜ☆（＾～＾） 駒台の駒の動きを作るぜ☆（＾～＾）
@@ -256,7 +256,7 @@ impl PseudoLegalMoves {
                 if let None = table.piece_at(&destination) {
                     // 駒が無いところに打つ
                     use crate::cosmic::smart::features::PieceMeaning::*;
-                    match piece.meaning {
+                    match table.get_meaning(*piece) {
                         Pawn1 | Pawn2 => {
                             // ひよこ　は２歩できない☆（＾～＾）
                             match destination {
@@ -273,10 +273,10 @@ impl PseudoLegalMoves {
                         _ => {}
                     }
                     listen_move(Movement::new(
-                        AddressPos::Hand(piece.meaning.physical_piece()), // 打った駒種類
-                        destination,                                      // どの升へ行きたいか
-                        false,                                            // 打に成りは無し
-                        None,                                             // 打で取れる駒無し
+                        AddressPos::Hand(table.get_meaning(*piece).physical_piece()), // 打った駒種類
+                        destination, // どの升へ行きたいか
+                        false,       // 打に成りは無し
+                        None,        // 打で取れる駒無し
                     ));
                 }
             };

@@ -221,6 +221,15 @@ impl GameTable {
         self.hands = table.hands.clone();
     }
 
+    /*
+    pub fn get_mut_meaning(&mut self, piece: Piece) -> PieceMeaning {
+        piece.meaning
+    }
+    */
+    pub fn get_meaning(&self, piece: Piece) -> PieceMeaning {
+        piece.meaning
+    }
+
     /// 駒を置く。
     pub fn push_piece(&mut self, addr: &AddressPos, piece: Option<Piece>) {
         match addr {
@@ -318,7 +327,7 @@ impl GameTable {
             AddressPos::Board(sq) => {
                 let piece = self.board[sq.serial_number() as usize];
                 if let Some(piece_val) = piece {
-                    Some(PieceInfo::new(&piece_val))
+                    Some(PieceInfo::new(self, &piece_val))
                 } else {
                     None
                 }
@@ -328,12 +337,16 @@ impl GameTable {
             ))),
         }
     }
-    pub fn promotion_value_at(&self, addr: &AddressPos) -> isize {
+    pub fn promotion_value_at(&self, table: &GameTable, addr: &AddressPos) -> isize {
         match addr {
             AddressPos::Board(sq) => {
                 let piece = self.board[sq.serial_number() as usize];
                 if let Some(piece_val) = piece {
-                    piece_val.meaning.physical_piece().type_().promotion_value()
+                    table
+                        .get_meaning(piece_val)
+                        .physical_piece()
+                        .type_()
+                        .promotion_value()
                 } else {
                     // 打なら成りは無いぜ☆（＾～＾）
                     0
@@ -348,7 +361,7 @@ impl GameTable {
         match addr {
             AddressPos::Board(sq) => {
                 if let Some(piece) = self.board[sq.serial_number() as usize] {
-                    Some(piece.meaning)
+                    Some(self.get_meaning(piece))
                 } else {
                     None
                 }
@@ -398,7 +411,7 @@ impl GameTable {
                 AddressPos::Board(_sq) => {
                     // 盤上の駒☆（＾～＾）
                     let piece = self.piece_at(&addr).unwrap();
-                    if piece.meaning.phase() == friend {
+                    if self.get_meaning(piece).phase() == friend {
                         piece_get(addr, piece);
                     }
                 }

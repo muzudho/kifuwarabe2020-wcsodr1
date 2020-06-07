@@ -404,10 +404,9 @@ pub fn set_position(line: &str, game: &mut Game) {
                         // 駒に背番号を付けるぜ☆（＾～＾）
                         let piece = game.mut_starting().naming_piece(hand_meaning);
                         // 駒台に置くぜ☆（＾～＾）
-                        game.mut_starting().push_piece(
-                            &AddressPos::Hand(piece.meaning.physical_piece()),
-                            Some(piece),
-                        );
+                        let addr =
+                            &AddressPos::Hand(game.table.get_meaning(piece).physical_piece());
+                        game.mut_starting().push_piece(addr, Some(piece));
                     }
                 } //if
             } //loop
