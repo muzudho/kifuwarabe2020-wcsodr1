@@ -138,11 +138,8 @@ impl Game {
                 let piece152: Option<Piece> = if move_.promote {
                     if let Some(piece) = self.table.pop_piece(&move_.source) {
                         // 成ったのなら、元のマスの駒を成らすぜ☆（＾～＾）
-                        Some(Piece::new(
-                            &self.table,
-                            self.table.get_meaning(piece).promoted(),
-                            piece.num,
-                        ))
+                        let meaning = self.table.get_meaning(piece).promoted();
+                        Some(Piece::new(&mut self.table, meaning, piece.num))
                     } else {
                         panic!(Beam::trouble(
                             "(Err.248) 成ったのに、元の升に駒がなかった☆（＾～＾）"
@@ -165,11 +162,8 @@ impl Game {
         if let Some(collision_piece) = self.table.pop_piece(&move_.destination) {
             // 移動先升の駒を盤上から消し、自分の持ち駒に増やす
             // 先後ひっくり返す。
-            let captured_piece = Piece::new(
-                &self.table,
-                self.table.get_meaning(collision_piece).captured(),
-                collision_piece.num,
-            );
+            let meaning = self.table.get_meaning(collision_piece).captured();
+            let captured_piece = Piece::new(&mut self.table, meaning, collision_piece.num);
             self.table.push_piece(
                 &AddressPos::Hand(self.table.get_meaning(captured_piece).physical_piece()),
                 Some(captured_piece),
@@ -200,11 +194,8 @@ impl Game {
                         if move_.promote {
                             // 成ったなら、成る前へ
                             if let Some(source_piece) = self.table.pop_piece(&move_.destination) {
-                                Some(Piece::new(
-                                    &self.table,
-                                    self.table.get_meaning(source_piece).demoted(),
-                                    source_piece.num,
-                                ))
+                                let meaning = self.table.get_meaning(source_piece).demoted();
+                                Some(Piece::new(&mut self.table, meaning, source_piece.num))
                             } else {
                                 panic!(Beam::trouble(
                                     "(Err.305) 成ったのに移動先に駒が無いぜ☆（＾～＾）！"

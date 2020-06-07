@@ -213,11 +213,8 @@ impl Tree {
             game.set_move(&move_);
             game.read_move(&move_);
             let captured_piece = if let Some(captured) = move_.captured {
-                Some(Piece::new(
-                    &game.table,
-                    game.table.get_meaning(captured.piece).captured(),
-                    captured.piece.num,
-                ))
+                let meaning = game.table.get_meaning(captured.piece).captured();
+                Some(Piece::new(&mut game.table, meaning, captured.piece.num))
             } else {
                 None
             };

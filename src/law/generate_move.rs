@@ -31,7 +31,8 @@ impl Default for Piece {
     }
 }
 impl Piece {
-    pub fn new(_table: &GameTable, meaning: PieceMeaning, num: PieceNum) -> Self {
+    pub fn new(table: &mut GameTable, meaning: PieceMeaning, num: PieceNum) -> Self {
+        table.new_piece_list[num as usize] = meaning;
         Piece {
             meaning: meaning,
             num: num,

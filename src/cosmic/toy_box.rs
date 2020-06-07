@@ -111,7 +111,7 @@ pub struct GameTable {
     /// 背番号付きの駒に、番地が紐づいているぜ☆（＾～＾）
     old_address_list: [AddressPos; NAMED_PIECES_LEN],
     /// 駒の背番号に、駒が紐づくぜ☆（＾～＾）
-    new_piece_list: [PieceMeaning; NAMED_PIECES_LEN],
+    pub new_piece_list: [PieceMeaning; NAMED_PIECES_LEN],
     /// 駒の背番号を付けるのに使うぜ☆（＾～＾）
     physical_piece_type_index: [usize; PHYSICAL_PIECE_TYPE_LEN],
     /// 持ち駒☆（＾～＾）TODO 固定長サイズのスタックを用意したいぜ☆（＾～＾）
@@ -277,15 +277,15 @@ impl GameTable {
     pub fn naming_piece(&mut self, piece_meaning: PieceMeaning) -> Piece {
         match piece_meaning {
             // 玉だけ、先後は決まってるから従えだぜ☆（＾～＾）
-            PieceMeaning::King1 => Piece::new(&self, piece_meaning, PieceNum::King1),
-            PieceMeaning::King2 => Piece::new(&self, piece_meaning, PieceNum::King2),
+            PieceMeaning::King1 => Piece::new(self, piece_meaning, PieceNum::King1),
+            PieceMeaning::King2 => Piece::new(self, piece_meaning, PieceNum::King2),
             _ => {
                 let phy_pct = piece_meaning.physical_piece().type_() as usize;
                 // 玉以外の背番号は、先後に関わりなく SFENに書いてあった順で☆（＾～＾）
                 let pn = PieceNum::from_usize(self.physical_piece_type_index[phy_pct]).unwrap();
                 // カウントアップ☆（＾～＾）
                 self.physical_piece_type_index[phy_pct] += 1;
-                Piece::new(&self, piece_meaning, pn)
+                Piece::new(self, piece_meaning, pn)
             }
         }
     }
