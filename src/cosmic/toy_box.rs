@@ -113,7 +113,7 @@ pub struct GameTable {
     /// 駒の背番号を付けるのに使うぜ☆（＾～＾）
     double_faced_piece_type_index: [usize; PHYSICAL_PIECE_TYPE_LEN],
     /// 持ち駒☆（＾～＾）TODO 固定長サイズのスタックを用意したいぜ☆（＾～＾）
-    pub hands: HandStack,
+    hands: HandStack,
 }
 impl Default for GameTable {
     fn default() -> Self {
@@ -397,15 +397,15 @@ impl GameTable {
         self.hands.last(drop)
     }
     /// 指し手生成で使うぜ☆（＾～＾）
-    pub fn last_hand(&self, table: &GameTable, phy: DoubleFacedPiece) -> Option<Piece> {
-        if let Some(old_piece) = self.hands.last(phy) {
+    pub fn last_hand(&self, table: &GameTable, drop: DoubleFacedPiece) -> Option<Piece> {
+        if let Some(old_piece) = self.hands.last(drop) {
             Some(table.get_piece(old_piece))
         } else {
             None
         }
     }
-    pub fn count_hand(&self, phy: DoubleFacedPiece) -> usize {
-        self.hands.len(phy)
+    pub fn count_hand(&self, drop: DoubleFacedPiece) -> usize {
+        self.hands.len(drop)
     }
 
     /// 表示に使うだけ☆（＾～＾）

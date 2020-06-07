@@ -180,8 +180,10 @@ impl Game {
                             // 成ったなら、成る前へ
                             if let Some(source_piece_num) = self.table.pop_piece(&move_.destination)
                             {
-                                let piece = self.table.get_piece(source_piece_num).demoted();
-                                Some(self.table.new_piece_num(piece, source_piece_num))
+                                // let piece = self.table.get_piece(source_piece_num).demoted();
+                                // Some(self.table.new_piece_num(piece, source_piece_num))
+                                self.table.demote(source_piece_num);
+                                Some(source_piece_num)
                             } else {
                                 panic!(Beam::trouble(
                                     "(Err.305) 成ったのに移動先に駒が無いぜ☆（＾～＾）！"
