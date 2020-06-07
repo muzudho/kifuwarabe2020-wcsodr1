@@ -258,27 +258,30 @@ impl GameTable {
 
     /// アンドゥ時の動き。
     /// あれば、指し手で取った駒の先後をひっくり返せば、自分の駒台にある駒を取り出せるので取り出して、盤の上に指し手の取った駒のまま駒を置きます。
-    pub fn rotate_piece_hand_to_board(&mut self, move_: &Movement) {
+    pub fn rotate_piece_hand_to_board(&mut self, friend: Phase, move_: &Movement) {
         if let Some(move2_val) = move_.captured {
             // TODO 元データを反転させたいぜ☆（＾～＾）
             // 棋譜には、取られた方の先後が記録されているぜ☆（＾～＾）
             // 取った方の駒台の先後に合わせるぜ☆（＾～＾）
-            let attacker_meaning = self.get_meaning(&move2_val.piece).captured();
             // 取った方の持ち駒を減らす
             let mut old_piece = self
-                .pop_piece(&AddressPos::Hand(attacker_meaning.physical_piece()))
+                .pop_piece(&AddressPos::Hand(PhysicalPiece::from_phase_and_type(
+                    friend, //.turn(),
+                    move2_val.piece_type.physical_piece_type(),
+                )))
                 .unwrap();
             // 先後をひっくり返す。
             old_piece.turn_phase();
-            if move2_val.piece.old_meaning.type_().promoted() {
+            if move2_val.piece_type.promoted() {
                 // 成り駒にします。
                 old_piece.promote();
             } else {
                 // 成っていない駒にします。
                 old_piece.demote();
             }
+            /*
             if old_piece.old_meaning.phase() != move2_val.piece.old_meaning.phase()
-                || old_piece.old_meaning.type_() != move2_val.piece.old_meaning.type_()
+                || old_piece.old_meaning.type_() != move2_val.piece_type
             {
                 panic!(Beam::trouble(&format!(
                     "(Err.276) 分けわからん☆（＾～＾） old_piece.old_meaning.phase()=|{}| move2_val.piece.old_meaning.phase()=|{}| old_piece.old_meaning.type_()=|{}| move2_val.piece.old_meaning.type_()=|{}|",
@@ -288,9 +291,10 @@ impl GameTable {
                     move2_val.piece.old_meaning.type_(),
                 )))
             }
+            */
             // TODO 指し手に 駒オブジェクト が入っているのは設計上おかしいぜ☆（＾～＾）
-            // TODO let opponent = move2_val.piece.old_meaning.phase();
-            // TODO let piece_type = move2_val.piece.old_meaning.type_();
+            // × let opponent = move2_val.piece.old_meaning.phase();
+            // × let piece_type = move2_val.piece.old_meaning.type_();
             // 取られた方に、駒を返すぜ☆（＾～＾）置くのは指し手の移動先☆（＾～＾）
             // 動いてたやつ: self.push_piece(&move_.destination, Some(move2_val.piece));
             self.push_piece(&move_.destination, Some(old_piece));

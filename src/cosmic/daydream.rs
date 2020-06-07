@@ -166,11 +166,7 @@ impl Tree {
             // 次は駒を取ったグループの中で、玉を取った手をグループの先頭に集めるぜ☆（＾～＾）
             let mut king = 0;
             for i in 0..cap {
-                match game
-                    .table
-                    .get_meaning(&ways.get(i).captured.unwrap().piece)
-                    .type_()
-                {
+                match ways.get(i).captured.unwrap().piece_type {
                     PieceType::King => {
                         // 玉を取った手は、リストの先頭に集めるぜ☆（＾～＾）
                         // TODO .clone()いやなんで、インデックスだけソートした方がいいのか☆（＾～＾）？
@@ -213,7 +209,7 @@ impl Tree {
             game.set_move(&move_);
             game.read_move(&move_);
             let captured_piece_type = if let Some(captured) = move_.captured {
-                Some(game.table.get_meaning(&captured.piece).type_())
+                Some(captured.piece_type)
             } else {
                 None
             };

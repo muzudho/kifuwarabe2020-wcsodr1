@@ -211,7 +211,8 @@ impl Game {
 
                 // 取った駒が有ったか。
                 // あれば、指し手で取った駒の先後をひっくり返せば、自分の駒台にある駒を取り出せるので取り出して、盤の上に指し手の取った駒のまま駒を置きます。
-                self.table.rotate_piece_hand_to_board(&move_);
+                self.table
+                    .rotate_piece_hand_to_board(self.history.get_friend(), &move_);
 
                 if let AddressPos::Board(_src_sq) = move_.source {
                     // 打でなければ、移動元升に、動かした駒を置く☆（＾～＾）打なら何もしないぜ☆（＾～＾）

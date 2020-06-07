@@ -162,86 +162,88 @@ impl PseudoLegalMoves {
     ) where
         F1: FnMut(Movement),
     {
-        let moving =
-            &mut |destination, promotability, _agility, move_permission: Option<MovePermission>| {
-                let pseudo_captured = table.piece_at(&destination);
+        let moving = &mut |destination,
+                           promotability,
+                           _agility,
+                           move_permission: Option<MovePermission>| {
+            let pseudo_captured = table.piece_at(&destination);
 
-                let (ok, space) = if let Some(pseudo_captured_val) = pseudo_captured {
-                    if table.get_meaning(&pseudo_captured_val).phase() == friend {
-                        // 味方の駒を取った☆（＾～＾）なしだぜ☆（＾～＾）！
-                        (false, false)
-                    } else {
-                        (true, false)
-                    }
+            let (ok, space) = if let Some(pseudo_captured_val) = pseudo_captured {
+                if table.get_meaning(&pseudo_captured_val).phase() == friend {
+                    // 味方の駒を取った☆（＾～＾）なしだぜ☆（＾～＾）！
+                    (false, false)
                 } else {
-                    (true, true)
+                    (true, false)
+                }
+            } else {
+                (true, true)
+            };
+
+            if ok {
+                // 成れるかどうかの判定☆（＾ｑ＾）
+                use crate::law::generate_move::Promotability::*;
+                let promotion = match &promotability {
+                    Forced => true,
+                    _ => false,
                 };
 
-                if ok {
-                    // 成れるかどうかの判定☆（＾ｑ＾）
-                    use crate::law::generate_move::Promotability::*;
-                    let promotion = match &promotability {
-                        Forced => true,
-                        _ => false,
-                    };
-
-                    // 成りじゃない場合は、行き先のない動きを制限されるぜ☆（＾～＾）
-                    let forbidden = if let Some(move_permission_val) = move_permission {
-                        if move_permission_val.check(&destination) {
-                            false
-                        } else {
-                            true
-                        }
-                    } else {
+                // 成りじゃない場合は、行き先のない動きを制限されるぜ☆（＾～＾）
+                let forbidden = if let Some(move_permission_val) = move_permission {
+                    if move_permission_val.check(&destination) {
                         false
-                    };
+                    } else {
+                        true
+                    }
+                } else {
+                    false
+                };
 
-                    match &promotability {
-                        Any => {
-                            // 成ったり、成れなかったりできるとき。
-                            if !forbidden {
-                                listen_move(Movement::new(
-                                    *source,
-                                    destination,
-                                    false,
-                                    if let Some(piece) = pseudo_captured {
-                                        Some(CapturedMove::new(&destination, piece))
-                                    } else {
-                                        None
-                                    },
-                                ));
-                            }
+                match &promotability {
+                    Any => {
+                        // 成ったり、成れなかったりできるとき。
+                        if !forbidden {
                             listen_move(Movement::new(
                                 *source,
                                 destination,
-                                true,
+                                false,
                                 if let Some(piece) = pseudo_captured {
-                                    Some(CapturedMove::new(&destination, piece))
+                                    Some(CapturedMove::new(&destination, piece.old_meaning.type_()))
                                 } else {
                                     None
                                 },
                             ));
                         }
-                        _ => {
-                            // 成れるか、成れないかのどちらかのとき。
-                            if promotion || !forbidden {
-                                listen_move(Movement::new(
-                                    *source,
-                                    destination,
-                                    promotion,
-                                    if let Some(piece) = pseudo_captured {
-                                        Some(CapturedMove::new(&destination, piece))
-                                    } else {
-                                        None
-                                    },
-                                ));
-                            }
+                        listen_move(Movement::new(
+                            *source,
+                            destination,
+                            true,
+                            if let Some(piece) = pseudo_captured {
+                                Some(CapturedMove::new(&destination, piece.old_meaning.type_()))
+                            } else {
+                                None
+                            },
+                        ));
+                    }
+                    _ => {
+                        // 成れるか、成れないかのどちらかのとき。
+                        if promotion || !forbidden {
+                            listen_move(Movement::new(
+                                *source,
+                                destination,
+                                promotion,
+                                if let Some(piece) = pseudo_captured {
+                                    Some(CapturedMove::new(&destination, piece.old_meaning.type_()))
+                                } else {
+                                    None
+                                },
+                            ));
                         }
-                    };
-                }
+                    }
+                };
+            }
 
-                !space
-            };
+            !space
+        };
 
         Area::piece_of(table.get_meaning(piece).type_(), friend, &source, moving);
     }

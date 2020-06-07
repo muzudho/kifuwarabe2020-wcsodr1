@@ -5,6 +5,7 @@
 //! * Person (先手,後手)
 //!
 use crate::cosmic::smart::features::PhysicalPiece;
+use crate::cosmic::smart::features::PieceType;
 use crate::cosmic::smart::square::AbsoluteAddress2D;
 use crate::law::cryptographic::num_to_lower_case;
 use crate::law::generate_move::OldPiece;
@@ -105,7 +106,7 @@ impl fmt::Debug for AddressPos {
 #[derive(Clone, Copy)]
 pub struct CapturedMove {
     /// 取ることになる駒
-    pub piece: OldPiece,
+    pub piece_type: PieceType,
     /// 元あった所。
     pub source: AddressPos,
     /*
@@ -115,10 +116,10 @@ pub struct CapturedMove {
 }
 impl CapturedMove {
     // TODO Piece を持ちまわすのは止めたいが……☆（＾～＾）
-    pub fn new(source: &AddressPos, piece: OldPiece) -> Self {
+    pub fn new(source: &AddressPos, piece_type: PieceType) -> Self {
         CapturedMove {
             source: *source,
-            piece: piece,
+            piece_type: piece_type,
         }
     }
 }
@@ -223,7 +224,6 @@ pub enum Phase {
     Second,
 }
 impl Phase {
-    /*
     pub fn turn(self) -> Phase {
         use self::Phase::*;
         match self {
@@ -231,7 +231,6 @@ impl Phase {
             Second => First,
         }
     }
-    */
 }
 /// 後手（上手）を盤の下側に持ってきて表示するのを基本とするぜ☆（＾～＾）
 impl fmt::Display for Phase {

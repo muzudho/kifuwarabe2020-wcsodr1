@@ -161,7 +161,10 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
     // 取られる駒を事前に調べてセットするぜ☆（＾～＾）！
     let captured_piece = game.table.piece_at(&buffer.destination);
     buffer.captured = if let Some(captured_piece_val) = captured_piece {
-        Some(CapturedMove::new(&buffer.destination, captured_piece_val))
+        Some(CapturedMove::new(
+            &buffer.destination,
+            captured_piece_val.old_meaning.type_(),
+        ))
     } else {
         None
     };
