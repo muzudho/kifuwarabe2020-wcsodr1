@@ -16,7 +16,7 @@ use num_traits::FromPrimitive;
 /// 背番号(名前)付きの駒の数。
 pub const NAMED_PIECES_LEN: usize = 40;
 
-/// 駒の背番号（名前）だぜ☆（＾～＾）
+/// 駒の背番号（名前）だぜ☆（＾～＾）大橋流で触る駒の順だぜ☆（＾～＾）
 #[derive(Clone, Copy, FromPrimitive, Debug, PartialEq)]
 pub enum PieceNum {
     // 1 先手玉
@@ -115,7 +115,7 @@ pub struct GameTable {
     /// 駒の背番号を付けるのに使うぜ☆（＾～＾）
     physical_piece_type_index: [usize; PHYSICAL_PIECE_TYPE_LEN],
     /// 持ち駒☆（＾～＾）TODO 固定長サイズのスタックを用意したいぜ☆（＾～＾）
-    pub hands: [HandAddressTypeStack; PHYSICAL_PIECES_LEN],
+    pub hands: [HandStack; PHYSICAL_PIECES_LEN],
 }
 impl Default for GameTable {
     fn default() -> Self {
@@ -147,22 +147,22 @@ impl Default for GameTable {
             ],
             // 持ち駒
             hands: [
-                HandAddressTypeStack::default(),
-                HandAddressTypeStack::default(),
-                HandAddressTypeStack::default(),
-                HandAddressTypeStack::default(),
-                HandAddressTypeStack::default(),
-                HandAddressTypeStack::default(),
-                HandAddressTypeStack::default(),
-                HandAddressTypeStack::default(),
-                HandAddressTypeStack::default(),
-                HandAddressTypeStack::default(),
-                HandAddressTypeStack::default(),
-                HandAddressTypeStack::default(),
-                HandAddressTypeStack::default(),
-                HandAddressTypeStack::default(),
-                HandAddressTypeStack::default(),
-                HandAddressTypeStack::default(),
+                HandStack::default(),
+                HandStack::default(),
+                HandStack::default(),
+                HandStack::default(),
+                HandStack::default(),
+                HandStack::default(),
+                HandStack::default(),
+                HandStack::default(),
+                HandStack::default(),
+                HandStack::default(),
+                HandStack::default(),
+                HandStack::default(),
+                HandStack::default(),
+                HandStack::default(),
+                HandStack::default(),
+                HandStack::default(),
             ],
         }
     }
@@ -195,22 +195,22 @@ impl GameTable {
         ];
         // 持ち駒☆（＾～＾）
         self.hands = [
-            HandAddressTypeStack::default(),
-            HandAddressTypeStack::default(),
-            HandAddressTypeStack::default(),
-            HandAddressTypeStack::default(),
-            HandAddressTypeStack::default(),
-            HandAddressTypeStack::default(),
-            HandAddressTypeStack::default(),
-            HandAddressTypeStack::default(),
-            HandAddressTypeStack::default(),
-            HandAddressTypeStack::default(),
-            HandAddressTypeStack::default(),
-            HandAddressTypeStack::default(),
-            HandAddressTypeStack::default(),
-            HandAddressTypeStack::default(),
-            HandAddressTypeStack::default(),
-            HandAddressTypeStack::default(),
+            HandStack::default(),
+            HandStack::default(),
+            HandStack::default(),
+            HandStack::default(),
+            HandStack::default(),
+            HandStack::default(),
+            HandStack::default(),
+            HandStack::default(),
+            HandStack::default(),
+            HandStack::default(),
+            HandStack::default(),
+            HandStack::default(),
+            HandStack::default(),
+            HandStack::default(),
+            HandStack::default(),
+            HandStack::default(),
         ];
     }
 
@@ -464,21 +464,157 @@ impl GameTable {
     }
 }
 
+/// 駒台だぜ☆（＾～＾）
 #[derive(Clone)]
-pub struct HandAddressTypeStack {
+pub struct HandUniverse {
+    king: Hand2Piece,
+    gold: Hand4Piece,
+    silver: Hand4Piece,
+    knight: Hand4Piece,
+    lance: Hand4Piece,
+    rook: Hand2Piece,
+    bishop: Hand2Piece,
+    pawn: Hand18Piece,
+}
+impl Default for HandUniverse {
+    /// ゴミ値だぜ☆（＾～＾）
+    fn default() -> Self {
+        HandUniverse {
+            king: Hand2Piece::default(),
+            gold: Hand4Piece::default(),
+            silver: Hand4Piece::default(),
+            knight: Hand4Piece::default(),
+            lance: Hand4Piece::default(),
+            rook: Hand2Piece::default(),
+            bishop: Hand2Piece::default(),
+            pawn: Hand18Piece::default(),
+        }
+    }
+}
+#[derive(Clone)]
+pub struct Hand2Piece {
+    items: [PieceNum; 2],
+    head: usize,
+    tail: usize,
+}
+impl Default for Hand2Piece {
+    /// ゴミ値だぜ☆（＾～＾）
+    fn default() -> Self {
+        Hand2Piece {
+            items: [PieceNum::Rook21; 2],
+            head: 0,
+            tail: 1,
+        }
+    }
+}
+impl Hand2Piece {
+    pub fn push_head(&mut self, num: PieceNum) {
+        self.items[self.head] = num;
+        self.head += 1;
+    }
+    pub fn push_tail(&mut self, num: PieceNum) {
+        self.items[self.tail] = num;
+        self.head -= 1;
+    }
+    pub fn pop_head(&mut self) -> PieceNum {
+        let num = self.items[self.head];
+        self.head -= 1;
+        num
+    }
+    pub fn pop_tail(&mut self) -> PieceNum {
+        let num = self.items[self.tail];
+        self.tail += 1;
+        num
+    }
+}
+#[derive(Clone)]
+pub struct Hand4Piece {
+    items: [PieceNum; 4],
+    head: usize,
+    tail: usize,
+}
+impl Default for Hand4Piece {
+    /// ゴミ値だぜ☆（＾～＾）
+    fn default() -> Self {
+        Hand4Piece {
+            items: [PieceNum::Gold3; 4],
+            head: 0,
+            tail: 3,
+        }
+    }
+}
+impl Hand4Piece {
+    pub fn push_head(&mut self, num: PieceNum) {
+        self.items[self.head] = num;
+        self.head += 1;
+    }
+    pub fn push_tail(&mut self, num: PieceNum) {
+        self.items[self.tail] = num;
+        self.head -= 1;
+    }
+    pub fn pop_head(&mut self) -> PieceNum {
+        let num = self.items[self.head];
+        self.head -= 1;
+        num
+    }
+    pub fn pop_tail(&mut self) -> PieceNum {
+        let num = self.items[self.tail];
+        self.tail += 1;
+        num
+    }
+}
+#[derive(Clone)]
+pub struct Hand18Piece {
+    items: [PieceNum; 18],
+    head: usize,
+    tail: usize,
+}
+impl Default for Hand18Piece {
+    /// ゴミ値だぜ☆（＾～＾）
+    fn default() -> Self {
+        Hand18Piece {
+            items: [PieceNum::Pawn23; 18],
+            head: 0,
+            tail: 17,
+        }
+    }
+}
+impl Hand18Piece {
+    pub fn push_head(&mut self, num: PieceNum) {
+        self.items[self.head] = num;
+        self.head += 1;
+    }
+    pub fn push_tail(&mut self, num: PieceNum) {
+        self.items[self.tail] = num;
+        self.head -= 1;
+    }
+    pub fn pop_head(&mut self) -> PieceNum {
+        let num = self.items[self.head];
+        self.head -= 1;
+        num
+    }
+    pub fn pop_tail(&mut self) -> PieceNum {
+        let num = self.items[self.tail];
+        self.tail += 1;
+        num
+    }
+}
+
+#[derive(Clone)]
+pub struct HandStack {
     items: [OldPiece; HAND_MAX],
     count: usize,
 }
-impl Default for HandAddressTypeStack {
+impl Default for HandStack {
     fn default() -> Self {
-        HandAddressTypeStack {
+        HandStack {
             // ゴミ値で埋めるぜ☆（＾～＾）
             items: [OldPiece::default(); HAND_MAX],
             count: 0,
         }
     }
 }
-impl HandAddressTypeStack {
+impl HandStack {
     fn push(&mut self, piece: &OldPiece) {
         self.items[self.count] = *piece;
         self.count += 1;
