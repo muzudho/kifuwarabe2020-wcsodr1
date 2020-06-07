@@ -159,11 +159,11 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
     }
 
     // 取られる駒を事前に調べてセットするぜ☆（＾～＾）！
-    let captured_piece = game.table.piece_at(&buffer.destination);
-    buffer.captured = if let Some(captured_piece_val) = captured_piece {
+    let captured_piece_num = game.table.piece_at(&buffer.destination);
+    buffer.captured = if let Some(captured_piece_num_val) = captured_piece_num {
         Some(CapturedMove::new(
             &buffer.destination,
-            captured_piece_val.old_meaning.type_(),
+            game.table.get_meaning(captured_piece_num_val).type_(),
         ))
     } else {
         None
@@ -405,11 +405,11 @@ pub fn set_position(line: &str, game: &mut Game) {
 
                     for _i in 0..hand_num {
                         // 駒に背番号を付けるぜ☆（＾～＾）
-                        let piece = game.mut_starting().naming_piece(hand_meaning);
+                        let piece_num = game.mut_starting().naming_piece(hand_meaning);
                         // 駒台に置くぜ☆（＾～＾）
                         let addr =
-                            &AddressPos::Hand(game.table.get_meaning(&piece).physical_piece());
-                        game.mut_starting().push_piece(addr, Some(piece));
+                            &AddressPos::Hand(game.table.get_meaning(piece_num).physical_piece());
+                        game.mut_starting().push_piece(addr, Some(piece_num));
                     }
                 } //if
             } //loop

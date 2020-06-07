@@ -8,7 +8,6 @@ use crate::cosmic::smart::features::PhysicalPiece;
 use crate::cosmic::smart::features::PieceType;
 use crate::cosmic::smart::square::AbsoluteAddress2D;
 use crate::law::cryptographic::num_to_lower_case;
-use crate::law::generate_move::OldPiece;
 use std::fmt;
 
 /// 手数☆（＾～＾） 大会ルールとは別で、このプログラムが対応できる上限値☆（＾～＾）
@@ -223,6 +222,7 @@ pub enum Phase {
     First,
     Second,
 }
+/*
 impl Phase {
     pub fn turn(self) -> Phase {
         use self::Phase::*;
@@ -232,6 +232,7 @@ impl Phase {
         }
     }
 }
+*/
 /// 後手（上手）を盤の下側に持ってきて表示するのを基本とするぜ☆（＾～＾）
 impl fmt::Display for Phase {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

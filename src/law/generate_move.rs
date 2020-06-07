@@ -3,7 +3,7 @@
 //!
 
 use crate::cosmic::recording::{AddressPos, CapturedMove, Movement, Phase};
-use crate::cosmic::smart::features::{PhysicalPiece, PieceMeaning, PieceType};
+use crate::cosmic::smart::features::{PhysicalPiece, PieceType};
 use crate::cosmic::smart::square::{
     AbsoluteAddress2D, Angle, RelAdr2D, FILE_1, FILE_10, RANK_1, RANK_10, RANK_2, RANK_3, RANK_4,
     RANK_6, RANK_7, RANK_8, RANK_9,
@@ -12,37 +12,6 @@ use crate::cosmic::toy_box::GameTable;
 use crate::cosmic::toy_box::PieceNum;
 use crate::spaceship::equipment::Beam;
 use std::fmt;
-
-/// TODO これ、廃止して中の num を直接使えばいいんじゃないのか☆（＾～＾）？
-#[derive(Clone, Copy, PartialEq)]
-pub struct OldPiece {
-    /// Stockfish系コンピューター将棋ソフトが言う Piece は、きふわらべでは PieceMeaning に名前を変えているぜ☆（＾～＾）
-    pub old_meaning: PieceMeaning,
-    /// 将棋の駒の背番号だぜ☆（＾～＾）
-    pub num: PieceNum,
-}
-impl Default for OldPiece {
-    /// これはゴミ値だぜ☆（＾～＾）上書きして消せだぜ☆（＾～＾）
-    fn default() -> Self {
-        OldPiece {
-            old_meaning: PieceMeaning::King1,
-            num: PieceNum::King1,
-        }
-    }
-}
-impl OldPiece {
-    pub fn turn_phase(&mut self) {
-        self.old_meaning = self.old_meaning.captured();
-    }
-    // 成り駒にします。
-    pub fn promote(&mut self) {
-        self.old_meaning = self.old_meaning.promoted();
-    }
-    // 成っていない駒にします。
-    pub fn demote(&mut self) {
-        self.old_meaning = self.old_meaning.demoted();
-    }
-}
 
 /// ソートを高速にするためのものだぜ☆（＾～＾）
 pub struct Ways {
@@ -128,9 +97,9 @@ impl PseudoLegalMoves {
     where
         F1: FnMut(Movement),
     {
-        table.for_some_pieces_on_list40(friend, &mut |addr, piece| match addr {
+        table.for_some_pieces_on_list40(friend, &mut |addr, piece_num| match addr {
             AddressPos::Board(_src_sq) => {
-                PseudoLegalMoves::start_on_board(friend, &addr, &piece, table, listen_move)
+                PseudoLegalMoves::start_on_board(friend, &addr, piece_num, table, listen_move)
             }
             AddressPos::Hand(drop) => {
                 PseudoLegalMoves::make_drop(friend, drop, table, listen_move);
@@ -156,96 +125,108 @@ impl PseudoLegalMoves {
     fn start_on_board<F1>(
         friend: Phase,
         source: &AddressPos,
-        piece: &OldPiece,
+        piece_num: PieceNum,
         table: &GameTable,
         listen_move: &mut F1,
     ) where
         F1: FnMut(Movement),
     {
-        let moving = &mut |destination,
-                           promotability,
-                           _agility,
-                           move_permission: Option<MovePermission>| {
-            let pseudo_captured = table.piece_at(&destination);
+        let moving =
+            &mut |destination, promotability, _agility, move_permission: Option<MovePermission>| {
+                let pseudo_captured_num = table.piece_at(&destination);
 
-            let (ok, space) = if let Some(pseudo_captured_val) = pseudo_captured {
-                if table.get_meaning(&pseudo_captured_val).phase() == friend {
-                    // 味方の駒を取った☆（＾～＾）なしだぜ☆（＾～＾）！
-                    (false, false)
+                let (ok, space) = if let Some(pseudo_captured_num_val) = pseudo_captured_num {
+                    if table.get_meaning(pseudo_captured_num_val).phase() == friend {
+                        // 味方の駒を取った☆（＾～＾）なしだぜ☆（＾～＾）！
+                        (false, false)
+                    } else {
+                        (true, false)
+                    }
                 } else {
-                    (true, false)
+                    (true, true)
+                };
+
+                if ok {
+                    // 成れるかどうかの判定☆（＾ｑ＾）
+                    use crate::law::generate_move::Promotability::*;
+                    let promotion = match &promotability {
+                        Forced => true,
+                        _ => false,
+                    };
+
+                    // 成りじゃない場合は、行き先のない動きを制限されるぜ☆（＾～＾）
+                    let forbidden = if let Some(move_permission_val) = move_permission {
+                        if move_permission_val.check(&destination) {
+                            false
+                        } else {
+                            true
+                        }
+                    } else {
+                        false
+                    };
+
+                    match &promotability {
+                        Any => {
+                            // 成ったり、成れなかったりできるとき。
+                            if !forbidden {
+                                listen_move(Movement::new(
+                                    *source,
+                                    destination,
+                                    false,
+                                    if let Some(piece_num_val) = pseudo_captured_num {
+                                        Some(CapturedMove::new(
+                                            &destination,
+                                            table.get_meaning(piece_num_val).type_(),
+                                        ))
+                                    } else {
+                                        None
+                                    },
+                                ));
+                            }
+                            listen_move(Movement::new(
+                                *source,
+                                destination,
+                                true,
+                                if let Some(piece_num_val) = pseudo_captured_num {
+                                    Some(CapturedMove::new(
+                                        &destination,
+                                        table.get_meaning(piece_num_val).type_(),
+                                    ))
+                                } else {
+                                    None
+                                },
+                            ));
+                        }
+                        _ => {
+                            // 成れるか、成れないかのどちらかのとき。
+                            if promotion || !forbidden {
+                                listen_move(Movement::new(
+                                    *source,
+                                    destination,
+                                    promotion,
+                                    if let Some(piece_num_val) = pseudo_captured_num {
+                                        Some(CapturedMove::new(
+                                            &destination,
+                                            table.get_meaning(piece_num_val).type_(),
+                                        ))
+                                    } else {
+                                        None
+                                    },
+                                ));
+                            }
+                        }
+                    };
                 }
-            } else {
-                (true, true)
+
+                !space
             };
 
-            if ok {
-                // 成れるかどうかの判定☆（＾ｑ＾）
-                use crate::law::generate_move::Promotability::*;
-                let promotion = match &promotability {
-                    Forced => true,
-                    _ => false,
-                };
-
-                // 成りじゃない場合は、行き先のない動きを制限されるぜ☆（＾～＾）
-                let forbidden = if let Some(move_permission_val) = move_permission {
-                    if move_permission_val.check(&destination) {
-                        false
-                    } else {
-                        true
-                    }
-                } else {
-                    false
-                };
-
-                match &promotability {
-                    Any => {
-                        // 成ったり、成れなかったりできるとき。
-                        if !forbidden {
-                            listen_move(Movement::new(
-                                *source,
-                                destination,
-                                false,
-                                if let Some(piece) = pseudo_captured {
-                                    Some(CapturedMove::new(&destination, piece.old_meaning.type_()))
-                                } else {
-                                    None
-                                },
-                            ));
-                        }
-                        listen_move(Movement::new(
-                            *source,
-                            destination,
-                            true,
-                            if let Some(piece) = pseudo_captured {
-                                Some(CapturedMove::new(&destination, piece.old_meaning.type_()))
-                            } else {
-                                None
-                            },
-                        ));
-                    }
-                    _ => {
-                        // 成れるか、成れないかのどちらかのとき。
-                        if promotion || !forbidden {
-                            listen_move(Movement::new(
-                                *source,
-                                destination,
-                                promotion,
-                                if let Some(piece) = pseudo_captured {
-                                    Some(CapturedMove::new(&destination, piece.old_meaning.type_()))
-                                } else {
-                                    None
-                                },
-                            ));
-                        }
-                    }
-                };
-            }
-
-            !space
-        };
-
-        Area::piece_of(table.get_meaning(piece).type_(), friend, &source, moving);
+        Area::piece_of(
+            table.get_meaning(piece_num).type_(),
+            friend,
+            &source,
+            moving,
+        );
     }
 
     /// 駒台を見ようぜ☆（＾～＾） 駒台の駒の動きを作るぜ☆（＾～＾）
