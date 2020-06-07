@@ -59,6 +59,7 @@ struct SpeedOfLight {
     /// 駒種類☆（＾～＾）
     piece_type_to_promoted_table: [bool; PIECE_TYPE_LEN],
     piece_type_to_mobility_table: [Vec<Mobility>; PIECE_TYPE_LEN],
+    piece_type_to_physical_piece_type: [PhysicalPieceType; PIECE_TYPE_LEN],
     /// 持ち駒☆（＾～＾）
     /// 玉２枚引く☆（＾～＾）
     physical_pieces_legal_all: [PhysicalPiece; PHYSICAL_PIECES_LEN - 2],
@@ -428,6 +429,22 @@ impl Default for SpeedOfLight {
                     Mobility::new(Angle::Ccw225, Agility::Hopping),
                 ], // PromotedPawn
             ],
+            piece_type_to_physical_piece_type: [
+                PhysicalPieceType::King,   // King
+                PhysicalPieceType::Rook,   // Rook
+                PhysicalPieceType::Bishop, // Bishop
+                PhysicalPieceType::Gold,   // Gold
+                PhysicalPieceType::Silver, // Silver
+                PhysicalPieceType::Knight, // Knight
+                PhysicalPieceType::Lance,  // Lance
+                PhysicalPieceType::Pawn,   // Pawn
+                PhysicalPieceType::Rook,   // Dragon
+                PhysicalPieceType::Bishop, // Horse
+                PhysicalPieceType::Silver, // PromotedSilver
+                PhysicalPieceType::Knight, // PromotedKnight
+                PhysicalPieceType::Lance,  // PromotedLance
+                PhysicalPieceType::Pawn,   // PromotedPawn
+            ],
             // 持ち駒☆（＾～＾）
             physical_pieces_legal_all: [
                 PhysicalPiece::Rook1,
@@ -619,6 +636,9 @@ impl PieceType {
     }
     pub fn mobility(self) -> &'static Vec<Mobility> {
         &NINE_299792458.piece_type_to_mobility_table[self as usize]
+    }
+    pub fn physical_piece_type(self) -> PhysicalPieceType {
+        NINE_299792458.piece_type_to_physical_piece_type[self as usize]
     }
 }
 
