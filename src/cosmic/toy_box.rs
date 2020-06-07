@@ -223,7 +223,7 @@ impl GameTable {
         self.hands = table.hands.clone();
     }
 
-    pub fn get_meaning(&self, piece: OldPiece) -> PieceMeaning {
+    pub fn get_meaning(&self, piece: &OldPiece) -> PieceMeaning {
         piece.old_meaning
         // self.new_piece_list[piece.num as usize]
     }
@@ -332,7 +332,7 @@ impl GameTable {
             AddressPos::Board(sq) => {
                 let piece = self.board[sq.serial_number() as usize];
                 if let Some(piece_val) = piece {
-                    Some(PieceInfo::new(self, &piece_val))
+                    Some(PieceInfo::new(self.get_meaning(&piece_val), piece_val.num))
                 } else {
                     None
                 }
@@ -348,7 +348,7 @@ impl GameTable {
                 let piece = self.board[sq.serial_number() as usize];
                 if let Some(piece_val) = piece {
                     table
-                        .get_meaning(piece_val)
+                        .get_meaning(&piece_val)
                         .physical_piece()
                         .type_()
                         .promotion_value()
@@ -366,7 +366,7 @@ impl GameTable {
         match addr {
             AddressPos::Board(sq) => {
                 if let Some(piece) = self.board[sq.serial_number() as usize] {
-                    Some(self.get_meaning(piece))
+                    Some(self.get_meaning(&piece))
                 } else {
                     None
                 }
@@ -416,7 +416,7 @@ impl GameTable {
                 AddressPos::Board(_sq) => {
                     // 盤上の駒☆（＾～＾）
                     let piece = self.piece_at(&addr).unwrap();
-                    if self.get_meaning(piece).phase() == friend {
+                    if self.get_meaning(&piece).phase() == friend {
                         piece_get(addr, piece);
                     }
                 }

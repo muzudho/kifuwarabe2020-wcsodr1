@@ -2,9 +2,9 @@
 use crate::config::*;
 use crate::cosmic::daydream::Value;
 use crate::cosmic::recording::Movement;
+use crate::cosmic::smart::features::PieceMeaning;
 use crate::cosmic::smart::square::test_rotation;
-use crate::cosmic::toy_box::GameTable;
-use crate::law::generate_move::OldPiece;
+use crate::cosmic::toy_box::PieceNum;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
@@ -211,10 +211,10 @@ pub struct PieceInfo {
     pub num: String,
 }
 impl PieceInfo {
-    pub fn new(table: &GameTable, piece: &OldPiece) -> Self {
+    pub fn new(meaning: PieceMeaning, num: PieceNum) -> Self {
         PieceInfo {
-            meaning: format!("{}", table.get_meaning(*piece)),
-            num: format!("{:?}", piece.num),
+            meaning: format!("{}", meaning),
+            num: format!("{:?}", num),
         }
     }
 }

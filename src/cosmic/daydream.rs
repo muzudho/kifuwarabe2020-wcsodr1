@@ -168,7 +168,7 @@ impl Tree {
             for i in 0..cap {
                 match game
                     .table
-                    .get_meaning(ways.get(i).captured.unwrap().piece)
+                    .get_meaning(&ways.get(i).captured.unwrap().piece)
                     .type_()
                 {
                     PieceType::King => {
@@ -213,7 +213,7 @@ impl Tree {
             game.set_move(&move_);
             game.read_move(&move_);
             let captured_meaning = if let Some(captured) = move_.captured {
-                Some(game.table.get_meaning(captured.piece).captured())
+                Some(game.table.get_meaning(&captured.piece).captured())
             } else {
                 None
             };

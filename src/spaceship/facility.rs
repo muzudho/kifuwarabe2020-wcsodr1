@@ -206,7 +206,7 @@ impl Kitchen {
                 "{}{}",
                 format!("{}", move_),
                 if let Some(captured_move) = move_.captured {
-                    format!(" ({})", table.get_meaning(captured_move.piece))
+                    format!(" ({})", table.get_meaning(&captured_move.piece))
                 } else {
                     "".to_string()
                 }

@@ -405,7 +405,7 @@ pub fn set_position(line: &str, game: &mut Game) {
                         let piece = game.mut_starting().naming_piece(hand_meaning);
                         // 駒台に置くぜ☆（＾～＾）
                         let addr =
-                            &AddressPos::Hand(game.table.get_meaning(piece).physical_piece());
+                            &AddressPos::Hand(game.table.get_meaning(&piece).physical_piece());
                         game.mut_starting().push_piece(addr, Some(piece));
                     }
                 } //if

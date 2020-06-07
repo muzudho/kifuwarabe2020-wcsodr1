@@ -138,7 +138,7 @@ impl Game {
                 let piece152: Option<OldPiece> = if move_.promote {
                     if let Some(piece) = self.table.pop_piece(&move_.source) {
                         // 成ったのなら、元のマスの駒を成らすぜ☆（＾～＾）
-                        let meaning = self.table.get_meaning(piece).promoted();
+                        let meaning = self.table.get_meaning(&piece).promoted();
                         Some(self.table.new_piece(meaning, piece.num))
                     } else {
                         panic!(Beam::trouble(
@@ -162,10 +162,10 @@ impl Game {
         if let Some(collision_piece) = self.table.pop_piece(&move_.destination) {
             // 移動先升の駒を盤上から消し、自分の持ち駒に増やす
             // 先後ひっくり返す。
-            let meaning = self.table.get_meaning(collision_piece).captured();
+            let meaning = self.table.get_meaning(&collision_piece).captured();
             let captured_piece = self.table.new_piece(meaning, collision_piece.num);
             self.table.push_piece(
-                &AddressPos::Hand(self.table.get_meaning(captured_piece).physical_piece()),
+                &AddressPos::Hand(self.table.get_meaning(&captured_piece).physical_piece()),
                 Some(captured_piece),
             );
         }
@@ -194,7 +194,7 @@ impl Game {
                         if move_.promote {
                             // 成ったなら、成る前へ
                             if let Some(source_piece) = self.table.pop_piece(&move_.destination) {
-                                let meaning = self.table.get_meaning(source_piece).demoted();
+                                let meaning = self.table.get_meaning(&source_piece).demoted();
                                 Some(self.table.new_piece(meaning, source_piece.num))
                             } else {
                                 panic!(Beam::trouble(
@@ -211,7 +211,7 @@ impl Game {
                         let piece = self.table.pop_piece(&move_.destination).unwrap();
                         // 自分の持ち駒を増やそうぜ☆（＾～＾）！
                         self.table.push_piece(
-                            &AddressPos::Hand(self.table.get_meaning(piece).physical_piece()),
+                            &AddressPos::Hand(self.table.get_meaning(&piece).physical_piece()),
                             Some(piece),
                         );
                         Some(piece)
@@ -224,7 +224,7 @@ impl Game {
                     // 自分の持ち駒を減らす
                     self.table.pop_piece(&AddressPos::Hand(
                         self.table
-                            .get_meaning(captured_move_val.piece)
+                            .get_meaning(&captured_move_val.piece)
                             .captured()
                             .physical_piece(),
                     ));
