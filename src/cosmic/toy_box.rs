@@ -116,7 +116,7 @@ pub struct GameTable {
     /// 駒の背番号を付けるのに使うぜ☆（＾～＾）
     physical_piece_type_index: [usize; PHYSICAL_PIECE_TYPE_LEN],
     /// 持ち駒☆（＾～＾）TODO 固定長サイズのスタックを用意したいぜ☆（＾～＾）
-    pub hands: OldHandStack,
+    pub hands: NewHandStack,
 }
 impl Default for GameTable {
     fn default() -> Self {
@@ -147,7 +147,7 @@ impl Default for GameTable {
                 PieceNum::Pawn23 as usize,
             ],
             // 持ち駒
-            hands: OldHandStack::default(),
+            hands: NewHandStack::default(),
         }
     }
 }
@@ -178,7 +178,7 @@ impl GameTable {
             PieceNum::Pawn23 as usize,
         ];
         // 持ち駒☆（＾～＾）
-        self.hands = OldHandStack::default();
+        self.hands = NewHandStack::default();
     }
 
     /// 開始盤面を、現盤面にコピーしたいときに使うぜ☆（＾～＾）
@@ -618,8 +618,9 @@ impl Default for NewHandStack {
 }
 impl NewHandStack {
     /// ひっくり返してから入れてください。
-    fn push(&mut self, old_piece: &OldPiece) {
-        match (*old_piece).old_meaning.physical_piece() {
+    fn push(&mut self, drop: PhysicalPiece, old_piece: &OldPiece) {
+        match drop {
+            // (*old_piece).old_meaning.physical_piece()
             PhysicalPiece::King1 => {
                 self.king.push_head(*old_piece);
             }
@@ -672,8 +673,8 @@ impl NewHandStack {
     }
 
     /// ゴミ値は消さないぜ☆（＾～＾）
-    fn pop(&mut self, phy: PhysicalPiece) -> OldPiece {
-        match phy {
+    fn pop(&mut self, drop: PhysicalPiece) -> OldPiece {
+        match drop {
             PhysicalPiece::King1 => self.king.pop_head(),
             PhysicalPiece::King2 => self.king.pop_tail(),
             PhysicalPiece::Gold1 => self.gold.pop_head(),
@@ -693,8 +694,8 @@ impl NewHandStack {
         }
     }
 
-    fn last(&self, phy: PhysicalPiece) -> Option<&OldPiece> {
-        match phy {
+    fn last(&self, drop: PhysicalPiece) -> Option<&OldPiece> {
+        match drop {
             PhysicalPiece::King1 => self.king.last_head(),
             PhysicalPiece::King2 => self.king.last_tail(),
             PhysicalPiece::Gold1 => self.gold.last_head(),
@@ -714,8 +715,8 @@ impl NewHandStack {
         }
     }
 
-    fn len(&self, phy: PhysicalPiece) -> usize {
-        match phy {
+    fn len(&self, drop: PhysicalPiece) -> usize {
+        match drop {
             PhysicalPiece::King1 => self.king.len_head(),
             PhysicalPiece::King2 => self.king.len_tail(),
             PhysicalPiece::Gold1 => self.gold.len_head(),
@@ -775,13 +776,13 @@ impl Hand2Piece {
         self.tail -= 1;
     }
     pub fn pop_head(&mut self) -> OldPiece {
-        let num = self.items[self.head];
         self.head -= 1;
+        let num = self.items[self.head];
         num
     }
     pub fn pop_tail(&mut self) -> OldPiece {
-        let num = self.items[self.tail];
         self.tail += 1;
+        let num = self.items[self.tail];
         num
     }
     pub fn last_head(&self) -> Option<&OldPiece> {
@@ -831,13 +832,13 @@ impl Hand4Piece {
         self.tail -= 1;
     }
     pub fn pop_head(&mut self) -> OldPiece {
-        let num = self.items[self.head];
         self.head -= 1;
+        let num = self.items[self.head];
         num
     }
     pub fn pop_tail(&mut self) -> OldPiece {
-        let num = self.items[self.tail];
         self.tail += 1;
+        let num = self.items[self.tail];
         num
     }
     pub fn last_head(&self) -> Option<&OldPiece> {
@@ -887,13 +888,13 @@ impl Hand18Piece {
         self.tail -= 1;
     }
     pub fn pop_head(&mut self) -> OldPiece {
-        let num = self.items[self.head];
         self.head -= 1;
+        let num = self.items[self.head];
         num
     }
     pub fn pop_tail(&mut self) -> OldPiece {
-        let num = self.items[self.tail];
         self.tail += 1;
+        let num = self.items[self.tail];
         num
     }
     pub fn last_head(&self) -> Option<&OldPiece> {
