@@ -264,10 +264,11 @@ impl GameTable {
                     self.board[sq.serial_number() as usize] = None;
                 }
             }
-            AddressPos::Hand(drop) => {
+            AddressPos::Hand(_old_drop) => {
                 if let Some(piece_num_val) = piece_num {
                     // 持ち駒を１つ増やします。
-                    self.hands.push(*drop, piece_num_val);
+                    let new_drop = self.get_meaning(piece_num_val).physical_piece();
+                    self.hands.push(new_drop /* *drop*/, piece_num_val);
                     // 背番号に番地を紐づけます。
                     self.address_list[piece_num_val as usize] = *addr;
                 }
@@ -514,7 +515,6 @@ impl NewHandStack {
     /// ひっくり返してから入れてください。
     fn push(&mut self, drop: PhysicalPiece, num: PieceNum) {
         match drop {
-            // (*old_piece).old_meaning.physical_piece()
             PhysicalPiece::King1 => {
                 self.king.push_head(num);
             }
