@@ -1,6 +1,8 @@
 //!
 //! 駒 と 盤
 //!
+use crate::cosmic::recording::CapturedMove;
+use crate::cosmic::recording::Movement;
 use crate::cosmic::recording::{AddressPos, Phase};
 use crate::cosmic::smart::features::{
     PhysicalPiece, PieceMeaning, PieceType, HAND_MAX, PHYSICAL_PIECES_LEN, PHYSICAL_PIECE_TYPE_LEN,
@@ -235,6 +237,36 @@ impl GameTable {
         }
     }
 
+    /// あれば、指し手で取った駒の先後をひっくり返せば、自分の駒台にある駒を取り出せるので取り出して、盤の上に指し手の取った駒のまま駒を置きます。
+    pub fn rotate_piece_hand_to_board(&mut self, move_: &Movement) {
+        let captured_move: Option<CapturedMove> = move_.captured;
+        if let Some(captured_move_val) = captured_move {
+            // TODO 元データを反転させたいぜ☆（＾～＾）
+            let captured_piece = self.get_meaning(&captured_move_val.piece).captured();
+            // 自分の持ち駒を減らす
+            self.pop_piece(&AddressPos::Hand(captured_piece.physical_piece()));
+            // 移動先の駒を、取った駒（あるいは空、ということがあるか？）に戻す
+            self.push_piece(&move_.destination, Some(captured_move_val.piece));
+        }
+    }
+
+    /// 駒の先後を反転させるぜ☆（＾～＾）
+    // あれば　盤の相手の駒を先後反転して、自分の駒台に置きます。
+    pub fn rotate_piece_board_to_hand(&mut self, move_: &Movement) {
+        if let Some(collision_piece) = self.pop_piece(&move_.destination) {
+            // 移動先升の駒を盤上から消し、自分の持ち駒に増やす
+            // 先後ひっくり返す。
+            // TODO 元データを反転させたいぜ☆（＾～＾）
+            let captured_piece = self.new_piece(
+                self.get_meaning(&collision_piece).captured(),
+                collision_piece.num,
+            );
+            self.push_piece(
+                &AddressPos::Hand(self.get_meaning(&captured_piece).physical_piece()),
+                Some(captured_piece),
+            );
+        }
+    }
     /// 駒を置く。
     pub fn push_piece(&mut self, addr: &AddressPos, piece: Option<OldPiece>) {
         match addr {

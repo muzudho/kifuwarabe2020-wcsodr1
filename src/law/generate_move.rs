@@ -30,6 +30,11 @@ impl Default for OldPiece {
         }
     }
 }
+impl OldPiece {
+    pub fn turn_phase(&mut self) {
+        self.old_meaning = self.old_meaning.captured();
+    }
+}
 
 /// ソートを高速にするためのものだぜ☆（＾～＾）
 pub struct Ways {

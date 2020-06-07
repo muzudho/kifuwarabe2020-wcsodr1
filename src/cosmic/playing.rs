@@ -1,5 +1,4 @@
 use crate::cosmic::pos_hash::pos_hash::*;
-use crate::cosmic::recording::CapturedMove;
 use crate::cosmic::recording::{AddressPos, History, Movement};
 use crate::cosmic::toy_box::GameTable;
 use crate::law::generate_move::OldPiece;
@@ -159,16 +158,8 @@ impl Game {
             }
         };
         // 移動先升に駒があるかどうか
-        if let Some(collision_piece) = self.table.pop_piece(&move_.destination) {
-            // 移動先升の駒を盤上から消し、自分の持ち駒に増やす
-            // 先後ひっくり返す。
-            let meaning = self.table.get_meaning(&collision_piece).captured();
-            let captured_piece = self.table.new_piece(meaning, collision_piece.num);
-            self.table.push_piece(
-                &AddressPos::Hand(self.table.get_meaning(&captured_piece).physical_piece()),
-                Some(captured_piece),
-            );
-        }
+        // あれば　盤の相手の駒を先後反転して、自分の駒台に置きます。
+        self.table.rotate_piece_board_to_hand(&move_);
 
         // 移動先升に駒を置く
         self.table.push_piece(&move_.destination, moveing_piece);
@@ -219,19 +210,8 @@ impl Game {
                 };
 
                 // 取った駒が有ったか。
-                let captured_move: Option<CapturedMove> = move_.captured;
-                if let Some(captured_move_val) = captured_move {
-                    // 自分の持ち駒を減らす
-                    self.table.pop_piece(&AddressPos::Hand(
-                        self.table
-                            .get_meaning(&captured_move_val.piece)
-                            .captured()
-                            .physical_piece(),
-                    ));
-                    // 移動先の駒を、取った駒（あるいは空、ということがあるか？）に戻す
-                    self.table
-                        .push_piece(&move_.destination, Some(captured_move_val.piece));
-                }
+                // あれば、指し手で取った駒の先後をひっくり返せば、自分の駒台にある駒を取り出せるので取り出して、盤の上に指し手の取った駒のまま駒を置きます。
+                self.table.rotate_piece_hand_to_board(&move_);
 
                 if let AddressPos::Board(_src_sq) = move_.source {
                     // 打でなければ、移動元升に、動かした駒を置く☆（＾～＾）打なら何もしないぜ☆（＾～＾）
