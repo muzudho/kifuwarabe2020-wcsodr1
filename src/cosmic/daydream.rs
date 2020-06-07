@@ -212,21 +212,20 @@ impl Tree {
             // 棋譜に入れる☆
             game.set_move(&move_);
             game.read_move(&move_);
-            let captured_piece = if let Some(captured) = move_.captured {
-                let meaning = game.table.get_meaning(captured.piece).captured();
-                Some(game.table.new_piece(meaning, captured.piece.num))
+            let captured_meaning = if let Some(captured) = move_.captured {
+                Some(game.table.get_meaning(captured.piece).captured())
             } else {
                 None
             };
 
             self.pv.push(&move_);
-            let (captured_piece_centi_pawn, delta_promotion_bonus) =
-                self.evaluation
-                    .after_do_move(&game.table, &captured_piece, promotion_value);
+            let (captured_piece_centi_pawn, delta_promotion_bonus) = self
+                .evaluation
+                .after_do_move(&captured_meaning, promotion_value);
 
             // TODO 廃止方針☆（＾～＾）
-            if let Some(captured_piece_val) = captured_piece {
-                if game.table.get_meaning(captured_piece_val).type_() == PieceType::King {
+            if let Some(captured_meaning_val) = captured_meaning {
+                if captured_meaning_val.type_() == PieceType::King {
                     // 玉を取る手より強い手はないぜ☆（＾～＾）！探索終了～☆（＾～＾）！この手を選べだぜ☆（＾～＾）！
                     ts.bestmove.catch_king(move_);
 

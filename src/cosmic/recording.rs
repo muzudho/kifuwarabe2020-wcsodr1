@@ -7,7 +7,7 @@
 use crate::cosmic::smart::features::PhysicalPiece;
 use crate::cosmic::smart::square::AbsoluteAddress2D;
 use crate::law::cryptographic::num_to_lower_case;
-use crate::law::generate_move::Piece;
+use crate::law::generate_move::OldPiece;
 use std::fmt;
 
 /// 手数☆（＾～＾） 大会ルールとは別で、このプログラムが対応できる上限値☆（＾～＾）
@@ -105,7 +105,7 @@ impl fmt::Debug for AddressPos {
 #[derive(Clone, Copy)]
 pub struct CapturedMove {
     /// 取ることになる駒
-    pub piece: Piece,
+    pub piece: OldPiece,
     /// 元あった所。
     pub source: AddressPos,
     /*
@@ -115,7 +115,7 @@ pub struct CapturedMove {
 }
 impl CapturedMove {
     // TODO Piece を持ちまわすのは止めたいが……☆（＾～＾）
-    pub fn new(source: &AddressPos, piece: Piece) -> Self {
+    pub fn new(source: &AddressPos, piece: OldPiece) -> Self {
         CapturedMove {
             source: *source,
             piece: piece,

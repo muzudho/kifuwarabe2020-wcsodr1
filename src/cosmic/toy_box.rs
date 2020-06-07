@@ -6,7 +6,7 @@ use crate::cosmic::smart::features::{
     PhysicalPiece, PieceMeaning, PieceType, HAND_MAX, PHYSICAL_PIECES_LEN, PHYSICAL_PIECE_TYPE_LEN,
 };
 use crate::cosmic::smart::square::{AbsoluteAddress2D, BOARD_MEMORY_AREA, RANK_1, RANK_10};
-use crate::law::generate_move::Piece;
+use crate::law::generate_move::OldPiece;
 use crate::law::speed_of_light::Nine299792458;
 use crate::spaceship::equipment::Beam;
 use crate::spaceship::equipment::PieceInfo;
@@ -107,7 +107,7 @@ pub enum PieceNum {
 /// 0筋、0段は未使用
 pub struct GameTable {
     /// 盤に、駒が紐づくぜ☆（＾～＾）
-    board: [Option<Piece>; BOARD_MEMORY_AREA as usize],
+    board: [Option<OldPiece>; BOARD_MEMORY_AREA as usize],
     /// 背番号付きの駒に、番地が紐づいているぜ☆（＾～＾）
     old_address_list: [AddressPos; NAMED_PIECES_LEN],
     /// 駒の背番号に、駒が紐づくぜ☆（＾～＾）
@@ -223,20 +223,20 @@ impl GameTable {
         self.hands = table.hands.clone();
     }
 
-    pub fn get_meaning(&self, piece: Piece) -> PieceMeaning {
-        piece.meaning
+    pub fn get_meaning(&self, piece: OldPiece) -> PieceMeaning {
+        piece.old_meaning
         // self.new_piece_list[piece.num as usize]
     }
-    pub fn new_piece(&mut self, meaning: PieceMeaning, num: PieceNum) -> Piece {
+    pub fn new_piece(&mut self, meaning: PieceMeaning, num: PieceNum) -> OldPiece {
         self.new_piece_list[num as usize] = meaning;
-        Piece {
-            meaning: meaning,
+        OldPiece {
+            old_meaning: meaning,
             num: num,
         }
     }
 
     /// 駒を置く。
-    pub fn push_piece(&mut self, addr: &AddressPos, piece: Option<Piece>) {
+    pub fn push_piece(&mut self, addr: &AddressPos, piece: Option<OldPiece>) {
         match addr {
             AddressPos::Board(sq) => {
                 if let Some(piece_val) = piece {
@@ -260,7 +260,7 @@ impl GameTable {
         }
     }
     /// 駒を取りのぞく。
-    pub fn pop_piece(&mut self, addr: &AddressPos) -> Option<Piece> {
+    pub fn pop_piece(&mut self, addr: &AddressPos) -> Option<OldPiece> {
         match addr {
             AddressPos::Board(sq) => {
                 let piece = self.board[sq.serial_number() as usize];
@@ -285,7 +285,7 @@ impl GameTable {
     }
 
     /// 駒の新しい背番号を生成します。
-    pub fn naming_piece(&mut self, piece_meaning: PieceMeaning) -> Piece {
+    pub fn naming_piece(&mut self, piece_meaning: PieceMeaning) -> OldPiece {
         match piece_meaning {
             // 玉だけ、先後は決まってるから従えだぜ☆（＾～＾）
             PieceMeaning::King1 => self.new_piece(piece_meaning, PieceNum::King1),
@@ -318,7 +318,7 @@ impl GameTable {
     /// TODO Piece をカプセル化したい。外に出したくないぜ☆（＾～＾）
     /// 升で指定して駒を取得。
     /// 駒台には対応してない。 -> 何に使っている？
-    pub fn piece_at(&self, addr: &AddressPos) -> Option<Piece> {
+    pub fn piece_at(&self, addr: &AddressPos) -> Option<OldPiece> {
         match addr {
             AddressPos::Board(sq) => self.board[sq.serial_number() as usize],
             _ => panic!(Beam::trouble(&format!(
@@ -377,7 +377,7 @@ impl GameTable {
         }
     }
     /// 指し手生成で使うぜ☆（＾～＾）
-    pub fn last_hand(&self, adr: PhysicalPiece) -> Option<&Piece> {
+    pub fn last_hand(&self, adr: PhysicalPiece) -> Option<&OldPiece> {
         self.hands[adr as usize].last()
     }
     pub fn count_hand(&self, adr: PhysicalPiece) -> usize {
@@ -408,7 +408,7 @@ impl GameTable {
     /// 盤上を検索するのではなく、４０個の駒を検索するぜ☆（＾～＾）
     pub fn for_some_pieces_on_list40<F>(&self, friend: Phase, piece_get: &mut F)
     where
-        F: FnMut(AddressPos, Piece),
+        F: FnMut(AddressPos, OldPiece),
     {
         for piece_num in Nine299792458::piece_numbers().iter() {
             let addr = self.old_address_list[*piece_num as usize];
@@ -458,32 +458,32 @@ impl GameTable {
 
 #[derive(Clone)]
 pub struct HandAddressTypeStack {
-    items: [Piece; HAND_MAX],
+    items: [OldPiece; HAND_MAX],
     count: usize,
 }
 impl Default for HandAddressTypeStack {
     fn default() -> Self {
         HandAddressTypeStack {
             // ゴミ値で埋めるぜ☆（＾～＾）
-            items: [Piece::default(); HAND_MAX],
+            items: [OldPiece::default(); HAND_MAX],
             count: 0,
         }
     }
 }
 impl HandAddressTypeStack {
-    fn push(&mut self, piece: &Piece) {
+    fn push(&mut self, piece: &OldPiece) {
         self.items[self.count] = *piece;
         self.count += 1;
     }
 
-    fn pop(&mut self) -> Piece {
+    fn pop(&mut self) -> OldPiece {
         self.count -= 1;
         let piece = self.items[self.count];
         // ゴミ値は消さないぜ☆（＾～＾）
         piece
     }
 
-    fn last(&self) -> Option<&Piece> {
+    fn last(&self) -> Option<&OldPiece> {
         if 0 < self.count {
             Some(&self.items[self.count - 1])
         } else {

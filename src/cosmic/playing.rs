@@ -2,7 +2,7 @@ use crate::cosmic::pos_hash::pos_hash::*;
 use crate::cosmic::recording::CapturedMove;
 use crate::cosmic::recording::{AddressPos, History, Movement};
 use crate::cosmic::toy_box::GameTable;
-use crate::law::generate_move::Piece;
+use crate::law::generate_move::OldPiece;
 use crate::spaceship::equipment::{Beam, DestinationDisplay};
 
 /// 局面
@@ -132,10 +132,10 @@ impl Game {
             .update_by_do_move(&mut self.history, &self.table, move_);
 
         // 動かす駒。Noneなことは無いが、将棋盤にセットするとき結局 Some を付けることになるので、わざわざ省かないぜ☆（＾～＾）
-        let moveing_piece: Option<Piece> = match move_.source {
+        let moveing_piece: Option<OldPiece> = match move_.source {
             AddressPos::Board(_src_sq) => {
                 // 盤上の移動なら、元の升に駒はあるので、それを消す。
-                let piece152: Option<Piece> = if move_.promote {
+                let piece152: Option<OldPiece> = if move_.promote {
                     if let Some(piece) = self.table.pop_piece(&move_.source) {
                         // 成ったのなら、元のマスの駒を成らすぜ☆（＾～＾）
                         let meaning = self.table.get_meaning(piece).promoted();
@@ -188,7 +188,7 @@ impl Game {
             let move_ = &self.history.get_move();
             {
                 // 動いた駒
-                let moveing_piece: Option<Piece> = match move_.source {
+                let moveing_piece: Option<OldPiece> = match move_.source {
                     AddressPos::Board(_source_val) => {
                         // 盤上の移動なら
                         if move_.promote {

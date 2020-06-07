@@ -13,19 +13,19 @@ use crate::cosmic::toy_box::PieceNum;
 use crate::spaceship::equipment::Beam;
 use std::fmt;
 
-/// TODO これ、スピード・オブ・ライトに移動できないか☆（＾～＾）？
+/// TODO これ、廃止して中の num を直接使えばいいんじゃないのか☆（＾～＾）？
 #[derive(Clone, Copy, PartialEq)]
-pub struct Piece {
+pub struct OldPiece {
     /// Stockfish系コンピューター将棋ソフトが言う Piece は、きふわらべでは PieceMeaning に名前を変えているぜ☆（＾～＾）
-    pub meaning: PieceMeaning,
+    pub old_meaning: PieceMeaning,
     /// 将棋の駒の背番号だぜ☆（＾～＾）
     pub num: PieceNum,
 }
-impl Default for Piece {
+impl Default for OldPiece {
     /// これはゴミ値だぜ☆（＾～＾）上書きして消せだぜ☆（＾～＾）
     fn default() -> Self {
-        Piece {
-            meaning: PieceMeaning::King1,
+        OldPiece {
+            old_meaning: PieceMeaning::King1,
             num: PieceNum::King1,
         }
     }
@@ -143,7 +143,7 @@ impl PseudoLegalMoves {
     fn start_on_board<F1>(
         friend: Phase,
         source: &AddressPos,
-        piece: &Piece,
+        piece: &OldPiece,
         table: &GameTable,
         listen_move: &mut F1,
     ) where
