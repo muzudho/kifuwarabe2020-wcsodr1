@@ -216,12 +216,14 @@ impl GameTable {
     pub fn copy_from(&mut self, table: &GameTable) {
         self.board = table.board.clone();
         self.old_address_list = table.old_address_list.clone();
+        self.new_piece_list = table.new_piece_list.clone();
         self.physical_piece_type_index = table.physical_piece_type_index.clone();
         self.hands = table.hands.clone();
     }
 
     pub fn get_meaning(&self, piece: Piece) -> PieceMeaning {
         piece.meaning
+        // self.new_piece_list[piece.num as usize]
     }
     pub fn new_piece(&mut self, meaning: PieceMeaning, num: PieceNum) -> Piece {
         self.new_piece_list[num as usize] = meaning;
