@@ -30,20 +30,6 @@ impl Default for Piece {
         }
     }
 }
-impl Piece {
-    pub fn new(table: &mut GameTable, meaning: PieceMeaning, num: PieceNum) -> Self {
-        table.new_piece_list[num as usize] = meaning;
-        Piece {
-            meaning: meaning,
-            num: num,
-        }
-    }
-    /*
-    pub fn to_debug(&self, table: &GameTable) -> String {
-        format!("Piece({} {:?})", self.meaning, self.num)
-    }
-    */
-}
 
 /// ソートを高速にするためのものだぜ☆（＾～＾）
 pub struct Ways {

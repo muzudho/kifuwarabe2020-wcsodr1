@@ -223,6 +223,13 @@ impl GameTable {
     pub fn get_meaning(&self, piece: Piece) -> PieceMeaning {
         piece.meaning
     }
+    pub fn new_piece(&mut self, meaning: PieceMeaning, num: PieceNum) -> Piece {
+        self.new_piece_list[num as usize] = meaning;
+        Piece {
+            meaning: meaning,
+            num: num,
+        }
+    }
 
     /// 駒を置く。
     pub fn push_piece(&mut self, addr: &AddressPos, piece: Option<Piece>) {
@@ -277,15 +284,15 @@ impl GameTable {
     pub fn naming_piece(&mut self, piece_meaning: PieceMeaning) -> Piece {
         match piece_meaning {
             // 玉だけ、先後は決まってるから従えだぜ☆（＾～＾）
-            PieceMeaning::King1 => Piece::new(self, piece_meaning, PieceNum::King1),
-            PieceMeaning::King2 => Piece::new(self, piece_meaning, PieceNum::King2),
+            PieceMeaning::King1 => self.new_piece(piece_meaning, PieceNum::King1),
+            PieceMeaning::King2 => self.new_piece(piece_meaning, PieceNum::King2),
             _ => {
                 let phy_pct = piece_meaning.physical_piece().type_() as usize;
                 // 玉以外の背番号は、先後に関わりなく SFENに書いてあった順で☆（＾～＾）
                 let pn = PieceNum::from_usize(self.physical_piece_type_index[phy_pct]).unwrap();
                 // カウントアップ☆（＾～＾）
                 self.physical_piece_type_index[phy_pct] += 1;
-                Piece::new(self, piece_meaning, pn)
+                self.new_piece(piece_meaning, pn)
             }
         }
     }

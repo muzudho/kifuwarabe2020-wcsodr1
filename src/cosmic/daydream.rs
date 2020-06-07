@@ -8,7 +8,7 @@ use crate::cosmic::smart::evaluator::{Evaluation, REPITITION_VALUE};
 use crate::cosmic::smart::features::PieceType;
 use crate::cosmic::smart::see::SEE;
 use crate::cosmic::universe::Universe;
-use crate::law::generate_move::{Piece, PseudoLegalMoves, Ways};
+use crate::law::generate_move::{PseudoLegalMoves, Ways};
 use crate::spaceship::equipment::{Beam, PvString};
 use std::fmt;
 use std::time::Instant;
@@ -214,7 +214,7 @@ impl Tree {
             game.read_move(&move_);
             let captured_piece = if let Some(captured) = move_.captured {
                 let meaning = game.table.get_meaning(captured.piece).captured();
-                Some(Piece::new(&mut game.table, meaning, captured.piece.num))
+                Some(game.table.new_piece(meaning, captured.piece.num))
             } else {
                 None
             };
