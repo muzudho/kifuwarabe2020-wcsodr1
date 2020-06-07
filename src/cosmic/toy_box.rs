@@ -237,19 +237,7 @@ impl GameTable {
         }
     }
 
-    /// あれば、指し手で取った駒の先後をひっくり返せば、自分の駒台にある駒を取り出せるので取り出して、盤の上に指し手の取った駒のまま駒を置きます。
-    pub fn rotate_piece_hand_to_board(&mut self, move_: &Movement) {
-        let captured_move: Option<CapturedMove> = move_.captured;
-        if let Some(captured_move_val) = captured_move {
-            // TODO 元データを反転させたいぜ☆（＾～＾）
-            let captured_piece = self.get_meaning(&captured_move_val.piece).captured();
-            // 自分の持ち駒を減らす
-            self.pop_piece(&AddressPos::Hand(captured_piece.physical_piece()));
-            // 移動先の駒を、取った駒（あるいは空、ということがあるか？）に戻す
-            self.push_piece(&move_.destination, Some(captured_move_val.piece));
-        }
-    }
-
+    /// ドゥ時の動き。
     /// 駒の先後を反転させるぜ☆（＾～＾）
     // あれば　盤の相手の駒を先後反転して、自分の駒台に置きます。
     pub fn rotate_piece_board_to_hand(&mut self, move_: &Movement) {
@@ -267,13 +255,54 @@ impl GameTable {
             );
         }
     }
+
+    /// アンドゥ時の動き。
+    /// あれば、指し手で取った駒の先後をひっくり返せば、自分の駒台にある駒を取り出せるので取り出して、盤の上に指し手の取った駒のまま駒を置きます。
+    pub fn rotate_piece_hand_to_board(&mut self, move_: &Movement) {
+        if let Some(move2_val) = move_.captured {
+            // TODO 元データを反転させたいぜ☆（＾～＾）
+            // 棋譜には、取られた方の先後が記録されているぜ☆（＾～＾）
+            // 取った方の駒台の先後に合わせるぜ☆（＾～＾）
+            let attacker_meaning = self.get_meaning(&move2_val.piece).captured();
+            // 取った方の持ち駒を減らす
+            let mut old_piece = self
+                .pop_piece(&AddressPos::Hand(attacker_meaning.physical_piece()))
+                .unwrap();
+            // 先後をひっくり返す。
+            old_piece.turn_phase();
+            if move2_val.piece.old_meaning.type_().promoted() {
+                // 成り駒にします。
+                old_piece.promote();
+            } else {
+                // 成っていない駒にします。
+                old_piece.demote();
+            }
+            if old_piece.old_meaning.phase() != move2_val.piece.old_meaning.phase()
+                || old_piece.old_meaning.type_() != move2_val.piece.old_meaning.type_()
+            {
+                panic!(Beam::trouble(&format!(
+                    "(Err.276) 分けわからん☆（＾～＾） old_piece.old_meaning.phase()=|{}| move2_val.piece.old_meaning.phase()=|{}| old_piece.old_meaning.type_()=|{}| move2_val.piece.old_meaning.type_()=|{}|",
+                    old_piece.old_meaning.phase(),
+                    move2_val.piece.old_meaning.phase(),
+                    old_piece.old_meaning.type_(),
+                    move2_val.piece.old_meaning.type_(),
+                )))
+            }
+            // TODO 指し手に 駒オブジェクト が入っているのは設計上おかしいぜ☆（＾～＾）
+            // TODO let opponent = move2_val.piece.old_meaning.phase();
+            // TODO let piece_type = move2_val.piece.old_meaning.type_();
+            // 取られた方に、駒を返すぜ☆（＾～＾）置くのは指し手の移動先☆（＾～＾）
+            // 動いてたやつ: self.push_piece(&move_.destination, Some(move2_val.piece));
+            self.push_piece(&move_.destination, Some(old_piece));
+        }
+    }
     /// 駒を置く。
-    pub fn push_piece(&mut self, addr: &AddressPos, piece: Option<OldPiece>) {
+    pub fn push_piece(&mut self, addr: &AddressPos, old_piece: Option<OldPiece>) {
         match addr {
             AddressPos::Board(sq) => {
-                if let Some(piece_val) = piece {
+                if let Some(piece_val) = old_piece {
                     // マスに駒を置きます。
-                    self.board[sq.serial_number() as usize] = piece;
+                    self.board[sq.serial_number() as usize] = old_piece;
                     // 背番号に番地を紐づけます。
                     self.old_address_list[piece_val.num as usize] = AddressPos::Board(*sq);
                 } else {
@@ -282,11 +311,11 @@ impl GameTable {
                 }
             }
             AddressPos::Hand(drop) => {
-                if let Some(piece_val) = piece {
+                if let Some(old_piece_val) = old_piece {
                     // 持ち駒を１つ増やします。
-                    self.hands[*drop as usize].push(&piece_val);
+                    self.hands[*drop as usize].push_hand(&old_piece_val);
                     // 背番号に番地を紐づけます。
-                    self.old_address_list[piece_val.num as usize] = *addr;
+                    self.old_address_list[old_piece_val.num as usize] = *addr;
                 }
             }
         }
@@ -307,11 +336,11 @@ impl GameTable {
             }
             AddressPos::Hand(drop) => {
                 // 台から取りのぞきます。
-                let piece = self.hands[*drop as usize].pop();
+                let old_piece = self.hands[*drop as usize].pop_hand();
                 // TODO 背番号の番地に、ゴミ値を入れて消去するが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
-                self.old_address_list[piece.num as usize] =
+                self.old_address_list[old_piece.num as usize] =
                     AddressPos::Board(AbsoluteAddress2D::default());
-                Some(piece)
+                Some(old_piece)
             }
         }
     }
@@ -511,12 +540,12 @@ impl Default for OldHandStack {
     }
 }
 impl OldHandStack {
-    fn push(&mut self, piece: &OldPiece) {
+    fn push_hand(&mut self, piece: &OldPiece) {
         self.items[self.count] = *piece;
         self.count += 1;
     }
 
-    fn pop(&mut self) -> OldPiece {
+    fn pop_hand(&mut self) -> OldPiece {
         self.count -= 1;
         let piece = self.items[self.count];
         // ゴミ値は消さないぜ☆（＾～＾）

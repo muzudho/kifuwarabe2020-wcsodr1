@@ -34,6 +34,14 @@ impl OldPiece {
     pub fn turn_phase(&mut self) {
         self.old_meaning = self.old_meaning.captured();
     }
+    // 成り駒にします。
+    pub fn promote(&mut self) {
+        self.old_meaning = self.old_meaning.promoted();
+    }
+    // 成っていない駒にします。
+    pub fn demote(&mut self) {
+        self.old_meaning = self.old_meaning.demoted();
+    }
 }
 
 /// ソートを高速にするためのものだぜ☆（＾～＾）
