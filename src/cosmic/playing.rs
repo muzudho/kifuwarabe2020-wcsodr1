@@ -147,7 +147,7 @@ impl Game {
 
                 piece_num152
             }
-            AddressPos::Hand(_old_drop) => {
+            AddressPos::Hand(_drop) => {
                 // 打なら
                 // 自分の持ち駒を減らす
                 Some(self.table.pop_piece(&move_.source).unwrap())
@@ -195,7 +195,7 @@ impl Game {
                             self.table.pop_piece(&move_.destination)
                         }
                     }
-                    AddressPos::Hand(_old_drop) => {
+                    AddressPos::Hand(_drop) => {
                         // 打なら
                         // 打った場所に駒があるはずだぜ☆（＾～＾）
                         let piece_num = self.table.pop_piece(&move_.destination).unwrap();

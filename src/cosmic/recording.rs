@@ -77,8 +77,8 @@ impl fmt::Display for AddressPos {
                 AddressPos::Board(addr) => {
                     format!("{}", addr)
                 }
-                AddressPos::Hand(_old_drop) => {
-                    format!("{}", _old_drop)
+                AddressPos::Hand(drop) => {
+                    format!("{}", drop)
                 }
             },
         )
@@ -93,8 +93,8 @@ impl fmt::Debug for AddressPos {
                 AddressPos::Board(addr) => {
                     addr.serial_number().to_string()
                 }
-                AddressPos::Hand(_old_drop) => {
-                    format!("{:?}", _old_drop)
+                AddressPos::Hand(drop) => {
+                    format!("{:?}", drop)
                 }
             },
         )
@@ -190,10 +190,10 @@ impl fmt::Display for Movement {
                     if self.promote { "+" } else { "" }
                 )
             }
-            AddressPos::Hand(_old_drop) => write!(
+            AddressPos::Hand(drop) => write!(
                 f,
                 "{}{}{}",
-                _old_drop,
+                drop,
                 self.destination,
                 if self.promote { "+" } else { "" }
             ),

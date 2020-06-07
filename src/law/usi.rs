@@ -258,7 +258,7 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Game) {
                 let addr = AddressPos::Board(AbsoluteAddress2D::new(file, rank));
 
                 // 駒に背番号を付けるぜ☆（＾～＾）
-                let piece_num = table.naming_piece(piece);
+                let piece_num = table.numbering_piece(piece);
                 // 盤に置くぜ☆（＾～＾）
                 table.push_piece(&addr, Some(piece_num));
 
@@ -406,11 +406,10 @@ pub fn set_position(line: &str, game: &mut Game) {
 
                     for _i in 0..hand_num {
                         // 駒に背番号を付けるぜ☆（＾～＾）
-                        let piece_num = game.mut_starting().naming_piece(hand);
+                        let piece_num = game.mut_starting().numbering_piece(hand);
                         // 駒台に置くぜ☆（＾～＾）
-                        let old_drop =
-                            AddressPos::Hand(game.table.get_double_faced_piece(piece_num));
-                        game.mut_starting().push_piece(&old_drop, Some(piece_num));
+                        let drop = AddressPos::Hand(game.table.get_double_faced_piece(piece_num));
+                        game.mut_starting().push_piece(&drop, Some(piece_num));
                     }
                 } //if
             } //loop

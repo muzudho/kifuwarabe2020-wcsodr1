@@ -87,15 +87,15 @@ impl GameHashSeed {
                     ))),
                 }
             }
-            AddressPos::Hand(old_drop) => {
-                let count = table.count_hand(old_drop);
+            AddressPos::Hand(drop) => {
+                let count = table.count_hand(drop);
                 // 打つ前の駒の枚数のハッシュ。
-                prev_hash ^= self.hands[old_drop as usize][count as usize];
+                prev_hash ^= self.hands[drop as usize][count as usize];
                 // 移動後マスに、打った駒があるときのハッシュ。
                 match move_.destination {
                     AddressPos::Board(sq) => {
                         prev_hash ^=
-                            self.piece[sq.serial_number()][old_drop.nonpromoted_piece() as usize];
+                            self.piece[sq.serial_number()][drop.nonpromoted_piece() as usize];
                     }
                     _ => panic!(Beam::trouble(&format!(
                         "(Err.101) まだ実装してないぜ☆（＾～＾）！",
