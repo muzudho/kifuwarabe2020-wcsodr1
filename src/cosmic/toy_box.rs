@@ -1,7 +1,6 @@
 //!
 //! 駒 と 盤
 //!
-use crate::cosmic::recording::CapturedMove;
 use crate::cosmic::recording::Movement;
 use crate::cosmic::recording::{AddressPos, Phase};
 use crate::cosmic::smart::features::{
@@ -117,7 +116,7 @@ pub struct GameTable {
     /// 駒の背番号を付けるのに使うぜ☆（＾～＾）
     physical_piece_type_index: [usize; PHYSICAL_PIECE_TYPE_LEN],
     /// 持ち駒☆（＾～＾）TODO 固定長サイズのスタックを用意したいぜ☆（＾～＾）
-    pub hands: [OldHandStack; PHYSICAL_PIECES_LEN],
+    pub hands: OldHandStack,
 }
 impl Default for GameTable {
     fn default() -> Self {
@@ -148,24 +147,7 @@ impl Default for GameTable {
                 PieceNum::Pawn23 as usize,
             ],
             // 持ち駒
-            hands: [
-                OldHandStack::default(),
-                OldHandStack::default(),
-                OldHandStack::default(),
-                OldHandStack::default(),
-                OldHandStack::default(),
-                OldHandStack::default(),
-                OldHandStack::default(),
-                OldHandStack::default(),
-                OldHandStack::default(),
-                OldHandStack::default(),
-                OldHandStack::default(),
-                OldHandStack::default(),
-                OldHandStack::default(),
-                OldHandStack::default(),
-                OldHandStack::default(),
-                OldHandStack::default(),
-            ],
+            hands: OldHandStack::default(),
         }
     }
 }
@@ -196,24 +178,7 @@ impl GameTable {
             PieceNum::Pawn23 as usize,
         ];
         // 持ち駒☆（＾～＾）
-        self.hands = [
-            OldHandStack::default(),
-            OldHandStack::default(),
-            OldHandStack::default(),
-            OldHandStack::default(),
-            OldHandStack::default(),
-            OldHandStack::default(),
-            OldHandStack::default(),
-            OldHandStack::default(),
-            OldHandStack::default(),
-            OldHandStack::default(),
-            OldHandStack::default(),
-            OldHandStack::default(),
-            OldHandStack::default(),
-            OldHandStack::default(),
-            OldHandStack::default(),
-            OldHandStack::default(),
-        ];
+        self.hands = OldHandStack::default();
     }
 
     /// 開始盤面を、現盤面にコピーしたいときに使うぜ☆（＾～＾）
@@ -317,7 +282,7 @@ impl GameTable {
             AddressPos::Hand(drop) => {
                 if let Some(old_piece_val) = old_piece {
                     // 持ち駒を１つ増やします。
-                    self.hands[*drop as usize].push_hand(&old_piece_val);
+                    self.hands.push(*drop, &old_piece_val);
                     // 背番号に番地を紐づけます。
                     self.old_address_list[old_piece_val.num as usize] = *addr;
                 }
@@ -340,7 +305,7 @@ impl GameTable {
             }
             AddressPos::Hand(drop) => {
                 // 台から取りのぞきます。
-                let old_piece = self.hands[*drop as usize].pop_hand();
+                let old_piece = self.hands.pop(*drop);
                 // TODO 背番号の番地に、ゴミ値を入れて消去するが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
                 self.old_address_list[old_piece.num as usize] =
                     AddressPos::Board(AbsoluteAddress2D::default());
@@ -442,19 +407,19 @@ impl GameTable {
         }
     }
     /// 指し手生成で使うぜ☆（＾～＾）
-    pub fn last_hand(&self, adr: PhysicalPiece) -> Option<&OldPiece> {
-        self.hands[adr as usize].last()
+    pub fn last_hand(&self, phy: PhysicalPiece) -> Option<&OldPiece> {
+        self.hands.last(phy)
     }
     /// 指し手生成で使うぜ☆（＾～＾）
-    pub fn last_hand_meaning(&self, table: &GameTable, adr: PhysicalPiece) -> Option<PieceMeaning> {
-        if let Some(old_piece) = self.hands[adr as usize].last() {
+    pub fn last_hand_meaning(&self, table: &GameTable, phy: PhysicalPiece) -> Option<PieceMeaning> {
+        if let Some(old_piece) = self.hands.last(phy) {
             Some(table.get_meaning(old_piece))
         } else {
             None
         }
     }
-    pub fn count_hand(&self, adr: PhysicalPiece) -> usize {
-        self.hands[adr as usize].len()
+    pub fn count_hand(&self, phy: PhysicalPiece) -> usize {
+        self.hands.len(phy)
     }
 
     /// 表示に使うだけ☆（＾～＾）
@@ -531,25 +496,67 @@ impl GameTable {
 
 #[derive(Clone)]
 pub struct OldHandStack {
-    items: [OldPiece; HAND_MAX],
-    count: usize,
+    pub hands: [OldHandStackElement; PHYSICAL_PIECES_LEN],
 }
 impl Default for OldHandStack {
     fn default() -> Self {
         OldHandStack {
+            hands: [
+                OldHandStackElement::default(),
+                OldHandStackElement::default(),
+                OldHandStackElement::default(),
+                OldHandStackElement::default(),
+                OldHandStackElement::default(),
+                OldHandStackElement::default(),
+                OldHandStackElement::default(),
+                OldHandStackElement::default(),
+                OldHandStackElement::default(),
+                OldHandStackElement::default(),
+                OldHandStackElement::default(),
+                OldHandStackElement::default(),
+                OldHandStackElement::default(),
+                OldHandStackElement::default(),
+                OldHandStackElement::default(),
+                OldHandStackElement::default(),
+            ],
+        }
+    }
+}
+impl OldHandStack {
+    pub fn push(&mut self, drop: PhysicalPiece, old_piece_val: &OldPiece) {
+        self.hands[drop as usize].push(&old_piece_val);
+    }
+    pub fn pop(&mut self, drop: PhysicalPiece) -> OldPiece {
+        self.hands[drop as usize].pop()
+    }
+    pub fn last(&self, drop: PhysicalPiece) -> Option<&OldPiece> {
+        self.hands[drop as usize].last()
+    }
+    pub fn len(&self, drop: PhysicalPiece) -> usize {
+        self.hands[drop as usize].len()
+    }
+}
+#[derive(Clone)]
+pub struct OldHandStackElement {
+    items: [OldPiece; HAND_MAX],
+    count: usize,
+}
+impl Default for OldHandStackElement {
+    fn default() -> Self {
+        OldHandStackElement {
             // ゴミ値で埋めるぜ☆（＾～＾）
             items: [OldPiece::default(); HAND_MAX],
             count: 0,
         }
     }
 }
-impl OldHandStack {
-    fn push_hand(&mut self, piece: &OldPiece) {
-        self.items[self.count] = *piece;
+impl OldHandStackElement {
+    fn push(&mut self, old_piece: &OldPiece) {
+        self.items[self.count] = *old_piece;
         self.count += 1;
     }
 
-    fn pop_hand(&mut self) -> OldPiece {
+    fn pop(&mut self) -> OldPiece {
         self.count -= 1;
         let piece = self.items[self.count];
         // ゴミ値は消さないぜ☆（＾～＾）
