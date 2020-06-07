@@ -11,7 +11,8 @@ use crate::law::generate_move::Piece;
 use std::fmt;
 
 /// 手数☆（＾～＾） 大会ルールとは別で、このプログラムが対応できる上限値☆（＾～＾）
-pub const PLY_SIZE: usize = 2048;
+/// 主要大会では、一番大きくても　電竜戦の 512 だろ☆（＾～＾）
+pub const PLY_SIZE: usize = 1024;
 
 /// 同一局面何回で千日手
 pub const SENNTITE_NUM: isize = 4;

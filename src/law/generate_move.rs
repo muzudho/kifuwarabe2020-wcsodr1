@@ -13,6 +13,7 @@ use crate::cosmic::toy_box::PieceNum;
 use crate::spaceship::equipment::Beam;
 use std::fmt;
 
+/// TODO これ、スピード・オブ・ライトに移動できないか☆（＾～＾）？
 #[derive(Clone, Copy, PartialEq)]
 pub struct Piece {
     /// Stockfish系コンピューター将棋ソフトが言う Piece は、きふわらべでは PieceMeaning に名前を変えているぜ☆（＾～＾）
