@@ -5,6 +5,7 @@ use crate::cosmic::recording::Movement;
 use crate::cosmic::recording::{AddressPos, Phase};
 use crate::cosmic::smart::features::{DoubleFacedPiece, PieceType, PHYSICAL_PIECE_TYPE_LEN};
 use crate::cosmic::smart::square::{AbsoluteAddress2D, BOARD_MEMORY_AREA, RANK_1, RANK_10};
+use crate::law::generate_move::Area;
 use crate::law::speed_of_light::Nine299792458;
 use crate::spaceship::equipment::Beam;
 use num_derive::FromPrimitive;
@@ -232,6 +233,8 @@ pub struct GameTable {
     double_faced_piece_type_index: [usize; PHYSICAL_PIECE_TYPE_LEN],
     /// 持ち駒☆（＾～＾）TODO 固定長サイズのスタックを用意したいぜ☆（＾～＾）
     hands: HandStack,
+    /// 指し手生成に利用☆（＾～＾）
+    pub area: Area,
 }
 impl Default for GameTable {
     fn default() -> Self {
@@ -263,6 +266,7 @@ impl Default for GameTable {
             ],
             // 持ち駒
             hands: HandStack::default(),
+            area: Area::default(),
         }
     }
 }

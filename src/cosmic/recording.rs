@@ -68,6 +68,12 @@ pub enum AddressPos {
     // 持ち駒の種類
     Hand(DoubleFacedPiece),
 }
+impl Default for AddressPos {
+    // ゴミ値だぜ☆（＾～＾）
+    fn default() -> Self {
+        AddressPos::Board(AbsoluteAddress2D::default())
+    }
+}
 impl fmt::Display for AddressPos {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(

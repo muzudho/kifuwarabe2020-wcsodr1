@@ -276,28 +276,41 @@ impl PseudoLegalMoves {
                 // 桂
                 Knight => Area::drop_knight(friend, drop_fn),
                 // それ以外の駒が打てる範囲は盤面全体。
-                _ => Area::for_all(drop_fn),
+                _ => table.area.for_all(drop_fn),
             }
         }
     }
 }
 
 /// 次の升☆（＾～＾）
-pub struct Area {}
+pub struct Area {
+    all_squares: [AddressPos; 81],
+}
+impl Default for Area {
+    fn default() -> Self {
+        let mut v = [AddressPos::default(); 81];
+        let mut i = 0;
+        for rank in RANK_1..RANK_10 {
+            for file in (FILE_1..FILE_10).rev() {
+                v[i] = AddressPos::Board(AbsoluteAddress2D::new(file, rank));
+                i += 1;
+            }
+        }
+        Area { all_squares: v }
+    }
+}
 impl Area {
     /// 全升の面積だぜ☆（＾～＾）駒を打つときに使うぜ☆（＾～＾）
     ///
     /// Arguments
     /// ---------
     /// * `callback` - 絶対番地を受け取れだぜ☆（＾～＾）
-    pub fn for_all<F1>(callback: &mut F1)
+    pub fn for_all<F1>(&self, callback: &mut F1)
     where
         F1: FnMut(AddressPos),
     {
-        for rank in RANK_1..RANK_10 {
-            for file in (FILE_1..FILE_10).rev() {
-                callback(AddressPos::Board(AbsoluteAddress2D::new(file, rank)));
-            }
+        for sq in self.all_squares.iter() {
+            callback(*sq);
         }
     }
 
