@@ -145,17 +145,13 @@ pub struct Movement {
     pub promote: bool,
     /// 取ることになる駒
     pub captured: Option<CapturedMove>,
-    /*
-    /// 取ることになる駒
-    pub captured: Option<Piece>,
-    */
 }
 impl Default for Movement {
     /// ゴミの値を作るぜ☆（＾～＾）
     fn default() -> Self {
         Movement {
-            source: AddressPos::Board(AbsoluteAddress2D::new(1, 1)),
-            destination: AddressPos::Board(AbsoluteAddress2D::new(1, 1)),
+            source: AddressPos::default(),
+            destination: AddressPos::default(),
             promote: false,
             captured: None,
         }
