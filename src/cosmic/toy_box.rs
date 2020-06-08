@@ -613,36 +613,48 @@ impl GameTable {
     }
 }
 
+#[derive(Clone)]
+pub struct HandStackArea {
+    start: isize,
+    step: isize,
+}
+impl HandStackArea {
+    pub fn new(start: isize, step: isize) -> Self {
+        HandStackArea {
+            start: start,
+            step: step,
+        }
+    }
+}
 /// 駒台だぜ☆（＾～＾）これ１つで２人分あるんで☆（＾～＾）
 #[derive(Clone)]
 pub struct HandStack {
     items: [PieceNum; 40],
-    starts: [isize; 16],
+    areas: [HandStackArea; 16],
     currents: [isize; 16],
-    steps: [isize; 16],
 }
 impl Default for HandStack {
     // ゴミ値で埋めるぜ☆（＾～＾）
     fn default() -> Self {
         HandStack {
             items: [PieceNum::King1; 40],
-            starts: [
-                0,  // King1
-                20, // Rook1
-                18, // Bishop1
-                2,  // Gold1
-                6,  // Silver1
-                10, // Knight1
-                14, // Lance1
-                22, // Pawn1
-                1,  // King2
-                21, // Rook2
-                19, // Bishop2
-                5,  // Gold2
-                9,  // Silver2
-                13, // Knight2
-                17, // Lance2
-                39, // Pawn2
+            areas: [
+                HandStackArea::new(0, 1),   // King1
+                HandStackArea::new(20, 1),  // Rook1
+                HandStackArea::new(18, 1),  // Bishop1
+                HandStackArea::new(2, 1),   // Gold1
+                HandStackArea::new(6, 1),   // Silver1
+                HandStackArea::new(10, 1),  // Knight1
+                HandStackArea::new(14, 1),  // Lance1
+                HandStackArea::new(22, 1),  // Pawn1
+                HandStackArea::new(1, -1),  // King2
+                HandStackArea::new(21, -1), // Rook2
+                HandStackArea::new(19, -1), // Bishop2
+                HandStackArea::new(5, -1),  // Gold2
+                HandStackArea::new(9, -1),  // Silver2
+                HandStackArea::new(13, -1), // Knight2
+                HandStackArea::new(17, -1), // Lance2
+                HandStackArea::new(39, -1), // Pawn2
             ],
             currents: [
                 0,  // King1
@@ -662,53 +674,37 @@ impl Default for HandStack {
                 17, // Lance2
                 39, // Pawn2
             ],
-            steps: [
-                1,  // King1
-                1,  // Rook1
-                1,  // Bishop1
-                1,  // Gold1
-                1,  // Silver1
-                1,  // Knight1
-                1,  // Lance1
-                1,  // Pawn1
-                -1, // King2
-                -1, // Rook2
-                -1, // Bishop2
-                -1, // Gold2
-                -1, // Silver2
-                -1, // Knight2
-                -1, // Lance2
-                -1, // Pawn2
-            ],
         }
     }
 }
 impl HandStack {
     /// 駒の先後を ひっくり返してから入れてください。
     pub fn push(&mut self, drop: DoubleFacedPiece, num: PieceNum) {
+        let area = &self.areas[drop as usize];
         // 駒台に駒を置くぜ☆（＾～＾）
         self.items[self.currents[drop as usize] as usize] = num;
         // 位置を増減するぜ☆（＾～＾）
-        self.currents[drop as usize] += self.steps[drop as usize];
+        self.currents[drop as usize] += area.step;
     }
     /// ゴミ値は消さないぜ☆（＾～＾）
     pub fn pop(&mut self, drop: DoubleFacedPiece) -> PieceNum {
+        let area = &self.areas[drop as usize];
         // 位置を増減するぜ☆（＾～＾）
-        self.currents[drop as usize] -= self.steps[drop as usize];
+        self.currents[drop as usize] -= area.step;
         // 駒台の駒をはがすぜ☆（＾～＾）
         self.items[self.currents[drop as usize] as usize]
     }
 
     fn last(&self, drop: DoubleFacedPiece) -> Option<PieceNum> {
-        let step = self.steps[drop as usize];
-        if step == 1 {
-            if self.starts[drop as usize] < self.currents[drop as usize] {
+        let area = &self.areas[drop as usize];
+        if area.step == 1 {
+            if area.start < self.currents[drop as usize] {
                 Some(self.items[(self.currents[drop as usize] - 1) as usize])
             } else {
                 None
             }
         } else {
-            if self.currents[drop as usize] < self.starts[drop as usize] {
+            if self.currents[drop as usize] < area.start {
                 Some(self.items[(self.currents[drop as usize] + 1) as usize])
             } else {
                 None
@@ -717,11 +713,11 @@ impl HandStack {
     }
 
     fn len(&self, drop: DoubleFacedPiece) -> usize {
-        let step = self.steps[drop as usize];
-        if step == 1 {
-            (self.currents[drop as usize] - self.starts[drop as usize]) as usize
+        let area = &self.areas[drop as usize];
+        if area.step == 1 {
+            (self.currents[drop as usize] - area.start) as usize
         } else {
-            (self.starts[drop as usize] - self.currents[drop as usize]) as usize
+            (area.start - self.currents[drop as usize]) as usize
         }
     }
 
