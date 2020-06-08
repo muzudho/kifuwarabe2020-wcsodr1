@@ -529,10 +529,10 @@ impl GameTable {
         }
     }
     /// 指し手生成で使うぜ☆（＾～＾）
-    pub fn last_hand(&self, drop: DoubleFacedPiece) -> Option<(PieceType, DoubleFacedPiece)> {
+    pub fn last_hand(&self, drop: DoubleFacedPiece) -> Option<(PieceType, AddressPos)> {
         if let Some(piece_num) = self.hands.last(drop) {
             let piece = self.get_piece(piece_num);
-            Some((piece.type_(), piece.double_faced_piece()))
+            Some((piece.type_(), AddressPos::Hand(piece.double_faced_piece())))
         } else {
             None
         }

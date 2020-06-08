@@ -236,7 +236,7 @@ impl PseudoLegalMoves {
     where
         F1: FnMut(Movement),
     {
-        if let Some((piece_type, double_faced_piece)) = table.last_hand(drop) {
+        if let Some((piece_type, hand_addr)) = table.last_hand(drop) {
             // 打つぜ☆（＾～＾）
             let drop_fn = &mut |destination| {
                 if let None = table.piece_num_at(&destination) {
@@ -259,10 +259,10 @@ impl PseudoLegalMoves {
                         _ => {}
                     }
                     listen_move(Movement::new(
-                        AddressPos::Hand(double_faced_piece), // 打った駒種類
-                        destination,                          // どの升へ行きたいか
-                        false,                                // 打に成りは無し
-                        None,                                 // 打で取れる駒無し
+                        hand_addr,   // 打った駒種類
+                        destination, // どの升へ行きたいか
+                        false,       // 打に成りは無し
+                        None,        // 打で取れる駒無し
                     ));
                 }
             };
@@ -272,7 +272,7 @@ impl PseudoLegalMoves {
             use crate::cosmic::smart::features::DoubleFacedPieceType::*;
             match ty {
                 // 歩、香
-                Pawn | Lance => Area::drop_pawn_lance(friend, drop_fn),
+                Pawn | Lance => Area::drop_pawn_lance(&table.area, friend, drop_fn),
                 // 桂
                 Knight => Area::drop_knight(friend, drop_fn),
                 // それ以外の駒が打てる範囲は盤面全体。
@@ -285,18 +285,50 @@ impl PseudoLegalMoves {
 /// 次の升☆（＾～＾）
 pub struct Area {
     all_squares: [AddressPos; 81],
+    first_drop_pawn_lance: [AddressPos; 72],
+    second_drop_pawn_lance: [AddressPos; 72],
 }
 impl Default for Area {
     fn default() -> Self {
-        let mut v = [AddressPos::default(); 81];
-        let mut i = 0;
-        for rank in RANK_1..RANK_10 {
-            for file in (FILE_1..FILE_10).rev() {
-                v[i] = AddressPos::Board(AbsoluteAddress2D::new(file, rank));
-                i += 1;
+        fn all_sq_fn() -> [AddressPos; 81] {
+            let mut v = [AddressPos::default(); 81];
+            let mut i = 0;
+            for rank in RANK_1..RANK_10 {
+                for file in (FILE_1..FILE_10).rev() {
+                    v[i] = AddressPos::Board(AbsoluteAddress2D::new(file, rank));
+                    i += 1;
+                }
             }
+            v
         }
-        Area { all_squares: v }
+        fn first_drop_pawn_fn() -> [AddressPos; 72] {
+            let mut v = [AddressPos::default(); 72];
+            let mut i = 0;
+            for rank in RANK_2..RANK_10 {
+                for file in (FILE_1..FILE_10).rev() {
+                    v[i] = AddressPos::Board(AbsoluteAddress2D::new(file, rank));
+                    i += 1;
+                }
+            }
+            v
+        }
+        fn second_drop_pawn_fn() -> [AddressPos; 72] {
+            let mut v = [AddressPos::default(); 72];
+            let mut i = 0;
+            for rank in RANK_1..RANK_9 {
+                for file in (FILE_1..FILE_10).rev() {
+                    v[i] = AddressPos::Board(AbsoluteAddress2D::new(file, rank));
+                    i += 1;
+                }
+            }
+            v
+        }
+
+        Area {
+            all_squares: all_sq_fn(),
+            first_drop_pawn_lance: first_drop_pawn_fn(),
+            second_drop_pawn_lance: second_drop_pawn_fn(),
+        }
     }
 }
 impl Area {
@@ -570,20 +602,18 @@ impl Area {
     ///
     /// * `phase` - 後手視点にしたけりゃ phase.turn() しろだぜ☆（＾～＾）
     /// * `callback` - 絶対番地を受け取れだぜ☆（＾～＾）
-    pub fn drop_pawn_lance<F1>(phase: Phase, callback: &mut F1)
+    pub fn drop_pawn_lance<F1>(&self, phase: Phase, callback: &mut F1)
     where
         F1: FnMut(AddressPos),
     {
         // 180°回転とかするより、for文の方を変えた方が高速だろ……☆（＾～＾）
-        let (min_rank, max_rank) = if phase == Phase::First {
-            (RANK_2, RANK_10)
+        if phase == Phase::First {
+            for sq in self.first_drop_pawn_lance.iter() {
+                callback(*sq);
+            }
         } else {
-            (RANK_1, RANK_9)
-        };
-
-        for rank in min_rank..max_rank {
-            for file in (FILE_1..FILE_10).rev() {
-                callback(AddressPos::Board(AbsoluteAddress2D::new(file, rank)));
+            for sq in self.second_drop_pawn_lance.iter() {
+                callback(*sq);
             }
         }
     }
