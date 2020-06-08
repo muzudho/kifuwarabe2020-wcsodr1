@@ -2,6 +2,7 @@
 //! 現局面を使った指し手生成☆（＾～＾）
 //!
 
+use crate::cosmic::recording::PHASE_LEN;
 use crate::cosmic::recording::{AddressPos, CapturedMove, Movement, Phase};
 use crate::cosmic::smart::features::{DoubleFacedPiece, PieceType};
 use crate::cosmic::smart::square::{
@@ -272,11 +273,26 @@ impl PseudoLegalMoves {
             use crate::cosmic::smart::features::DoubleFacedPieceType::*;
             match ty {
                 // 歩、香
-                Pawn | Lance => Area::drop_pawn_lance(&table.area, friend, drop_fn),
+                Pawn | Lance => {
+                    // 先手から見た歩、香車の打てる面積だぜ☆（＾～＾）
+                    for sq in table.area.drop_pawn_lance[friend as usize].iter() {
+                        drop_fn(*sq);
+                    }
+                }
                 // 桂
-                Knight => table.area.drop_knight(friend, drop_fn),
+                Knight => {
+                    // 先手から見た桂馬の打てる面積だぜ☆（＾～＾）
+                    for sq in table.area.drop_knight[friend as usize].iter() {
+                        drop_fn(*sq);
+                    }
+                }
                 // それ以外の駒が打てる範囲は盤面全体。
-                _ => table.area.for_all(drop_fn),
+                _ => {
+                    // 全升の面積だぜ☆（＾～＾）駒を打つときに使うぜ☆（＾～＾）
+                    for sq in table.area.all_squares.iter() {
+                        drop_fn(*sq);
+                    }
+                }
             }
         }
     }
@@ -285,10 +301,8 @@ impl PseudoLegalMoves {
 /// 次の升☆（＾～＾）
 pub struct Area {
     all_squares: [AddressPos; 81],
-    first_drop_pawn_lance: [AddressPos; 72],
-    second_drop_pawn_lance: [AddressPos; 72],
-    first_drop_knight: [AddressPos; 63],
-    second_drop_knight: [AddressPos; 63],
+    drop_pawn_lance: [[AddressPos; 72]; PHASE_LEN],
+    drop_knight: [[AddressPos; 63]; PHASE_LEN],
 }
 impl Default for Area {
     fn default() -> Self {
@@ -350,28 +364,12 @@ impl Default for Area {
 
         Area {
             all_squares: all_sq_fn(),
-            first_drop_pawn_lance: first_drop_pawn_fn(),
-            second_drop_pawn_lance: second_drop_pawn_fn(),
-            first_drop_knight: first_drop_knight_fn(),
-            second_drop_knight: second_drop_knight_fn(),
+            drop_pawn_lance: [first_drop_pawn_fn(), second_drop_pawn_fn()],
+            drop_knight: [first_drop_knight_fn(), second_drop_knight_fn()],
         }
     }
 }
 impl Area {
-    /// 全升の面積だぜ☆（＾～＾）駒を打つときに使うぜ☆（＾～＾）
-    ///
-    /// Arguments
-    /// ---------
-    /// * `callback` - 絶対番地を受け取れだぜ☆（＾～＾）
-    pub fn for_all<F1>(&self, callback: &mut F1)
-    where
-        F1: FnMut(AddressPos),
-    {
-        for sq in self.all_squares.iter() {
-            callback(*sq);
-        }
-    }
-
     /// 先手から見た盤上の駒の動けるマスだぜ☆（＾～＾）
     ///
     /// Arguments
@@ -617,54 +615,6 @@ impl Area {
 
             for mobility in PieceType::Dragon.mobility().iter() {
                 Area::move_(&None, source, *mobility, moving);
-            }
-        }
-    }
-
-    /// 先手から見た歩、香車の打てる面積だぜ☆（＾～＾）
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `phase` - 後手視点にしたけりゃ phase.turn() しろだぜ☆（＾～＾）
-    /// * `callback` - 絶対番地を受け取れだぜ☆（＾～＾）
-    pub fn drop_pawn_lance<F1>(&self, phase: Phase, callback: &mut F1)
-    where
-        F1: FnMut(AddressPos),
-    {
-        // 180°回転とかするより、for文の方を変えた方が高速だろ……☆（＾～＾）
-        if phase == Phase::First {
-            for sq in self.first_drop_pawn_lance.iter() {
-                callback(*sq);
-            }
-        } else {
-            for sq in self.second_drop_pawn_lance.iter() {
-                callback(*sq);
-            }
-        }
-    }
-
-    /// 先手から見た桂馬の打てる面積だぜ☆（＾～＾）
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `phase` - 後手視点にしたけりゃ phase.turn() しろだぜ☆（＾～＾）
-    /// * `callback` - 絶対番地を受け取れだぜ☆（＾～＾）
-    pub fn drop_knight<F1>(&self, phase: Phase, callback: &mut F1)
-    where
-        F1: FnMut(AddressPos),
-    {
-        match phase {
-            Phase::First => {
-                for sq in self.first_drop_knight.iter() {
-                    callback(*sq);
-                }
-            }
-            Phase::Second => {
-                for sq in self.second_drop_knight.iter() {
-                    callback(*sq);
-                }
             }
         }
     }
