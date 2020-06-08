@@ -274,7 +274,7 @@ impl PseudoLegalMoves {
                 // 歩、香
                 Pawn | Lance => Area::drop_pawn_lance(&table.area, friend, drop_fn),
                 // 桂
-                Knight => Area::drop_knight(friend, drop_fn),
+                Knight => table.area.drop_knight(friend, drop_fn),
                 // それ以外の駒が打てる範囲は盤面全体。
                 _ => table.area.for_all(drop_fn),
             }
@@ -287,6 +287,8 @@ pub struct Area {
     all_squares: [AddressPos; 81],
     first_drop_pawn_lance: [AddressPos; 72],
     second_drop_pawn_lance: [AddressPos; 72],
+    first_drop_knight: [AddressPos; 63],
+    second_drop_knight: [AddressPos; 63],
 }
 impl Default for Area {
     fn default() -> Self {
@@ -323,11 +325,35 @@ impl Default for Area {
             }
             v
         }
+        fn first_drop_knight_fn() -> [AddressPos; 63] {
+            let mut v = [AddressPos::default(); 63];
+            let mut i = 0;
+            for rank in RANK_3..RANK_10 {
+                for file in (FILE_1..FILE_10).rev() {
+                    v[i] = AddressPos::Board(AbsoluteAddress2D::new(file, rank));
+                    i += 1;
+                }
+            }
+            v
+        }
+        fn second_drop_knight_fn() -> [AddressPos; 63] {
+            let mut v = [AddressPos::default(); 63];
+            let mut i = 0;
+            for rank in RANK_3..RANK_10 {
+                for file in (FILE_1..FILE_10).rev() {
+                    v[i] = AddressPos::Board(AbsoluteAddress2D::new(file, rank).rotate_180());
+                    i += 1;
+                }
+            }
+            v
+        }
 
         Area {
             all_squares: all_sq_fn(),
             first_drop_pawn_lance: first_drop_pawn_fn(),
             second_drop_pawn_lance: second_drop_pawn_fn(),
+            first_drop_knight: first_drop_knight_fn(),
+            second_drop_knight: second_drop_knight_fn(),
         }
     }
 }
@@ -625,18 +651,20 @@ impl Area {
     ///
     /// * `phase` - 後手視点にしたけりゃ phase.turn() しろだぜ☆（＾～＾）
     /// * `callback` - 絶対番地を受け取れだぜ☆（＾～＾）
-    pub fn drop_knight<F1>(phase: Phase, callback: &mut F1)
+    pub fn drop_knight<F1>(&self, phase: Phase, callback: &mut F1)
     where
         F1: FnMut(AddressPos),
     {
-        for rank in RANK_3..RANK_10 {
-            for file in (FILE_1..FILE_10).rev() {
-                let mut ab_adr = AbsoluteAddress2D::new(file, rank);
-                if phase == Phase::Second {
-                    ab_adr = ab_adr.rotate_180();
+        match phase {
+            Phase::First => {
+                for sq in self.first_drop_knight.iter() {
+                    callback(*sq);
                 }
-
-                callback(AddressPos::Board(ab_adr));
+            }
+            Phase::Second => {
+                for sq in self.second_drop_knight.iter() {
+                    callback(*sq);
+                }
             }
         }
     }
