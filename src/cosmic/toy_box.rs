@@ -232,7 +232,7 @@ pub struct GameTable {
     /// 駒の背番号を付けるのに使うぜ☆（＾～＾）
     double_faced_piece_type_index: [usize; PHYSICAL_PIECE_TYPE_LEN],
     /// 持ち駒☆（＾～＾）TODO 固定長サイズのスタックを用意したいぜ☆（＾～＾）
-    hands: HandStack,
+    phase_classification: PhaseClassification,
     /// 指し手生成に利用☆（＾～＾）
     pub area: Area,
 }
@@ -265,7 +265,7 @@ impl Default for GameTable {
                 PieceNum::Pawn23 as usize,
             ],
             // 持ち駒
-            hands: HandStack::default(),
+            phase_classification: PhaseClassification::default(),
             area: Area::default(),
         }
     }
@@ -297,7 +297,7 @@ impl GameTable {
             PieceNum::Pawn23 as usize,
         ];
         // 持ち駒☆（＾～＾）
-        self.hands = HandStack::default();
+        self.phase_classification = PhaseClassification::default();
     }
 
     /// 開始盤面を、現盤面にコピーしたいときに使うぜ☆（＾～＾）
@@ -306,7 +306,7 @@ impl GameTable {
         self.address_list = table.address_list.clone();
         self.piece_list = table.piece_list.clone();
         self.double_faced_piece_type_index = table.double_faced_piece_type_index.clone();
-        self.hands = table.hands.clone();
+        self.phase_classification = table.phase_classification.clone();
     }
 
     /// TODO 駒はカプセル化したいんで、なるべく他のメソッド使えだぜ☆（＾～＾）
@@ -395,7 +395,7 @@ impl GameTable {
             AddressPos::Hand(drop) => {
                 if let Some(piece_num_val) = piece_num {
                     // 持ち駒を１つ増やします。
-                    self.hands.push(*drop, piece_num_val);
+                    self.phase_classification.push(*drop, piece_num_val);
                     // 背番号に番地を紐づけます。
                     self.address_list[piece_num_val as usize] = *addr;
                 }
@@ -419,7 +419,7 @@ impl GameTable {
             AddressPos::Hand(drop) => {
                 // 場所で指定します。
                 // 台から取りのぞきます。
-                let piece_num = self.hands.pop(*drop);
+                let piece_num = self.phase_classification.pop(*drop);
                 // TODO 背番号の番地に、ゴミ値を入れて消去するが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
                 self.address_list[piece_num as usize] =
                     AddressPos::Board(AbsoluteAddress2D::default());
@@ -521,7 +521,7 @@ impl GameTable {
     }
     /// 指し手生成で使うぜ☆（＾～＾）有無を調べるぜ☆（＾～＾）
     pub fn last_hand_type(&self, drop: DoubleFacedPiece) -> Option<PieceType> {
-        if let Some(piece_num) = self.hands.last(drop) {
+        if let Some(piece_num) = self.phase_classification.last(drop) {
             Some(self.get_type(piece_num))
         } else {
             None
@@ -529,7 +529,7 @@ impl GameTable {
     }
     /// 指し手生成で使うぜ☆（＾～＾）
     pub fn last_hand(&self, drop: DoubleFacedPiece) -> Option<(PieceType, AddressPos)> {
-        if let Some(piece_num) = self.hands.last(drop) {
+        if let Some(piece_num) = self.phase_classification.last(drop) {
             let piece = self.get_piece(piece_num);
             Some((piece.type_(), AddressPos::Hand(piece.double_faced_piece())))
         } else {
@@ -537,7 +537,7 @@ impl GameTable {
         }
     }
     pub fn count_hand(&self, drop: DoubleFacedPiece) -> usize {
-        self.hands.len(drop)
+        self.phase_classification.len(drop)
     }
 
     /// 表示に使うだけ☆（＾～＾）
@@ -613,91 +613,87 @@ impl GameTable {
     }
 }
 
-#[derive(Clone)]
-pub struct HandStackArea {
-    start: isize,
-    step: isize,
-}
-impl HandStackArea {
-    pub fn new(start: isize, step: isize) -> Self {
-        HandStackArea {
-            start: start,
-            step: step,
-        }
-    }
-}
+/// 以下の４つを、漏れなく被りなく　分類するぜ☆（＾～＾）
+/// * 盤上の先手の駒
+/// * 盤上の後手の駒
+/// * 駒台の先手の駒
+/// * 駒台の後手の駒
 /// 駒台だぜ☆（＾～＾）これ１つで２人分あるんで☆（＾～＾）
 #[derive(Clone)]
-pub struct HandStack {
-    items: [PieceNum; 40],
-    areas: [HandStackArea; 16],
-    currents: [isize; 16],
+pub struct PhaseClassification {
+    items: [PieceNum; 80],
+    areas: [HandStackArea; 18],
+    currents: [isize; 18],
 }
-impl Default for HandStack {
+impl Default for PhaseClassification {
     // ゴミ値で埋めるぜ☆（＾～＾）
     fn default() -> Self {
-        HandStack {
-            items: [PieceNum::King1; 40],
+        PhaseClassification {
+            items: [PieceNum::King1; 80],
             areas: [
-                HandStackArea::new(0, 1),   // King1
-                HandStackArea::new(20, 1),  // Rook1
-                HandStackArea::new(18, 1),  // Bishop1
-                HandStackArea::new(2, 1),   // Gold1
-                HandStackArea::new(6, 1),   // Silver1
-                HandStackArea::new(10, 1),  // Knight1
-                HandStackArea::new(14, 1),  // Lance1
-                HandStackArea::new(22, 1),  // Pawn1
-                HandStackArea::new(1, -1),  // King2
-                HandStackArea::new(21, -1), // Rook2
-                HandStackArea::new(19, -1), // Bishop2
-                HandStackArea::new(5, -1),  // Gold2
-                HandStackArea::new(9, -1),  // Silver2
-                HandStackArea::new(13, -1), // Knight2
-                HandStackArea::new(17, -1), // Lance2
-                HandStackArea::new(39, -1), // Pawn2
+                HandStackArea::new(40, 1),  // King1
+                HandStackArea::new(60, 1),  // Rook1
+                HandStackArea::new(58, 1),  // Bishop1
+                HandStackArea::new(42, 1),  // Gold1
+                HandStackArea::new(46, 1),  // Silver1
+                HandStackArea::new(50, 1),  // Knight1
+                HandStackArea::new(54, 1),  // Lance1
+                HandStackArea::new(62, 1),  // Pawn1
+                HandStackArea::new(41, -1), // King2
+                HandStackArea::new(61, -1), // Rook2
+                HandStackArea::new(59, -1), // Bishop2
+                HandStackArea::new(45, -1), // Gold2
+                HandStackArea::new(49, -1), // Silver2
+                HandStackArea::new(53, -1), // Knight2
+                HandStackArea::new(57, -1), // Lance2
+                HandStackArea::new(79, -1), // Pawn2
+                HandStackArea::new(0, 1),   // Board1
+                HandStackArea::new(39, -1), // Board2
             ],
             currents: [
-                0,  // King1
-                20, // Rook1
-                18, // Bishop1
-                2,  // Gold1
-                6,  // Silver1
-                10, // Knight1
-                14, // Lance1
-                22, // Pawn1
-                1,  // King2
-                21, // Rook2
-                19, // Bishop2
-                5,  // Gold2
-                9,  // Silver2
-                13, // Knight2
-                17, // Lance2
-                39, // Pawn2
+                40, // King1
+                60, // Rook1
+                58, // Bishop1
+                42, // Gold1
+                46, // Silver1
+                50, // Knight1
+                54, // Lance1
+                62, // Pawn1
+                41, // King2
+                61, // Rook2
+                59, // Bishop2
+                45, // Gold2
+                49, // Silver2
+                53, // Knight2
+                57, // Lance2
+                79, // Pawn2
+                0,  // Board1
+                39, // Board2
             ],
         }
     }
 }
-impl HandStack {
+impl PhaseClassification {
     /// 駒の先後を ひっくり返してから入れてください。
     pub fn push(&mut self, drop: DoubleFacedPiece, num: PieceNum) {
         let area = &self.areas[drop as usize];
         // 駒台に駒を置くぜ☆（＾～＾）
         self.items[self.currents[drop as usize] as usize] = num;
         // 位置を増減するぜ☆（＾～＾）
-        self.currents[drop as usize] += area.step;
+        self.currents[drop as usize] += area.direction;
     }
     /// ゴミ値は消さないぜ☆（＾～＾）
     pub fn pop(&mut self, drop: DoubleFacedPiece) -> PieceNum {
         let area = &self.areas[drop as usize];
         // 位置を増減するぜ☆（＾～＾）
-        self.currents[drop as usize] -= area.step;
+        self.currents[drop as usize] -= area.direction;
         // 駒台の駒をはがすぜ☆（＾～＾）
         self.items[self.currents[drop as usize] as usize]
     }
 
     fn last(&self, drop: DoubleFacedPiece) -> Option<PieceNum> {
         let area = &self.areas[drop as usize];
-        if area.step == 1 {
+        if area.direction == 1 {
             if area.start < self.currents[drop as usize] {
                 Some(self.items[(self.currents[drop as usize] - 1) as usize])
             } else {
@@ -714,7 +710,7 @@ impl HandStack {
 
     fn len(&self, drop: DoubleFacedPiece) -> usize {
         let area = &self.areas[drop as usize];
-        if area.step == 1 {
+        if area.direction == 1 {
             (self.currents[drop as usize] - area.start) as usize
         } else {
             (area.start - self.currents[drop as usize]) as usize
@@ -733,4 +729,19 @@ impl HandStack {
         buffer.trim_end().to_string()
     }
     */
+}
+#[derive(Clone)]
+pub struct HandStackArea {
+    // 開始地点。
+    start: isize,
+    // 向き。+1, -1。
+    direction: isize,
+}
+impl HandStackArea {
+    pub fn new(start: isize, direction: isize) -> Self {
+        HandStackArea {
+            start: start,
+            direction: direction,
+        }
+    }
 }
