@@ -9,7 +9,7 @@ use crate::cosmic::smart::square::{
     AbsoluteAddress2D, Angle, RelAdr2D, FILE_1, FILE_10, RANK_1, RANK_10, RANK_2, RANK_3, RANK_4,
     RANK_6, RANK_7, RANK_8, RANK_9,
 };
-use crate::cosmic::toy_box::GameTable;
+use crate::cosmic::toy_box::{GameTable, UnifiedAddress};
 use crate::spaceship::equipment::Beam;
 use std::fmt;
 
@@ -175,7 +175,7 @@ impl PseudoLegalMoves {
                                     false,
                                     if let Some(piece_num_val) = pseudo_captured_num {
                                         Some(CapturedMove::new(
-                                            &destination,
+                                            UnifiedAddress::from_address_pos(&destination),
                                             table.get_type(piece_num_val),
                                         ))
                                     } else {
@@ -189,7 +189,7 @@ impl PseudoLegalMoves {
                                 true,
                                 if let Some(piece_num_val) = pseudo_captured_num {
                                     Some(CapturedMove::new(
-                                        &destination,
+                                        UnifiedAddress::from_address_pos(&destination),
                                         table.get_type(piece_num_val),
                                     ))
                                 } else {
@@ -206,7 +206,7 @@ impl PseudoLegalMoves {
                                     promotion,
                                     if let Some(piece_num_val) = pseudo_captured_num {
                                         Some(CapturedMove::new(
-                                            &destination,
+                                            UnifiedAddress::from_address_pos(&destination),
                                             table.get_type(piece_num_val),
                                         ))
                                     } else {
