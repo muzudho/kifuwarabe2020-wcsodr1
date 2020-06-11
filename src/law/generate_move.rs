@@ -98,9 +98,13 @@ impl PseudoLegalMoves {
         F1: FnMut(Movement),
     {
         table.for_some_pieces_on_list40(friend, &mut |addr, piece_type| match addr {
-            AddressPos::Board(_src_sq) => {
-                PseudoLegalMoves::start_on_board(friend, &addr, piece_type, table, listen_move)
-            }
+            AddressPos::Board(_src_sq) => PseudoLegalMoves::start_on_board(
+                friend,
+                UnifiedAddress::from_address_pos(friend, &addr),
+                piece_type,
+                table,
+                listen_move,
+            ),
             AddressPos::Hand(drop) => {
                 PseudoLegalMoves::make_drop(friend, drop, table, listen_move);
             }
@@ -124,7 +128,7 @@ impl PseudoLegalMoves {
     /// * 移動先にあった駒
     fn start_on_board<F1>(
         friend: Phase,
-        source: &AddressPos,
+        source: UnifiedAddress,
         piece_type: PieceType,
         table: &GameTable,
         listen_move: &mut F1,
@@ -172,7 +176,7 @@ impl PseudoLegalMoves {
                             // 成ったり、成れなかったりできるとき。
                             if !forbidden {
                                 listen_move(Movement::new(
-                                    *source,
+                                    source.to_address_pos(),
                                     destination,
                                     false,
                                     if let Some(piece_num_val) = pseudo_captured_num {
@@ -186,7 +190,7 @@ impl PseudoLegalMoves {
                                 ));
                             }
                             listen_move(Movement::new(
-                                *source,
+                                source.to_address_pos(),
                                 destination,
                                 true,
                                 if let Some(piece_num_val) = pseudo_captured_num {
@@ -203,7 +207,7 @@ impl PseudoLegalMoves {
                             // 成れるか、成れないかのどちらかのとき。
                             if promotion || !forbidden {
                                 listen_move(Movement::new(
-                                    *source,
+                                    source.to_address_pos(),
                                     destination,
                                     promotion,
                                     if let Some(piece_num_val) = pseudo_captured_num {
@@ -223,12 +227,7 @@ impl PseudoLegalMoves {
                 !space
             };
 
-        Area::piece_of(
-            piece_type,
-            friend,
-            UnifiedAddress::from_address_pos(friend, &source),
-            moving,
-        );
+        Area::piece_of(piece_type, friend, source, moving);
     }
 
     /// 駒台を見ようぜ☆（＾～＾） 駒台の駒の動きを作るぜ☆（＾～＾）
