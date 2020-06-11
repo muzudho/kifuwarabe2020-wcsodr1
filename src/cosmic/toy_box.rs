@@ -203,58 +203,59 @@ impl Default for UnifiedAddress {
     }
 }
 impl UnifiedAddress {
-    pub fn from_absolute_address(addr: &AbsoluteAddress2D) -> Self {
+    pub fn from_absolute_address(friend: Phase, addr: &AbsoluteAddress2D) -> Self {
+        let second = if friend == Phase::Second { 81 } else { 0 };
         let num = addr.serial_number();
         if 10 < num && num < 20 {
-            if let Some(val) = UnifiedAddress::from_usize(num - 10) {
+            if let Some(val) = UnifiedAddress::from_usize(second + num - 11) {
                 val
             } else {
                 panic!(Beam::trouble("(Err.124) 番地を変換できね☆（＾～＾）"))
             }
         } else if 20 < num && num < 30 {
-            if let Some(val) = UnifiedAddress::from_usize(num - 20 + 9) {
+            if let Some(val) = UnifiedAddress::from_usize(second + num - 21 + 9) {
                 val
             } else {
                 panic!(Beam::trouble("(Err.131) 番地を変換できね☆（＾～＾）"))
             }
         } else if 30 < num && num < 40 {
-            if let Some(val) = UnifiedAddress::from_usize(num - 30 + 2 * 9) {
+            if let Some(val) = UnifiedAddress::from_usize(second + num - 31 + 2 * 9) {
                 val
             } else {
                 panic!(Beam::trouble("(Err.137) 番地を変換できね☆（＾～＾）"))
             }
         } else if 40 < num && num < 50 {
-            if let Some(val) = UnifiedAddress::from_usize(num - 40 + 3 * 9) {
+            if let Some(val) = UnifiedAddress::from_usize(second + num - 41 + 3 * 9) {
                 val
             } else {
                 panic!(Beam::trouble("(Err.143) 番地を変換できね☆（＾～＾）"))
             }
         } else if 50 < num && num < 60 {
-            if let Some(val) = UnifiedAddress::from_usize(num - 50 + 4 * 9) {
+            if let Some(val) = UnifiedAddress::from_usize(second + num - 51 + 4 * 9) {
                 val
             } else {
                 panic!(Beam::trouble("(Err.149) 番地を変換できね☆（＾～＾）"))
             }
         } else if 60 < num && num < 70 {
-            if let Some(val) = UnifiedAddress::from_usize(num - 60 + 5 * 9) {
+            if let Some(val) = UnifiedAddress::from_usize(second + num - 61 + 5 * 9) {
                 val
             } else {
                 panic!(Beam::trouble("(Err.155) 番地を変換できね☆（＾～＾）"))
             }
         } else if 70 < num && num < 80 {
-            if let Some(val) = UnifiedAddress::from_usize(num - 70 + 6 * 9) {
+            if let Some(val) = UnifiedAddress::from_usize(second + num - 71 + 6 * 9) {
                 val
             } else {
                 panic!(Beam::trouble("(Err.161) 番地を変換できね☆（＾～＾）"))
             }
         } else if 80 < num && num < 90 {
-            if let Some(val) = UnifiedAddress::from_usize(num - 80 + 7 * 9) {
+            if let Some(val) = UnifiedAddress::from_usize(second + num - 81 + 7 * 9) {
                 val
             } else {
                 panic!(Beam::trouble("(Err.167) 番地を変換できね☆（＾～＾）"))
             }
         } else if 90 < num && num < 100 {
-            if let Some(val) = UnifiedAddress::from_usize(num - 90 + 8 * 9) {
+            if let Some(val) = UnifiedAddress::from_usize(second + num - 91 + 8 * 9) {
                 val
             } else {
                 panic!(Beam::trouble("(Err.173) 番地を変換できね☆（＾～＾）"))
@@ -316,9 +317,9 @@ impl UnifiedAddress {
         MAP[self as usize]
     }
 
-    pub fn from_address_pos(addr: &AddressPos) -> Self {
+    pub fn from_address_pos(friend: Phase, addr: &AddressPos) -> Self {
         match addr {
-            AddressPos::Board(sq) => UnifiedAddress::from_absolute_address(sq),
+            AddressPos::Board(sq) => UnifiedAddress::from_absolute_address(friend, sq),
             AddressPos::Hand(drop) => UnifiedAddress::from_double_faced_piece(*drop),
         }
     }
@@ -861,7 +862,7 @@ impl GameTable {
                     move2_val.piece_type.double_faced_piece_type(),
                 );
                 let addr_pos1 = AddressPos::Hand(double_faced_piece);
-                let uni_addr = UnifiedAddress::from_address_pos(&addr_pos1);
+                let uni_addr = UnifiedAddress::from_address_pos(friend, &addr_pos1);
                 let addr_pos2 = uni_addr.to_address_pos();
                 /*
                 Beam::shoot(&format!(
@@ -986,7 +987,7 @@ impl GameTable {
         match addr {
             AddressPos::Board(sq) => self.board[sq.serial_number() as usize],
             _ => panic!(Beam::trouble(&format!(
-                "(Err.254) まだ実装してないぜ☆（＾～＾）！",
+                "(Err.254) まだ駒台は実装してないぜ☆（＾～＾）！",
             ))),
         }
     }

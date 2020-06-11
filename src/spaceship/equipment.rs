@@ -3,6 +3,7 @@ use crate::config::*;
 use crate::cosmic::daydream::Value;
 use crate::cosmic::recording::Movement;
 use crate::cosmic::smart::square::test_rotation;
+use crate::law::generate_move::test_area;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
@@ -16,6 +17,7 @@ pub struct Telescope {}
 impl Telescope {
     pub fn look() {
         test_rotation();
+        test_area();
     }
 }
 

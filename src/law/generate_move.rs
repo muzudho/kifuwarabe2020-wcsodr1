@@ -175,7 +175,7 @@ impl PseudoLegalMoves {
                                     false,
                                     if let Some(piece_num_val) = pseudo_captured_num {
                                         Some(CapturedMove::new(
-                                            UnifiedAddress::from_address_pos(&destination),
+                                            UnifiedAddress::from_address_pos(friend, &destination),
                                             table.get_type(piece_num_val),
                                         ))
                                     } else {
@@ -189,7 +189,7 @@ impl PseudoLegalMoves {
                                 true,
                                 if let Some(piece_num_val) = pseudo_captured_num {
                                     Some(CapturedMove::new(
-                                        UnifiedAddress::from_address_pos(&destination),
+                                        UnifiedAddress::from_address_pos(friend, &destination),
                                         table.get_type(piece_num_val),
                                     ))
                                 } else {
@@ -206,7 +206,7 @@ impl PseudoLegalMoves {
                                     promotion,
                                     if let Some(piece_num_val) = pseudo_captured_num {
                                         Some(CapturedMove::new(
-                                            UnifiedAddress::from_address_pos(&destination),
+                                            UnifiedAddress::from_address_pos(friend, &destination),
                                             table.get_type(piece_num_val),
                                         ))
                                     } else {
@@ -298,6 +298,31 @@ impl PseudoLegalMoves {
     }
 }
 
+pub fn test_area() {
+    let area = Area::default();
+    /*
+    for friend in 0..2 {
+        for i in 0..81 {
+            let uni_addr = area.all_squares[friend][i] as usize;
+            println!("area: friend={} i={} uni_addr={}", friend, i, uni_addr)
+        }
+    }
+    */
+    for friend in 0..2 {
+        for i in 0..81 {
+            let uni_addr = area.all_squares[friend][i] as usize;
+            let expected = friend * 81 + i;
+            debug_assert!(
+                expected == uni_addr,
+                format!(
+                    "area: friend={} i={} expected={} uni_addr={}",
+                    friend, i, expected, uni_addr
+                )
+            );
+        }
+    }
+}
+
 /// 次の升☆（＾～＾）
 pub struct Area {
     /// 変わっているが、すべてのマスは先後に分かれているぜ☆（＾～＾）
@@ -310,11 +335,12 @@ impl Default for Area {
         fn all_first_sq_fn() -> [UnifiedAddress; 81] {
             let mut v = [UnifiedAddress::default(); 81];
             let mut i = 0;
-            for rank in RANK_1..RANK_10 {
-                for file in (FILE_1..FILE_10).rev() {
-                    v[i] = UnifiedAddress::from_address_pos(&AddressPos::Board(
-                        AbsoluteAddress2D::new(file, rank),
-                    ));
+            for file in FILE_1..FILE_10 {
+                for rank in RANK_1..RANK_10 {
+                    v[i] = UnifiedAddress::from_address_pos(
+                        Phase::First,
+                        &AddressPos::Board(AbsoluteAddress2D::new(file, rank)),
+                    );
                     i += 1;
                 }
             }
@@ -323,11 +349,12 @@ impl Default for Area {
         fn all_second_sq_fn() -> [UnifiedAddress; 81] {
             let mut v = [UnifiedAddress::default(); 81];
             let mut i = 0;
-            for rank in RANK_1..RANK_10 {
-                for file in (FILE_1..FILE_10).rev() {
-                    v[i] = UnifiedAddress::from_address_pos(&AddressPos::Board(
-                        AbsoluteAddress2D::new(file, rank),
-                    ));
+            for file in FILE_1..FILE_10 {
+                for rank in RANK_1..RANK_10 {
+                    v[i] = UnifiedAddress::from_address_pos(
+                        Phase::Second,
+                        &AddressPos::Board(AbsoluteAddress2D::new(file, rank)),
+                    );
                     i += 1;
                 }
             }
@@ -338,9 +365,10 @@ impl Default for Area {
             let mut i = 0;
             for rank in RANK_2..RANK_10 {
                 for file in (FILE_1..FILE_10).rev() {
-                    v[i] = UnifiedAddress::from_address_pos(&AddressPos::Board(
-                        AbsoluteAddress2D::new(file, rank),
-                    ));
+                    v[i] = UnifiedAddress::from_address_pos(
+                        Phase::First,
+                        &AddressPos::Board(AbsoluteAddress2D::new(file, rank)),
+                    );
                     i += 1;
                 }
             }
@@ -351,9 +379,10 @@ impl Default for Area {
             let mut i = 0;
             for rank in RANK_1..RANK_9 {
                 for file in (FILE_1..FILE_10).rev() {
-                    v[i] = UnifiedAddress::from_address_pos(&AddressPos::Board(
-                        AbsoluteAddress2D::new(file, rank),
-                    ));
+                    v[i] = UnifiedAddress::from_address_pos(
+                        Phase::Second,
+                        &AddressPos::Board(AbsoluteAddress2D::new(file, rank)),
+                    );
                     i += 1;
                 }
             }
@@ -364,9 +393,10 @@ impl Default for Area {
             let mut i = 0;
             for rank in RANK_3..RANK_10 {
                 for file in (FILE_1..FILE_10).rev() {
-                    v[i] = UnifiedAddress::from_address_pos(&AddressPos::Board(
-                        AbsoluteAddress2D::new(file, rank),
-                    ));
+                    v[i] = UnifiedAddress::from_address_pos(
+                        Phase::First,
+                        &AddressPos::Board(AbsoluteAddress2D::new(file, rank)),
+                    );
                     i += 1;
                 }
             }
@@ -377,9 +407,10 @@ impl Default for Area {
             let mut i = 0;
             for rank in RANK_3..RANK_10 {
                 for file in (FILE_1..FILE_10).rev() {
-                    v[i] = UnifiedAddress::from_address_pos(&AddressPos::Board(
-                        AbsoluteAddress2D::new(file, rank).rotate_180(),
-                    ));
+                    v[i] = UnifiedAddress::from_address_pos(
+                        Phase::Second,
+                        &AddressPos::Board(AbsoluteAddress2D::new(file, rank).rotate_180()),
+                    );
                     i += 1;
                 }
             }
@@ -853,7 +884,10 @@ impl Promoting {
                 Agility::Knight,
                 move_permission,
             )
-        } else if Promoting::is_third_farthest_rank_from_friend(friend, &destination) {
+        } else if Promoting::is_third_farthest_rank_from_friend(
+            friend,
+            UnifiedAddress::from_address_pos(friend, &destination),
+        ) {
             callback(
                 *destination,
                 Promotability::Any,
@@ -889,11 +923,14 @@ impl Promoting {
     where
         F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        if Promoting::is_third_farthest_rank_from_friend(friend, &source) {
+        if Promoting::is_third_farthest_rank_from_friend(
+            friend,
+            UnifiedAddress::from_address_pos(friend, &source),
+        ) {
             callback(*destination, Promotability::Any, Agility::Hopping, None)
         } else if Promoting::is_opponent_region(
             friend,
-            UnifiedAddress::from_address_pos(&destination),
+            UnifiedAddress::from_address_pos(friend, &destination),
         ) {
             callback(*destination, Promotability::Any, Agility::Hopping, None)
         } else {
@@ -920,8 +957,11 @@ impl Promoting {
     where
         F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        if Promoting::is_opponent_region(friend, UnifiedAddress::from_address_pos(&source))
-            || Promoting::is_opponent_region(friend, UnifiedAddress::from_address_pos(&destination))
+        if Promoting::is_opponent_region(friend, UnifiedAddress::from_address_pos(friend, &source))
+            || Promoting::is_opponent_region(
+                friend,
+                UnifiedAddress::from_address_pos(friend, &destination),
+            )
         {
             callback(*destination, Promotability::Any, Agility::Sliding, None)
         } else {
@@ -990,8 +1030,8 @@ impl Promoting {
     ///
     /// * `friend` -
     /// * `destination` -
-    fn is_third_farthest_rank_from_friend(friend: Phase, destination: &AddressPos) -> bool {
-        match destination {
+    fn is_third_farthest_rank_from_friend(friend: Phase, destination: UnifiedAddress) -> bool {
+        match destination.to_address_pos() {
             AddressPos::Board(dst_sq) => {
                 (friend == Phase::First && dst_sq.rank() == RANK_3)
                     || (friend == Phase::Second && RANK_7 == dst_sq.rank())

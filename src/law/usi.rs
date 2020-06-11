@@ -163,7 +163,10 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
     let captured_piece_num = game.table.piece_num_at(&buffer.destination);
     buffer.captured = if let Some(captured_piece_num_val) = captured_piece_num {
         Some(CapturedMove::new(
-            UnifiedAddress::from_address_pos(&buffer.destination),
+            UnifiedAddress::from_address_pos(
+                game.history.get_friend(), // game.table.get_phase(captured_piece_num_val),
+                &buffer.destination,
+            ),
             game.table.get_type(captured_piece_num_val),
         ))
     } else {
