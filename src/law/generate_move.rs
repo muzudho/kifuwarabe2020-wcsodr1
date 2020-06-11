@@ -156,7 +156,9 @@ impl PseudoLegalMoves {
 
                     // 成りじゃない場合は、行き先のない動きを制限されるぜ☆（＾～＾）
                     let forbidden = if let Some(move_permission_val) = move_permission {
-                        if move_permission_val.check(&destination) {
+                        if move_permission_val
+                            .check(UnifiedAddress::from_address_pos(friend, &destination))
+                        {
                             false
                         } else {
                             true
@@ -221,7 +223,12 @@ impl PseudoLegalMoves {
                 !space
             };
 
-        Area::piece_of(piece_type, friend, &source, moving);
+        Area::piece_of(
+            piece_type,
+            friend,
+            UnifiedAddress::from_address_pos(friend, &source),
+            moving,
+        );
     }
 
     /// 駒台を見ようぜ☆（＾～＾） 駒台の駒の動きを作るぜ☆（＾～＾）
@@ -435,7 +442,7 @@ impl Area {
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `hopping` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     /// * `sliding` -
-    fn piece_of<F1>(piece_type: PieceType, friend: Phase, source: &AddressPos, moving: &mut F1)
+    fn piece_of<F1>(piece_type: PieceType, friend: Phase, source: UnifiedAddress, moving: &mut F1)
     where
         F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
@@ -465,7 +472,7 @@ impl Area {
     /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn pawn<F1>(friend: Phase, source: &AddressPos, moving: &mut F1)
+    fn pawn<F1>(friend: Phase, source: UnifiedAddress, moving: &mut F1)
     where
         F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
@@ -491,7 +498,7 @@ impl Area {
     /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn lance<F1>(friend: Phase, source: &AddressPos, moving: &mut F1)
+    fn lance<F1>(friend: Phase, source: UnifiedAddress, moving: &mut F1)
     where
         F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
@@ -517,7 +524,7 @@ impl Area {
     /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn knight<F1>(friend: Phase, source: &AddressPos, moving: &mut F1)
+    fn knight<F1>(friend: Phase, source: UnifiedAddress, moving: &mut F1)
     where
         F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
@@ -543,14 +550,14 @@ impl Area {
     /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn silver<F1>(friend: Phase, source: &AddressPos, moving: &mut F1)
+    fn silver<F1>(friend: Phase, source: UnifiedAddress, moving: &mut F1)
     where
         F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving = &mut |destination, _agility| {
             Promoting::silver(
                 friend,
-                UnifiedAddress::from_address_pos(friend, &source),
+                source,
                 UnifiedAddress::from_address_pos(friend, &destination),
                 moving,
             )
@@ -569,7 +576,7 @@ impl Area {
     /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn gold<F1>(friend: Phase, source: &AddressPos, moving: &mut F1)
+    fn gold<F1>(friend: Phase, source: UnifiedAddress, moving: &mut F1)
     where
         F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
@@ -589,7 +596,7 @@ impl Area {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn king<F1>(source: &AddressPos, moving: &mut F1)
+    fn king<F1>(source: UnifiedAddress, moving: &mut F1)
     where
         F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
@@ -609,14 +616,14 @@ impl Area {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn bishop<F1>(friend: Phase, source: &AddressPos, moving: &mut F1)
+    fn bishop<F1>(friend: Phase, source: UnifiedAddress, moving: &mut F1)
     where
         F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving = &mut |destination, _agility| {
             Promoting::bishop_rook(
                 friend,
-                UnifiedAddress::from_address_pos(friend, &source),
+                source,
                 UnifiedAddress::from_address_pos(friend, &destination),
                 moving,
             )
@@ -633,14 +640,14 @@ impl Area {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn rook<F1>(friend: Phase, source: &AddressPos, moving: &mut F1)
+    fn rook<F1>(friend: Phase, source: UnifiedAddress, moving: &mut F1)
     where
         F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving = &mut |destination, _agility| {
             Promoting::bishop_rook(
                 friend,
-                UnifiedAddress::from_address_pos(friend, &source),
+                source,
                 UnifiedAddress::from_address_pos(friend, &destination),
                 moving,
             )
@@ -657,7 +664,7 @@ impl Area {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn horse<F1>(source: &AddressPos, moving: &mut F1)
+    fn horse<F1>(source: UnifiedAddress, moving: &mut F1)
     where
         F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
@@ -676,7 +683,7 @@ impl Area {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn dragon<F1>(source: &AddressPos, moving: &mut F1)
+    fn dragon<F1>(source: UnifiedAddress, moving: &mut F1)
     where
         F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
@@ -699,7 +706,7 @@ impl Area {
     /// * `angle` - 角度☆（＾～＾）
     /// * `agility` - 動き方☆（＾～＾）
     /// * `callback` - 絶対番地を受け取れだぜ☆（＾～＾）
-    fn move_<F1>(friend: &Option<Phase>, start: &AddressPos, mobility: Mobility, moving: &mut F1)
+    fn move_<F1>(friend: &Option<Phase>, start: UnifiedAddress, mobility: Mobility, moving: &mut F1)
     where
         F1: FnMut(AddressPos, Agility) -> bool,
     {
@@ -715,7 +722,7 @@ impl Area {
             mobility.angle
         };
 
-        match start {
+        match start.to_address_pos() {
             AddressPos::Board(start_sq) => {
                 match mobility.agility {
                     Agility::Sliding => {
@@ -808,8 +815,8 @@ impl MovePermission {
             },
         }
     }
-    fn check(&self, dst_addr: &AddressPos) -> bool {
-        match dst_addr {
+    fn check(&self, dst_addr: UnifiedAddress) -> bool {
+        match dst_addr.to_address_pos() {
             AddressPos::Board(dst_sq) => {
                 if dst_sq.rank() < self.min_rank || self.max_rank < dst_sq.rank() {
                     return false;
