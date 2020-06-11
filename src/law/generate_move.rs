@@ -99,14 +99,13 @@ impl PseudoLegalMoves {
     {
         table.for_some_pieces_on_list40(friend, &mut |addr:UnifiedAddress, piece_type| match addr.to_address_pos() {
             AddressPos::Board(_src_sq) => PseudoLegalMoves::start_on_board(
-                friend,
                 addr,
                 piece_type,
                 table,
                 listen_move,
             ),
             AddressPos::Hand(drop) => {
-                PseudoLegalMoves::make_drop(friend, drop, table, listen_move);
+                PseudoLegalMoves::make_drop(drop, table, listen_move);
             }
         });
     }
@@ -127,7 +126,6 @@ impl PseudoLegalMoves {
     /// * 指し手ハッシュ
     /// * 移動先にあった駒
     fn start_on_board<F1>(
-        friend: Phase,
         source: UnifiedAddress,
         piece_type: PieceType,
         table: &GameTable,
@@ -135,6 +133,7 @@ impl PseudoLegalMoves {
     ) where
         F1: FnMut(Movement),
     {
+        let friend = source.to_phase();
         let moving = &mut |destination: UnifiedAddress,
                            promotability,
                            _agility,
@@ -239,10 +238,11 @@ impl PseudoLegalMoves {
     /// * `table` - 現局面の盤上だぜ☆（＾～＾）
     /// * `listen_move` - 指し手を受け取れだぜ☆（＾～＾）
     /// * `listen_control` - 利きを受け取れだぜ☆（＾～＾）
-    fn make_drop<F1>(friend: Phase, drop: DoubleFacedPiece, table: &GameTable, listen_move: &mut F1)
+    fn make_drop<F1>(drop: DoubleFacedPiece, table: &GameTable, listen_move: &mut F1)
     where
         F1: FnMut(Movement),
     {
+        let friend = drop.phase();
         if let Some((piece_type, hand_addr)) = table.last_hand(drop) {
             // 打つぜ☆（＾～＾）
             let drop_fn = &mut |destination: UnifiedAddress| {
