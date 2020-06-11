@@ -124,8 +124,56 @@ impl UnifiedAddress {
             } else {
                 panic!(Beam::trouble("(Err.124) 番地を変換できね☆（＾～＾）"))
             }
+        } else if 20 < num && num < 30 {
+            if let Some(val) = UnifiedAddress::from_usize(num - 20) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.131) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 30 < num && num < 40 {
+            if let Some(val) = UnifiedAddress::from_usize(num - 30) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.137) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 40 < num && num < 50 {
+            if let Some(val) = UnifiedAddress::from_usize(num - 40) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.143) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 50 < num && num < 60 {
+            if let Some(val) = UnifiedAddress::from_usize(num - 50) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.149) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 60 < num && num < 70 {
+            if let Some(val) = UnifiedAddress::from_usize(num - 60) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.155) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 70 < num && num < 80 {
+            if let Some(val) = UnifiedAddress::from_usize(num - 70) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.161) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 80 < num && num < 90 {
+            if let Some(val) = UnifiedAddress::from_usize(num - 80) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.167) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 90 < num && num < 100 {
+            if let Some(val) = UnifiedAddress::from_usize(num - 90) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.173) 番地を変換できね☆（＾～＾）"))
+            }
         } else {
-            panic!(Beam::trouble("(Err.127) 番地を変換できね☆（＾～＾）"))
+            panic!(Beam::trouble("(Err.176) 番地を変換できね☆（＾～＾）"))
         }
     }
 
@@ -179,6 +227,13 @@ impl UnifiedAddress {
             DoubleFacedPiece::Pawn2,
         ];
         map[self as usize]
+    }
+
+    pub fn from_address_pos(addr: &AddressPos) -> Self {
+        match addr {
+            AddressPos::Board(sq) => UnifiedAddress::from_absolute_address(sq),
+            AddressPos::Hand(drop) => UnifiedAddress::from_double_faced_piece(*drop),
+        }
     }
 
     pub fn to_address_pos(self) -> AddressPos {
