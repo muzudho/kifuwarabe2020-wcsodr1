@@ -841,7 +841,10 @@ impl Promoting {
                 Agility::Hopping,
                 move_permission,
             )
-        } else if Promoting::is_second_third_farthest_rank_from_friend(friend, &destinaion) {
+        } else if Promoting::is_second_third_farthest_rank_from_friend(
+            friend,
+            UnifiedAddress::from_address_pos(friend, &destinaion),
+        ) {
             // 自陣から見て二番、三番目の奥の段
             callback(
                 *destinaion,
@@ -1012,8 +1015,11 @@ impl Promoting {
     ///
     /// * `friend` -
     /// * `destination` -
-    fn is_second_third_farthest_rank_from_friend(friend: Phase, destination: &AddressPos) -> bool {
-        match destination {
+    fn is_second_third_farthest_rank_from_friend(
+        friend: Phase,
+        destination: UnifiedAddress,
+    ) -> bool {
+        match destination.to_address_pos() {
             AddressPos::Board(dst_sq) => {
                 (friend == Phase::First && RANK_1 < dst_sq.rank() && dst_sq.rank() < RANK_4)
                     || (friend == Phase::Second && RANK_6 < dst_sq.rank() && dst_sq.rank() < RANK_9)
