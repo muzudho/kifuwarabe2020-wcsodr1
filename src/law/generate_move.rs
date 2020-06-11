@@ -289,8 +289,17 @@ impl PseudoLegalMoves {
                 // それ以外の駒が打てる範囲は盤面全体。
                 _ => {
                     // 全升の面積だぜ☆（＾～＾）駒を打つときに使うぜ☆（＾～＾）
-                    for sq in table.area.all_squares.iter() {
-                        drop_fn(*sq);
+                    match drop.phase() {
+                        Phase::First => {
+                            for sq in table.area.first_all_squares.iter() {
+                                drop_fn(*sq);
+                            }
+                        }
+                        Phase::Second => {
+                            for sq in table.area.second_all_squares.iter() {
+                                drop_fn(*sq);
+                            }
+                        }
                     }
                 }
             }
@@ -300,7 +309,9 @@ impl PseudoLegalMoves {
 
 /// 次の升☆（＾～＾）
 pub struct Area {
-    all_squares: [AddressPos; 81],
+    /// 変わっているが、すべてのマスは先後に分かれているぜ☆（＾～＾）
+    first_all_squares: [AddressPos; 81],
+    second_all_squares: [AddressPos; 81],
     drop_pawn_lance: [[AddressPos; 72]; PHASE_LEN],
     drop_knight: [[AddressPos; 63]; PHASE_LEN],
 }
@@ -363,7 +374,8 @@ impl Default for Area {
         }
 
         Area {
-            all_squares: all_sq_fn(),
+            first_all_squares: all_sq_fn(),
+            second_all_squares: all_sq_fn(),
             drop_pawn_lance: [first_drop_pawn_fn(), second_drop_pawn_fn()],
             drop_knight: [first_drop_knight_fn(), second_drop_knight_fn()],
         }

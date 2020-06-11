@@ -63,6 +63,7 @@ struct SpeedOfLight {
     /// 玉２枚引く☆（＾～＾）
     double_faced_pieces_legal_all: [DoubleFacedPiece; PHYSICAL_PIECES_LEN - 2],
     double_faced_pieces: [[DoubleFacedPiece; PHYSICAL_PIECE_TYPE_LEN]; PHASE_LEN],
+    double_faced_piece_to_phase_table: [Phase; PHYSICAL_PIECES_LEN],
     double_faced_piece_to_type_table: [DoubleFacedPieceType; PHYSICAL_PIECES_LEN],
     double_faced_piece_to_captured_value: [isize; PHYSICAL_PIECE_TYPE_LEN],
     double_faced_piece_to_nonpromoted_piece: [Piece; PHYSICAL_PIECES_LEN],
@@ -484,6 +485,25 @@ impl Default for SpeedOfLight {
                 ],
             ],
 
+            double_faced_piece_to_phase_table: [
+                Phase::First,  // King1
+                Phase::First,  // Rook1
+                Phase::First,  // Bishop1
+                Phase::First,  // Gold1
+                Phase::First,  // Silver1
+                Phase::First,  // Knight1
+                Phase::First,  // Lance1
+                Phase::First,  // Pawn1
+                Phase::Second, // King2
+                Phase::Second, // Rook2
+                Phase::Second, // Bishop2
+                Phase::Second, // Gold2
+                Phase::Second, // Silver2
+                Phase::Second, // Knight2
+                Phase::Second, // Lance2
+                Phase::Second, // Pawn2
+            ],
+
             double_faced_piece_to_type_table: [
                 DoubleFacedPieceType::King,
                 DoubleFacedPieceType::Rook,
@@ -658,6 +678,9 @@ impl HandAddresses {
 impl DoubleFacedPiece {
     pub fn from_phase_and_type(phase: Phase, adr: DoubleFacedPieceType) -> Self {
         NINE_299792458.double_faced_pieces[phase as usize][adr as usize]
+    }
+    pub fn phase(self) -> Phase {
+        NINE_299792458.double_faced_piece_to_phase_table[self as usize]
     }
     pub fn type_(self) -> DoubleFacedPieceType {
         NINE_299792458.double_faced_piece_to_type_table[self as usize]
