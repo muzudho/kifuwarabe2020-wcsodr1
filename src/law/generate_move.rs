@@ -477,7 +477,6 @@ impl Area {
     {
         let moving = &mut |destination: UnifiedAddress, _agility| {
             Promoting::pawn_lance(
-                friend,
                 destination,
                 moving,
                 Some(MovePermission::from_pawn_or_lance(friend)),
@@ -503,7 +502,6 @@ impl Area {
     {
         let moving = &mut |destination: UnifiedAddress, _agility| {
             Promoting::pawn_lance(
-                friend,
                 destination,
                 moving,
                 Some(MovePermission::from_pawn_or_lance(friend)),
@@ -529,7 +527,6 @@ impl Area {
     {
         let moving = &mut |destination: UnifiedAddress, _agility| {
             Promoting::knight(
-                friend,
                 destination,
                 moving,
                 Some(MovePermission::from_knight(friend)),
@@ -554,7 +551,7 @@ impl Area {
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving = &mut |destination: UnifiedAddress, _agility| {
-            Promoting::silver(friend, source, destination, moving)
+            Promoting::silver( source, destination, moving)
         };
 
         for mobility in PieceType::Silver.mobility().iter() {
@@ -615,7 +612,7 @@ impl Area {
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving = &mut |destination: UnifiedAddress, _agility| {
-            Promoting::bishop_rook(friend, source, destination, moving)
+            Promoting::bishop_rook( source, destination, moving)
         };
         for mobility in PieceType::Bishop.mobility().iter() {
             Area::move_(friend, source, *mobility, moving);
@@ -634,7 +631,7 @@ impl Area {
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving = &mut |destination: UnifiedAddress, _agility| {
-            Promoting::bishop_rook(friend, source, destination, moving)
+            Promoting::bishop_rook( source, destination, moving)
         };
         for mobility in PieceType::Rook.mobility().iter() {
             Area::move_(friend, source, *mobility, moving);
@@ -831,7 +828,6 @@ impl Promoting {
     /// * `callback` -
     /// * `move_permission` - 成らずに一番奥の段に移動することはできません。
     fn pawn_lance<F1>(
-        friend: Phase,
         destinaion: UnifiedAddress,
         callback: &mut F1,
         move_permission: Option<MovePermission>,
@@ -839,7 +835,7 @@ impl Promoting {
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        if Promoting::is_farthest_rank_from_friend(friend, destinaion) {
+        if Promoting::is_farthest_rank_from_friend(destinaion) {
             // 自陣から見て一番奥の段
             callback(
                 destinaion,
@@ -847,7 +843,7 @@ impl Promoting {
                 Agility::Hopping,
                 move_permission,
             )
-        } else if Promoting::is_second_third_farthest_rank_from_friend(friend, destinaion) {
+        } else if Promoting::is_second_third_farthest_rank_from_friend(destinaion) {
             // 自陣から見て二番、三番目の奥の段
             callback(
                 destinaion,
@@ -875,7 +871,6 @@ impl Promoting {
     /// * `callback` -
     /// * `move_permission` - 成らずに奥から２番目の段に移動することはできません。
     fn knight<F1>(
-        friend: Phase,
         destination: UnifiedAddress,
         callback: &mut F1,
         move_permission: Option<MovePermission>,
@@ -883,14 +878,14 @@ impl Promoting {
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        if Promoting::is_first_second_farthest_rank_from_friend(friend, destination) {
+        if Promoting::is_first_second_farthest_rank_from_friend(destination) {
             callback(
                 destination,
                 Promotability::Forced,
                 Agility::Knight,
                 move_permission,
             )
-        } else if Promoting::is_third_farthest_rank_from_friend(friend, destination) {
+        } else if Promoting::is_third_farthest_rank_from_friend(destination) {
             callback(
                 destination,
                 Promotability::Any,
@@ -918,7 +913,6 @@ impl Promoting {
     /// * `destination` -
     /// * `callback` -
     fn silver<F1>(
-        friend: Phase,
         source: UnifiedAddress,
         destination: UnifiedAddress,
         callback: &mut F1,
@@ -926,14 +920,14 @@ impl Promoting {
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        if Promoting::is_third_farthest_rank_from_friend(friend, source) {
+        if Promoting::is_third_farthest_rank_from_friend(source) {
             callback(
                 destination,
                 Promotability::Any,
                 Agility::Hopping,
                 None,
             )
-        } else if Promoting::is_opponent_region(friend, destination) {
+        } else if Promoting::is_opponent_region(destination) {
             callback(
                 destination,
                 Promotability::Any,
@@ -961,7 +955,6 @@ impl Promoting {
     /// * `destination` -
     /// * `callback` -
     fn bishop_rook<F1>(
-        friend: Phase,
         source: UnifiedAddress,
         destination: UnifiedAddress,
         callback: &mut F1,
@@ -969,8 +962,8 @@ impl Promoting {
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        if Promoting::is_opponent_region(friend, source)
-            || Promoting::is_opponent_region(friend, destination)
+        if Promoting::is_opponent_region(source)
+            || Promoting::is_opponent_region(destination)
         {
             callback(
                 destination,
@@ -995,7 +988,8 @@ impl Promoting {
     ///
     /// * `friend` -
     /// * `destination` -
-    fn is_farthest_rank_from_friend(friend: Phase, destination: UnifiedAddress) -> bool {
+    fn is_farthest_rank_from_friend(destination: UnifiedAddress) -> bool {
+        let friend = destination.to_phase();
         match destination.to_address_pos() {
             AddressPos::Board(dst_sq) => {
                 (friend == Phase::First && dst_sq.rank() < RANK_2)
@@ -1014,9 +1008,9 @@ impl Promoting {
     /// * `friend` -
     /// * `destination` -
     fn is_first_second_farthest_rank_from_friend(
-        friend: Phase,
         destination: UnifiedAddress,
     ) -> bool {
+        let friend = destination.to_phase();
         match destination.to_address_pos() {
             AddressPos::Board(dst_sq) => {
                 (friend == Phase::First && dst_sq.rank() < RANK_3)
@@ -1035,9 +1029,9 @@ impl Promoting {
     /// * `friend` -
     /// * `destination` -
     fn is_second_third_farthest_rank_from_friend(
-        friend: Phase,
         destination: UnifiedAddress,
     ) -> bool {
+        let friend = destination.to_phase();
         match destination.to_address_pos() {
             AddressPos::Board(dst_sq) => {
                 (friend == Phase::First && RANK_1 < dst_sq.rank() && dst_sq.rank() < RANK_4)
@@ -1055,7 +1049,8 @@ impl Promoting {
     ///
     /// * `friend` -
     /// * `destination` -
-    fn is_third_farthest_rank_from_friend(friend: Phase, destination: UnifiedAddress) -> bool {
+    fn is_third_farthest_rank_from_friend(destination: UnifiedAddress) -> bool {
+        let friend = destination.to_phase();
         match destination.to_address_pos() {
             AddressPos::Board(dst_sq) => {
                 (friend == Phase::First && dst_sq.rank() == RANK_3)
@@ -1073,12 +1068,12 @@ impl Promoting {
     ///
     /// * `friend` -
     /// * `destination` -
-    fn is_opponent_region(friend1: Phase, destination: UnifiedAddress) -> bool {
-        let friend2 = destination.to_phase();
+    fn is_opponent_region(destination: UnifiedAddress) -> bool {
+        let friend = destination.to_phase();
         match destination.to_address_pos() {
             AddressPos::Board(dst_sq) => {
-                (friend2 == Phase::First && dst_sq.rank() < RANK_4)
-                    || (friend2 == Phase::Second && RANK_6 < dst_sq.rank())
+                (friend == Phase::First && dst_sq.rank() < RANK_4)
+                    || (friend == Phase::Second && RANK_6 < dst_sq.rank())
             }
             _ => panic!(Beam::trouble(&format!(
                 "(Err.957) まだ実装してないぜ☆（＾～＾）！",
