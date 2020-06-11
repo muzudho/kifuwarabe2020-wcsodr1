@@ -891,7 +891,10 @@ impl Promoting {
     {
         if Promoting::is_third_farthest_rank_from_friend(friend, &source) {
             callback(*destination, Promotability::Any, Agility::Hopping, None)
-        } else if Promoting::is_opponent_region(friend, &destination) {
+        } else if Promoting::is_opponent_region(
+            friend,
+            UnifiedAddress::from_address_pos(&destination),
+        ) {
             callback(*destination, Promotability::Any, Agility::Hopping, None)
         } else {
             callback(*destination, Promotability::Deny, Agility::Hopping, None)
@@ -917,8 +920,8 @@ impl Promoting {
     where
         F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        if Promoting::is_opponent_region(friend, &source)
-            || Promoting::is_opponent_region(friend, &destination)
+        if Promoting::is_opponent_region(friend, UnifiedAddress::from_address_pos(&source))
+            || Promoting::is_opponent_region(friend, UnifiedAddress::from_address_pos(&destination))
         {
             callback(*destination, Promotability::Any, Agility::Sliding, None)
         } else {
@@ -1005,8 +1008,8 @@ impl Promoting {
     ///
     /// * `friend` -
     /// * `destination` -
-    fn is_opponent_region(friend: Phase, destination: &AddressPos) -> bool {
-        match destination {
+    fn is_opponent_region(friend: Phase, destination: UnifiedAddress) -> bool {
+        match destination.to_address_pos() {
             AddressPos::Board(dst_sq) => {
                 (friend == Phase::First && dst_sq.rank() < RANK_4)
                     || (friend == Phase::Second && RANK_6 < dst_sq.rank())
