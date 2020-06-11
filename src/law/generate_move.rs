@@ -880,7 +880,10 @@ impl Promoting {
     where
         F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        if Promoting::is_first_second_farthest_rank_from_friend(friend, &destination) {
+        if Promoting::is_first_second_farthest_rank_from_friend(
+            friend,
+            UnifiedAddress::from_address_pos(friend, &destination),
+        ) {
             callback(
                 *destination,
                 Promotability::Forced,
@@ -997,8 +1000,11 @@ impl Promoting {
     ///
     /// * `friend` -
     /// * `destination` -
-    fn is_first_second_farthest_rank_from_friend(friend: Phase, destination: &AddressPos) -> bool {
-        match destination {
+    fn is_first_second_farthest_rank_from_friend(
+        friend: Phase,
+        destination: UnifiedAddress,
+    ) -> bool {
+        match destination.to_address_pos() {
             AddressPos::Board(dst_sq) => {
                 (friend == Phase::First && dst_sq.rank() < RANK_3)
                     || (friend == Phase::Second && RANK_7 < dst_sq.rank())
