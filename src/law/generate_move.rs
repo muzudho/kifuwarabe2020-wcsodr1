@@ -472,7 +472,7 @@ impl Area {
         let moving = &mut |destination, _agility| {
             Promoting::pawn_lance(
                 friend,
-                &destination,
+                UnifiedAddress::from_address_pos(friend, &destination),
                 moving,
                 Some(MovePermission::from_pawn_or_lance(friend)),
             )
@@ -498,7 +498,7 @@ impl Area {
         let moving = &mut |destination, _agility| {
             Promoting::pawn_lance(
                 friend,
-                &destination,
+                UnifiedAddress::from_address_pos(friend, &destination),
                 moving,
                 Some(MovePermission::from_pawn_or_lance(friend)),
             )
@@ -524,7 +524,7 @@ impl Area {
         let moving = &mut |destination, _agility| {
             Promoting::knight(
                 friend,
-                &destination,
+                UnifiedAddress::from_address_pos(friend, &destination),
                 moving,
                 Some(MovePermission::from_knight(friend)),
             )
@@ -547,8 +547,14 @@ impl Area {
     where
         F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        let moving =
-            &mut |destination, _agility| Promoting::silver(friend, &source, &destination, moving);
+        let moving = &mut |destination, _agility| {
+            Promoting::silver(
+                friend,
+                UnifiedAddress::from_address_pos(friend, &source),
+                UnifiedAddress::from_address_pos(friend, &destination),
+                moving,
+            )
+        };
 
         for mobility in PieceType::Silver.mobility().iter() {
             Area::move_(&Some(friend), source, *mobility, moving);
@@ -608,7 +614,12 @@ impl Area {
         F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving = &mut |destination, _agility| {
-            Promoting::bishop_rook(friend, &source, &destination, moving)
+            Promoting::bishop_rook(
+                friend,
+                UnifiedAddress::from_address_pos(friend, &source),
+                UnifiedAddress::from_address_pos(friend, &destination),
+                moving,
+            )
         };
         for mobility in PieceType::Bishop.mobility().iter() {
             Area::move_(&Some(friend), source, *mobility, moving);
@@ -627,7 +638,12 @@ impl Area {
         F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving = &mut |destination, _agility| {
-            Promoting::bishop_rook(friend, &source, &destination, moving)
+            Promoting::bishop_rook(
+                friend,
+                UnifiedAddress::from_address_pos(friend, &source),
+                UnifiedAddress::from_address_pos(friend, &destination),
+                moving,
+            )
         };
         for mobility in PieceType::Rook.mobility().iter() {
             Area::move_(&Some(friend), source, *mobility, moving);
@@ -826,38 +842,32 @@ impl Promoting {
     /// * `move_permission` - 成らずに一番奥の段に移動することはできません。
     fn pawn_lance<F1>(
         friend: Phase,
-        destinaion: &AddressPos,
+        destinaion: UnifiedAddress,
         callback: &mut F1,
         move_permission: Option<MovePermission>,
     ) -> bool
     where
         F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        if Promoting::is_farthest_rank_from_friend(
-            friend,
-            UnifiedAddress::from_address_pos(friend, &destinaion),
-        ) {
+        if Promoting::is_farthest_rank_from_friend(friend, destinaion) {
             // 自陣から見て一番奥の段
             callback(
-                *destinaion,
+                destinaion.to_address_pos(),
                 Promotability::Forced,
                 Agility::Hopping,
                 move_permission,
             )
-        } else if Promoting::is_second_third_farthest_rank_from_friend(
-            friend,
-            UnifiedAddress::from_address_pos(friend, &destinaion),
-        ) {
+        } else if Promoting::is_second_third_farthest_rank_from_friend(friend, destinaion) {
             // 自陣から見て二番、三番目の奥の段
             callback(
-                *destinaion,
+                destinaion.to_address_pos(),
                 Promotability::Any,
                 Agility::Hopping,
                 move_permission,
             )
         } else {
             callback(
-                *destinaion,
+                destinaion.to_address_pos(),
                 Promotability::Deny,
                 Agility::Hopping,
                 move_permission,
@@ -876,36 +886,30 @@ impl Promoting {
     /// * `move_permission` - 成らずに奥から２番目の段に移動することはできません。
     fn knight<F1>(
         friend: Phase,
-        destination: &AddressPos,
+        destination: UnifiedAddress,
         callback: &mut F1,
         move_permission: Option<MovePermission>,
     ) -> bool
     where
         F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        if Promoting::is_first_second_farthest_rank_from_friend(
-            friend,
-            UnifiedAddress::from_address_pos(friend, &destination),
-        ) {
+        if Promoting::is_first_second_farthest_rank_from_friend(friend, destination) {
             callback(
-                *destination,
+                destination.to_address_pos(),
                 Promotability::Forced,
                 Agility::Knight,
                 move_permission,
             )
-        } else if Promoting::is_third_farthest_rank_from_friend(
-            friend,
-            UnifiedAddress::from_address_pos(friend, &destination),
-        ) {
+        } else if Promoting::is_third_farthest_rank_from_friend(friend, destination) {
             callback(
-                *destination,
+                destination.to_address_pos(),
                 Promotability::Any,
                 Agility::Knight,
                 move_permission,
             )
         } else {
             callback(
-                *destination,
+                destination.to_address_pos(),
                 Promotability::Deny,
                 Agility::Knight,
                 move_permission,
@@ -925,25 +929,34 @@ impl Promoting {
     /// * `callback` -
     fn silver<F1>(
         friend: Phase,
-        source: &AddressPos,
-        destination: &AddressPos,
+        source: UnifiedAddress,
+        destination: UnifiedAddress,
         callback: &mut F1,
     ) -> bool
     where
         F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        if Promoting::is_third_farthest_rank_from_friend(
-            friend,
-            UnifiedAddress::from_address_pos(friend, &source),
-        ) {
-            callback(*destination, Promotability::Any, Agility::Hopping, None)
-        } else if Promoting::is_opponent_region(
-            friend,
-            UnifiedAddress::from_address_pos(friend, &destination),
-        ) {
-            callback(*destination, Promotability::Any, Agility::Hopping, None)
+        if Promoting::is_third_farthest_rank_from_friend(friend, source) {
+            callback(
+                destination.to_address_pos(),
+                Promotability::Any,
+                Agility::Hopping,
+                None,
+            )
+        } else if Promoting::is_opponent_region(friend, destination) {
+            callback(
+                destination.to_address_pos(),
+                Promotability::Any,
+                Agility::Hopping,
+                None,
+            )
         } else {
-            callback(*destination, Promotability::Deny, Agility::Hopping, None)
+            callback(
+                destination.to_address_pos(),
+                Promotability::Deny,
+                Agility::Hopping,
+                None,
+            )
         }
     }
 
@@ -959,22 +972,29 @@ impl Promoting {
     /// * `callback` -
     fn bishop_rook<F1>(
         friend: Phase,
-        source: &AddressPos,
-        destination: &AddressPos,
+        source: UnifiedAddress,
+        destination: UnifiedAddress,
         callback: &mut F1,
     ) -> bool
     where
         F1: FnMut(AddressPos, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        if Promoting::is_opponent_region(friend, UnifiedAddress::from_address_pos(friend, &source))
-            || Promoting::is_opponent_region(
-                friend,
-                UnifiedAddress::from_address_pos(friend, &destination),
-            )
+        if Promoting::is_opponent_region(friend, source)
+            || Promoting::is_opponent_region(friend, destination)
         {
-            callback(*destination, Promotability::Any, Agility::Sliding, None)
+            callback(
+                destination.to_address_pos(),
+                Promotability::Any,
+                Agility::Sliding,
+                None,
+            )
         } else {
-            callback(*destination, Promotability::Deny, Agility::Sliding, None)
+            callback(
+                destination.to_address_pos(),
+                Promotability::Deny,
+                Agility::Sliding,
+                None,
+            )
         }
     }
 
