@@ -200,7 +200,7 @@ impl Tree {
             self.state_nodes += 1;
             // * `promotion_value` - 評価値用。成ったら加点☆（＾～＾）
             let promotion_value = if move_.promote {
-                game.table.promotion_value_at(&game.table, &move_.source)
+                game.table.promotion_value_at(&game.table, move_.source)
             } else {
                 0
             };
@@ -242,7 +242,7 @@ impl Tree {
 
                 if let Some(_captured) = move_.captured {
                     // TODO SEEやろうぜ☆（＾～＾）
-                    SEE::go(game, &move_.destination);
+                    SEE::go(game, move_.destination);
                 }
 
                 // 評価を集計するぜ☆（＾～＾）

@@ -2,7 +2,7 @@
 //! USIプロトコル
 //!
 use crate::cosmic::playing::Game;
-use crate::cosmic::recording::{AddressPos, CapturedMove, Movement};
+use crate::cosmic::recording::{AddressPos, CapturedMove, Movement, Phase};
 use crate::cosmic::smart::features::{DoubleFacedPiece, DoubleFacedPieceType};
 use crate::cosmic::smart::square::{AbsoluteAddress2D, FILE_9, RANK_1};
 use crate::cosmic::toy_box::{Piece, UnifiedAddress};
@@ -100,14 +100,20 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
     match source {
         Source::Move(file, rank) => {
             *starts += 1;
-            buffer.source = AddressPos::Board(AbsoluteAddress2D::new(file, rank));
+            buffer.source = UnifiedAddress::from_address_pos(
+                game.history.get_friend(),
+                &AddressPos::Board(AbsoluteAddress2D::new(file, rank)),
+            );
         }
         Source::Drop(hand) => {
             *starts += 2;
-            buffer.source = AddressPos::Hand(DoubleFacedPiece::from_phase_and_type(
+            buffer.source = UnifiedAddress::from_address_pos(
                 game.history.get_friend(),
-                hand,
-            ));
+                &AddressPos::Hand(DoubleFacedPiece::from_phase_and_type(
+                    game.history.get_friend(),
+                    hand,
+                )),
+            );
         }
     }
 
@@ -144,7 +150,10 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
     *starts += 1;
 
     // 行き先。
-    buffer.destination = AddressPos::Board(AbsoluteAddress2D::new(file, rank));
+    buffer.destination = UnifiedAddress::from_address_pos(
+        game.history.get_friend(),
+        &AddressPos::Board(AbsoluteAddress2D::new(file, rank)),
+    );
 
     // 5文字に「+」があれば成り。
     buffer.promote = if 0 < (len - *starts) && &line[*starts..=*starts] == "+" {
@@ -160,13 +169,10 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
     }
 
     // 取られる駒を事前に調べてセットするぜ☆（＾～＾）！
-    let captured_piece_num = game.table.piece_num_at(&buffer.destination);
+    let captured_piece_num = game.table.piece_num_at(buffer.destination);
     buffer.captured = if let Some(captured_piece_num_val) = captured_piece_num {
         Some(CapturedMove::new(
-            UnifiedAddress::from_address_pos(
-                game.history.get_friend(), // game.table.get_phase(captured_piece_num_val),
-                &buffer.destination,
-            ),
+            buffer.destination,
             game.table.get_type(captured_piece_num_val),
         ))
     } else {
@@ -258,12 +264,15 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Game) {
         match board_part {
             BoardPart::Alphabet(piece) => {
                 *starts += 1;
-                let addr = AddressPos::Board(AbsoluteAddress2D::new(file, rank));
+                let addr = UnifiedAddress::from_address_pos(
+                    piece.phase(),
+                    &AddressPos::Board(AbsoluteAddress2D::new(file, rank)),
+                );
 
                 // 駒に背番号を付けるぜ☆（＾～＾）
                 let piece_num = table.numbering_piece(piece);
                 // 盤に置くぜ☆（＾～＾）
-                table.push_piece(&addr, Some(piece_num));
+                table.push_piece(addr, Some(piece_num));
 
                 file -= 1;
             }
@@ -386,21 +395,21 @@ pub fn set_position(line: &str, game: &mut Game) {
                     };
 
                     use crate::cosmic::toy_box::Piece::*;
-                    let hand = match &line[starts..=starts] {
-                        "R" => Rook1,
-                        "B" => Bishop1,
-                        "G" => Gold1,
-                        "S" => Silver1,
-                        "N" => Knight1,
-                        "L" => Lance1,
-                        "P" => Pawn1,
-                        "r" => Rook2,
-                        "b" => Bishop2,
-                        "g" => Gold2,
-                        "s" => Silver2,
-                        "n" => Knight2,
-                        "l" => Lance2,
-                        "p" => Pawn2,
+                    let (hand, friend) = match &line[starts..=starts] {
+                        "R" => (Rook1, Phase::First),
+                        "B" => (Bishop1, Phase::First),
+                        "G" => (Gold1, Phase::First),
+                        "S" => (Silver1, Phase::First),
+                        "N" => (Knight1, Phase::First),
+                        "L" => (Lance1, Phase::First),
+                        "P" => (Pawn1, Phase::First),
+                        "r" => (Rook2, Phase::Second),
+                        "b" => (Bishop2, Phase::Second),
+                        "g" => (Gold2, Phase::Second),
+                        "s" => (Silver2, Phase::Second),
+                        "n" => (Knight2, Phase::Second),
+                        "l" => (Lance2, Phase::Second),
+                        "p" => (Pawn2, Phase::Second),
                         _ => {
                             break 'mg;
                         } // 持駒部 正常終了
@@ -411,8 +420,11 @@ pub fn set_position(line: &str, game: &mut Game) {
                         // 駒に背番号を付けるぜ☆（＾～＾）
                         let piece_num = game.mut_starting().numbering_piece(hand);
                         // 駒台に置くぜ☆（＾～＾）
-                        let drop = AddressPos::Hand(game.table.get_double_faced_piece(piece_num));
-                        game.mut_starting().push_piece(&drop, Some(piece_num));
+                        let drop = UnifiedAddress::from_address_pos(
+                            friend,
+                            &AddressPos::Hand(game.table.get_double_faced_piece(piece_num)),
+                        );
+                        game.mut_starting().push_piece(drop, Some(piece_num));
                     }
                 } //if
             } //loop

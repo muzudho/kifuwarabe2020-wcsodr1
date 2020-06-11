@@ -1,7 +1,7 @@
 use crate::cosmic::pos_hash::pos_hash::*;
 use crate::cosmic::recording::{AddressPos, History, Movement};
-use crate::cosmic::toy_box::GameTable;
 use crate::cosmic::toy_box::PieceNum;
+use crate::cosmic::toy_box::{GameTable, UnifiedAddress};
 use crate::spaceship::equipment::{Beam, DestinationDisplay};
 
 /// 局面
@@ -125,11 +125,11 @@ impl Game {
             .update_by_do_move(&mut self.history, &self.table, move_);
 
         // 動かす駒。Noneなことは無いが、将棋盤にセットするとき結局 Some を付けることになるので、わざわざ省かないぜ☆（＾～＾）
-        let moveing_piece_num: Option<PieceNum> = match move_.source {
+        let moveing_piece_num: Option<PieceNum> = match move_.source.to_address_pos() {
             AddressPos::Board(_src_sq) => {
                 // 盤上の移動なら、元の升に駒はあるので、それを消す。
                 let piece_num152: Option<PieceNum> = if move_.promote {
-                    if let Some(piece_num) = self.table.pop_piece(&move_.source) {
+                    if let Some(piece_num) = self.table.pop_piece(move_.source) {
                         // 成ったのなら、元のマスの駒を成らすぜ☆（＾～＾）
                         // let piece = self.table.get_piece(piece_num).promoted();
                         // Some(self.table.new_piece_num(piece, piece_num))
@@ -142,7 +142,7 @@ impl Game {
                     }
                 } else {
                     // 移動元の駒。
-                    self.table.pop_piece(&move_.source)
+                    self.table.pop_piece(move_.source)
                 };
 
                 piece_num152
@@ -150,7 +150,7 @@ impl Game {
             AddressPos::Hand(_drop) => {
                 // 打なら
                 // 自分の持ち駒を減らす
-                Some(self.table.pop_piece(&move_.source).unwrap())
+                Some(self.table.pop_piece(move_.source).unwrap())
             }
         };
         // 移動先升に駒があるかどうか
@@ -158,7 +158,7 @@ impl Game {
         self.table.rotate_piece_board_to_hand(&move_);
 
         // 移動先升に駒を置く
-        self.table.push_piece(&move_.destination, moveing_piece_num);
+        self.table.push_piece(move_.destination, moveing_piece_num);
 
         // // 局面ハッシュを作り直す
         // let ky_hash = self.hash_seed.current_position(&self);
@@ -175,12 +175,12 @@ impl Game {
             let move_ = &self.history.get_move();
             {
                 // 動いた駒
-                let moveing_piece_num: Option<PieceNum> = match move_.source {
+                let moveing_piece_num: Option<PieceNum> = match move_.source.to_address_pos() {
                     AddressPos::Board(_source_val) => {
                         // 盤上の移動なら
                         if move_.promote {
                             // 成ったなら、成る前へ
-                            if let Some(source_piece_num) = self.table.pop_piece(&move_.destination)
+                            if let Some(source_piece_num) = self.table.pop_piece(move_.destination)
                             {
                                 // let piece = self.table.get_piece(source_piece_num).demoted();
                                 // Some(self.table.new_piece_num(piece, source_piece_num))
@@ -192,16 +192,19 @@ impl Game {
                                 ))
                             }
                         } else {
-                            self.table.pop_piece(&move_.destination)
+                            self.table.pop_piece(move_.destination)
                         }
                     }
                     AddressPos::Hand(_drop) => {
                         // 打なら
                         // 打った場所に駒があるはずだぜ☆（＾～＾）
-                        let piece_num = self.table.pop_piece(&move_.destination).unwrap();
+                        let piece_num = self.table.pop_piece(move_.destination).unwrap();
                         // 自分の持ち駒を増やそうぜ☆（＾～＾）！
                         self.table.push_piece(
-                            &AddressPos::Hand(self.table.get_double_faced_piece(piece_num)),
+                            UnifiedAddress::from_address_pos(
+                                self.history.get_friend(),
+                                &AddressPos::Hand(self.table.get_double_faced_piece(piece_num)),
+                            ),
                             Some(piece_num),
                         );
                         Some(piece_num)
@@ -213,9 +216,9 @@ impl Game {
                 self.table
                     .rotate_piece_hand_to_board(self.history.get_friend(), &move_);
 
-                if let AddressPos::Board(_src_sq) = move_.source {
+                if let AddressPos::Board(_src_sq) = move_.source.to_address_pos() {
                     // 打でなければ、移動元升に、動かした駒を置く☆（＾～＾）打なら何もしないぜ☆（＾～＾）
-                    self.table.push_piece(&move_.source, moveing_piece_num);
+                    self.table.push_piece(move_.source, moveing_piece_num);
                 }
             }
 

@@ -7,7 +7,7 @@ use crate::cosmic::smart::features::{HAND_MAX, PHYSICAL_PIECES_LEN};
 use crate::cosmic::smart::square::{
     AbsoluteAddress2D, BOARD_MEMORY_AREA, FILE_1, FILE_10, RANK_1, RANK_10, SQUARE_NONE,
 };
-use crate::cosmic::toy_box::{GameTable, PIECE_LEN};
+use crate::cosmic::toy_box::{GameTable, UnifiedAddress, PIECE_LEN};
 use crate::law::speed_of_light::HandAddresses;
 use crate::spaceship::equipment::Beam;
 use rand::Rng;
@@ -72,13 +72,13 @@ impl GameHashSeed {
         };
         // TODO 指し手 で差分を適用
         // 移動する駒。
-        match move_.source {
+        match move_.source.to_address_pos() {
             AddressPos::Board(sq) => {
-                let source_piece = table.piece_at(&move_.source).unwrap() as usize;
+                let source_piece = table.piece_at(&move_.source.to_address_pos()).unwrap() as usize;
                 // 移動前マスに、動かしたい駒があるときのハッシュ。
                 prev_hash ^= self.piece[sq.serial_number()][source_piece];
                 // 移動後マスに、動かしたい駒があるときのハッシュ。
-                match move_.destination {
+                match move_.destination.to_address_pos() {
                     AddressPos::Board(sq) => {
                         prev_hash ^= self.piece[sq.serial_number()][source_piece];
                     }
@@ -92,7 +92,7 @@ impl GameHashSeed {
                 // 打つ前の駒の枚数のハッシュ。
                 prev_hash ^= self.hands[drop as usize][count as usize];
                 // 移動後マスに、打った駒があるときのハッシュ。
-                match move_.destination {
+                match move_.destination.to_address_pos() {
                     AddressPos::Board(sq) => {
                         prev_hash ^=
                             self.piece[sq.serial_number()][drop.nonpromoted_piece() as usize];
@@ -104,10 +104,10 @@ impl GameHashSeed {
             }
         }
         // TODO 移動先にある駒
-        match move_.destination {
+        match move_.destination.to_address_pos() {
             AddressPos::Board(dst_sq) => {
                 // 移動先にある駒があれば
-                if let Some(dst_piece_val) = table.piece_at(&move_.destination) {
+                if let Some(dst_piece_val) = table.piece_at(&move_.destination.to_address_pos()) {
                     prev_hash ^= self.piece[dst_sq.serial_number()][dst_piece_val as usize];
                     // 持ち駒になるとき。
                     let double_faced_piece = dst_piece_val.double_faced_piece();

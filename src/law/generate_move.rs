@@ -97,10 +97,10 @@ impl PseudoLegalMoves {
     where
         F1: FnMut(Movement),
     {
-        table.for_some_pieces_on_list40(friend, &mut |addr, piece_type| match addr {
+        table.for_some_pieces_on_list40(friend, &mut |addr:UnifiedAddress, piece_type| match addr.to_address_pos() {
             AddressPos::Board(_src_sq) => PseudoLegalMoves::start_on_board(
                 friend,
-                UnifiedAddress::from_address_pos(friend, &addr),
+                addr,
                 piece_type,
                 table,
                 listen_move,
@@ -139,7 +139,7 @@ impl PseudoLegalMoves {
                            promotability,
                            _agility,
                            move_permission: Option<MovePermission>| {
-            let pseudo_captured_num = table.piece_num_at(&destination.to_address_pos());
+            let pseudo_captured_num = table.piece_num_at(destination);
 
             let (ok, space) = if let Some(pseudo_captured_num_val) = pseudo_captured_num {
                 if table.get_phase(pseudo_captured_num_val) == friend {
@@ -176,8 +176,8 @@ impl PseudoLegalMoves {
                         // 成ったり、成れなかったりできるとき。
                         if !forbidden {
                             listen_move(Movement::new(
-                                source.to_address_pos(),
-                                destination.to_address_pos(),
+                                source,
+                                destination,
                                 false,
                                 if let Some(piece_num_val) = pseudo_captured_num {
                                     Some(CapturedMove::new(
@@ -190,8 +190,8 @@ impl PseudoLegalMoves {
                             ));
                         }
                         listen_move(Movement::new(
-                            source.to_address_pos(),
-                            destination.to_address_pos(),
+                            source,
+                            destination,
                             true,
                             if let Some(piece_num_val) = pseudo_captured_num {
                                 Some(CapturedMove::new(
@@ -207,8 +207,8 @@ impl PseudoLegalMoves {
                         // 成れるか、成れないかのどちらかのとき。
                         if promotion || !forbidden {
                             listen_move(Movement::new(
-                                source.to_address_pos(),
-                                destination.to_address_pos(),
+                                source,
+                                destination,
                                 promotion,
                                 if let Some(piece_num_val) = pseudo_captured_num {
                                     Some(CapturedMove::new(
@@ -246,7 +246,7 @@ impl PseudoLegalMoves {
         if let Some((piece_type, hand_addr)) = table.last_hand(drop) {
             // 打つぜ☆（＾～＾）
             let drop_fn = &mut |destination: UnifiedAddress| {
-                if let None = table.piece_num_at(&destination.to_address_pos()) {
+                if let None = table.piece_num_at(destination) {
                     // 駒が無いところに打つ
                     use crate::cosmic::smart::features::PieceType::*;
                     match piece_type {
@@ -267,7 +267,7 @@ impl PseudoLegalMoves {
                     }
                     listen_move(Movement::new(
                         hand_addr,                    // 打った駒種類
-                        destination.to_address_pos(), // どの升へ行きたいか
+                        destination, // どの升へ行きたいか
                         false,                        // 打に成りは無し
                         None,                         // 打で取れる駒無し
                     ));

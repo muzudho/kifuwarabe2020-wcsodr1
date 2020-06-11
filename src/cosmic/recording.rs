@@ -139,9 +139,9 @@ impl CapturedMove {
 #[derive(Clone, Copy)]
 pub struct Movement {
     /// 移動元マス。
-    pub source: AddressPos,
+    pub source: UnifiedAddress,
     /// 移動先マス。リバーシブルに作りたいので、駒台にも指せる。
-    pub destination: AddressPos,
+    pub destination: UnifiedAddress,
     /// 移動後に成るなら真
     pub promote: bool,
     /// 取ることになる駒
@@ -151,8 +151,8 @@ impl Default for Movement {
     /// ゴミの値を作るぜ☆（＾～＾）
     fn default() -> Self {
         Movement {
-            source: AddressPos::default(),
-            destination: AddressPos::default(),
+            source: UnifiedAddress::default(),
+            destination: UnifiedAddress::default(),
             promote: false,
             captured: None,
         }
@@ -160,8 +160,8 @@ impl Default for Movement {
 }
 impl Movement {
     pub fn new(
-        source: AddressPos,
-        destination: AddressPos,
+        source: UnifiedAddress,
+        destination: UnifiedAddress,
         promote: bool,
         captured: Option<CapturedMove>,
     ) -> Self {
@@ -181,7 +181,7 @@ impl Movement {
 }
 impl fmt::Display for Movement {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self.source {
+        match self.source.to_address_pos() {
             AddressPos::Board(source_val) => {
                 let (sx, sy) = source_val.to_file_rank();
                 write!(
@@ -189,7 +189,7 @@ impl fmt::Display for Movement {
                     "{}{}{}{}",
                     sx,
                     num_to_lower_case(sy),
-                    self.destination,
+                    self.destination.to_address_pos(),
                     if self.promote { "+" } else { "" }
                 )
             }
@@ -197,7 +197,7 @@ impl fmt::Display for Movement {
                 f,
                 "{}{}{}",
                 drop,
-                self.destination,
+                self.destination.to_address_pos(),
                 if self.promote { "+" } else { "" }
             ),
         }

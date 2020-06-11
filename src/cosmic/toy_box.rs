@@ -721,7 +721,7 @@ pub struct GameTable {
     /// 盤に、駒が紐づくぜ☆（＾～＾）
     board: [Option<PieceNum>; BOARD_MEMORY_AREA as usize],
     /// 背番号付きの駒に、番地が紐づいているぜ☆（＾～＾）
-    address_list: [AddressPos; NAMED_PIECES_LEN],
+    address_list: [UnifiedAddress; NAMED_PIECES_LEN],
     /// 駒の背番号に、駒が紐づくぜ☆（＾～＾）
     piece_list: [Piece; NAMED_PIECES_LEN],
     /// 駒の背番号を付けるのに使うぜ☆（＾～＾）
@@ -746,7 +746,7 @@ impl Default for GameTable {
                 None, None, None, None, None, None, None, None, None, None, None, None, None,
             ],
             /// 初期値はゴミ値だぜ☆（＾～＾）上書きして消せだぜ☆（＾～＾）
-            address_list: [AddressPos::Board(AbsoluteAddress2D::default()); NAMED_PIECES_LEN],
+            address_list: [UnifiedAddress::default(); NAMED_PIECES_LEN],
             /// 初期値はゴミ値だぜ☆（＾～＾）上書きして消せだぜ☆（＾～＾）
             piece_list: [Piece::King1; NAMED_PIECES_LEN],
             double_faced_piece_type_index: [
@@ -778,7 +778,7 @@ impl GameTable {
             None, None, None, None, None, None, None, None, None, None, None, None, None,
         ];
         // 初期値はゴミ値だぜ☆（＾～＾）上書きして消せだぜ☆（＾～＾）
-        self.address_list = [AddressPos::Board(AbsoluteAddress2D::default()); NAMED_PIECES_LEN];
+        self.address_list = [UnifiedAddress::default(); NAMED_PIECES_LEN];
         // 初期値はゴミ値だぜ☆（＾～＾）上書きして消せだぜ☆（＾～＾）
         self.piece_list = [Piece::King1; NAMED_PIECES_LEN];
         self.double_faced_piece_type_index = [
@@ -837,12 +837,15 @@ impl GameTable {
     /// 駒の先後を反転させるぜ☆（＾～＾）
     // あれば　盤の相手の駒を先後反転して、自分の駒台に置きます。
     pub fn rotate_piece_board_to_hand(&mut self, move_: &Movement) {
-        if let Some(collision_piece_num_val) = self.pop_piece(&move_.destination) {
+        if let Some(collision_piece_num_val) = self.pop_piece(move_.destination) {
             // 移動先升の駒を盤上から消し、自分の持ち駒に増やす
             // 先後ひっくり返す。
             self.turn_phase(collision_piece_num_val);
             self.push_piece(
-                &AddressPos::Hand(self.get_double_faced_piece(collision_piece_num_val)),
+                UnifiedAddress::from_address_pos(
+                    self.get_phase(collision_piece_num_val),
+                    &AddressPos::Hand(self.get_double_faced_piece(collision_piece_num_val)),
+                ),
                 Some(collision_piece_num_val),
             );
         }
@@ -863,14 +866,14 @@ impl GameTable {
                 );
                 let addr_pos1 = AddressPos::Hand(double_faced_piece);
                 let uni_addr = UnifiedAddress::from_address_pos(friend, &addr_pos1);
-                let addr_pos2 = uni_addr.to_address_pos();
+                // let addr_pos2 = uni_addr.to_address_pos();
                 /*
                 Beam::shoot(&format!(
                     "addr_pos {} -> {:?} -> {}",
                     addr_pos1, uni_addr, addr_pos2
                 ));
                 */
-                self.pop_piece(&addr_pos2).unwrap()
+                self.pop_piece(uni_addr).unwrap()
             };
             // 先後をひっくり返す。
             self.turn_phase(piece_num);
@@ -882,18 +885,21 @@ impl GameTable {
                 self.demote(piece_num);
             }
             // 取られた方に、駒を返すぜ☆（＾～＾）置くのは指し手の移動先☆（＾～＾）
-            self.push_piece(&move_.destination, Some(piece_num));
+            self.push_piece(move_.destination, Some(piece_num));
         }
     }
     /// 駒を置く。
-    pub fn push_piece(&mut self, addr: &AddressPos, piece_num: Option<PieceNum>) {
-        match addr {
+    pub fn push_piece(&mut self, addr: UnifiedAddress, piece_num: Option<PieceNum>) {
+        match addr.to_address_pos() {
             AddressPos::Board(sq) => {
                 if let Some(piece_num_val) = piece_num {
                     // マスに駒を置きます。
                     self.board[sq.serial_number() as usize] = piece_num;
                     // 背番号に番地を紐づけます。
-                    self.address_list[piece_num_val as usize] = AddressPos::Board(*sq);
+                    self.address_list[piece_num_val as usize] = UnifiedAddress::from_address_pos(
+                        self.get_phase(piece_num_val),
+                        &AddressPos::Board(sq),
+                    );
                 } else {
                     // マスを空にします。
                     self.board[sq.serial_number() as usize] = None;
@@ -902,34 +908,38 @@ impl GameTable {
             AddressPos::Hand(drop) => {
                 if let Some(piece_num_val) = piece_num {
                     // 持ち駒を１つ増やします。
-                    self.phase_classification.push(*drop, piece_num_val);
+                    self.phase_classification.push(drop, piece_num_val);
                     // 背番号に番地を紐づけます。
-                    self.address_list[piece_num_val as usize] = *addr;
+                    self.address_list[piece_num_val as usize] = addr;
                 }
             }
         }
     }
     /// 駒を取りのぞく。
-    pub fn pop_piece(&mut self, addr: &AddressPos) -> Option<PieceNum> {
-        match addr {
+    pub fn pop_piece(&mut self, addr: UnifiedAddress) -> Option<PieceNum> {
+        match addr.to_address_pos() {
             AddressPos::Board(sq) => {
                 let piece_num = self.board[sq.serial_number() as usize];
                 if let Some(piece_num_val) = piece_num {
                     // マスを空にします。
                     self.board[sq.serial_number() as usize] = None;
                     // TODO 背番号の番地を、ゴミ値で塗りつぶすが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
-                    self.address_list[piece_num_val as usize] =
-                        AddressPos::Board(AbsoluteAddress2D::default());
+                    self.address_list[piece_num_val as usize] = UnifiedAddress::from_address_pos(
+                        self.get_phase(piece_num_val),
+                        &AddressPos::Board(AbsoluteAddress2D::default()),
+                    );
                 }
                 piece_num
             }
             AddressPos::Hand(drop) => {
                 // 場所で指定します。
                 // 台から取りのぞきます。
-                let piece_num = self.phase_classification.pop(*drop);
+                let piece_num = self.phase_classification.pop(drop);
                 // TODO 背番号の番地に、ゴミ値を入れて消去するが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
-                self.address_list[piece_num as usize] =
-                    AddressPos::Board(AbsoluteAddress2D::default());
+                self.address_list[piece_num as usize] = UnifiedAddress::from_address_pos(
+                    self.get_phase(piece_num),
+                    &AddressPos::Board(AbsoluteAddress2D::default()),
+                );
                 Some(piece_num)
             }
         }
@@ -954,18 +964,21 @@ impl GameTable {
     }
 
     /// 歩が置いてあるか確認
-    pub fn exists_pawn_on_file(&self, phase: Phase, file: usize) -> bool {
+    pub fn exists_pawn_on_file(&self, friend: Phase, file: usize) -> bool {
         for rank in RANK_1..RANK_10 {
-            let addr = AddressPos::Board(AbsoluteAddress2D::new(file, rank));
-            if let Some(piece_val) = self.piece_at(&addr) {
-                if piece_val.phase() == phase && piece_val.type_() == PieceType::Pawn {
+            let addr = UnifiedAddress::from_address_pos(
+                friend,
+                &AddressPos::Board(AbsoluteAddress2D::new(file, rank)),
+            );
+            if let Some(piece_val) = self.piece_at(&addr.to_address_pos()) {
+                if piece_val.phase() == friend && piece_val.type_() == PieceType::Pawn {
                     return true;
                 }
             }
         }
         false
     }
-    /// ハッシュを作るときにも利用。
+    /// ハッシュを作るときにも利用。盤上専用。
     pub fn piece_at(&self, addr: &AddressPos) -> Option<Piece> {
         match addr {
             AddressPos::Board(sq) => {
@@ -976,15 +989,15 @@ impl GameTable {
                 }
             }
             AddressPos::Hand(_drop) => panic!(Beam::trouble(&format!(
-                "(Err.345) まだ実装してないぜ☆（＾～＾）！",
+                "(Err.345) 駒台は非対応☆（＾～＾）！",
             ))),
         }
     }
     /// TODO Piece をカプセル化したい。外に出したくないぜ☆（＾～＾）
     /// 升で指定して駒を取得。
     /// 駒台には対応してない。 -> 何に使っている？
-    pub fn piece_num_at(&self, addr: &AddressPos) -> Option<PieceNum> {
-        match addr {
+    pub fn piece_num_at(&self, addr: UnifiedAddress) -> Option<PieceNum> {
+        match addr.to_address_pos() {
             AddressPos::Board(sq) => self.board[sq.serial_number() as usize],
             _ => panic!(Beam::trouble(&format!(
                 "(Err.254) まだ駒台は実装してないぜ☆（＾～＾）！",
@@ -1007,8 +1020,8 @@ impl GameTable {
             ))),
         }
     }
-    pub fn promotion_value_at(&self, table: &GameTable, addr: &AddressPos) -> isize {
-        match addr {
+    pub fn promotion_value_at(&self, table: &GameTable, addr: UnifiedAddress) -> isize {
+        match addr.to_address_pos() {
             AddressPos::Board(sq) => {
                 let piece_num = self.board[sq.serial_number() as usize];
                 if let Some(piece_num_val) = piece_num {
@@ -1035,10 +1048,16 @@ impl GameTable {
         }
     }
     /// 指し手生成で使うぜ☆（＾～＾）
-    pub fn last_hand(&self, drop: DoubleFacedPiece) -> Option<(PieceType, AddressPos)> {
+    pub fn last_hand(&self, drop: DoubleFacedPiece) -> Option<(PieceType, UnifiedAddress)> {
         if let Some(piece_num) = self.phase_classification.last(drop) {
             let piece = self.get_piece(piece_num);
-            Some((piece.type_(), AddressPos::Hand(piece.double_faced_piece())))
+            Some((
+                piece.type_(),
+                UnifiedAddress::from_address_pos(
+                    self.get_phase(piece_num),
+                    &AddressPos::Hand(piece.double_faced_piece()),
+                ),
+            ))
         } else {
             None
         }
@@ -1054,11 +1073,11 @@ impl GameTable {
         F: FnMut(usize, Option<&AbsoluteAddress2D>, Option<PieceInfo>),
     {
         for (i, addr) in self.address_list.iter().enumerate() {
-            match addr {
+            match addr.to_address_pos() {
                 AddressPos::Board(sq) => {
                     // 盤上の駒☆（＾～＾）
-                    let piece_info = self.piece_info_at(addr).unwrap();
-                    piece_get(i, Some(sq), Some(piece_info));
+                    let piece_info = self.piece_info_at(&addr.to_address_pos()).unwrap();
+                    piece_get(i, Some(&sq), Some(piece_info));
                 }
                 AddressPos::Hand(_drop) => {
                     // TODO 持ち駒☆（＾～＾）
@@ -1073,12 +1092,12 @@ impl GameTable {
     /// TODO できれば、「自分の盤上の駒」「自分の持ち駒」「相手の盤上の駒」「相手の持ち駒」の４チャンネルで分けておけないか☆（＾～＾）？
     pub fn for_some_pieces_on_list40<F>(&self, friend: Phase, piece_get: &mut F)
     where
-        F: FnMut(AddressPos, PieceType),
+        F: FnMut(UnifiedAddress, PieceType),
     {
         for piece_num in Nine299792458::piece_numbers().iter() {
             // 盤上の駒だけを調べようぜ☆（＾～＾）
             let addr = self.address_list[*piece_num as usize];
-            match addr {
+            match addr.to_address_pos() {
                 AddressPos::Board(_sq) => {
                     if self.get_phase(*piece_num) == friend {
                         piece_get(addr, self.get_type(*piece_num));
@@ -1114,7 +1133,10 @@ impl GameTable {
         ];
         for drop in &FIRST_SECOND[friend as usize] {
             if let Some(piece_type) = self.last_hand_type(*drop) {
-                piece_get(AddressPos::Hand(*drop), piece_type);
+                piece_get(
+                    UnifiedAddress::from_address_pos(friend, &AddressPos::Hand(*drop)),
+                    piece_type,
+                );
             }
         }
     }
