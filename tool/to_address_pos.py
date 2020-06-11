@@ -1,5 +1,5 @@
 print('trace   | Start.')
-print('const map: [AddressPos; 178] = [')
+print('const MAP: [AddressPos; 178] = [')
 for phase in range(1, 3):
     for file in range(1, 10):
         for rank in range(1, 10):

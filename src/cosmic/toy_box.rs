@@ -186,7 +186,7 @@ impl UnifiedAddress {
     }
 
     pub fn from_double_faced_piece(drop: DoubleFacedPiece) -> UnifiedAddress {
-        const map: [UnifiedAddress; 16] = [
+        const MAP: [UnifiedAddress; 16] = [
             UnifiedAddress::King1,
             UnifiedAddress::Rook1,
             UnifiedAddress::Bishop1,
@@ -204,11 +204,11 @@ impl UnifiedAddress {
             UnifiedAddress::Lance2,
             UnifiedAddress::Pawn2,
         ];
-        map[drop as usize]
+        MAP[drop as usize]
     }
 
     pub fn to_double_faced_piece(self) -> DoubleFacedPiece {
-        const map: [DoubleFacedPiece; 16] = [
+        const MAP: [DoubleFacedPiece; 16] = [
             DoubleFacedPiece::King1,
             DoubleFacedPiece::Rook1,
             DoubleFacedPiece::Bishop1,
@@ -226,7 +226,7 @@ impl UnifiedAddress {
             DoubleFacedPiece::Lance2,
             DoubleFacedPiece::Pawn2,
         ];
-        map[self as usize]
+        MAP[self as usize]
     }
 
     pub fn from_address_pos(addr: &AddressPos) -> Self {
@@ -237,7 +237,7 @@ impl UnifiedAddress {
     }
 
     pub fn to_address_pos(self) -> AddressPos {
-        const map: [AddressPos; 178] = [
+        const MAP: [AddressPos; 178] = [
             AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 1 }),
             AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 2 }),
             AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 3 }),
@@ -417,7 +417,7 @@ impl UnifiedAddress {
             AddressPos::Hand(DoubleFacedPiece::Lance2),
             AddressPos::Hand(DoubleFacedPiece::Pawn2),
         ];
-        map[self as usize]
+        MAP[self as usize]
     }
 }
 

@@ -584,8 +584,8 @@ pub struct AbsoluteAddress2D {
     ///   98 88 78 68 58 48 38 28 18
     ///   99 89 79 69 59 49 39 29 19
     ///           Source
-    file: usize,
-    rank: usize,
+    pub file: usize,
+    pub rank: usize,
 }
 impl Default for AbsoluteAddress2D {
     /// ゴミの値を作るぜ☆（＾～＾）
