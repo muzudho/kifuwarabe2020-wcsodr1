@@ -1073,11 +1073,12 @@ impl Promoting {
     ///
     /// * `friend` -
     /// * `destination` -
-    fn is_opponent_region(friend: Phase, destination: UnifiedAddress) -> bool {
+    fn is_opponent_region(friend1: Phase, destination: UnifiedAddress) -> bool {
+        let friend2 = destination.to_phase();
         match destination.to_address_pos() {
             AddressPos::Board(dst_sq) => {
-                (friend == Phase::First && dst_sq.rank() < RANK_4)
-                    || (friend == Phase::Second && RANK_6 < dst_sq.rank())
+                (friend2 == Phase::First && dst_sq.rank() < RANK_4)
+                    || (friend2 == Phase::Second && RANK_6 < dst_sq.rank())
             }
             _ => panic!(Beam::trouble(&format!(
                 "(Err.957) まだ実装してないぜ☆（＾～＾）！",
