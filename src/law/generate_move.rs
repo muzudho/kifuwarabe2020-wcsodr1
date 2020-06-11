@@ -239,14 +239,14 @@ impl PseudoLegalMoves {
     {
         if let Some((piece_type, hand_addr)) = table.last_hand(drop) {
             // 打つぜ☆（＾～＾）
-            let drop_fn = &mut |destination| {
-                if let None = table.piece_num_at(&destination) {
+            let drop_fn = &mut |destination: UnifiedAddress| {
+                if let None = table.piece_num_at(&destination.to_address_pos()) {
                     // 駒が無いところに打つ
                     use crate::cosmic::smart::features::PieceType::*;
                     match piece_type {
                         Pawn => {
                             // ひよこ　は２歩できない☆（＾～＾）
-                            match destination {
+                            match destination.to_address_pos() {
                                 AddressPos::Board(dst_sq) => {
                                     if table.exists_pawn_on_file(friend, dst_sq.file()) {
                                         return;
@@ -260,10 +260,10 @@ impl PseudoLegalMoves {
                         _ => {}
                     }
                     listen_move(Movement::new(
-                        hand_addr,   // 打った駒種類
-                        destination, // どの升へ行きたいか
-                        false,       // 打に成りは無し
-                        None,        // 打で取れる駒無し
+                        hand_addr,                    // 打った駒種類
+                        destination.to_address_pos(), // どの升へ行きたいか
+                        false,                        // 打に成りは無し
+                        None,                         // 打で取れる駒無し
                     ));
                 }
             };
@@ -289,17 +289,8 @@ impl PseudoLegalMoves {
                 // それ以外の駒が打てる範囲は盤面全体。
                 _ => {
                     // 全升の面積だぜ☆（＾～＾）駒を打つときに使うぜ☆（＾～＾）
-                    match drop.phase() {
-                        Phase::First => {
-                            for sq in table.area.first_all_squares.iter() {
-                                drop_fn(*sq);
-                            }
-                        }
-                        Phase::Second => {
-                            for sq in table.area.second_all_squares.iter() {
-                                drop_fn(*sq);
-                            }
-                        }
+                    for sq in table.area.all_squares[friend as usize].iter() {
+                        drop_fn(*sq);
                     }
                 }
             }
@@ -310,63 +301,85 @@ impl PseudoLegalMoves {
 /// 次の升☆（＾～＾）
 pub struct Area {
     /// 変わっているが、すべてのマスは先後に分かれているぜ☆（＾～＾）
-    first_all_squares: [AddressPos; 81],
-    second_all_squares: [AddressPos; 81],
-    drop_pawn_lance: [[AddressPos; 72]; PHASE_LEN],
-    drop_knight: [[AddressPos; 63]; PHASE_LEN],
+    all_squares: [[UnifiedAddress; 81]; PHASE_LEN],
+    drop_pawn_lance: [[UnifiedAddress; 72]; PHASE_LEN],
+    drop_knight: [[UnifiedAddress; 63]; PHASE_LEN],
 }
 impl Default for Area {
     fn default() -> Self {
-        fn all_sq_fn() -> [AddressPos; 81] {
-            let mut v = [AddressPos::default(); 81];
+        fn all_first_sq_fn() -> [UnifiedAddress; 81] {
+            let mut v = [UnifiedAddress::default(); 81];
             let mut i = 0;
             for rank in RANK_1..RANK_10 {
                 for file in (FILE_1..FILE_10).rev() {
-                    v[i] = AddressPos::Board(AbsoluteAddress2D::new(file, rank));
+                    v[i] = UnifiedAddress::from_address_pos(&AddressPos::Board(
+                        AbsoluteAddress2D::new(file, rank),
+                    ));
                     i += 1;
                 }
             }
             v
         }
-        fn first_drop_pawn_fn() -> [AddressPos; 72] {
-            let mut v = [AddressPos::default(); 72];
+        fn all_second_sq_fn() -> [UnifiedAddress; 81] {
+            let mut v = [UnifiedAddress::default(); 81];
+            let mut i = 0;
+            for rank in RANK_1..RANK_10 {
+                for file in (FILE_1..FILE_10).rev() {
+                    v[i] = UnifiedAddress::from_address_pos(&AddressPos::Board(
+                        AbsoluteAddress2D::new(file, rank),
+                    ));
+                    i += 1;
+                }
+            }
+            v
+        }
+        fn first_drop_pawn_fn() -> [UnifiedAddress; 72] {
+            let mut v = [UnifiedAddress::default(); 72];
             let mut i = 0;
             for rank in RANK_2..RANK_10 {
                 for file in (FILE_1..FILE_10).rev() {
-                    v[i] = AddressPos::Board(AbsoluteAddress2D::new(file, rank));
+                    v[i] = UnifiedAddress::from_address_pos(&AddressPos::Board(
+                        AbsoluteAddress2D::new(file, rank),
+                    ));
                     i += 1;
                 }
             }
             v
         }
-        fn second_drop_pawn_fn() -> [AddressPos; 72] {
-            let mut v = [AddressPos::default(); 72];
+        fn second_drop_pawn_fn() -> [UnifiedAddress; 72] {
+            let mut v = [UnifiedAddress::default(); 72];
             let mut i = 0;
             for rank in RANK_1..RANK_9 {
                 for file in (FILE_1..FILE_10).rev() {
-                    v[i] = AddressPos::Board(AbsoluteAddress2D::new(file, rank));
+                    v[i] = UnifiedAddress::from_address_pos(&AddressPos::Board(
+                        AbsoluteAddress2D::new(file, rank),
+                    ));
                     i += 1;
                 }
             }
             v
         }
-        fn first_drop_knight_fn() -> [AddressPos; 63] {
-            let mut v = [AddressPos::default(); 63];
+        fn first_drop_knight_fn() -> [UnifiedAddress; 63] {
+            let mut v = [UnifiedAddress::default(); 63];
             let mut i = 0;
             for rank in RANK_3..RANK_10 {
                 for file in (FILE_1..FILE_10).rev() {
-                    v[i] = AddressPos::Board(AbsoluteAddress2D::new(file, rank));
+                    v[i] = UnifiedAddress::from_address_pos(&AddressPos::Board(
+                        AbsoluteAddress2D::new(file, rank),
+                    ));
                     i += 1;
                 }
             }
             v
         }
-        fn second_drop_knight_fn() -> [AddressPos; 63] {
-            let mut v = [AddressPos::default(); 63];
+        fn second_drop_knight_fn() -> [UnifiedAddress; 63] {
+            let mut v = [UnifiedAddress::default(); 63];
             let mut i = 0;
             for rank in RANK_3..RANK_10 {
                 for file in (FILE_1..FILE_10).rev() {
-                    v[i] = AddressPos::Board(AbsoluteAddress2D::new(file, rank).rotate_180());
+                    v[i] = UnifiedAddress::from_address_pos(&AddressPos::Board(
+                        AbsoluteAddress2D::new(file, rank).rotate_180(),
+                    ));
                     i += 1;
                 }
             }
@@ -374,8 +387,7 @@ impl Default for Area {
         }
 
         Area {
-            first_all_squares: all_sq_fn(),
-            second_all_squares: all_sq_fn(),
+            all_squares: [all_first_sq_fn(), all_second_sq_fn()],
             drop_pawn_lance: [first_drop_pawn_fn(), second_drop_pawn_fn()],
             drop_knight: [first_drop_knight_fn(), second_drop_knight_fn()],
         }

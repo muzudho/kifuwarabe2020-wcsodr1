@@ -196,6 +196,12 @@ pub enum UnifiedAddress {
     Lance2,
     Pawn2,
 }
+impl Default for UnifiedAddress {
+    /// ゴミ値だぜ☆（＾～＾）
+    fn default() -> Self {
+        UnifiedAddress::Sq11_1
+    }
+}
 impl UnifiedAddress {
     pub fn from_absolute_address(addr: &AbsoluteAddress2D) -> Self {
         let num = addr.serial_number();
