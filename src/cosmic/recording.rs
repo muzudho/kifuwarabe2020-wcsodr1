@@ -64,7 +64,7 @@ impl History {
 /// 局面(Position)全体を範囲にして振られた番地(Address)。
 #[derive(Clone, Copy)]
 pub enum AddressPos {
-    // 盤上の番地
+    // 盤上の番地 TODO これを先手盤上、後手盤上の２つに分けれる☆（＾～＾）
     Board(AbsoluteAddress2D),
     // 持ち駒の種類
     Hand(DoubleFacedPiece),

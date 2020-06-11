@@ -437,7 +437,6 @@ impl Area {
     /// ---------
     ///
     /// * `piece_type` - 駒の種類だぜ☆（＾～＾）
-    /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `hopping` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     /// * `sliding` -
@@ -485,7 +484,7 @@ impl Area {
         };
 
         for mobility in PieceType::Pawn.mobility().iter() {
-            Area::move_(friend, source, *mobility, moving);
+            Area::move_( source, *mobility, moving);
         }
     }
 
@@ -511,7 +510,7 @@ impl Area {
         };
 
         for mobility in PieceType::Lance.mobility().iter() {
-            Area::move_(friend, source, *mobility, moving);
+            Area::move_( source, *mobility, moving);
         }
     }
 
@@ -537,7 +536,7 @@ impl Area {
         };
 
         for mobility in PieceType::Knight.mobility().iter() {
-            Area::move_(friend, source, *mobility, moving);
+            Area::move_( source, *mobility, moving);
         }
     }
 
@@ -546,20 +545,18 @@ impl Area {
     /// Arguments
     /// ---------
     ///
-    /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn silver<F1>(source: UnifiedAddress, moving: &mut F1)
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        let friend = source.to_phase();
         let moving = &mut |destination: UnifiedAddress, _agility| {
             Promoting::silver( source, destination, moving)
         };
 
         for mobility in PieceType::Silver.mobility().iter() {
-            Area::move_(friend, source, *mobility, moving);
+            Area::move_( source, *mobility, moving);
         }
     }
 
@@ -575,13 +572,12 @@ impl Area {
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        let friend = source.to_phase();
         let moving = &mut |destination, _agility| {
             moving(destination, Promotability::Deny, Agility::Hopping, None)
         };
 
         for mobility in PieceType::Gold.mobility().iter() {
-            Area::move_(friend, source, *mobility, moving);
+            Area::move_( source, *mobility, moving);
         }
     }
 
@@ -596,13 +592,12 @@ impl Area {
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        let friend = source.to_phase();
         let moving = &mut |destination, _agility| {
             moving(destination, Promotability::Deny, Agility::Hopping, None)
         };
 
         for mobility in PieceType::King.mobility().iter() {
-            Area::move_(friend, source, *mobility, moving);
+            Area::move_( source, *mobility, moving);
         }
     }
 
@@ -617,12 +612,11 @@ impl Area {
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        let friend = source.to_phase();
         let moving = &mut |destination: UnifiedAddress, _agility| {
             Promoting::bishop_rook( source, destination, moving)
         };
         for mobility in PieceType::Bishop.mobility().iter() {
-            Area::move_(friend, source, *mobility, moving);
+            Area::move_( source, *mobility, moving);
         }
     }
 
@@ -637,12 +631,11 @@ impl Area {
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        let friend = source.to_phase();
         let moving = &mut |destination: UnifiedAddress, _agility| {
             Promoting::bishop_rook( source, destination, moving)
         };
         for mobility in PieceType::Rook.mobility().iter() {
-            Area::move_(friend, source, *mobility, moving);
+            Area::move_( source, *mobility, moving);
         }
     }
 
@@ -657,12 +650,11 @@ impl Area {
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        let friend = source.to_phase();
         let moving =
             &mut |destination, agility| moving(destination, Promotability::Deny, agility, None);
 
         for mobility in PieceType::Horse.mobility().iter() {
-            Area::move_(friend, source, *mobility, moving);
+            Area::move_( source, *mobility, moving);
         }
     }
 
@@ -677,12 +669,11 @@ impl Area {
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        let friend = source.to_phase();
             let moving =
                 &mut |destination, agility| moving(destination, Promotability::Deny, agility, None);
 
             for mobility in PieceType::Dragon.mobility().iter() {
-                Area::move_(friend, source, *mobility, moving);
+                Area::move_( source, *mobility, moving);
             }
     }
 
@@ -695,10 +686,11 @@ impl Area {
     /// * `angle` - 角度☆（＾～＾）
     /// * `agility` - 動き方☆（＾～＾）
     /// * `callback` - 絶対番地を受け取れだぜ☆（＾～＾）
-    fn move_<F1>(friend: Phase, start: UnifiedAddress, mobility: Mobility, moving: &mut F1)
+    fn move_<F1>(start: UnifiedAddress, mobility: Mobility, moving: &mut F1)
     where
         F1: FnMut(UnifiedAddress, Agility) -> bool,
     {
+        let friend = start.to_phase();
         let angle = 
             // 後手なら１８０°回転だぜ☆（＾～＾）
             if friend == Phase::Second {
@@ -831,7 +823,6 @@ impl Promoting {
     /// Arguments
     /// ---------
     ///
-    /// * `friend` -
     /// * `destinaion` -
     /// * `callback` -
     /// * `move_permission` - 成らずに一番奥の段に移動することはできません。
@@ -874,7 +865,6 @@ impl Promoting {
     /// Arguments
     /// ---------
     ///
-    /// * `friend` -
     /// * `destinaion` -
     /// * `callback` -
     /// * `move_permission` - 成らずに奥から２番目の段に移動することはできません。
@@ -916,7 +906,6 @@ impl Promoting {
     /// Arguments
     /// ---------
     ///
-    /// * `friend` -
     /// * `source` -
     /// * `destination` -
     /// * `callback` -
