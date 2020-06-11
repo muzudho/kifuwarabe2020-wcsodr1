@@ -226,7 +226,7 @@ impl PseudoLegalMoves {
             !space
         };
 
-        Area::piece_of(piece_type, friend, source, moving);
+        Area::piece_of(piece_type,  source, moving);
     }
 
     /// 駒台を見ようぜ☆（＾～＾） 駒台の駒の動きを作るぜ☆（＾～＾）
@@ -441,25 +441,25 @@ impl Area {
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `hopping` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     /// * `sliding` -
-    fn piece_of<F1>(piece_type: PieceType, friend: Phase, source: UnifiedAddress, moving: &mut F1)
+    fn piece_of<F1>(piece_type: PieceType, source: UnifiedAddress, moving: &mut F1)
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         match piece_type {
-            PieceType::Pawn => Area::pawn(friend, source, moving),
-            PieceType::Lance => Area::lance(friend, source, moving),
-            PieceType::Knight => Area::knight(friend, source, moving),
-            PieceType::Silver => Area::silver(friend, source, moving),
-            PieceType::Gold => Area::gold(friend, source, moving),
-            PieceType::King => Area::king(friend,source, moving),
-            PieceType::Bishop => Area::bishop(friend, source, moving),
-            PieceType::Rook => Area::rook(friend, source, moving),
-            PieceType::PromotedPawn => Area::gold(friend, source, moving),
-            PieceType::PromotedLance => Area::gold(friend, source, moving),
-            PieceType::PromotedKnight => Area::gold(friend, source, moving),
-            PieceType::PromotedSilver => Area::gold(friend, source, moving),
-            PieceType::Horse => Area::horse(friend,source, moving),
-            PieceType::Dragon => Area::dragon(friend,source, moving),
+            PieceType::Pawn => Area::pawn( source, moving),
+            PieceType::Lance => Area::lance( source, moving),
+            PieceType::Knight => Area::knight( source, moving),
+            PieceType::Silver => Area::silver( source, moving),
+            PieceType::Gold => Area::gold( source, moving),
+            PieceType::King => Area::king(source, moving),
+            PieceType::Bishop => Area::bishop( source, moving),
+            PieceType::Rook => Area::rook( source, moving),
+            PieceType::PromotedPawn => Area::gold( source, moving),
+            PieceType::PromotedLance => Area::gold( source, moving),
+            PieceType::PromotedKnight => Area::gold( source, moving),
+            PieceType::PromotedSilver => Area::gold( source, moving),
+            PieceType::Horse => Area::horse(source, moving),
+            PieceType::Dragon => Area::dragon(source, moving),
         }
     }
 
@@ -471,10 +471,11 @@ impl Area {
     /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn pawn<F1>(friend: Phase, source: UnifiedAddress, moving: &mut F1)
+    fn pawn<F1>( source: UnifiedAddress, moving: &mut F1)
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
+        let friend = source.to_phase();
         let moving = &mut |destination: UnifiedAddress, _agility| {
             Promoting::pawn_lance(
                 destination,
@@ -496,10 +497,11 @@ impl Area {
     /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn lance<F1>(friend: Phase, source: UnifiedAddress, moving: &mut F1)
+    fn lance<F1>( source: UnifiedAddress, moving: &mut F1)
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
+        let friend = source.to_phase();
         let moving = &mut |destination: UnifiedAddress, _agility| {
             Promoting::pawn_lance(
                 destination,
@@ -521,10 +523,11 @@ impl Area {
     /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn knight<F1>(friend: Phase, source: UnifiedAddress, moving: &mut F1)
+    fn knight<F1>( source: UnifiedAddress, moving: &mut F1)
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
+        let friend = source.to_phase();
         let moving = &mut |destination: UnifiedAddress, _agility| {
             Promoting::knight(
                 destination,
@@ -546,10 +549,11 @@ impl Area {
     /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn silver<F1>(friend: Phase, source: UnifiedAddress, moving: &mut F1)
+    fn silver<F1>(source: UnifiedAddress, moving: &mut F1)
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
+        let friend = source.to_phase();
         let moving = &mut |destination: UnifiedAddress, _agility| {
             Promoting::silver( source, destination, moving)
         };
@@ -567,10 +571,11 @@ impl Area {
     /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn gold<F1>(friend: Phase, source: UnifiedAddress, moving: &mut F1)
+    fn gold<F1>(source: UnifiedAddress, moving: &mut F1)
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
+        let friend = source.to_phase();
         let moving = &mut |destination, _agility| {
             moving(destination, Promotability::Deny, Agility::Hopping, None)
         };
@@ -587,10 +592,11 @@ impl Area {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn king<F1>(friend: Phase,source: UnifiedAddress, moving: &mut F1)
+    fn king<F1>(source: UnifiedAddress, moving: &mut F1)
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
+        let friend = source.to_phase();
         let moving = &mut |destination, _agility| {
             moving(destination, Promotability::Deny, Agility::Hopping, None)
         };
@@ -607,10 +613,11 @@ impl Area {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn bishop<F1>(friend: Phase, source: UnifiedAddress, moving: &mut F1)
+    fn bishop<F1>( source: UnifiedAddress, moving: &mut F1)
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
+        let friend = source.to_phase();
         let moving = &mut |destination: UnifiedAddress, _agility| {
             Promoting::bishop_rook( source, destination, moving)
         };
@@ -626,10 +633,11 @@ impl Area {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn rook<F1>(friend: Phase, source: UnifiedAddress, moving: &mut F1)
+    fn rook<F1>( source: UnifiedAddress, moving: &mut F1)
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
+        let friend = source.to_phase();
         let moving = &mut |destination: UnifiedAddress, _agility| {
             Promoting::bishop_rook( source, destination, moving)
         };
@@ -645,10 +653,11 @@ impl Area {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn horse<F1>(friend:Phase,source: UnifiedAddress, moving: &mut F1)
+    fn horse<F1>(source: UnifiedAddress, moving: &mut F1)
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
+        let friend = source.to_phase();
         let moving =
             &mut |destination, agility| moving(destination, Promotability::Deny, agility, None);
 
@@ -664,18 +673,17 @@ impl Area {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn dragon<F1>(friend:Phase,source: UnifiedAddress, moving: &mut F1)
+    fn dragon<F1>(source: UnifiedAddress, moving: &mut F1)
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        {
+        let friend = source.to_phase();
             let moving =
                 &mut |destination, agility| moving(destination, Promotability::Deny, agility, None);
 
             for mobility in PieceType::Dragon.mobility().iter() {
                 Area::move_(friend, source, *mobility, moving);
             }
-        }
     }
 
     /// 盤上の駒を指すぜ☆（＾～＾）
