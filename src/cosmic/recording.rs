@@ -8,6 +8,7 @@ use crate::cosmic::smart::features::DoubleFacedPiece;
 use crate::cosmic::smart::features::PieceType;
 use crate::cosmic::smart::square::AbsoluteAddress2D;
 use crate::cosmic::toy_box::UnifiedAddress;
+use crate::cosmic::toy_box::UnifiedSq;
 use crate::law::cryptographic::num_to_lower_case;
 use std::fmt;
 
@@ -119,6 +120,21 @@ impl fmt::Debug for AddressPos {
                 }
             },
         )
+    }
+}
+
+/// 局面(Position)全体を範囲にして振られた番地(Address)。
+#[derive(Clone, Copy, Debug)]
+pub enum AddressPos1 {
+    // 盤上の番地 TODO これを先手盤上、後手盤上の２つに分けれる☆（＾～＾）
+    Board(UnifiedSq),
+    // 持ち駒の種類
+    Hand(DoubleFacedPiece),
+}
+impl Default for AddressPos1 {
+    // ゴミ値だぜ☆（＾～＾）
+    fn default() -> Self {
+        AddressPos1::Board(UnifiedSq::Sq11)
     }
 }
 
