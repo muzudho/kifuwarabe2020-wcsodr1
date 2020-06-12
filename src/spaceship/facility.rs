@@ -1,7 +1,7 @@
 use crate::cosmic::playing::{Game, PosNums};
 use crate::cosmic::recording::{AddressPos1, Movement, Phase};
 use crate::cosmic::smart::features::DoubleFacedPiece;
-use crate::cosmic::toy_box::{GameTable, UnifiedSq, PIECE_WHITE_SPACE};
+use crate::cosmic::toy_box::{GameTable, SquareType, PIECE_WHITE_SPACE};
 use crate::spaceship::equipment::Beam;
 
 /// 指令室はこちらだぜ☆（＾～＾）！
@@ -48,7 +48,7 @@ pub struct GameRoom {}
 impl GameRoom {
     fn to_string3(table: &GameTable, file: usize, rank: usize) -> String {
         if let Some(piece_info_val) =
-            table.piece_info_at1(AddressPos1::Board(UnifiedSq::from_file_rank(file, rank)))
+            table.piece_info_at1(AddressPos1::Board(SquareType::from_file_rank(file, rank)))
         {
             format!("{}", piece_info_val.piece)
         } else {

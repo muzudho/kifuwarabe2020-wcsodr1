@@ -6,7 +6,7 @@ for phase in range(1, 3):
     for file in range(1, 10):
         for rank in range(1, 10):
             print(
-                f'const UNIFIED_ADDRESS_{i}_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq{file}{rank});')
+                f'const UNIFIED_ADDRESS_{i}_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq{file}{rank});')
             i += 1
 for phase in range(1, 3):
     for hand in ['King', 'Rook', 'Bishop', 'Gold', 'Silver', 'Knight', 'Lance', 'Pawn']:

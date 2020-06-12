@@ -7,7 +7,7 @@ use crate::cosmic::smart::features::{HAND_MAX, PHYSICAL_PIECES_LEN};
 use crate::cosmic::smart::square::{
     BOARD_MEMORY_AREA, FILE_1, FILE_10, RANK_1, RANK_10, SQUARE_NONE,
 };
-use crate::cosmic::toy_box::{GameTable, UnifiedSq, PIECE_LEN};
+use crate::cosmic::toy_box::{GameTable, SquareType, PIECE_LEN};
 use crate::law::speed_of_light::HandAddresses;
 use rand::Rng;
 
@@ -137,7 +137,7 @@ impl GameHashSeed {
         // 盤上の駒
         for rank in RANK_1..RANK_10 {
             for file in (FILE_1..FILE_10).rev() {
-                let sq = UnifiedSq::from_file_rank(file, rank);
+                let sq = SquareType::from_file_rank(file, rank);
                 if let Some(piece_val) = table.piece_at1(AddressPos1::Board(sq)) {
                     hash ^= self.piece[sq.to_serial_number()][piece_val as usize];
                 }
