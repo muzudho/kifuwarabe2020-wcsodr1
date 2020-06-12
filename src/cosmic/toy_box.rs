@@ -783,6 +783,68 @@ impl SquareType {
         }
     }
 
+    pub fn from_absolute_address_2d(friend: Phase, addr: &AbsoluteAddress2D) -> SquareType {
+        let second = if friend == Phase::Second { 81 } else { 0 };
+        let num = addr.serial_number();
+        if 10 < num && num < 20 {
+            if let Some(val) = SquareType::from_usize(second + num - 11) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.124) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 20 < num && num < 30 {
+            if let Some(val) = SquareType::from_usize(second + num - 21 + 9) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.131) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 30 < num && num < 40 {
+            if let Some(val) = SquareType::from_usize(second + num - 31 + 2 * 9) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.137) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 40 < num && num < 50 {
+            if let Some(val) = SquareType::from_usize(second + num - 41 + 3 * 9) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.143) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 50 < num && num < 60 {
+            if let Some(val) = SquareType::from_usize(second + num - 51 + 4 * 9) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.149) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 60 < num && num < 70 {
+            if let Some(val) = SquareType::from_usize(second + num - 61 + 5 * 9) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.155) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 70 < num && num < 80 {
+            if let Some(val) = SquareType::from_usize(second + num - 71 + 6 * 9) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.161) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 80 < num && num < 90 {
+            if let Some(val) = SquareType::from_usize(second + num - 81 + 7 * 9) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.167) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 90 < num && num < 100 {
+            if let Some(val) = SquareType::from_usize(second + num - 91 + 8 * 9) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.173) 番地を変換できね☆（＾～＾）"))
+            }
+        } else {
+            panic!(Beam::trouble("(Err.176) 番地を変換できね☆（＾～＾）"))
+        }
+    }
+
     pub fn to_unified_address(&self, friend: Phase) -> UnifiedAddress {
         use crate::cosmic::toy_box::SquareType::*;
         match friend {
@@ -1206,71 +1268,6 @@ impl UnifiedAddress {
         }
     }
 
-    pub fn from_absolute_address_2d_to_unified_sq(
-        friend: Phase,
-        addr: &AbsoluteAddress2D,
-    ) -> SquareType {
-        let second = if friend == Phase::Second { 81 } else { 0 };
-        let num = addr.serial_number();
-        if 10 < num && num < 20 {
-            if let Some(val) = SquareType::from_usize(second + num - 11) {
-                val
-            } else {
-                panic!(Beam::trouble("(Err.124) 番地を変換できね☆（＾～＾）"))
-            }
-        } else if 20 < num && num < 30 {
-            if let Some(val) = SquareType::from_usize(second + num - 21 + 9) {
-                val
-            } else {
-                panic!(Beam::trouble("(Err.131) 番地を変換できね☆（＾～＾）"))
-            }
-        } else if 30 < num && num < 40 {
-            if let Some(val) = SquareType::from_usize(second + num - 31 + 2 * 9) {
-                val
-            } else {
-                panic!(Beam::trouble("(Err.137) 番地を変換できね☆（＾～＾）"))
-            }
-        } else if 40 < num && num < 50 {
-            if let Some(val) = SquareType::from_usize(second + num - 41 + 3 * 9) {
-                val
-            } else {
-                panic!(Beam::trouble("(Err.143) 番地を変換できね☆（＾～＾）"))
-            }
-        } else if 50 < num && num < 60 {
-            if let Some(val) = SquareType::from_usize(second + num - 51 + 4 * 9) {
-                val
-            } else {
-                panic!(Beam::trouble("(Err.149) 番地を変換できね☆（＾～＾）"))
-            }
-        } else if 60 < num && num < 70 {
-            if let Some(val) = SquareType::from_usize(second + num - 61 + 5 * 9) {
-                val
-            } else {
-                panic!(Beam::trouble("(Err.155) 番地を変換できね☆（＾～＾）"))
-            }
-        } else if 70 < num && num < 80 {
-            if let Some(val) = SquareType::from_usize(second + num - 71 + 6 * 9) {
-                val
-            } else {
-                panic!(Beam::trouble("(Err.161) 番地を変換できね☆（＾～＾）"))
-            }
-        } else if 80 < num && num < 90 {
-            if let Some(val) = SquareType::from_usize(second + num - 81 + 7 * 9) {
-                val
-            } else {
-                panic!(Beam::trouble("(Err.167) 番地を変換できね☆（＾～＾）"))
-            }
-        } else if 90 < num && num < 100 {
-            if let Some(val) = SquareType::from_usize(second + num - 91 + 8 * 9) {
-                val
-            } else {
-                panic!(Beam::trouble("(Err.173) 番地を変換できね☆（＾～＾）"))
-            }
-        } else {
-            panic!(Beam::trouble("(Err.176) 番地を変換できね☆（＾～＾）"))
-        }
-    }
-
     pub fn to_absolute_address(self) -> AbsoluteAddress2D {
         if let Some(val) = AbsoluteAddress2D::from_absolute_address(self as usize) {
             val
@@ -1350,187 +1347,187 @@ impl UnifiedAddress {
     }
 
     pub fn to_address_pos0(self) -> AddressPos0 {
-        const MAP: [AddressPos0; 178] = [
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Board,
-            AddressPos0::Hand,
-            AddressPos0::Hand,
-            AddressPos0::Hand,
-            AddressPos0::Hand,
-            AddressPos0::Hand,
-            AddressPos0::Hand,
-            AddressPos0::Hand,
-            AddressPos0::Hand,
-            AddressPos0::Hand,
-            AddressPos0::Hand,
-            AddressPos0::Hand,
-            AddressPos0::Hand,
-            AddressPos0::Hand,
-            AddressPos0::Hand,
-            AddressPos0::Hand,
-            AddressPos0::Hand,
-        ];
-        MAP[self as usize]
+        use crate::cosmic::toy_box::UnifiedAddress::*;
+        match self {
+            Sq11_1 => AddressPos0::Board,
+            Sq12_1 => AddressPos0::Board,
+            Sq13_1 => AddressPos0::Board,
+            Sq14_1 => AddressPos0::Board,
+            Sq15_1 => AddressPos0::Board,
+            Sq16_1 => AddressPos0::Board,
+            Sq17_1 => AddressPos0::Board,
+            Sq18_1 => AddressPos0::Board,
+            Sq19_1 => AddressPos0::Board,
+            Sq21_1 => AddressPos0::Board,
+            Sq22_1 => AddressPos0::Board,
+            Sq23_1 => AddressPos0::Board,
+            Sq24_1 => AddressPos0::Board,
+            Sq25_1 => AddressPos0::Board,
+            Sq26_1 => AddressPos0::Board,
+            Sq27_1 => AddressPos0::Board,
+            Sq28_1 => AddressPos0::Board,
+            Sq29_1 => AddressPos0::Board,
+            Sq31_1 => AddressPos0::Board,
+            Sq32_1 => AddressPos0::Board,
+            Sq33_1 => AddressPos0::Board,
+            Sq34_1 => AddressPos0::Board,
+            Sq35_1 => AddressPos0::Board,
+            Sq36_1 => AddressPos0::Board,
+            Sq37_1 => AddressPos0::Board,
+            Sq38_1 => AddressPos0::Board,
+            Sq39_1 => AddressPos0::Board,
+            Sq41_1 => AddressPos0::Board,
+            Sq42_1 => AddressPos0::Board,
+            Sq43_1 => AddressPos0::Board,
+            Sq44_1 => AddressPos0::Board,
+            Sq45_1 => AddressPos0::Board,
+            Sq46_1 => AddressPos0::Board,
+            Sq47_1 => AddressPos0::Board,
+            Sq48_1 => AddressPos0::Board,
+            Sq49_1 => AddressPos0::Board,
+            Sq51_1 => AddressPos0::Board,
+            Sq52_1 => AddressPos0::Board,
+            Sq53_1 => AddressPos0::Board,
+            Sq54_1 => AddressPos0::Board,
+            Sq55_1 => AddressPos0::Board,
+            Sq56_1 => AddressPos0::Board,
+            Sq57_1 => AddressPos0::Board,
+            Sq58_1 => AddressPos0::Board,
+            Sq59_1 => AddressPos0::Board,
+            Sq61_1 => AddressPos0::Board,
+            Sq62_1 => AddressPos0::Board,
+            Sq63_1 => AddressPos0::Board,
+            Sq64_1 => AddressPos0::Board,
+            Sq65_1 => AddressPos0::Board,
+            Sq66_1 => AddressPos0::Board,
+            Sq67_1 => AddressPos0::Board,
+            Sq68_1 => AddressPos0::Board,
+            Sq69_1 => AddressPos0::Board,
+            Sq71_1 => AddressPos0::Board,
+            Sq72_1 => AddressPos0::Board,
+            Sq73_1 => AddressPos0::Board,
+            Sq74_1 => AddressPos0::Board,
+            Sq75_1 => AddressPos0::Board,
+            Sq76_1 => AddressPos0::Board,
+            Sq77_1 => AddressPos0::Board,
+            Sq78_1 => AddressPos0::Board,
+            Sq79_1 => AddressPos0::Board,
+            Sq81_1 => AddressPos0::Board,
+            Sq82_1 => AddressPos0::Board,
+            Sq83_1 => AddressPos0::Board,
+            Sq84_1 => AddressPos0::Board,
+            Sq85_1 => AddressPos0::Board,
+            Sq86_1 => AddressPos0::Board,
+            Sq87_1 => AddressPos0::Board,
+            Sq88_1 => AddressPos0::Board,
+            Sq89_1 => AddressPos0::Board,
+            Sq91_1 => AddressPos0::Board,
+            Sq92_1 => AddressPos0::Board,
+            Sq93_1 => AddressPos0::Board,
+            Sq94_1 => AddressPos0::Board,
+            Sq95_1 => AddressPos0::Board,
+            Sq96_1 => AddressPos0::Board,
+            Sq97_1 => AddressPos0::Board,
+            Sq98_1 => AddressPos0::Board,
+            Sq99_1 => AddressPos0::Board,
+            Sq11_2 => AddressPos0::Board,
+            Sq12_2 => AddressPos0::Board,
+            Sq13_2 => AddressPos0::Board,
+            Sq14_2 => AddressPos0::Board,
+            Sq15_2 => AddressPos0::Board,
+            Sq16_2 => AddressPos0::Board,
+            Sq17_2 => AddressPos0::Board,
+            Sq18_2 => AddressPos0::Board,
+            Sq19_2 => AddressPos0::Board,
+            Sq21_2 => AddressPos0::Board,
+            Sq22_2 => AddressPos0::Board,
+            Sq23_2 => AddressPos0::Board,
+            Sq24_2 => AddressPos0::Board,
+            Sq25_2 => AddressPos0::Board,
+            Sq26_2 => AddressPos0::Board,
+            Sq27_2 => AddressPos0::Board,
+            Sq28_2 => AddressPos0::Board,
+            Sq29_2 => AddressPos0::Board,
+            Sq31_2 => AddressPos0::Board,
+            Sq32_2 => AddressPos0::Board,
+            Sq33_2 => AddressPos0::Board,
+            Sq34_2 => AddressPos0::Board,
+            Sq35_2 => AddressPos0::Board,
+            Sq36_2 => AddressPos0::Board,
+            Sq37_2 => AddressPos0::Board,
+            Sq38_2 => AddressPos0::Board,
+            Sq39_2 => AddressPos0::Board,
+            Sq41_2 => AddressPos0::Board,
+            Sq42_2 => AddressPos0::Board,
+            Sq43_2 => AddressPos0::Board,
+            Sq44_2 => AddressPos0::Board,
+            Sq45_2 => AddressPos0::Board,
+            Sq46_2 => AddressPos0::Board,
+            Sq47_2 => AddressPos0::Board,
+            Sq48_2 => AddressPos0::Board,
+            Sq49_2 => AddressPos0::Board,
+            Sq51_2 => AddressPos0::Board,
+            Sq52_2 => AddressPos0::Board,
+            Sq53_2 => AddressPos0::Board,
+            Sq54_2 => AddressPos0::Board,
+            Sq55_2 => AddressPos0::Board,
+            Sq56_2 => AddressPos0::Board,
+            Sq57_2 => AddressPos0::Board,
+            Sq58_2 => AddressPos0::Board,
+            Sq59_2 => AddressPos0::Board,
+            Sq61_2 => AddressPos0::Board,
+            Sq62_2 => AddressPos0::Board,
+            Sq63_2 => AddressPos0::Board,
+            Sq64_2 => AddressPos0::Board,
+            Sq65_2 => AddressPos0::Board,
+            Sq66_2 => AddressPos0::Board,
+            Sq67_2 => AddressPos0::Board,
+            Sq68_2 => AddressPos0::Board,
+            Sq69_2 => AddressPos0::Board,
+            Sq71_2 => AddressPos0::Board,
+            Sq72_2 => AddressPos0::Board,
+            Sq73_2 => AddressPos0::Board,
+            Sq74_2 => AddressPos0::Board,
+            Sq75_2 => AddressPos0::Board,
+            Sq76_2 => AddressPos0::Board,
+            Sq77_2 => AddressPos0::Board,
+            Sq78_2 => AddressPos0::Board,
+            Sq79_2 => AddressPos0::Board,
+            Sq81_2 => AddressPos0::Board,
+            Sq82_2 => AddressPos0::Board,
+            Sq83_2 => AddressPos0::Board,
+            Sq84_2 => AddressPos0::Board,
+            Sq85_2 => AddressPos0::Board,
+            Sq86_2 => AddressPos0::Board,
+            Sq87_2 => AddressPos0::Board,
+            Sq88_2 => AddressPos0::Board,
+            Sq89_2 => AddressPos0::Board,
+            Sq91_2 => AddressPos0::Board,
+            Sq92_2 => AddressPos0::Board,
+            Sq93_2 => AddressPos0::Board,
+            Sq94_2 => AddressPos0::Board,
+            Sq95_2 => AddressPos0::Board,
+            Sq96_2 => AddressPos0::Board,
+            Sq97_2 => AddressPos0::Board,
+            Sq98_2 => AddressPos0::Board,
+            Sq99_2 => AddressPos0::Board,
+            King1 => AddressPos0::Hand,
+            Rook1 => AddressPos0::Hand,
+            Bishop1 => AddressPos0::Hand,
+            Gold1 => AddressPos0::Hand,
+            Silver1 => AddressPos0::Hand,
+            Knight1 => AddressPos0::Hand,
+            Lance1 => AddressPos0::Hand,
+            Pawn1 => AddressPos0::Hand,
+            King2 => AddressPos0::Hand,
+            Rook2 => AddressPos0::Hand,
+            Bishop2 => AddressPos0::Hand,
+            Gold2 => AddressPos0::Hand,
+            Silver2 => AddressPos0::Hand,
+            Knight2 => AddressPos0::Hand,
+            Lance2 => AddressPos0::Hand,
+            Pawn2 => AddressPos0::Hand,
+        }
     }
 
     /// 二歩チェックで使うぜ☆（＾～＾）
