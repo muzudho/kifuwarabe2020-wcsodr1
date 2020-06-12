@@ -1,6 +1,7 @@
 //!
 //! 駒 と 盤
 //!
+use crate::cosmic::recording::AddressPos1;
 use crate::cosmic::recording::Movement;
 use crate::cosmic::recording::{AddressPos, Phase};
 use crate::cosmic::recording::{AddressPos0, AddressPos3};
@@ -16,346 +17,346 @@ use std::*;
 pub const PIECE_LEN: usize = 28;
 
 // 配列へのアクセスは遅い気がするので、定数で作っておいて……☆（＾～＾）
-const UNIFIED_ADDRES_0_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_0_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 1 });
-const UNIFIED_ADDRES_1_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_1_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 2 });
-const UNIFIED_ADDRES_2_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_2_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 3 });
-const UNIFIED_ADDRES_3_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_3_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 4 });
-const UNIFIED_ADDRES_4_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_4_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 5 });
-const UNIFIED_ADDRES_5_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_5_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 6 });
-const UNIFIED_ADDRES_6_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_6_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 7 });
-const UNIFIED_ADDRES_7_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_7_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 8 });
-const UNIFIED_ADDRES_8_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_8_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 9 });
-const UNIFIED_ADDRES_9_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_9_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 1 });
-const UNIFIED_ADDRES_10_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_10_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 2 });
-const UNIFIED_ADDRES_11_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_11_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 3 });
-const UNIFIED_ADDRES_12_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_12_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 4 });
-const UNIFIED_ADDRES_13_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_13_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 5 });
-const UNIFIED_ADDRES_14_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_14_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 6 });
-const UNIFIED_ADDRES_15_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_15_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 7 });
-const UNIFIED_ADDRES_16_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_16_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 8 });
-const UNIFIED_ADDRES_17_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_17_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 9 });
-const UNIFIED_ADDRES_18_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_18_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 1 });
-const UNIFIED_ADDRES_19_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_19_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 2 });
-const UNIFIED_ADDRES_20_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_20_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 3 });
-const UNIFIED_ADDRES_21_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_21_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 4 });
-const UNIFIED_ADDRES_22_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_22_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 5 });
-const UNIFIED_ADDRES_23_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_23_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 6 });
-const UNIFIED_ADDRES_24_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_24_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 7 });
-const UNIFIED_ADDRES_25_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_25_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 8 });
-const UNIFIED_ADDRES_26_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_26_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 9 });
-const UNIFIED_ADDRES_27_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_27_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 1 });
-const UNIFIED_ADDRES_28_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_28_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 2 });
-const UNIFIED_ADDRES_29_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_29_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 3 });
-const UNIFIED_ADDRES_30_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_30_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 4 });
-const UNIFIED_ADDRES_31_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_31_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 5 });
-const UNIFIED_ADDRES_32_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_32_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 6 });
-const UNIFIED_ADDRES_33_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_33_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 7 });
-const UNIFIED_ADDRES_34_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_34_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 8 });
-const UNIFIED_ADDRES_35_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_35_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 9 });
-const UNIFIED_ADDRES_36_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_36_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 1 });
-const UNIFIED_ADDRES_37_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_37_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 2 });
-const UNIFIED_ADDRES_38_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_38_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 3 });
-const UNIFIED_ADDRES_39_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_39_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 4 });
-const UNIFIED_ADDRES_40_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_40_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 5 });
-const UNIFIED_ADDRES_41_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_41_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 6 });
-const UNIFIED_ADDRES_42_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_42_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 7 });
-const UNIFIED_ADDRES_43_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_43_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 8 });
-const UNIFIED_ADDRES_44_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_44_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 9 });
-const UNIFIED_ADDRES_45_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_45_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 1 });
-const UNIFIED_ADDRES_46_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_46_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 2 });
-const UNIFIED_ADDRES_47_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_47_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 3 });
-const UNIFIED_ADDRES_48_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_48_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 4 });
-const UNIFIED_ADDRES_49_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_49_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 5 });
-const UNIFIED_ADDRES_50_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_50_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 6 });
-const UNIFIED_ADDRES_51_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_51_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 7 });
-const UNIFIED_ADDRES_52_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_52_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 8 });
-const UNIFIED_ADDRES_53_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_53_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 9 });
-const UNIFIED_ADDRES_54_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_54_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 1 });
-const UNIFIED_ADDRES_55_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_55_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 2 });
-const UNIFIED_ADDRES_56_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_56_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 3 });
-const UNIFIED_ADDRES_57_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_57_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 4 });
-const UNIFIED_ADDRES_58_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_58_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 5 });
-const UNIFIED_ADDRES_59_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_59_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 6 });
-const UNIFIED_ADDRES_60_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_60_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 7 });
-const UNIFIED_ADDRES_61_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_61_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 8 });
-const UNIFIED_ADDRES_62_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_62_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 9 });
-const UNIFIED_ADDRES_63_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_63_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 1 });
-const UNIFIED_ADDRES_64_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_64_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 2 });
-const UNIFIED_ADDRES_65_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_65_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 3 });
-const UNIFIED_ADDRES_66_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_66_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 4 });
-const UNIFIED_ADDRES_67_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_67_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 5 });
-const UNIFIED_ADDRES_68_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_68_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 6 });
-const UNIFIED_ADDRES_69_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_69_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 7 });
-const UNIFIED_ADDRES_70_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_70_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 8 });
-const UNIFIED_ADDRES_71_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_71_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 9 });
-const UNIFIED_ADDRES_72_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_72_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 1 });
-const UNIFIED_ADDRES_73_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_73_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 2 });
-const UNIFIED_ADDRES_74_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_74_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 3 });
-const UNIFIED_ADDRES_75_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_75_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 4 });
-const UNIFIED_ADDRES_76_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_76_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 5 });
-const UNIFIED_ADDRES_77_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_77_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 6 });
-const UNIFIED_ADDRES_78_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_78_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 7 });
-const UNIFIED_ADDRES_79_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_79_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 8 });
-const UNIFIED_ADDRES_80_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_80_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 9 });
-const UNIFIED_ADDRES_81_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_81_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 1 });
-const UNIFIED_ADDRES_82_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_82_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 2 });
-const UNIFIED_ADDRES_83_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_83_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 3 });
-const UNIFIED_ADDRES_84_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_84_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 4 });
-const UNIFIED_ADDRES_85_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_85_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 5 });
-const UNIFIED_ADDRES_86_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_86_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 6 });
-const UNIFIED_ADDRES_87_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_87_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 7 });
-const UNIFIED_ADDRES_88_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_88_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 8 });
-const UNIFIED_ADDRES_89_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_89_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 9 });
-const UNIFIED_ADDRES_90_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_90_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 1 });
-const UNIFIED_ADDRES_91_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_91_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 2 });
-const UNIFIED_ADDRES_92_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_92_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 3 });
-const UNIFIED_ADDRES_93_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_93_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 4 });
-const UNIFIED_ADDRES_94_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_94_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 5 });
-const UNIFIED_ADDRES_95_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_95_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 6 });
-const UNIFIED_ADDRES_96_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_96_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 7 });
-const UNIFIED_ADDRES_97_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_97_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 8 });
-const UNIFIED_ADDRES_98_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_98_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 9 });
-const UNIFIED_ADDRES_99_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_99_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 1 });
-const UNIFIED_ADDRES_100_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_100_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 2 });
-const UNIFIED_ADDRES_101_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_101_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 3 });
-const UNIFIED_ADDRES_102_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_102_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 4 });
-const UNIFIED_ADDRES_103_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_103_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 5 });
-const UNIFIED_ADDRES_104_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_104_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 6 });
-const UNIFIED_ADDRES_105_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_105_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 7 });
-const UNIFIED_ADDRES_106_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_106_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 8 });
-const UNIFIED_ADDRES_107_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_107_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 9 });
-const UNIFIED_ADDRES_108_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_108_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 1 });
-const UNIFIED_ADDRES_109_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_109_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 2 });
-const UNIFIED_ADDRES_110_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_110_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 3 });
-const UNIFIED_ADDRES_111_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_111_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 4 });
-const UNIFIED_ADDRES_112_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_112_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 5 });
-const UNIFIED_ADDRES_113_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_113_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 6 });
-const UNIFIED_ADDRES_114_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_114_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 7 });
-const UNIFIED_ADDRES_115_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_115_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 8 });
-const UNIFIED_ADDRES_116_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_116_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 9 });
-const UNIFIED_ADDRES_117_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_117_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 1 });
-const UNIFIED_ADDRES_118_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_118_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 2 });
-const UNIFIED_ADDRES_119_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_119_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 3 });
-const UNIFIED_ADDRES_120_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_120_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 4 });
-const UNIFIED_ADDRES_121_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_121_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 5 });
-const UNIFIED_ADDRES_122_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_122_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 6 });
-const UNIFIED_ADDRES_123_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_123_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 7 });
-const UNIFIED_ADDRES_124_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_124_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 8 });
-const UNIFIED_ADDRES_125_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_125_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 9 });
-const UNIFIED_ADDRES_126_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_126_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 1 });
-const UNIFIED_ADDRES_127_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_127_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 2 });
-const UNIFIED_ADDRES_128_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_128_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 3 });
-const UNIFIED_ADDRES_129_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_129_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 4 });
-const UNIFIED_ADDRES_130_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_130_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 5 });
-const UNIFIED_ADDRES_131_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_131_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 6 });
-const UNIFIED_ADDRES_132_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_132_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 7 });
-const UNIFIED_ADDRES_133_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_133_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 8 });
-const UNIFIED_ADDRES_134_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_134_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 9 });
-const UNIFIED_ADDRES_135_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_135_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 1 });
-const UNIFIED_ADDRES_136_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_136_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 2 });
-const UNIFIED_ADDRES_137_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_137_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 3 });
-const UNIFIED_ADDRES_138_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_138_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 4 });
-const UNIFIED_ADDRES_139_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_139_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 5 });
-const UNIFIED_ADDRES_140_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_140_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 6 });
-const UNIFIED_ADDRES_141_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_141_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 7 });
-const UNIFIED_ADDRES_142_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_142_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 8 });
-const UNIFIED_ADDRES_143_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_143_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 9 });
-const UNIFIED_ADDRES_144_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_144_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 1 });
-const UNIFIED_ADDRES_145_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_145_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 2 });
-const UNIFIED_ADDRES_146_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_146_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 3 });
-const UNIFIED_ADDRES_147_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_147_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 4 });
-const UNIFIED_ADDRES_148_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_148_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 5 });
-const UNIFIED_ADDRES_149_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_149_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 6 });
-const UNIFIED_ADDRES_150_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_150_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 7 });
-const UNIFIED_ADDRES_151_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_151_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 8 });
-const UNIFIED_ADDRES_152_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_152_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 9 });
-const UNIFIED_ADDRES_153_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_153_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 1 });
-const UNIFIED_ADDRES_154_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_154_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 2 });
-const UNIFIED_ADDRES_155_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_155_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 3 });
-const UNIFIED_ADDRES_156_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_156_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 4 });
-const UNIFIED_ADDRES_157_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_157_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 5 });
-const UNIFIED_ADDRES_158_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_158_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 6 });
-const UNIFIED_ADDRES_159_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_159_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 7 });
-const UNIFIED_ADDRES_160_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_160_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 8 });
-const UNIFIED_ADDRES_161_TO_ADDRESS_POS: AddressPos =
+const UNIFIED_ADDRESS_161_TO_ADDRESS_POS: AddressPos =
     AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 9 });
-const UNIFIED_ADDRES_162_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::King1);
-const UNIFIED_ADDRES_163_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Rook1);
-const UNIFIED_ADDRES_164_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Bishop1);
-const UNIFIED_ADDRES_165_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Gold1);
-const UNIFIED_ADDRES_166_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Silver1);
-const UNIFIED_ADDRES_167_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Knight1);
-const UNIFIED_ADDRES_168_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Lance1);
-const UNIFIED_ADDRES_169_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Pawn1);
-const UNIFIED_ADDRES_170_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::King2);
-const UNIFIED_ADDRES_171_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Rook2);
-const UNIFIED_ADDRES_172_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Bishop2);
-const UNIFIED_ADDRES_173_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Gold2);
-const UNIFIED_ADDRES_174_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Silver2);
-const UNIFIED_ADDRES_175_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Knight2);
-const UNIFIED_ADDRES_176_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Lance2);
-const UNIFIED_ADDRES_177_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Pawn2);
+const UNIFIED_ADDRESS_162_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::King1);
+const UNIFIED_ADDRESS_163_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Rook1);
+const UNIFIED_ADDRESS_164_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Bishop1);
+const UNIFIED_ADDRESS_165_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Gold1);
+const UNIFIED_ADDRESS_166_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Silver1);
+const UNIFIED_ADDRESS_167_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Knight1);
+const UNIFIED_ADDRESS_168_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Lance1);
+const UNIFIED_ADDRESS_169_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Pawn1);
+const UNIFIED_ADDRESS_170_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::King2);
+const UNIFIED_ADDRESS_171_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Rook2);
+const UNIFIED_ADDRESS_172_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Bishop2);
+const UNIFIED_ADDRESS_173_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Gold2);
+const UNIFIED_ADDRESS_174_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Silver2);
+const UNIFIED_ADDRESS_175_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Knight2);
+const UNIFIED_ADDRESS_176_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Lance2);
+const UNIFIED_ADDRESS_177_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Pawn2);
 
 const UNIFIED_SQ_0_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
     AbsoluteAddress2D { file: 1, rank: 1 };
@@ -519,6 +520,169 @@ const UNIFIED_SQ_79_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
     AbsoluteAddress2D { file: 9, rank: 8 };
 const UNIFIED_SQ_80_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
     AbsoluteAddress2D { file: 9, rank: 9 };
+
+const UNIFIED_ADDRESS_0_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq11);
+const UNIFIED_ADDRESS_1_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq12);
+const UNIFIED_ADDRESS_2_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq13);
+const UNIFIED_ADDRESS_3_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq14);
+const UNIFIED_ADDRESS_4_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq15);
+const UNIFIED_ADDRESS_5_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq16);
+const UNIFIED_ADDRESS_6_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq17);
+const UNIFIED_ADDRESS_7_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq18);
+const UNIFIED_ADDRESS_8_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq19);
+const UNIFIED_ADDRESS_9_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq21);
+const UNIFIED_ADDRESS_10_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq22);
+const UNIFIED_ADDRESS_11_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq23);
+const UNIFIED_ADDRESS_12_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq24);
+const UNIFIED_ADDRESS_13_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq25);
+const UNIFIED_ADDRESS_14_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq26);
+const UNIFIED_ADDRESS_15_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq27);
+const UNIFIED_ADDRESS_16_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq28);
+const UNIFIED_ADDRESS_17_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq29);
+const UNIFIED_ADDRESS_18_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq31);
+const UNIFIED_ADDRESS_19_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq32);
+const UNIFIED_ADDRESS_20_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq33);
+const UNIFIED_ADDRESS_21_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq34);
+const UNIFIED_ADDRESS_22_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq35);
+const UNIFIED_ADDRESS_23_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq36);
+const UNIFIED_ADDRESS_24_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq37);
+const UNIFIED_ADDRESS_25_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq38);
+const UNIFIED_ADDRESS_26_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq39);
+const UNIFIED_ADDRESS_27_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq41);
+const UNIFIED_ADDRESS_28_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq42);
+const UNIFIED_ADDRESS_29_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq43);
+const UNIFIED_ADDRESS_30_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq44);
+const UNIFIED_ADDRESS_31_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq45);
+const UNIFIED_ADDRESS_32_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq46);
+const UNIFIED_ADDRESS_33_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq47);
+const UNIFIED_ADDRESS_34_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq48);
+const UNIFIED_ADDRESS_35_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq49);
+const UNIFIED_ADDRESS_36_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq51);
+const UNIFIED_ADDRESS_37_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq52);
+const UNIFIED_ADDRESS_38_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq53);
+const UNIFIED_ADDRESS_39_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq54);
+const UNIFIED_ADDRESS_40_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq55);
+const UNIFIED_ADDRESS_41_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq56);
+const UNIFIED_ADDRESS_42_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq57);
+const UNIFIED_ADDRESS_43_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq58);
+const UNIFIED_ADDRESS_44_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq59);
+const UNIFIED_ADDRESS_45_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq61);
+const UNIFIED_ADDRESS_46_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq62);
+const UNIFIED_ADDRESS_47_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq63);
+const UNIFIED_ADDRESS_48_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq64);
+const UNIFIED_ADDRESS_49_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq65);
+const UNIFIED_ADDRESS_50_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq66);
+const UNIFIED_ADDRESS_51_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq67);
+const UNIFIED_ADDRESS_52_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq68);
+const UNIFIED_ADDRESS_53_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq69);
+const UNIFIED_ADDRESS_54_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq71);
+const UNIFIED_ADDRESS_55_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq72);
+const UNIFIED_ADDRESS_56_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq73);
+const UNIFIED_ADDRESS_57_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq74);
+const UNIFIED_ADDRESS_58_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq75);
+const UNIFIED_ADDRESS_59_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq76);
+const UNIFIED_ADDRESS_60_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq77);
+const UNIFIED_ADDRESS_61_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq78);
+const UNIFIED_ADDRESS_62_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq79);
+const UNIFIED_ADDRESS_63_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq81);
+const UNIFIED_ADDRESS_64_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq82);
+const UNIFIED_ADDRESS_65_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq83);
+const UNIFIED_ADDRESS_66_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq84);
+const UNIFIED_ADDRESS_67_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq85);
+const UNIFIED_ADDRESS_68_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq86);
+const UNIFIED_ADDRESS_69_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq87);
+const UNIFIED_ADDRESS_70_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq88);
+const UNIFIED_ADDRESS_71_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq89);
+const UNIFIED_ADDRESS_72_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq91);
+const UNIFIED_ADDRESS_73_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq92);
+const UNIFIED_ADDRESS_74_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq93);
+const UNIFIED_ADDRESS_75_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq94);
+const UNIFIED_ADDRESS_76_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq95);
+const UNIFIED_ADDRESS_77_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq96);
+const UNIFIED_ADDRESS_78_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq97);
+const UNIFIED_ADDRESS_79_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq98);
+const UNIFIED_ADDRESS_80_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq99);
+const UNIFIED_ADDRESS_81_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq11);
+const UNIFIED_ADDRESS_82_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq12);
+const UNIFIED_ADDRESS_83_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq13);
+const UNIFIED_ADDRESS_84_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq14);
+const UNIFIED_ADDRESS_85_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq15);
+const UNIFIED_ADDRESS_86_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq16);
+const UNIFIED_ADDRESS_87_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq17);
+const UNIFIED_ADDRESS_88_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq18);
+const UNIFIED_ADDRESS_89_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq19);
+const UNIFIED_ADDRESS_90_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq21);
+const UNIFIED_ADDRESS_91_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq22);
+const UNIFIED_ADDRESS_92_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq23);
+const UNIFIED_ADDRESS_93_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq24);
+const UNIFIED_ADDRESS_94_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq25);
+const UNIFIED_ADDRESS_95_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq26);
+const UNIFIED_ADDRESS_96_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq27);
+const UNIFIED_ADDRESS_97_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq28);
+const UNIFIED_ADDRESS_98_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq29);
+const UNIFIED_ADDRESS_99_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq31);
+const UNIFIED_ADDRESS_100_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq32);
+const UNIFIED_ADDRESS_101_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq33);
+const UNIFIED_ADDRESS_102_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq34);
+const UNIFIED_ADDRESS_103_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq35);
+const UNIFIED_ADDRESS_104_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq36);
+const UNIFIED_ADDRESS_105_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq37);
+const UNIFIED_ADDRESS_106_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq38);
+const UNIFIED_ADDRESS_107_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq39);
+const UNIFIED_ADDRESS_108_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq41);
+const UNIFIED_ADDRESS_109_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq42);
+const UNIFIED_ADDRESS_110_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq43);
+const UNIFIED_ADDRESS_111_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq44);
+const UNIFIED_ADDRESS_112_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq45);
+const UNIFIED_ADDRESS_113_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq46);
+const UNIFIED_ADDRESS_114_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq47);
+const UNIFIED_ADDRESS_115_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq48);
+const UNIFIED_ADDRESS_116_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq49);
+const UNIFIED_ADDRESS_117_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq51);
+const UNIFIED_ADDRESS_118_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq52);
+const UNIFIED_ADDRESS_119_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq53);
+const UNIFIED_ADDRESS_120_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq54);
+const UNIFIED_ADDRESS_121_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq55);
+const UNIFIED_ADDRESS_122_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq56);
+const UNIFIED_ADDRESS_123_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq57);
+const UNIFIED_ADDRESS_124_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq58);
+const UNIFIED_ADDRESS_125_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq59);
+const UNIFIED_ADDRESS_126_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq61);
+const UNIFIED_ADDRESS_127_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq62);
+const UNIFIED_ADDRESS_128_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq63);
+const UNIFIED_ADDRESS_129_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq64);
+const UNIFIED_ADDRESS_130_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq65);
+const UNIFIED_ADDRESS_131_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq66);
+const UNIFIED_ADDRESS_132_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq67);
+const UNIFIED_ADDRESS_133_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq68);
+const UNIFIED_ADDRESS_134_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq69);
+const UNIFIED_ADDRESS_135_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq71);
+const UNIFIED_ADDRESS_136_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq72);
+const UNIFIED_ADDRESS_137_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq73);
+const UNIFIED_ADDRESS_138_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq74);
+const UNIFIED_ADDRESS_139_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq75);
+const UNIFIED_ADDRESS_140_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq76);
+const UNIFIED_ADDRESS_141_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq77);
+const UNIFIED_ADDRESS_142_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq78);
+const UNIFIED_ADDRESS_143_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq79);
+const UNIFIED_ADDRESS_144_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq81);
+const UNIFIED_ADDRESS_145_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq82);
+const UNIFIED_ADDRESS_146_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq83);
+const UNIFIED_ADDRESS_147_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq84);
+const UNIFIED_ADDRESS_148_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq85);
+const UNIFIED_ADDRESS_149_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq86);
+const UNIFIED_ADDRESS_150_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq87);
+const UNIFIED_ADDRESS_151_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq88);
+const UNIFIED_ADDRESS_152_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq89);
+const UNIFIED_ADDRESS_153_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq91);
+const UNIFIED_ADDRESS_154_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq92);
+const UNIFIED_ADDRESS_155_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq93);
+const UNIFIED_ADDRESS_156_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq94);
+const UNIFIED_ADDRESS_157_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq95);
+const UNIFIED_ADDRESS_158_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq96);
+const UNIFIED_ADDRESS_159_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq97);
+const UNIFIED_ADDRESS_160_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq98);
+const UNIFIED_ADDRESS_161_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq99);
 
 /// 統一盤上アドレス。
 #[derive(Copy, Clone, Debug, FromPrimitive)]
@@ -1626,188 +1790,362 @@ impl UnifiedAddress {
     }
 
     pub fn to_address_pos(self) -> &'static AddressPos {
-        // UNIFIED_ADDRES_TO_ADDRESS_POS_178[self as usize]
+        // UNIFIED_ADDRESS_TO_ADDRESS_POS_178[self as usize]
         // 配列アクセスは遅い気がするので、match構文で書こうぜ☆（＾～＾）
         use crate::cosmic::toy_box::UnifiedAddress::*;
         match self {
-            Sq11_1 => &UNIFIED_ADDRES_0_TO_ADDRESS_POS,
-            Sq12_1 => &UNIFIED_ADDRES_1_TO_ADDRESS_POS,
-            Sq13_1 => &UNIFIED_ADDRES_2_TO_ADDRESS_POS,
-            Sq14_1 => &UNIFIED_ADDRES_3_TO_ADDRESS_POS,
-            Sq15_1 => &UNIFIED_ADDRES_4_TO_ADDRESS_POS,
-            Sq16_1 => &UNIFIED_ADDRES_5_TO_ADDRESS_POS,
-            Sq17_1 => &UNIFIED_ADDRES_6_TO_ADDRESS_POS,
-            Sq18_1 => &UNIFIED_ADDRES_7_TO_ADDRESS_POS,
-            Sq19_1 => &UNIFIED_ADDRES_8_TO_ADDRESS_POS,
-            Sq21_1 => &UNIFIED_ADDRES_9_TO_ADDRESS_POS,
-            Sq22_1 => &UNIFIED_ADDRES_10_TO_ADDRESS_POS,
-            Sq23_1 => &UNIFIED_ADDRES_11_TO_ADDRESS_POS,
-            Sq24_1 => &UNIFIED_ADDRES_12_TO_ADDRESS_POS,
-            Sq25_1 => &UNIFIED_ADDRES_13_TO_ADDRESS_POS,
-            Sq26_1 => &UNIFIED_ADDRES_14_TO_ADDRESS_POS,
-            Sq27_1 => &UNIFIED_ADDRES_15_TO_ADDRESS_POS,
-            Sq28_1 => &UNIFIED_ADDRES_16_TO_ADDRESS_POS,
-            Sq29_1 => &UNIFIED_ADDRES_17_TO_ADDRESS_POS,
-            Sq31_1 => &UNIFIED_ADDRES_18_TO_ADDRESS_POS,
-            Sq32_1 => &UNIFIED_ADDRES_19_TO_ADDRESS_POS,
-            Sq33_1 => &UNIFIED_ADDRES_20_TO_ADDRESS_POS,
-            Sq34_1 => &UNIFIED_ADDRES_21_TO_ADDRESS_POS,
-            Sq35_1 => &UNIFIED_ADDRES_22_TO_ADDRESS_POS,
-            Sq36_1 => &UNIFIED_ADDRES_23_TO_ADDRESS_POS,
-            Sq37_1 => &UNIFIED_ADDRES_24_TO_ADDRESS_POS,
-            Sq38_1 => &UNIFIED_ADDRES_25_TO_ADDRESS_POS,
-            Sq39_1 => &UNIFIED_ADDRES_26_TO_ADDRESS_POS,
-            Sq41_1 => &UNIFIED_ADDRES_27_TO_ADDRESS_POS,
-            Sq42_1 => &UNIFIED_ADDRES_28_TO_ADDRESS_POS,
-            Sq43_1 => &UNIFIED_ADDRES_29_TO_ADDRESS_POS,
-            Sq44_1 => &UNIFIED_ADDRES_30_TO_ADDRESS_POS,
-            Sq45_1 => &UNIFIED_ADDRES_31_TO_ADDRESS_POS,
-            Sq46_1 => &UNIFIED_ADDRES_32_TO_ADDRESS_POS,
-            Sq47_1 => &UNIFIED_ADDRES_33_TO_ADDRESS_POS,
-            Sq48_1 => &UNIFIED_ADDRES_34_TO_ADDRESS_POS,
-            Sq49_1 => &UNIFIED_ADDRES_35_TO_ADDRESS_POS,
-            Sq51_1 => &UNIFIED_ADDRES_36_TO_ADDRESS_POS,
-            Sq52_1 => &UNIFIED_ADDRES_37_TO_ADDRESS_POS,
-            Sq53_1 => &UNIFIED_ADDRES_38_TO_ADDRESS_POS,
-            Sq54_1 => &UNIFIED_ADDRES_39_TO_ADDRESS_POS,
-            Sq55_1 => &UNIFIED_ADDRES_40_TO_ADDRESS_POS,
-            Sq56_1 => &UNIFIED_ADDRES_41_TO_ADDRESS_POS,
-            Sq57_1 => &UNIFIED_ADDRES_42_TO_ADDRESS_POS,
-            Sq58_1 => &UNIFIED_ADDRES_43_TO_ADDRESS_POS,
-            Sq59_1 => &UNIFIED_ADDRES_44_TO_ADDRESS_POS,
-            Sq61_1 => &UNIFIED_ADDRES_45_TO_ADDRESS_POS,
-            Sq62_1 => &UNIFIED_ADDRES_46_TO_ADDRESS_POS,
-            Sq63_1 => &UNIFIED_ADDRES_47_TO_ADDRESS_POS,
-            Sq64_1 => &UNIFIED_ADDRES_48_TO_ADDRESS_POS,
-            Sq65_1 => &UNIFIED_ADDRES_49_TO_ADDRESS_POS,
-            Sq66_1 => &UNIFIED_ADDRES_50_TO_ADDRESS_POS,
-            Sq67_1 => &UNIFIED_ADDRES_51_TO_ADDRESS_POS,
-            Sq68_1 => &UNIFIED_ADDRES_52_TO_ADDRESS_POS,
-            Sq69_1 => &UNIFIED_ADDRES_53_TO_ADDRESS_POS,
-            Sq71_1 => &UNIFIED_ADDRES_54_TO_ADDRESS_POS,
-            Sq72_1 => &UNIFIED_ADDRES_55_TO_ADDRESS_POS,
-            Sq73_1 => &UNIFIED_ADDRES_56_TO_ADDRESS_POS,
-            Sq74_1 => &UNIFIED_ADDRES_57_TO_ADDRESS_POS,
-            Sq75_1 => &UNIFIED_ADDRES_58_TO_ADDRESS_POS,
-            Sq76_1 => &UNIFIED_ADDRES_59_TO_ADDRESS_POS,
-            Sq77_1 => &UNIFIED_ADDRES_60_TO_ADDRESS_POS,
-            Sq78_1 => &UNIFIED_ADDRES_61_TO_ADDRESS_POS,
-            Sq79_1 => &UNIFIED_ADDRES_62_TO_ADDRESS_POS,
-            Sq81_1 => &UNIFIED_ADDRES_63_TO_ADDRESS_POS,
-            Sq82_1 => &UNIFIED_ADDRES_64_TO_ADDRESS_POS,
-            Sq83_1 => &UNIFIED_ADDRES_65_TO_ADDRESS_POS,
-            Sq84_1 => &UNIFIED_ADDRES_66_TO_ADDRESS_POS,
-            Sq85_1 => &UNIFIED_ADDRES_67_TO_ADDRESS_POS,
-            Sq86_1 => &UNIFIED_ADDRES_68_TO_ADDRESS_POS,
-            Sq87_1 => &UNIFIED_ADDRES_69_TO_ADDRESS_POS,
-            Sq88_1 => &UNIFIED_ADDRES_70_TO_ADDRESS_POS,
-            Sq89_1 => &UNIFIED_ADDRES_71_TO_ADDRESS_POS,
-            Sq91_1 => &UNIFIED_ADDRES_72_TO_ADDRESS_POS,
-            Sq92_1 => &UNIFIED_ADDRES_73_TO_ADDRESS_POS,
-            Sq93_1 => &UNIFIED_ADDRES_74_TO_ADDRESS_POS,
-            Sq94_1 => &UNIFIED_ADDRES_75_TO_ADDRESS_POS,
-            Sq95_1 => &UNIFIED_ADDRES_76_TO_ADDRESS_POS,
-            Sq96_1 => &UNIFIED_ADDRES_77_TO_ADDRESS_POS,
-            Sq97_1 => &UNIFIED_ADDRES_78_TO_ADDRESS_POS,
-            Sq98_1 => &UNIFIED_ADDRES_79_TO_ADDRESS_POS,
-            Sq99_1 => &UNIFIED_ADDRES_80_TO_ADDRESS_POS,
-            Sq11_2 => &UNIFIED_ADDRES_81_TO_ADDRESS_POS,
-            Sq12_2 => &UNIFIED_ADDRES_82_TO_ADDRESS_POS,
-            Sq13_2 => &UNIFIED_ADDRES_83_TO_ADDRESS_POS,
-            Sq14_2 => &UNIFIED_ADDRES_84_TO_ADDRESS_POS,
-            Sq15_2 => &UNIFIED_ADDRES_85_TO_ADDRESS_POS,
-            Sq16_2 => &UNIFIED_ADDRES_86_TO_ADDRESS_POS,
-            Sq17_2 => &UNIFIED_ADDRES_87_TO_ADDRESS_POS,
-            Sq18_2 => &UNIFIED_ADDRES_88_TO_ADDRESS_POS,
-            Sq19_2 => &UNIFIED_ADDRES_89_TO_ADDRESS_POS,
-            Sq21_2 => &UNIFIED_ADDRES_90_TO_ADDRESS_POS,
-            Sq22_2 => &UNIFIED_ADDRES_91_TO_ADDRESS_POS,
-            Sq23_2 => &UNIFIED_ADDRES_92_TO_ADDRESS_POS,
-            Sq24_2 => &UNIFIED_ADDRES_93_TO_ADDRESS_POS,
-            Sq25_2 => &UNIFIED_ADDRES_94_TO_ADDRESS_POS,
-            Sq26_2 => &UNIFIED_ADDRES_95_TO_ADDRESS_POS,
-            Sq27_2 => &UNIFIED_ADDRES_96_TO_ADDRESS_POS,
-            Sq28_2 => &UNIFIED_ADDRES_97_TO_ADDRESS_POS,
-            Sq29_2 => &UNIFIED_ADDRES_98_TO_ADDRESS_POS,
-            Sq31_2 => &UNIFIED_ADDRES_99_TO_ADDRESS_POS,
-            Sq32_2 => &UNIFIED_ADDRES_100_TO_ADDRESS_POS,
-            Sq33_2 => &UNIFIED_ADDRES_101_TO_ADDRESS_POS,
-            Sq34_2 => &UNIFIED_ADDRES_102_TO_ADDRESS_POS,
-            Sq35_2 => &UNIFIED_ADDRES_103_TO_ADDRESS_POS,
-            Sq36_2 => &UNIFIED_ADDRES_104_TO_ADDRESS_POS,
-            Sq37_2 => &UNIFIED_ADDRES_105_TO_ADDRESS_POS,
-            Sq38_2 => &UNIFIED_ADDRES_106_TO_ADDRESS_POS,
-            Sq39_2 => &UNIFIED_ADDRES_107_TO_ADDRESS_POS,
-            Sq41_2 => &UNIFIED_ADDRES_108_TO_ADDRESS_POS,
-            Sq42_2 => &UNIFIED_ADDRES_109_TO_ADDRESS_POS,
-            Sq43_2 => &UNIFIED_ADDRES_110_TO_ADDRESS_POS,
-            Sq44_2 => &UNIFIED_ADDRES_111_TO_ADDRESS_POS,
-            Sq45_2 => &UNIFIED_ADDRES_112_TO_ADDRESS_POS,
-            Sq46_2 => &UNIFIED_ADDRES_113_TO_ADDRESS_POS,
-            Sq47_2 => &UNIFIED_ADDRES_114_TO_ADDRESS_POS,
-            Sq48_2 => &UNIFIED_ADDRES_115_TO_ADDRESS_POS,
-            Sq49_2 => &UNIFIED_ADDRES_116_TO_ADDRESS_POS,
-            Sq51_2 => &UNIFIED_ADDRES_117_TO_ADDRESS_POS,
-            Sq52_2 => &UNIFIED_ADDRES_118_TO_ADDRESS_POS,
-            Sq53_2 => &UNIFIED_ADDRES_119_TO_ADDRESS_POS,
-            Sq54_2 => &UNIFIED_ADDRES_120_TO_ADDRESS_POS,
-            Sq55_2 => &UNIFIED_ADDRES_121_TO_ADDRESS_POS,
-            Sq56_2 => &UNIFIED_ADDRES_122_TO_ADDRESS_POS,
-            Sq57_2 => &UNIFIED_ADDRES_123_TO_ADDRESS_POS,
-            Sq58_2 => &UNIFIED_ADDRES_124_TO_ADDRESS_POS,
-            Sq59_2 => &UNIFIED_ADDRES_125_TO_ADDRESS_POS,
-            Sq61_2 => &UNIFIED_ADDRES_126_TO_ADDRESS_POS,
-            Sq62_2 => &UNIFIED_ADDRES_127_TO_ADDRESS_POS,
-            Sq63_2 => &UNIFIED_ADDRES_128_TO_ADDRESS_POS,
-            Sq64_2 => &UNIFIED_ADDRES_129_TO_ADDRESS_POS,
-            Sq65_2 => &UNIFIED_ADDRES_130_TO_ADDRESS_POS,
-            Sq66_2 => &UNIFIED_ADDRES_131_TO_ADDRESS_POS,
-            Sq67_2 => &UNIFIED_ADDRES_132_TO_ADDRESS_POS,
-            Sq68_2 => &UNIFIED_ADDRES_133_TO_ADDRESS_POS,
-            Sq69_2 => &UNIFIED_ADDRES_134_TO_ADDRESS_POS,
-            Sq71_2 => &UNIFIED_ADDRES_135_TO_ADDRESS_POS,
-            Sq72_2 => &UNIFIED_ADDRES_136_TO_ADDRESS_POS,
-            Sq73_2 => &UNIFIED_ADDRES_137_TO_ADDRESS_POS,
-            Sq74_2 => &UNIFIED_ADDRES_138_TO_ADDRESS_POS,
-            Sq75_2 => &UNIFIED_ADDRES_139_TO_ADDRESS_POS,
-            Sq76_2 => &UNIFIED_ADDRES_140_TO_ADDRESS_POS,
-            Sq77_2 => &UNIFIED_ADDRES_141_TO_ADDRESS_POS,
-            Sq78_2 => &UNIFIED_ADDRES_142_TO_ADDRESS_POS,
-            Sq79_2 => &UNIFIED_ADDRES_143_TO_ADDRESS_POS,
-            Sq81_2 => &UNIFIED_ADDRES_144_TO_ADDRESS_POS,
-            Sq82_2 => &UNIFIED_ADDRES_145_TO_ADDRESS_POS,
-            Sq83_2 => &UNIFIED_ADDRES_146_TO_ADDRESS_POS,
-            Sq84_2 => &UNIFIED_ADDRES_147_TO_ADDRESS_POS,
-            Sq85_2 => &UNIFIED_ADDRES_148_TO_ADDRESS_POS,
-            Sq86_2 => &UNIFIED_ADDRES_149_TO_ADDRESS_POS,
-            Sq87_2 => &UNIFIED_ADDRES_150_TO_ADDRESS_POS,
-            Sq88_2 => &UNIFIED_ADDRES_151_TO_ADDRESS_POS,
-            Sq89_2 => &UNIFIED_ADDRES_152_TO_ADDRESS_POS,
-            Sq91_2 => &UNIFIED_ADDRES_153_TO_ADDRESS_POS,
-            Sq92_2 => &UNIFIED_ADDRES_154_TO_ADDRESS_POS,
-            Sq93_2 => &UNIFIED_ADDRES_155_TO_ADDRESS_POS,
-            Sq94_2 => &UNIFIED_ADDRES_156_TO_ADDRESS_POS,
-            Sq95_2 => &UNIFIED_ADDRES_157_TO_ADDRESS_POS,
-            Sq96_2 => &UNIFIED_ADDRES_158_TO_ADDRESS_POS,
-            Sq97_2 => &UNIFIED_ADDRES_159_TO_ADDRESS_POS,
-            Sq98_2 => &UNIFIED_ADDRES_160_TO_ADDRESS_POS,
-            Sq99_2 => &UNIFIED_ADDRES_161_TO_ADDRESS_POS,
-            King1 => &UNIFIED_ADDRES_162_TO_ADDRESS_POS,
-            Rook1 => &UNIFIED_ADDRES_163_TO_ADDRESS_POS,
-            Bishop1 => &UNIFIED_ADDRES_164_TO_ADDRESS_POS,
-            Gold1 => &UNIFIED_ADDRES_165_TO_ADDRESS_POS,
-            Silver1 => &UNIFIED_ADDRES_166_TO_ADDRESS_POS,
-            Knight1 => &UNIFIED_ADDRES_167_TO_ADDRESS_POS,
-            Lance1 => &UNIFIED_ADDRES_168_TO_ADDRESS_POS,
-            Pawn1 => &UNIFIED_ADDRES_169_TO_ADDRESS_POS,
-            King2 => &UNIFIED_ADDRES_170_TO_ADDRESS_POS,
-            Rook2 => &UNIFIED_ADDRES_171_TO_ADDRESS_POS,
-            Bishop2 => &UNIFIED_ADDRES_172_TO_ADDRESS_POS,
-            Gold2 => &UNIFIED_ADDRES_173_TO_ADDRESS_POS,
-            Silver2 => &UNIFIED_ADDRES_174_TO_ADDRESS_POS,
-            Knight2 => &UNIFIED_ADDRES_175_TO_ADDRESS_POS,
-            Lance2 => &UNIFIED_ADDRES_176_TO_ADDRESS_POS,
-            Pawn2 => &UNIFIED_ADDRES_177_TO_ADDRESS_POS,
+            Sq11_1 => &UNIFIED_ADDRESS_0_TO_ADDRESS_POS,
+            Sq12_1 => &UNIFIED_ADDRESS_1_TO_ADDRESS_POS,
+            Sq13_1 => &UNIFIED_ADDRESS_2_TO_ADDRESS_POS,
+            Sq14_1 => &UNIFIED_ADDRESS_3_TO_ADDRESS_POS,
+            Sq15_1 => &UNIFIED_ADDRESS_4_TO_ADDRESS_POS,
+            Sq16_1 => &UNIFIED_ADDRESS_5_TO_ADDRESS_POS,
+            Sq17_1 => &UNIFIED_ADDRESS_6_TO_ADDRESS_POS,
+            Sq18_1 => &UNIFIED_ADDRESS_7_TO_ADDRESS_POS,
+            Sq19_1 => &UNIFIED_ADDRESS_8_TO_ADDRESS_POS,
+            Sq21_1 => &UNIFIED_ADDRESS_9_TO_ADDRESS_POS,
+            Sq22_1 => &UNIFIED_ADDRESS_10_TO_ADDRESS_POS,
+            Sq23_1 => &UNIFIED_ADDRESS_11_TO_ADDRESS_POS,
+            Sq24_1 => &UNIFIED_ADDRESS_12_TO_ADDRESS_POS,
+            Sq25_1 => &UNIFIED_ADDRESS_13_TO_ADDRESS_POS,
+            Sq26_1 => &UNIFIED_ADDRESS_14_TO_ADDRESS_POS,
+            Sq27_1 => &UNIFIED_ADDRESS_15_TO_ADDRESS_POS,
+            Sq28_1 => &UNIFIED_ADDRESS_16_TO_ADDRESS_POS,
+            Sq29_1 => &UNIFIED_ADDRESS_17_TO_ADDRESS_POS,
+            Sq31_1 => &UNIFIED_ADDRESS_18_TO_ADDRESS_POS,
+            Sq32_1 => &UNIFIED_ADDRESS_19_TO_ADDRESS_POS,
+            Sq33_1 => &UNIFIED_ADDRESS_20_TO_ADDRESS_POS,
+            Sq34_1 => &UNIFIED_ADDRESS_21_TO_ADDRESS_POS,
+            Sq35_1 => &UNIFIED_ADDRESS_22_TO_ADDRESS_POS,
+            Sq36_1 => &UNIFIED_ADDRESS_23_TO_ADDRESS_POS,
+            Sq37_1 => &UNIFIED_ADDRESS_24_TO_ADDRESS_POS,
+            Sq38_1 => &UNIFIED_ADDRESS_25_TO_ADDRESS_POS,
+            Sq39_1 => &UNIFIED_ADDRESS_26_TO_ADDRESS_POS,
+            Sq41_1 => &UNIFIED_ADDRESS_27_TO_ADDRESS_POS,
+            Sq42_1 => &UNIFIED_ADDRESS_28_TO_ADDRESS_POS,
+            Sq43_1 => &UNIFIED_ADDRESS_29_TO_ADDRESS_POS,
+            Sq44_1 => &UNIFIED_ADDRESS_30_TO_ADDRESS_POS,
+            Sq45_1 => &UNIFIED_ADDRESS_31_TO_ADDRESS_POS,
+            Sq46_1 => &UNIFIED_ADDRESS_32_TO_ADDRESS_POS,
+            Sq47_1 => &UNIFIED_ADDRESS_33_TO_ADDRESS_POS,
+            Sq48_1 => &UNIFIED_ADDRESS_34_TO_ADDRESS_POS,
+            Sq49_1 => &UNIFIED_ADDRESS_35_TO_ADDRESS_POS,
+            Sq51_1 => &UNIFIED_ADDRESS_36_TO_ADDRESS_POS,
+            Sq52_1 => &UNIFIED_ADDRESS_37_TO_ADDRESS_POS,
+            Sq53_1 => &UNIFIED_ADDRESS_38_TO_ADDRESS_POS,
+            Sq54_1 => &UNIFIED_ADDRESS_39_TO_ADDRESS_POS,
+            Sq55_1 => &UNIFIED_ADDRESS_40_TO_ADDRESS_POS,
+            Sq56_1 => &UNIFIED_ADDRESS_41_TO_ADDRESS_POS,
+            Sq57_1 => &UNIFIED_ADDRESS_42_TO_ADDRESS_POS,
+            Sq58_1 => &UNIFIED_ADDRESS_43_TO_ADDRESS_POS,
+            Sq59_1 => &UNIFIED_ADDRESS_44_TO_ADDRESS_POS,
+            Sq61_1 => &UNIFIED_ADDRESS_45_TO_ADDRESS_POS,
+            Sq62_1 => &UNIFIED_ADDRESS_46_TO_ADDRESS_POS,
+            Sq63_1 => &UNIFIED_ADDRESS_47_TO_ADDRESS_POS,
+            Sq64_1 => &UNIFIED_ADDRESS_48_TO_ADDRESS_POS,
+            Sq65_1 => &UNIFIED_ADDRESS_49_TO_ADDRESS_POS,
+            Sq66_1 => &UNIFIED_ADDRESS_50_TO_ADDRESS_POS,
+            Sq67_1 => &UNIFIED_ADDRESS_51_TO_ADDRESS_POS,
+            Sq68_1 => &UNIFIED_ADDRESS_52_TO_ADDRESS_POS,
+            Sq69_1 => &UNIFIED_ADDRESS_53_TO_ADDRESS_POS,
+            Sq71_1 => &UNIFIED_ADDRESS_54_TO_ADDRESS_POS,
+            Sq72_1 => &UNIFIED_ADDRESS_55_TO_ADDRESS_POS,
+            Sq73_1 => &UNIFIED_ADDRESS_56_TO_ADDRESS_POS,
+            Sq74_1 => &UNIFIED_ADDRESS_57_TO_ADDRESS_POS,
+            Sq75_1 => &UNIFIED_ADDRESS_58_TO_ADDRESS_POS,
+            Sq76_1 => &UNIFIED_ADDRESS_59_TO_ADDRESS_POS,
+            Sq77_1 => &UNIFIED_ADDRESS_60_TO_ADDRESS_POS,
+            Sq78_1 => &UNIFIED_ADDRESS_61_TO_ADDRESS_POS,
+            Sq79_1 => &UNIFIED_ADDRESS_62_TO_ADDRESS_POS,
+            Sq81_1 => &UNIFIED_ADDRESS_63_TO_ADDRESS_POS,
+            Sq82_1 => &UNIFIED_ADDRESS_64_TO_ADDRESS_POS,
+            Sq83_1 => &UNIFIED_ADDRESS_65_TO_ADDRESS_POS,
+            Sq84_1 => &UNIFIED_ADDRESS_66_TO_ADDRESS_POS,
+            Sq85_1 => &UNIFIED_ADDRESS_67_TO_ADDRESS_POS,
+            Sq86_1 => &UNIFIED_ADDRESS_68_TO_ADDRESS_POS,
+            Sq87_1 => &UNIFIED_ADDRESS_69_TO_ADDRESS_POS,
+            Sq88_1 => &UNIFIED_ADDRESS_70_TO_ADDRESS_POS,
+            Sq89_1 => &UNIFIED_ADDRESS_71_TO_ADDRESS_POS,
+            Sq91_1 => &UNIFIED_ADDRESS_72_TO_ADDRESS_POS,
+            Sq92_1 => &UNIFIED_ADDRESS_73_TO_ADDRESS_POS,
+            Sq93_1 => &UNIFIED_ADDRESS_74_TO_ADDRESS_POS,
+            Sq94_1 => &UNIFIED_ADDRESS_75_TO_ADDRESS_POS,
+            Sq95_1 => &UNIFIED_ADDRESS_76_TO_ADDRESS_POS,
+            Sq96_1 => &UNIFIED_ADDRESS_77_TO_ADDRESS_POS,
+            Sq97_1 => &UNIFIED_ADDRESS_78_TO_ADDRESS_POS,
+            Sq98_1 => &UNIFIED_ADDRESS_79_TO_ADDRESS_POS,
+            Sq99_1 => &UNIFIED_ADDRESS_80_TO_ADDRESS_POS,
+            Sq11_2 => &UNIFIED_ADDRESS_81_TO_ADDRESS_POS,
+            Sq12_2 => &UNIFIED_ADDRESS_82_TO_ADDRESS_POS,
+            Sq13_2 => &UNIFIED_ADDRESS_83_TO_ADDRESS_POS,
+            Sq14_2 => &UNIFIED_ADDRESS_84_TO_ADDRESS_POS,
+            Sq15_2 => &UNIFIED_ADDRESS_85_TO_ADDRESS_POS,
+            Sq16_2 => &UNIFIED_ADDRESS_86_TO_ADDRESS_POS,
+            Sq17_2 => &UNIFIED_ADDRESS_87_TO_ADDRESS_POS,
+            Sq18_2 => &UNIFIED_ADDRESS_88_TO_ADDRESS_POS,
+            Sq19_2 => &UNIFIED_ADDRESS_89_TO_ADDRESS_POS,
+            Sq21_2 => &UNIFIED_ADDRESS_90_TO_ADDRESS_POS,
+            Sq22_2 => &UNIFIED_ADDRESS_91_TO_ADDRESS_POS,
+            Sq23_2 => &UNIFIED_ADDRESS_92_TO_ADDRESS_POS,
+            Sq24_2 => &UNIFIED_ADDRESS_93_TO_ADDRESS_POS,
+            Sq25_2 => &UNIFIED_ADDRESS_94_TO_ADDRESS_POS,
+            Sq26_2 => &UNIFIED_ADDRESS_95_TO_ADDRESS_POS,
+            Sq27_2 => &UNIFIED_ADDRESS_96_TO_ADDRESS_POS,
+            Sq28_2 => &UNIFIED_ADDRESS_97_TO_ADDRESS_POS,
+            Sq29_2 => &UNIFIED_ADDRESS_98_TO_ADDRESS_POS,
+            Sq31_2 => &UNIFIED_ADDRESS_99_TO_ADDRESS_POS,
+            Sq32_2 => &UNIFIED_ADDRESS_100_TO_ADDRESS_POS,
+            Sq33_2 => &UNIFIED_ADDRESS_101_TO_ADDRESS_POS,
+            Sq34_2 => &UNIFIED_ADDRESS_102_TO_ADDRESS_POS,
+            Sq35_2 => &UNIFIED_ADDRESS_103_TO_ADDRESS_POS,
+            Sq36_2 => &UNIFIED_ADDRESS_104_TO_ADDRESS_POS,
+            Sq37_2 => &UNIFIED_ADDRESS_105_TO_ADDRESS_POS,
+            Sq38_2 => &UNIFIED_ADDRESS_106_TO_ADDRESS_POS,
+            Sq39_2 => &UNIFIED_ADDRESS_107_TO_ADDRESS_POS,
+            Sq41_2 => &UNIFIED_ADDRESS_108_TO_ADDRESS_POS,
+            Sq42_2 => &UNIFIED_ADDRESS_109_TO_ADDRESS_POS,
+            Sq43_2 => &UNIFIED_ADDRESS_110_TO_ADDRESS_POS,
+            Sq44_2 => &UNIFIED_ADDRESS_111_TO_ADDRESS_POS,
+            Sq45_2 => &UNIFIED_ADDRESS_112_TO_ADDRESS_POS,
+            Sq46_2 => &UNIFIED_ADDRESS_113_TO_ADDRESS_POS,
+            Sq47_2 => &UNIFIED_ADDRESS_114_TO_ADDRESS_POS,
+            Sq48_2 => &UNIFIED_ADDRESS_115_TO_ADDRESS_POS,
+            Sq49_2 => &UNIFIED_ADDRESS_116_TO_ADDRESS_POS,
+            Sq51_2 => &UNIFIED_ADDRESS_117_TO_ADDRESS_POS,
+            Sq52_2 => &UNIFIED_ADDRESS_118_TO_ADDRESS_POS,
+            Sq53_2 => &UNIFIED_ADDRESS_119_TO_ADDRESS_POS,
+            Sq54_2 => &UNIFIED_ADDRESS_120_TO_ADDRESS_POS,
+            Sq55_2 => &UNIFIED_ADDRESS_121_TO_ADDRESS_POS,
+            Sq56_2 => &UNIFIED_ADDRESS_122_TO_ADDRESS_POS,
+            Sq57_2 => &UNIFIED_ADDRESS_123_TO_ADDRESS_POS,
+            Sq58_2 => &UNIFIED_ADDRESS_124_TO_ADDRESS_POS,
+            Sq59_2 => &UNIFIED_ADDRESS_125_TO_ADDRESS_POS,
+            Sq61_2 => &UNIFIED_ADDRESS_126_TO_ADDRESS_POS,
+            Sq62_2 => &UNIFIED_ADDRESS_127_TO_ADDRESS_POS,
+            Sq63_2 => &UNIFIED_ADDRESS_128_TO_ADDRESS_POS,
+            Sq64_2 => &UNIFIED_ADDRESS_129_TO_ADDRESS_POS,
+            Sq65_2 => &UNIFIED_ADDRESS_130_TO_ADDRESS_POS,
+            Sq66_2 => &UNIFIED_ADDRESS_131_TO_ADDRESS_POS,
+            Sq67_2 => &UNIFIED_ADDRESS_132_TO_ADDRESS_POS,
+            Sq68_2 => &UNIFIED_ADDRESS_133_TO_ADDRESS_POS,
+            Sq69_2 => &UNIFIED_ADDRESS_134_TO_ADDRESS_POS,
+            Sq71_2 => &UNIFIED_ADDRESS_135_TO_ADDRESS_POS,
+            Sq72_2 => &UNIFIED_ADDRESS_136_TO_ADDRESS_POS,
+            Sq73_2 => &UNIFIED_ADDRESS_137_TO_ADDRESS_POS,
+            Sq74_2 => &UNIFIED_ADDRESS_138_TO_ADDRESS_POS,
+            Sq75_2 => &UNIFIED_ADDRESS_139_TO_ADDRESS_POS,
+            Sq76_2 => &UNIFIED_ADDRESS_140_TO_ADDRESS_POS,
+            Sq77_2 => &UNIFIED_ADDRESS_141_TO_ADDRESS_POS,
+            Sq78_2 => &UNIFIED_ADDRESS_142_TO_ADDRESS_POS,
+            Sq79_2 => &UNIFIED_ADDRESS_143_TO_ADDRESS_POS,
+            Sq81_2 => &UNIFIED_ADDRESS_144_TO_ADDRESS_POS,
+            Sq82_2 => &UNIFIED_ADDRESS_145_TO_ADDRESS_POS,
+            Sq83_2 => &UNIFIED_ADDRESS_146_TO_ADDRESS_POS,
+            Sq84_2 => &UNIFIED_ADDRESS_147_TO_ADDRESS_POS,
+            Sq85_2 => &UNIFIED_ADDRESS_148_TO_ADDRESS_POS,
+            Sq86_2 => &UNIFIED_ADDRESS_149_TO_ADDRESS_POS,
+            Sq87_2 => &UNIFIED_ADDRESS_150_TO_ADDRESS_POS,
+            Sq88_2 => &UNIFIED_ADDRESS_151_TO_ADDRESS_POS,
+            Sq89_2 => &UNIFIED_ADDRESS_152_TO_ADDRESS_POS,
+            Sq91_2 => &UNIFIED_ADDRESS_153_TO_ADDRESS_POS,
+            Sq92_2 => &UNIFIED_ADDRESS_154_TO_ADDRESS_POS,
+            Sq93_2 => &UNIFIED_ADDRESS_155_TO_ADDRESS_POS,
+            Sq94_2 => &UNIFIED_ADDRESS_156_TO_ADDRESS_POS,
+            Sq95_2 => &UNIFIED_ADDRESS_157_TO_ADDRESS_POS,
+            Sq96_2 => &UNIFIED_ADDRESS_158_TO_ADDRESS_POS,
+            Sq97_2 => &UNIFIED_ADDRESS_159_TO_ADDRESS_POS,
+            Sq98_2 => &UNIFIED_ADDRESS_160_TO_ADDRESS_POS,
+            Sq99_2 => &UNIFIED_ADDRESS_161_TO_ADDRESS_POS,
+            King1 => &UNIFIED_ADDRESS_162_TO_ADDRESS_POS,
+            Rook1 => &UNIFIED_ADDRESS_163_TO_ADDRESS_POS,
+            Bishop1 => &UNIFIED_ADDRESS_164_TO_ADDRESS_POS,
+            Gold1 => &UNIFIED_ADDRESS_165_TO_ADDRESS_POS,
+            Silver1 => &UNIFIED_ADDRESS_166_TO_ADDRESS_POS,
+            Knight1 => &UNIFIED_ADDRESS_167_TO_ADDRESS_POS,
+            Lance1 => &UNIFIED_ADDRESS_168_TO_ADDRESS_POS,
+            Pawn1 => &UNIFIED_ADDRESS_169_TO_ADDRESS_POS,
+            King2 => &UNIFIED_ADDRESS_170_TO_ADDRESS_POS,
+            Rook2 => &UNIFIED_ADDRESS_171_TO_ADDRESS_POS,
+            Bishop2 => &UNIFIED_ADDRESS_172_TO_ADDRESS_POS,
+            Gold2 => &UNIFIED_ADDRESS_173_TO_ADDRESS_POS,
+            Silver2 => &UNIFIED_ADDRESS_174_TO_ADDRESS_POS,
+            Knight2 => &UNIFIED_ADDRESS_175_TO_ADDRESS_POS,
+            Lance2 => &UNIFIED_ADDRESS_176_TO_ADDRESS_POS,
+            Pawn2 => &UNIFIED_ADDRESS_177_TO_ADDRESS_POS,
+        }
+    }
+
+    pub fn to_address_pos1(self) -> AddressPos1 {
+        // 配列アクセスは遅い気がするので、match構文で書こうぜ☆（＾～＾）
+        use crate::cosmic::toy_box::UnifiedAddress::*;
+        match self {
+            Sq11_1 => UNIFIED_ADDRESS_0_TO_ADDRESS_POS1,
+            Sq12_1 => UNIFIED_ADDRESS_1_TO_ADDRESS_POS1,
+            Sq13_1 => UNIFIED_ADDRESS_2_TO_ADDRESS_POS1,
+            Sq14_1 => UNIFIED_ADDRESS_3_TO_ADDRESS_POS1,
+            Sq15_1 => UNIFIED_ADDRESS_4_TO_ADDRESS_POS1,
+            Sq16_1 => UNIFIED_ADDRESS_5_TO_ADDRESS_POS1,
+            Sq17_1 => UNIFIED_ADDRESS_6_TO_ADDRESS_POS1,
+            Sq18_1 => UNIFIED_ADDRESS_7_TO_ADDRESS_POS1,
+            Sq19_1 => UNIFIED_ADDRESS_8_TO_ADDRESS_POS1,
+            Sq21_1 => UNIFIED_ADDRESS_9_TO_ADDRESS_POS1,
+            Sq22_1 => UNIFIED_ADDRESS_10_TO_ADDRESS_POS1,
+            Sq23_1 => UNIFIED_ADDRESS_11_TO_ADDRESS_POS1,
+            Sq24_1 => UNIFIED_ADDRESS_12_TO_ADDRESS_POS1,
+            Sq25_1 => UNIFIED_ADDRESS_13_TO_ADDRESS_POS1,
+            Sq26_1 => UNIFIED_ADDRESS_14_TO_ADDRESS_POS1,
+            Sq27_1 => UNIFIED_ADDRESS_15_TO_ADDRESS_POS1,
+            Sq28_1 => UNIFIED_ADDRESS_16_TO_ADDRESS_POS1,
+            Sq29_1 => UNIFIED_ADDRESS_17_TO_ADDRESS_POS1,
+            Sq31_1 => UNIFIED_ADDRESS_18_TO_ADDRESS_POS1,
+            Sq32_1 => UNIFIED_ADDRESS_19_TO_ADDRESS_POS1,
+            Sq33_1 => UNIFIED_ADDRESS_20_TO_ADDRESS_POS1,
+            Sq34_1 => UNIFIED_ADDRESS_21_TO_ADDRESS_POS1,
+            Sq35_1 => UNIFIED_ADDRESS_22_TO_ADDRESS_POS1,
+            Sq36_1 => UNIFIED_ADDRESS_23_TO_ADDRESS_POS1,
+            Sq37_1 => UNIFIED_ADDRESS_24_TO_ADDRESS_POS1,
+            Sq38_1 => UNIFIED_ADDRESS_25_TO_ADDRESS_POS1,
+            Sq39_1 => UNIFIED_ADDRESS_26_TO_ADDRESS_POS1,
+            Sq41_1 => UNIFIED_ADDRESS_27_TO_ADDRESS_POS1,
+            Sq42_1 => UNIFIED_ADDRESS_28_TO_ADDRESS_POS1,
+            Sq43_1 => UNIFIED_ADDRESS_29_TO_ADDRESS_POS1,
+            Sq44_1 => UNIFIED_ADDRESS_30_TO_ADDRESS_POS1,
+            Sq45_1 => UNIFIED_ADDRESS_31_TO_ADDRESS_POS1,
+            Sq46_1 => UNIFIED_ADDRESS_32_TO_ADDRESS_POS1,
+            Sq47_1 => UNIFIED_ADDRESS_33_TO_ADDRESS_POS1,
+            Sq48_1 => UNIFIED_ADDRESS_34_TO_ADDRESS_POS1,
+            Sq49_1 => UNIFIED_ADDRESS_35_TO_ADDRESS_POS1,
+            Sq51_1 => UNIFIED_ADDRESS_36_TO_ADDRESS_POS1,
+            Sq52_1 => UNIFIED_ADDRESS_37_TO_ADDRESS_POS1,
+            Sq53_1 => UNIFIED_ADDRESS_38_TO_ADDRESS_POS1,
+            Sq54_1 => UNIFIED_ADDRESS_39_TO_ADDRESS_POS1,
+            Sq55_1 => UNIFIED_ADDRESS_40_TO_ADDRESS_POS1,
+            Sq56_1 => UNIFIED_ADDRESS_41_TO_ADDRESS_POS1,
+            Sq57_1 => UNIFIED_ADDRESS_42_TO_ADDRESS_POS1,
+            Sq58_1 => UNIFIED_ADDRESS_43_TO_ADDRESS_POS1,
+            Sq59_1 => UNIFIED_ADDRESS_44_TO_ADDRESS_POS1,
+            Sq61_1 => UNIFIED_ADDRESS_45_TO_ADDRESS_POS1,
+            Sq62_1 => UNIFIED_ADDRESS_46_TO_ADDRESS_POS1,
+            Sq63_1 => UNIFIED_ADDRESS_47_TO_ADDRESS_POS1,
+            Sq64_1 => UNIFIED_ADDRESS_48_TO_ADDRESS_POS1,
+            Sq65_1 => UNIFIED_ADDRESS_49_TO_ADDRESS_POS1,
+            Sq66_1 => UNIFIED_ADDRESS_50_TO_ADDRESS_POS1,
+            Sq67_1 => UNIFIED_ADDRESS_51_TO_ADDRESS_POS1,
+            Sq68_1 => UNIFIED_ADDRESS_52_TO_ADDRESS_POS1,
+            Sq69_1 => UNIFIED_ADDRESS_53_TO_ADDRESS_POS1,
+            Sq71_1 => UNIFIED_ADDRESS_54_TO_ADDRESS_POS1,
+            Sq72_1 => UNIFIED_ADDRESS_55_TO_ADDRESS_POS1,
+            Sq73_1 => UNIFIED_ADDRESS_56_TO_ADDRESS_POS1,
+            Sq74_1 => UNIFIED_ADDRESS_57_TO_ADDRESS_POS1,
+            Sq75_1 => UNIFIED_ADDRESS_58_TO_ADDRESS_POS1,
+            Sq76_1 => UNIFIED_ADDRESS_59_TO_ADDRESS_POS1,
+            Sq77_1 => UNIFIED_ADDRESS_60_TO_ADDRESS_POS1,
+            Sq78_1 => UNIFIED_ADDRESS_61_TO_ADDRESS_POS1,
+            Sq79_1 => UNIFIED_ADDRESS_62_TO_ADDRESS_POS1,
+            Sq81_1 => UNIFIED_ADDRESS_63_TO_ADDRESS_POS1,
+            Sq82_1 => UNIFIED_ADDRESS_64_TO_ADDRESS_POS1,
+            Sq83_1 => UNIFIED_ADDRESS_65_TO_ADDRESS_POS1,
+            Sq84_1 => UNIFIED_ADDRESS_66_TO_ADDRESS_POS1,
+            Sq85_1 => UNIFIED_ADDRESS_67_TO_ADDRESS_POS1,
+            Sq86_1 => UNIFIED_ADDRESS_68_TO_ADDRESS_POS1,
+            Sq87_1 => UNIFIED_ADDRESS_69_TO_ADDRESS_POS1,
+            Sq88_1 => UNIFIED_ADDRESS_70_TO_ADDRESS_POS1,
+            Sq89_1 => UNIFIED_ADDRESS_71_TO_ADDRESS_POS1,
+            Sq91_1 => UNIFIED_ADDRESS_72_TO_ADDRESS_POS1,
+            Sq92_1 => UNIFIED_ADDRESS_73_TO_ADDRESS_POS1,
+            Sq93_1 => UNIFIED_ADDRESS_74_TO_ADDRESS_POS1,
+            Sq94_1 => UNIFIED_ADDRESS_75_TO_ADDRESS_POS1,
+            Sq95_1 => UNIFIED_ADDRESS_76_TO_ADDRESS_POS1,
+            Sq96_1 => UNIFIED_ADDRESS_77_TO_ADDRESS_POS1,
+            Sq97_1 => UNIFIED_ADDRESS_78_TO_ADDRESS_POS1,
+            Sq98_1 => UNIFIED_ADDRESS_79_TO_ADDRESS_POS1,
+            Sq99_1 => UNIFIED_ADDRESS_80_TO_ADDRESS_POS1,
+            Sq11_2 => UNIFIED_ADDRESS_81_TO_ADDRESS_POS1,
+            Sq12_2 => UNIFIED_ADDRESS_82_TO_ADDRESS_POS1,
+            Sq13_2 => UNIFIED_ADDRESS_83_TO_ADDRESS_POS1,
+            Sq14_2 => UNIFIED_ADDRESS_84_TO_ADDRESS_POS1,
+            Sq15_2 => UNIFIED_ADDRESS_85_TO_ADDRESS_POS1,
+            Sq16_2 => UNIFIED_ADDRESS_86_TO_ADDRESS_POS1,
+            Sq17_2 => UNIFIED_ADDRESS_87_TO_ADDRESS_POS1,
+            Sq18_2 => UNIFIED_ADDRESS_88_TO_ADDRESS_POS1,
+            Sq19_2 => UNIFIED_ADDRESS_89_TO_ADDRESS_POS1,
+            Sq21_2 => UNIFIED_ADDRESS_90_TO_ADDRESS_POS1,
+            Sq22_2 => UNIFIED_ADDRESS_91_TO_ADDRESS_POS1,
+            Sq23_2 => UNIFIED_ADDRESS_92_TO_ADDRESS_POS1,
+            Sq24_2 => UNIFIED_ADDRESS_93_TO_ADDRESS_POS1,
+            Sq25_2 => UNIFIED_ADDRESS_94_TO_ADDRESS_POS1,
+            Sq26_2 => UNIFIED_ADDRESS_95_TO_ADDRESS_POS1,
+            Sq27_2 => UNIFIED_ADDRESS_96_TO_ADDRESS_POS1,
+            Sq28_2 => UNIFIED_ADDRESS_97_TO_ADDRESS_POS1,
+            Sq29_2 => UNIFIED_ADDRESS_98_TO_ADDRESS_POS1,
+            Sq31_2 => UNIFIED_ADDRESS_99_TO_ADDRESS_POS1,
+            Sq32_2 => UNIFIED_ADDRESS_100_TO_ADDRESS_POS1,
+            Sq33_2 => UNIFIED_ADDRESS_101_TO_ADDRESS_POS1,
+            Sq34_2 => UNIFIED_ADDRESS_102_TO_ADDRESS_POS1,
+            Sq35_2 => UNIFIED_ADDRESS_103_TO_ADDRESS_POS1,
+            Sq36_2 => UNIFIED_ADDRESS_104_TO_ADDRESS_POS1,
+            Sq37_2 => UNIFIED_ADDRESS_105_TO_ADDRESS_POS1,
+            Sq38_2 => UNIFIED_ADDRESS_106_TO_ADDRESS_POS1,
+            Sq39_2 => UNIFIED_ADDRESS_107_TO_ADDRESS_POS1,
+            Sq41_2 => UNIFIED_ADDRESS_108_TO_ADDRESS_POS1,
+            Sq42_2 => UNIFIED_ADDRESS_109_TO_ADDRESS_POS1,
+            Sq43_2 => UNIFIED_ADDRESS_110_TO_ADDRESS_POS1,
+            Sq44_2 => UNIFIED_ADDRESS_111_TO_ADDRESS_POS1,
+            Sq45_2 => UNIFIED_ADDRESS_112_TO_ADDRESS_POS1,
+            Sq46_2 => UNIFIED_ADDRESS_113_TO_ADDRESS_POS1,
+            Sq47_2 => UNIFIED_ADDRESS_114_TO_ADDRESS_POS1,
+            Sq48_2 => UNIFIED_ADDRESS_115_TO_ADDRESS_POS1,
+            Sq49_2 => UNIFIED_ADDRESS_116_TO_ADDRESS_POS1,
+            Sq51_2 => UNIFIED_ADDRESS_117_TO_ADDRESS_POS1,
+            Sq52_2 => UNIFIED_ADDRESS_118_TO_ADDRESS_POS1,
+            Sq53_2 => UNIFIED_ADDRESS_119_TO_ADDRESS_POS1,
+            Sq54_2 => UNIFIED_ADDRESS_120_TO_ADDRESS_POS1,
+            Sq55_2 => UNIFIED_ADDRESS_121_TO_ADDRESS_POS1,
+            Sq56_2 => UNIFIED_ADDRESS_122_TO_ADDRESS_POS1,
+            Sq57_2 => UNIFIED_ADDRESS_123_TO_ADDRESS_POS1,
+            Sq58_2 => UNIFIED_ADDRESS_124_TO_ADDRESS_POS1,
+            Sq59_2 => UNIFIED_ADDRESS_125_TO_ADDRESS_POS1,
+            Sq61_2 => UNIFIED_ADDRESS_126_TO_ADDRESS_POS1,
+            Sq62_2 => UNIFIED_ADDRESS_127_TO_ADDRESS_POS1,
+            Sq63_2 => UNIFIED_ADDRESS_128_TO_ADDRESS_POS1,
+            Sq64_2 => UNIFIED_ADDRESS_129_TO_ADDRESS_POS1,
+            Sq65_2 => UNIFIED_ADDRESS_130_TO_ADDRESS_POS1,
+            Sq66_2 => UNIFIED_ADDRESS_131_TO_ADDRESS_POS1,
+            Sq67_2 => UNIFIED_ADDRESS_132_TO_ADDRESS_POS1,
+            Sq68_2 => UNIFIED_ADDRESS_133_TO_ADDRESS_POS1,
+            Sq69_2 => UNIFIED_ADDRESS_134_TO_ADDRESS_POS1,
+            Sq71_2 => UNIFIED_ADDRESS_135_TO_ADDRESS_POS1,
+            Sq72_2 => UNIFIED_ADDRESS_136_TO_ADDRESS_POS1,
+            Sq73_2 => UNIFIED_ADDRESS_137_TO_ADDRESS_POS1,
+            Sq74_2 => UNIFIED_ADDRESS_138_TO_ADDRESS_POS1,
+            Sq75_2 => UNIFIED_ADDRESS_139_TO_ADDRESS_POS1,
+            Sq76_2 => UNIFIED_ADDRESS_140_TO_ADDRESS_POS1,
+            Sq77_2 => UNIFIED_ADDRESS_141_TO_ADDRESS_POS1,
+            Sq78_2 => UNIFIED_ADDRESS_142_TO_ADDRESS_POS1,
+            Sq79_2 => UNIFIED_ADDRESS_143_TO_ADDRESS_POS1,
+            Sq81_2 => UNIFIED_ADDRESS_144_TO_ADDRESS_POS1,
+            Sq82_2 => UNIFIED_ADDRESS_145_TO_ADDRESS_POS1,
+            Sq83_2 => UNIFIED_ADDRESS_146_TO_ADDRESS_POS1,
+            Sq84_2 => UNIFIED_ADDRESS_147_TO_ADDRESS_POS1,
+            Sq85_2 => UNIFIED_ADDRESS_148_TO_ADDRESS_POS1,
+            Sq86_2 => UNIFIED_ADDRESS_149_TO_ADDRESS_POS1,
+            Sq87_2 => UNIFIED_ADDRESS_150_TO_ADDRESS_POS1,
+            Sq88_2 => UNIFIED_ADDRESS_151_TO_ADDRESS_POS1,
+            Sq89_2 => UNIFIED_ADDRESS_152_TO_ADDRESS_POS1,
+            Sq91_2 => UNIFIED_ADDRESS_153_TO_ADDRESS_POS1,
+            Sq92_2 => UNIFIED_ADDRESS_154_TO_ADDRESS_POS1,
+            Sq93_2 => UNIFIED_ADDRESS_155_TO_ADDRESS_POS1,
+            Sq94_2 => UNIFIED_ADDRESS_156_TO_ADDRESS_POS1,
+            Sq95_2 => UNIFIED_ADDRESS_157_TO_ADDRESS_POS1,
+            Sq96_2 => UNIFIED_ADDRESS_158_TO_ADDRESS_POS1,
+            Sq97_2 => UNIFIED_ADDRESS_159_TO_ADDRESS_POS1,
+            Sq98_2 => UNIFIED_ADDRESS_160_TO_ADDRESS_POS1,
+            Sq99_2 => UNIFIED_ADDRESS_161_TO_ADDRESS_POS1,
+            King1 | Rook1 | Bishop1 | Gold1 | Silver1 | Knight1 | Lance1 | Pawn1 | King2
+            | Rook2 | Bishop2 | Gold2 | Silver2 | Knight2 | Lance2 | Pawn2 => panic!(
+                "（＾～＾）
+        "
+            ),
         }
     }
 
