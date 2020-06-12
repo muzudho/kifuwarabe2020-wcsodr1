@@ -6,12 +6,12 @@ for phase in range(1, 3):
     for file in range(1, 10):
         for rank in range(1, 10):
             print(
-                f'const UNIFIED_ADDRES_{i}_TO_ADDRESS_POS: AddressPos = AddressPos::Board(AbsoluteAddress2D {{ file: {file}, rank: {rank} }});')
+                f'const UNIFIED_ADDRESS_{i}_TO_ADDRESS_POS: AddressPos = AddressPos::Board(AbsoluteAddress2D {{ file: {file}, rank: {rank} }});')
             i += 1
 for phase in range(1, 3):
     for hand in ['King', 'Rook', 'Bishop', 'Gold', 'Silver', 'Knight', 'Lance', 'Pawn']:
         print(
-            f'const UNIFIED_ADDRES_{i}_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::{hand}{phase});')
+            f'const UNIFIED_ADDRESS_{i}_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::{hand}{phase});')
         i += 1
 
 # 配列アクセスは遅い気がするので、match構文で書こうぜ☆（＾～＾）
@@ -22,7 +22,7 @@ print('use crate::cosmic::toy_box::UnifiedAddress::*;')
 print('let addr_pos = match self {')
 for phase in range(0, 178):
     print(
-        f'    {enums[i]} => UNIFIED_ADDRES_{i}_TO_ADDRESS_POS,')
+        f'    {enums[i]} => UNIFIED_ADDRESS_{i}_TO_ADDRESS_POS,')
     i += 1
 print('};')
 

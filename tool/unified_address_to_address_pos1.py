@@ -8,6 +8,11 @@ for phase in range(1, 3):
             print(
                 f'const UNIFIED_ADDRESS_{i}_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq{file}{rank});')
             i += 1
+for phase in range(1, 3):
+    for hand in ['King', 'Rook', 'Bishop', 'Gold', 'Silver', 'Knight', 'Lance', 'Pawn']:
+        print(
+            f'const UNIFIED_ADDRESS_{i}_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Hand(DoubleFacedPiece::{hand}{phase});')
+        i += 1
 
 # 配列アクセスは遅い気がするので、match構文で書こうぜ☆（＾～＾）
 enums = ['Sq11_1', 'Sq12_1', 'Sq13_1', 'Sq14_1', 'Sq15_1', 'Sq16_1', 'Sq17_1', 'Sq18_1', 'Sq19_1', 'Sq21_1', 'Sq22_1', 'Sq23_1', 'Sq24_1', 'Sq25_1', 'Sq26_1', 'Sq27_1', 'Sq28_1', 'Sq29_1', 'Sq31_1', 'Sq32_1', 'Sq33_1', 'Sq34_1', 'Sq35_1', 'Sq36_1', 'Sq37_1', 'Sq38_1', 'Sq39_1', 'Sq41_1', 'Sq42_1', 'Sq43_1', 'Sq44_1', 'Sq45_1', 'Sq46_1', 'Sq47_1', 'Sq48_1', 'Sq49_1', 'Sq51_1', 'Sq52_1', 'Sq53_1', 'Sq54_1', 'Sq55_1', 'Sq56_1', 'Sq57_1', 'Sq58_1', 'Sq59_1', 'Sq61_1', 'Sq62_1', 'Sq63_1', 'Sq64_1', 'Sq65_1', 'Sq66_1', 'Sq67_1', 'Sq68_1', 'Sq69_1', 'Sq71_1', 'Sq72_1', 'Sq73_1', 'Sq74_1', 'Sq75_1', 'Sq76_1', 'Sq77_1', 'Sq78_1', 'Sq79_1', 'Sq81_1', 'Sq82_1', 'Sq83_1', 'Sq84_1', 'Sq85_1', 'Sq86_1', 'Sq87_1', 'Sq88_1', 'Sq89_1', 'Sq91_1', 'Sq92_1', 'Sq93_1', 'Sq94_1', 'Sq95_1', 'Sq96_1', 'Sq97_1', 'Sq98_1', 'Sq99_1', 'Sq11_2', 'Sq12_2', 'Sq13_2', 'Sq14_2', 'Sq15_2', 'Sq16_2', 'Sq17_2', 'Sq18_2',
@@ -15,14 +20,10 @@ enums = ['Sq11_1', 'Sq12_1', 'Sq13_1', 'Sq14_1', 'Sq15_1', 'Sq16_1', 'Sq17_1', '
 i = 0
 print('use crate::cosmic::toy_box::UnifiedAddress::*;')
 print('let addr_pos1 = match self {')
-for phase in range(0, 162):
+for phase in range(0, 178):
     print(
         f'    {enums[i]} => UNIFIED_ADDRESS_{i}_TO_ADDRESS_POS1,')
     i += 1
-for phase in range(162, 178):
-    print(f'    {enums[i]} |', end='')
-    i += 1
-print(f'    => panic!("（＾～＾）"),')
 print('};')
 
 print('trace   | Finished.')

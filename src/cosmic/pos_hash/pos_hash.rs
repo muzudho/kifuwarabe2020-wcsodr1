@@ -2,7 +2,9 @@
 //!
 
 use crate::cosmic::playing::Game;
-use crate::cosmic::recording::{AddressPos, History, Movement, PHASE_LEN, PHASE_SECOND};
+use crate::cosmic::recording::{
+    AddressPos, AddressPos1, History, Movement, PHASE_LEN, PHASE_SECOND,
+};
 use crate::cosmic::smart::features::{HAND_MAX, PHYSICAL_PIECES_LEN};
 use crate::cosmic::smart::square::{
     AbsoluteAddress2D, BOARD_MEMORY_AREA, FILE_1, FILE_10, RANK_1, RANK_10, SQUARE_NONE,
@@ -72,18 +74,18 @@ impl GameHashSeed {
         };
         // TODO 指し手 で差分を適用
         // 移動する駒。
-        match move_.source.to_address_pos() {
-            AddressPos::Board(src_sq) => {
+        match move_.source.to_address_pos1() {
+            AddressPos1::Board(src_sq) => {
                 let source_piece = table.piece_at(&move_.source.to_address_pos()).unwrap() as usize;
                 // 移動前マスに、動かしたい駒があるときのハッシュ。
-                prev_hash ^= self.piece[src_sq.serial_number()][source_piece];
+                prev_hash ^= self.piece[src_sq.to_serial_number()][source_piece];
                 // 移動後マスに、動かしたい駒があるときのハッシュ。
                 prev_hash ^= self.piece[move_.destination.to_square_serial_number()][source_piece];
             }
-            AddressPos::Hand(drop) => {
-                let count = table.count_hand(*drop);
+            AddressPos1::Hand(drop) => {
+                let count = table.count_hand(drop);
                 // 打つ前の駒の枚数のハッシュ。
-                prev_hash ^= self.hands[*drop as usize][count as usize];
+                prev_hash ^= self.hands[drop as usize][count as usize];
                 // 移動後マスに、打った駒があるときのハッシュ。
                 prev_hash ^= self.piece[move_.destination.to_square_serial_number()]
                     [drop.nonpromoted_piece() as usize];

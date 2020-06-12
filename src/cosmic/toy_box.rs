@@ -683,7 +683,30 @@ const UNIFIED_ADDRESS_158_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(Unif
 const UNIFIED_ADDRESS_159_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq97);
 const UNIFIED_ADDRESS_160_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq98);
 const UNIFIED_ADDRESS_161_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(UnifiedSq::Sq99);
-
+const UNIFIED_ADDRESS_162_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Hand(DoubleFacedPiece::King1);
+const UNIFIED_ADDRESS_163_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Hand(DoubleFacedPiece::Rook1);
+const UNIFIED_ADDRESS_164_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Hand(DoubleFacedPiece::Bishop1);
+const UNIFIED_ADDRESS_165_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Hand(DoubleFacedPiece::Gold1);
+const UNIFIED_ADDRESS_166_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Hand(DoubleFacedPiece::Silver1);
+const UNIFIED_ADDRESS_167_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Hand(DoubleFacedPiece::Knight1);
+const UNIFIED_ADDRESS_168_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Hand(DoubleFacedPiece::Lance1);
+const UNIFIED_ADDRESS_169_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Hand(DoubleFacedPiece::Pawn1);
+const UNIFIED_ADDRESS_170_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Hand(DoubleFacedPiece::King2);
+const UNIFIED_ADDRESS_171_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Hand(DoubleFacedPiece::Rook2);
+const UNIFIED_ADDRESS_172_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Hand(DoubleFacedPiece::Bishop2);
+const UNIFIED_ADDRESS_173_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Hand(DoubleFacedPiece::Gold2);
+const UNIFIED_ADDRESS_174_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Hand(DoubleFacedPiece::Silver2);
+const UNIFIED_ADDRESS_175_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Hand(DoubleFacedPiece::Knight2);
+const UNIFIED_ADDRESS_176_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Hand(DoubleFacedPiece::Lance2);
+const UNIFIED_ADDRESS_177_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Hand(DoubleFacedPiece::Pawn2);
 /// 統一盤上アドレス。
 #[derive(Copy, Clone, Debug, FromPrimitive)]
 pub enum UnifiedSq {
@@ -775,7 +798,94 @@ impl Default for UnifiedSq {
         UnifiedSq::Sq11
     }
 }
-
+impl UnifiedSq {
+    pub fn to_serial_number(&self) -> usize {
+        use crate::cosmic::toy_box::UnifiedSq::*;
+        match self {
+            Sq11 => 11,
+            Sq12 => 12,
+            Sq13 => 13,
+            Sq14 => 14,
+            Sq15 => 15,
+            Sq16 => 16,
+            Sq17 => 17,
+            Sq18 => 18,
+            Sq19 => 19,
+            Sq21 => 21,
+            Sq22 => 22,
+            Sq23 => 23,
+            Sq24 => 24,
+            Sq25 => 25,
+            Sq26 => 26,
+            Sq27 => 27,
+            Sq28 => 28,
+            Sq29 => 29,
+            Sq31 => 31,
+            Sq32 => 32,
+            Sq33 => 33,
+            Sq34 => 34,
+            Sq35 => 35,
+            Sq36 => 36,
+            Sq37 => 37,
+            Sq38 => 38,
+            Sq39 => 39,
+            Sq41 => 41,
+            Sq42 => 42,
+            Sq43 => 43,
+            Sq44 => 44,
+            Sq45 => 45,
+            Sq46 => 46,
+            Sq47 => 47,
+            Sq48 => 48,
+            Sq49 => 49,
+            Sq51 => 51,
+            Sq52 => 52,
+            Sq53 => 53,
+            Sq54 => 54,
+            Sq55 => 55,
+            Sq56 => 56,
+            Sq57 => 57,
+            Sq58 => 58,
+            Sq59 => 59,
+            Sq61 => 61,
+            Sq62 => 62,
+            Sq63 => 63,
+            Sq64 => 64,
+            Sq65 => 65,
+            Sq66 => 66,
+            Sq67 => 67,
+            Sq68 => 68,
+            Sq69 => 69,
+            Sq71 => 71,
+            Sq72 => 72,
+            Sq73 => 73,
+            Sq74 => 74,
+            Sq75 => 75,
+            Sq76 => 76,
+            Sq77 => 77,
+            Sq78 => 78,
+            Sq79 => 79,
+            Sq81 => 81,
+            Sq82 => 82,
+            Sq83 => 83,
+            Sq84 => 84,
+            Sq85 => 85,
+            Sq86 => 86,
+            Sq87 => 87,
+            Sq88 => 88,
+            Sq89 => 89,
+            Sq91 => 91,
+            Sq92 => 92,
+            Sq93 => 93,
+            Sq94 => 94,
+            Sq95 => 95,
+            Sq96 => 96,
+            Sq97 => 97,
+            Sq98 => 98,
+            Sq99 => 99,
+        }
+    }
+}
 /// 統一アドレス。
 #[derive(Copy, Clone, Debug, FromPrimitive)]
 pub enum UnifiedAddress {
@@ -2141,11 +2251,22 @@ impl UnifiedAddress {
             Sq97_2 => UNIFIED_ADDRESS_159_TO_ADDRESS_POS1,
             Sq98_2 => UNIFIED_ADDRESS_160_TO_ADDRESS_POS1,
             Sq99_2 => UNIFIED_ADDRESS_161_TO_ADDRESS_POS1,
-            King1 | Rook1 | Bishop1 | Gold1 | Silver1 | Knight1 | Lance1 | Pawn1 | King2
-            | Rook2 | Bishop2 | Gold2 | Silver2 | Knight2 | Lance2 | Pawn2 => panic!(
-                "（＾～＾）
-        "
-            ),
+            King1 => UNIFIED_ADDRESS_162_TO_ADDRESS_POS1,
+            Rook1 => UNIFIED_ADDRESS_163_TO_ADDRESS_POS1,
+            Bishop1 => UNIFIED_ADDRESS_164_TO_ADDRESS_POS1,
+            Gold1 => UNIFIED_ADDRESS_165_TO_ADDRESS_POS1,
+            Silver1 => UNIFIED_ADDRESS_166_TO_ADDRESS_POS1,
+            Knight1 => UNIFIED_ADDRESS_167_TO_ADDRESS_POS1,
+            Lance1 => UNIFIED_ADDRESS_168_TO_ADDRESS_POS1,
+            Pawn1 => UNIFIED_ADDRESS_169_TO_ADDRESS_POS1,
+            King2 => UNIFIED_ADDRESS_170_TO_ADDRESS_POS1,
+            Rook2 => UNIFIED_ADDRESS_171_TO_ADDRESS_POS1,
+            Bishop2 => UNIFIED_ADDRESS_172_TO_ADDRESS_POS1,
+            Gold2 => UNIFIED_ADDRESS_173_TO_ADDRESS_POS1,
+            Silver2 => UNIFIED_ADDRESS_174_TO_ADDRESS_POS1,
+            Knight2 => UNIFIED_ADDRESS_175_TO_ADDRESS_POS1,
+            Lance2 => UNIFIED_ADDRESS_176_TO_ADDRESS_POS1,
+            Pawn2 => UNIFIED_ADDRESS_177_TO_ADDRESS_POS1,
         }
     }
 
