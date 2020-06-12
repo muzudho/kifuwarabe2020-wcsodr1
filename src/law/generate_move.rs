@@ -832,7 +832,7 @@ impl Promoting {
                 Agility::Hopping,
                 move_permission,
             )
-        } else if Promoting::is_second_third_farthest_rank_from_friend(destinaion) {
+        } else if Promoting::is_second_third_farthest_rank_from_friend(destinaion.to_fire()) {
             // 自陣から見て二番、三番目の奥の段
             callback(
                 destinaion,
@@ -866,7 +866,7 @@ impl Promoting {
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        if Promoting::is_first_second_farthest_rank_from_friend(destination) {
+        if Promoting::is_first_second_farthest_rank_from_friend(destination.to_fire()) {
             callback(
                 destination,
                 Promotability::Forced,
@@ -996,14 +996,20 @@ impl Promoting {
     /// * `friend` -
     /// * `destination` -
     fn is_first_second_farthest_rank_from_friend(
-        destination: UnifiedAddress,
+        destination: Fire,
     ) -> bool {
-        match destination.to_address_pos3() {
-            AddressPos3::FirstBoard(dst_sq) => {
-                dst_sq.to_rank() < RANK_3
-            }
-            AddressPos3::SecondBoard(dst_sq) => {
-                RANK_7 < dst_sq.to_rank()
+        match destination.address {
+            FireAddress::Board(dst_sq) => {
+                match destination.phase{
+                    Phase::First=>{
+                        dst_sq.rank < RANK_3
+
+                    }
+                    Phase::Second=>{
+
+                        RANK_7 < dst_sq.rank
+                    }
+                }
             }
             _ => panic!(Beam::trouble(&format!(
                 "(Err.919) まだ実装してないぜ☆（＾～＾）！",
@@ -1018,14 +1024,19 @@ impl Promoting {
     /// * `friend` -
     /// * `destination` -
     fn is_second_third_farthest_rank_from_friend(
-        destination: UnifiedAddress,
+        destination: Fire,
     ) -> bool {
-        match destination.to_address_pos3() {
-            AddressPos3::FirstBoard(dst_sq) => {
-                RANK_1 < dst_sq.to_rank() && dst_sq.to_rank() < RANK_4
-            }
-            AddressPos3::SecondBoard(dst_sq) => {
-                    RANK_6 < dst_sq.to_rank() && dst_sq.to_rank() < RANK_9
+        match destination.address {
+            FireAddress::Board(dst_sq) => {
+                match destination.phase{
+                    Phase::First=>{
+                        RANK_1 < dst_sq.rank && dst_sq.rank < RANK_4
+                    }
+                    Phase::Second=>{
+                        RANK_6 < dst_sq.rank && dst_sq.rank < RANK_9
+
+                    }
+                }
             }
             _ => panic!(Beam::trouble(&format!(
                 "(Err.937) まだ実装してないぜ☆（＾～＾）！",
