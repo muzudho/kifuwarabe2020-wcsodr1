@@ -61,6 +61,20 @@ impl History {
     */
 }
 
+#[derive(Clone, Copy, Debug)]
+pub enum AddressPos0 {
+    // 盤上
+    Board,
+    // 持ち駒
+    Hand,
+}
+impl Default for AddressPos0 {
+    // ゴミ値だぜ☆（＾～＾）
+    fn default() -> Self {
+        AddressPos0::Board
+    }
+}
+
 /// 局面(Position)全体を範囲にして振られた番地(Address)。
 #[derive(Clone, Copy)]
 pub enum AddressPos {

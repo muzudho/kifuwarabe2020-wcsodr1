@@ -1,6 +1,5 @@
 use crate::cosmic::pos_hash::pos_hash::*;
-use crate::cosmic::recording::{AddressPos, History, Movement};
-use crate::cosmic::toy_box::PieceNum;
+use crate::cosmic::recording::{AddressPos, AddressPos0, History, Movement};
 use crate::cosmic::toy_box::{GameTable, UnifiedAddress};
 use crate::spaceship::equipment::{Beam, DestinationDisplay};
 
@@ -160,8 +159,8 @@ impl Game {
             let move_ = &self.history.get_move();
             // 移動先にある駒をポップするのは確定。
             let moveing_piece_num = self.table.pop_piece(move_.destination);
-            match move_.source.to_address_pos() {
-                AddressPos::Board(_source_val) => {
+            match move_.source.to_address_pos0() {
+                AddressPos0::Board => {
                     // 盤上の移動なら
                     if move_.promote {
                         // 成ったなら、成る前へ
@@ -177,7 +176,7 @@ impl Game {
                     // 打でなければ、移動元升に、動かした駒を置く☆（＾～＾）打なら何もしないぜ☆（＾～＾）
                     self.table.push_piece(move_.source, moveing_piece_num);
                 }
-                AddressPos::Hand(_drop) => {
+                AddressPos0::Hand => {
                     // 打なら
                     // 打った場所に駒があるはずだぜ☆（＾～＾）
                     let piece_num = moveing_piece_num.unwrap();
