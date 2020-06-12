@@ -336,9 +336,9 @@ impl Default for Area {
             let mut i = 0;
             for file in FILE_1..FILE_10 {
                 for rank in RANK_1..RANK_10 {
-                    v[i] = UnifiedAddress::from_address_pos(
+                    v[i] = UnifiedAddress::from_absolute_address(
                         Phase::First,
-                        &AddressPos::Board(AbsoluteAddress2D::new(file, rank)),
+                        &AbsoluteAddress2D::new(file, rank),
                     );
                     i += 1;
                 }
@@ -350,9 +350,9 @@ impl Default for Area {
             let mut i = 0;
             for file in FILE_1..FILE_10 {
                 for rank in RANK_1..RANK_10 {
-                    v[i] = UnifiedAddress::from_address_pos(
+                    v[i] = UnifiedAddress::from_absolute_address(
                         Phase::Second,
-                        &AddressPos::Board(AbsoluteAddress2D::new(file, rank)),
+                        &AbsoluteAddress2D::new(file, rank),
                     );
                     i += 1;
                 }
@@ -364,9 +364,9 @@ impl Default for Area {
             let mut i = 0;
             for rank in RANK_2..RANK_10 {
                 for file in (FILE_1..FILE_10).rev() {
-                    v[i] = UnifiedAddress::from_address_pos(
+                    v[i] = UnifiedAddress::from_absolute_address(
                         Phase::First,
-                        &AddressPos::Board(AbsoluteAddress2D::new(file, rank)),
+                        &AbsoluteAddress2D::new(file, rank),
                     );
                     i += 1;
                 }
@@ -378,9 +378,9 @@ impl Default for Area {
             let mut i = 0;
             for rank in RANK_1..RANK_9 {
                 for file in (FILE_1..FILE_10).rev() {
-                    v[i] = UnifiedAddress::from_address_pos(
+                    v[i] = UnifiedAddress::from_absolute_address(
                         Phase::Second,
-                        &AddressPos::Board(AbsoluteAddress2D::new(file, rank)),
+                        &AbsoluteAddress2D::new(file, rank),
                     );
                     i += 1;
                 }
@@ -392,9 +392,9 @@ impl Default for Area {
             let mut i = 0;
             for rank in RANK_3..RANK_10 {
                 for file in (FILE_1..FILE_10).rev() {
-                    v[i] = UnifiedAddress::from_address_pos(
+                    v[i] = UnifiedAddress::from_absolute_address(
                         Phase::First,
-                        &AddressPos::Board(AbsoluteAddress2D::new(file, rank)),
+                        &AbsoluteAddress2D::new(file, rank),
                     );
                     i += 1;
                 }
@@ -406,9 +406,9 @@ impl Default for Area {
             let mut i = 0;
             for rank in RANK_3..RANK_10 {
                 for file in (FILE_1..FILE_10).rev() {
-                    v[i] = UnifiedAddress::from_address_pos(
+                    v[i] = UnifiedAddress::from_absolute_address(
                         Phase::Second,
-                        &AddressPos::Board(AbsoluteAddress2D::new(file, rank).rotate_180()),
+                        &AbsoluteAddress2D::new(file, rank).rotate_180(),
                     );
                     i += 1;
                 }
@@ -704,7 +704,7 @@ impl Area {
                                 break;
                             }
                             if moving(
-                                UnifiedAddress::from_address_pos(friend, &AddressPos::Board(cur)),
+                                UnifiedAddress::from_absolute_address(friend, &cur),
                                 mobility.agility,
                             ) {
                                 break;
@@ -716,14 +716,14 @@ impl Area {
                         let mut cur = start_sq.clone();
                         // 西隣から反時計回りだぜ☆（＾～＾）
                         if !cur.offset(&angle.west_ccw_double_rank()).wall() {
-                            moving(UnifiedAddress::from_address_pos(friend, &AddressPos::Board(cur)), mobility.agility);
+                            moving(UnifiedAddress::from_absolute_address(friend, &cur), mobility.agility);
                         }
                     }
                     Agility::Hopping => {
                         let mut cur = start_sq.clone();
                         // 西隣から反時計回りだぜ☆（＾～＾）
                         if !cur.offset(&angle.west_ccw()).wall() {
-                            moving(UnifiedAddress::from_address_pos(friend, &AddressPos::Board(cur)), mobility.agility);
+                            moving(UnifiedAddress::from_absolute_address(friend, &cur), mobility.agility);
                         }
                     }
                 }

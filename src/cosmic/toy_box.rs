@@ -1647,12 +1647,6 @@ impl GameTable {
             Some((
                 piece.type_(),
                 UnifiedAddress::from_double_faced_piece(piece.double_faced_piece()),
-                /*
-                UnifiedAddress::from_address_pos(
-                    self.get_phase(piece_num),
-                    &AddressPos::Hand(piece.double_faced_piece()),
-                ),
-                */
             ))
         } else {
             None

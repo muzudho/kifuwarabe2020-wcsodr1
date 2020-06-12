@@ -125,66 +125,39 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
             match &line[*starts..=*starts] {
                 "a" => {
                     *starts += 1;
-                    UnifiedAddress::from_address_pos(
-                        friend,
-                        &AddressPos::Board(AbsoluteAddress2D::new(file, 1)),
-                    )
+                    UnifiedAddress::from_absolute_address(friend, &AbsoluteAddress2D::new(file, 1))
                 }
                 "b" => {
                     *starts += 1;
-                    UnifiedAddress::from_address_pos(
-                        friend,
-                        &AddressPos::Board(AbsoluteAddress2D::new(file, 2)),
-                    )
+                    UnifiedAddress::from_absolute_address(friend, &AbsoluteAddress2D::new(file, 2))
                 }
                 "c" => {
                     *starts += 1;
-                    UnifiedAddress::from_address_pos(
-                        friend,
-                        &AddressPos::Board(AbsoluteAddress2D::new(file, 3)),
-                    )
+                    UnifiedAddress::from_absolute_address(friend, &AbsoluteAddress2D::new(file, 3))
                 }
                 "d" => {
                     *starts += 1;
-                    UnifiedAddress::from_address_pos(
-                        friend,
-                        &AddressPos::Board(AbsoluteAddress2D::new(file, 4)),
-                    )
+                    UnifiedAddress::from_absolute_address(friend, &AbsoluteAddress2D::new(file, 4))
                 }
                 "e" => {
                     *starts += 1;
-                    UnifiedAddress::from_address_pos(
-                        friend,
-                        &AddressPos::Board(AbsoluteAddress2D::new(file, 5)),
-                    )
+                    UnifiedAddress::from_absolute_address(friend, &AbsoluteAddress2D::new(file, 5))
                 }
                 "f" => {
                     *starts += 1;
-                    UnifiedAddress::from_address_pos(
-                        friend,
-                        &AddressPos::Board(AbsoluteAddress2D::new(file, 6)),
-                    )
+                    UnifiedAddress::from_absolute_address(friend, &AbsoluteAddress2D::new(file, 6))
                 }
                 "g" => {
                     *starts += 1;
-                    UnifiedAddress::from_address_pos(
-                        friend,
-                        &AddressPos::Board(AbsoluteAddress2D::new(file, 7)),
-                    )
+                    UnifiedAddress::from_absolute_address(friend, &AbsoluteAddress2D::new(file, 7))
                 }
                 "h" => {
                     *starts += 1;
-                    UnifiedAddress::from_address_pos(
-                        friend,
-                        &AddressPos::Board(AbsoluteAddress2D::new(file, 8)),
-                    )
+                    UnifiedAddress::from_absolute_address(friend, &AbsoluteAddress2D::new(file, 8))
                 }
                 "i" => {
                     *starts += 1;
-                    UnifiedAddress::from_address_pos(
-                        friend,
-                        &AddressPos::Board(AbsoluteAddress2D::new(file, 9)),
-                    )
+                    UnifiedAddress::from_absolute_address(friend, &AbsoluteAddress2D::new(file, 9))
                 }
                 _ => {
                     panic!(Beam::trouble(&format!(
@@ -229,9 +202,9 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
     *starts += 1;
 
     // 行き先。
-    buffer.destination = UnifiedAddress::from_address_pos(
+    buffer.destination = UnifiedAddress::from_absolute_address(
         game.history.get_friend(),
-        &AddressPos::Board(AbsoluteAddress2D::new(file, rank)),
+        &AbsoluteAddress2D::new(file, rank),
     );
 
     // 5文字に「+」があれば成り。
@@ -343,9 +316,9 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Game) {
         match board_part {
             BoardPart::Alphabet(piece) => {
                 *starts += 1;
-                let addr = UnifiedAddress::from_address_pos(
+                let addr = UnifiedAddress::from_absolute_address(
                     piece.phase(),
-                    &AddressPos::Board(AbsoluteAddress2D::new(file, rank)),
+                    &AbsoluteAddress2D::new(file, rank),
                 );
 
                 // 駒に背番号を付けるぜ☆（＾～＾）
