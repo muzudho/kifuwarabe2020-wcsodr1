@@ -196,7 +196,7 @@ pub struct CapturedMove {
     pub source: UnifiedAddress,
     /*
     /// TODO 移動先。
-    pub destination: AddressPos,
+    pub destination: UnifiedAddress,
     */
 }
 impl CapturedMove {
@@ -260,8 +260,8 @@ impl Movement {
 }
 impl fmt::Display for Movement {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self.source.to_address_pos() {
-            AddressPos::Board(source_val) => {
+        match self.source.to_address_pos1() {
+            AddressPos1::Board(source_val) => {
                 let (sx, sy) = source_val.to_file_rank();
                 write!(
                     f,
@@ -272,7 +272,7 @@ impl fmt::Display for Movement {
                     if self.promote { "+" } else { "" }
                 )
             }
-            AddressPos::Hand(drop) => write!(
+            AddressPos1::Hand(drop) => write!(
                 f,
                 "{}{}{}",
                 drop,

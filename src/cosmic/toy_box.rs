@@ -948,6 +948,93 @@ impl UnifiedSq {
         }
     }
 
+    pub fn to_file_rank(&self) -> (usize, usize) {
+        use crate::cosmic::toy_box::UnifiedSq::*;
+        match self {
+            Sq11 => (1, 1),
+            Sq12 => (1, 2),
+            Sq13 => (1, 3),
+            Sq14 => (1, 4),
+            Sq15 => (1, 5),
+            Sq16 => (1, 6),
+            Sq17 => (1, 7),
+            Sq18 => (1, 8),
+            Sq19 => (1, 9),
+            Sq21 => (2, 1),
+            Sq22 => (2, 2),
+            Sq23 => (2, 3),
+            Sq24 => (2, 4),
+            Sq25 => (2, 5),
+            Sq26 => (2, 6),
+            Sq27 => (2, 7),
+            Sq28 => (2, 8),
+            Sq29 => (2, 9),
+            Sq31 => (3, 1),
+            Sq32 => (3, 2),
+            Sq33 => (3, 3),
+            Sq34 => (3, 4),
+            Sq35 => (3, 5),
+            Sq36 => (3, 6),
+            Sq37 => (3, 7),
+            Sq38 => (3, 8),
+            Sq39 => (3, 9),
+            Sq41 => (4, 1),
+            Sq42 => (4, 2),
+            Sq43 => (4, 3),
+            Sq44 => (4, 4),
+            Sq45 => (4, 5),
+            Sq46 => (4, 6),
+            Sq47 => (4, 7),
+            Sq48 => (4, 8),
+            Sq49 => (4, 9),
+            Sq51 => (5, 1),
+            Sq52 => (5, 2),
+            Sq53 => (5, 3),
+            Sq54 => (5, 4),
+            Sq55 => (5, 5),
+            Sq56 => (5, 6),
+            Sq57 => (5, 7),
+            Sq58 => (5, 8),
+            Sq59 => (5, 9),
+            Sq61 => (6, 1),
+            Sq62 => (6, 2),
+            Sq63 => (6, 3),
+            Sq64 => (6, 4),
+            Sq65 => (6, 5),
+            Sq66 => (6, 6),
+            Sq67 => (6, 7),
+            Sq68 => (6, 8),
+            Sq69 => (6, 9),
+            Sq71 => (7, 1),
+            Sq72 => (7, 2),
+            Sq73 => (7, 3),
+            Sq74 => (7, 4),
+            Sq75 => (7, 5),
+            Sq76 => (7, 6),
+            Sq77 => (7, 7),
+            Sq78 => (7, 8),
+            Sq79 => (7, 9),
+            Sq81 => (8, 1),
+            Sq82 => (8, 2),
+            Sq83 => (8, 3),
+            Sq84 => (8, 4),
+            Sq85 => (8, 5),
+            Sq86 => (8, 6),
+            Sq87 => (8, 7),
+            Sq88 => (8, 8),
+            Sq89 => (8, 9),
+            Sq91 => (9, 1),
+            Sq92 => (9, 2),
+            Sq93 => (9, 3),
+            Sq94 => (9, 4),
+            Sq95 => (9, 5),
+            Sq96 => (9, 6),
+            Sq97 => (9, 7),
+            Sq98 => (9, 8),
+            Sq99 => (9, 9),
+        }
+    }
+
     pub fn to_absolute_address_2d(&self) -> AbsoluteAddress2D {
         // 配列アクセスは遅い気がするので、match構文で書こうぜ☆（＾～＾）
         use crate::cosmic::toy_box::UnifiedSq::*;
@@ -3334,28 +3421,13 @@ impl GameTable {
                 friend,
                 &AddressPos::Board(AbsoluteAddress2D::new(file, rank)),
             );
-            if let Some(piece_val) = self.piece_at(&addr.to_address_pos()) {
+            if let Some(piece_val) = self.piece_at1(addr.to_address_pos1()) {
                 if piece_val.phase() == friend && piece_val.type_() == PieceType::Pawn {
                     return true;
                 }
             }
         }
         false
-    }
-    /// ハッシュを作るときにも利用。盤上専用。
-    pub fn piece_at(&self, addr: &AddressPos) -> Option<Piece> {
-        match addr {
-            AddressPos::Board(sq) => {
-                if let Some(piece_num) = self.board[sq.serial_number() as usize] {
-                    Some(self.get_piece(piece_num))
-                } else {
-                    None
-                }
-            }
-            AddressPos::Hand(_drop) => panic!(Beam::trouble(&format!(
-                "(Err.345) 駒台は非対応☆（＾～＾）！",
-            ))),
-        }
     }
     /// ハッシュを作るときにも利用。盤上専用。
     pub fn piece_at1(&self, addr: AddressPos1) -> Option<Piece> {
@@ -3376,26 +3448,10 @@ impl GameTable {
     /// 升で指定して駒を取得。
     /// 駒台には対応してない。 -> 何に使っている？
     pub fn piece_num_at(&self, addr: UnifiedAddress) -> Option<PieceNum> {
-        match addr.to_address_pos() {
-            AddressPos::Board(sq) => self.board[sq.serial_number() as usize],
+        match addr.to_address_pos1() {
+            AddressPos1::Board(sq) => self.board[sq.to_serial_number() as usize],
             _ => panic!(Beam::trouble(&format!(
                 "(Err.254) まだ駒台は実装してないぜ☆（＾～＾）！",
-            ))),
-        }
-    }
-    /// 駒台には対応してない。 -> 何に使っている？
-    pub fn piece_info_at(&self, addr: &AddressPos) -> Option<PieceInfo> {
-        match addr {
-            AddressPos::Board(sq) => {
-                let piece_num = self.board[sq.serial_number() as usize];
-                if let Some(piece_num_val) = piece_num {
-                    Some(PieceInfo::new(self.get_piece(piece_num_val), piece_num_val))
-                } else {
-                    None
-                }
-            }
-            _ => panic!(Beam::trouble(&format!(
-                "(Err.321) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
     }
@@ -3416,9 +3472,9 @@ impl GameTable {
         }
     }
     pub fn promotion_value_at(&self, table: &GameTable, addr: UnifiedAddress) -> isize {
-        match addr.to_address_pos() {
-            AddressPos::Board(sq) => {
-                let piece_num = self.board[sq.serial_number() as usize];
+        match addr.to_address_pos1() {
+            AddressPos1::Board(sq) => {
+                let piece_num = self.board[sq.to_serial_number() as usize];
                 if let Some(piece_num_val) = piece_num {
                     table
                         .get_double_faced_piece(piece_num_val)
@@ -3429,7 +3485,7 @@ impl GameTable {
                     0
                 }
             }
-            AddressPos::Hand(_drop) => panic!(Beam::trouble(&format!(
+            AddressPos1::Hand(_drop) => panic!(Beam::trouble(&format!(
                 "(Err.254) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
@@ -3465,13 +3521,13 @@ impl GameTable {
         F: FnMut(usize, Option<&AbsoluteAddress2D>, Option<PieceInfo>),
     {
         for (i, addr) in self.address_list.iter().enumerate() {
-            match addr.to_address_pos() {
-                AddressPos::Board(sq) => {
+            match addr.to_address_pos1() {
+                AddressPos1::Board(sq) => {
                     // 盤上の駒☆（＾～＾）
-                    let piece_info = self.piece_info_at(&addr.to_address_pos()).unwrap();
-                    piece_get(i, Some(&sq), Some(piece_info));
+                    let piece_info = self.piece_info_at1(addr.to_address_pos1()).unwrap();
+                    piece_get(i, Some(&sq.to_absolute_address_2d()), Some(piece_info));
                 }
-                AddressPos::Hand(_drop) => {
+                AddressPos1::Hand(_drop) => {
                     // TODO 持ち駒☆（＾～＾）
                     piece_get(i, None, None);
                 }
@@ -3489,13 +3545,13 @@ impl GameTable {
         for piece_num in Nine299792458::piece_numbers().iter() {
             // 盤上の駒だけを調べようぜ☆（＾～＾）
             let addr = self.address_list[*piece_num as usize];
-            match addr.to_address_pos() {
-                AddressPos::Board(_sq) => {
+            match addr.to_address_pos1() {
+                AddressPos1::Board(_sq) => {
                     if self.get_phase(*piece_num) == friend {
                         piece_get(addr, self.get_type(*piece_num));
                     }
                 }
-                AddressPos::Hand(_drop) => {
+                AddressPos1::Hand(_drop) => {
                     // 持ち駒はここで調べるのは無駄な気がするよな☆（＾～＾）持ち駒に歩が１８個とか☆（＾～＾）
                 }
             }
