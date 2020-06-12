@@ -158,52 +158,44 @@ impl Game {
             // 棋譜から読取、手目も減る
             self.history.ply -= 1;
             let move_ = &self.history.get_move();
-            {
-                // 動いた駒
-                let moveing_piece_num: Option<PieceNum> = match move_.source.to_address_pos() {
-                    AddressPos::Board(_source_val) => {
-                        // 盤上の移動なら
-                        if move_.promote {
-                            // 成ったなら、成る前へ
-                            if let Some(source_piece_num) = self.table.pop_piece(move_.destination)
-                            {
-                                self.table.demote(source_piece_num);
-                                Some(source_piece_num)
-                            } else {
-                                panic!(Beam::trouble(
-                                    "(Err.305) 成ったのに移動先に駒が無いぜ☆（＾～＾）！"
-                                ))
-                            }
+            // 移動先にある駒をポップするのは確定。
+            let moveing_piece_num = self.table.pop_piece(move_.destination);
+            match move_.source.to_address_pos() {
+                AddressPos::Board(_source_val) => {
+                    // 盤上の移動なら
+                    if move_.promote {
+                        // 成ったなら、成る前へ
+                        if let Some(source_piece_num) = moveing_piece_num {
+                            self.table.demote(source_piece_num);
                         } else {
-                            self.table.pop_piece(move_.destination)
+                            panic!(Beam::trouble(
+                                "(Err.305) 成ったのに移動先に駒が無いぜ☆（＾～＾）！"
+                            ))
                         }
                     }
-                    AddressPos::Hand(_drop) => {
-                        // 打なら
-                        // 打った場所に駒があるはずだぜ☆（＾～＾）
-                        let piece_num = self.table.pop_piece(move_.destination).unwrap();
-                        // 自分の持ち駒を増やそうぜ☆（＾～＾）！
-                        self.table.push_piece(
-                            UnifiedAddress::from_address_pos(
-                                self.history.get_friend(),
-                                &AddressPos::Hand(self.table.get_double_faced_piece(piece_num)),
-                            ),
-                            Some(piece_num),
-                        );
-                        Some(piece_num)
-                    }
-                };
 
-                // 取った駒が有ったか。
-                // あれば、指し手で取った駒の先後をひっくり返せば、自分の駒台にある駒を取り出せるので取り出して、盤の上に指し手の取った駒のまま駒を置きます。
-                self.table
-                    .rotate_piece_hand_to_board(self.history.get_friend(), &move_);
-
-                if let AddressPos::Board(_src_sq) = move_.source.to_address_pos() {
                     // 打でなければ、移動元升に、動かした駒を置く☆（＾～＾）打なら何もしないぜ☆（＾～＾）
                     self.table.push_piece(move_.source, moveing_piece_num);
                 }
+                AddressPos::Hand(_drop) => {
+                    // 打なら
+                    // 打った場所に駒があるはずだぜ☆（＾～＾）
+                    let piece_num = moveing_piece_num.unwrap();
+                    // 自分の持ち駒を増やそうぜ☆（＾～＾）！
+                    self.table.push_piece(
+                        UnifiedAddress::from_address_pos(
+                            self.history.get_friend(),
+                            &AddressPos::Hand(self.table.get_double_faced_piece(piece_num)),
+                        ),
+                        moveing_piece_num,
+                    );
+                }
             }
+
+            // 取った駒が有ったか。
+            // あれば、指し手で取った駒の先後をひっくり返せば、自分の駒台にある駒を取り出せるので取り出して、盤の上に指し手の取った駒のまま駒を置きます。
+            self.table
+                .rotate_piece_hand_to_board(self.history.get_friend(), &move_);
 
             // TODO 局面ハッシュを作り直したいぜ☆（＾～＾）
 
