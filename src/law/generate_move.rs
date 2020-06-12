@@ -3,7 +3,7 @@
 //!
 
 use crate::cosmic::recording::PHASE_LEN;
-use crate::cosmic::recording::{AddressPos, CapturedMove, Movement, Phase};
+use crate::cosmic::recording::{AddressPos, AddressPos3,CapturedMove, Movement, Phase};
 use crate::cosmic::smart::features::{DoubleFacedPiece, PieceType};
 use crate::cosmic::smart::square::{
     AbsoluteAddress2D, Angle, RelAdr2D, FILE_1, FILE_10, RANK_1, RANK_10, RANK_2, RANK_3, RANK_4,
@@ -986,11 +986,12 @@ impl Promoting {
     /// * `friend` -
     /// * `destination` -
     fn is_farthest_rank_from_friend(destination: UnifiedAddress) -> bool {
-        let friend = destination.to_phase();
-        match destination.to_address_pos() {
-            AddressPos::Board(dst_sq) => {
-                (friend == Phase::First && dst_sq.rank() < RANK_2)
-                    || (friend == Phase::Second && RANK_8 < dst_sq.rank())
+        match destination.to_address_pos3() {
+            AddressPos3::FirstBoard(dst_sq) => {
+                dst_sq.rank() < RANK_2
+            }
+            AddressPos3::SecondBoard(dst_sq) => {
+                    RANK_8 < dst_sq.rank()
             }
             _ => panic!(Beam::trouble(&format!(
                 "(Err.905) まだ実装してないぜ☆（＾～＾）！",

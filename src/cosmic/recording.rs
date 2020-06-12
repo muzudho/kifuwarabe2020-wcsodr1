@@ -81,8 +81,8 @@ impl fmt::Display for AddressPos {
             f,
             "{}",
             match self {
-                AddressPos::Board(addr) => {
-                    format!("{}", addr)
+                AddressPos::Board(sq) => {
+                    format!("{}", sq)
                 }
                 AddressPos::Hand(drop) => {
                     format!("{}", drop)
@@ -97,8 +97,8 @@ impl fmt::Debug for AddressPos {
             f,
             "{}",
             match self {
-                AddressPos::Board(addr) => {
-                    addr.serial_number().to_string()
+                AddressPos::Board(sq) => {
+                    sq.serial_number().to_string()
                 }
                 AddressPos::Hand(drop) => {
                     format!("{:?}", drop)

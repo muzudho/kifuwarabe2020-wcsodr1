@@ -73,52 +73,31 @@ impl GameHashSeed {
         // TODO 指し手 で差分を適用
         // 移動する駒。
         match move_.source.to_address_pos() {
-            AddressPos::Board(sq) => {
+            AddressPos::Board(src_sq) => {
                 let source_piece = table.piece_at(&move_.source.to_address_pos()).unwrap() as usize;
                 // 移動前マスに、動かしたい駒があるときのハッシュ。
-                prev_hash ^= self.piece[sq.serial_number()][source_piece];
+                prev_hash ^= self.piece[src_sq.serial_number()][source_piece];
                 // 移動後マスに、動かしたい駒があるときのハッシュ。
-                match move_.destination.to_address_pos() {
-                    AddressPos::Board(sq) => {
-                        prev_hash ^= self.piece[sq.serial_number()][source_piece];
-                    }
-                    _ => panic!(Beam::trouble(&format!(
-                        "(Err.87) まだ実装してないぜ☆（＾～＾）！",
-                    ))),
-                }
+                prev_hash ^= self.piece[move_.destination.to_square_serial_number()][source_piece];
             }
             AddressPos::Hand(drop) => {
                 let count = table.count_hand(drop);
                 // 打つ前の駒の枚数のハッシュ。
                 prev_hash ^= self.hands[drop as usize][count as usize];
                 // 移動後マスに、打った駒があるときのハッシュ。
-                match move_.destination.to_address_pos() {
-                    AddressPos::Board(sq) => {
-                        prev_hash ^=
-                            self.piece[sq.serial_number()][drop.nonpromoted_piece() as usize];
-                    }
-                    _ => panic!(Beam::trouble(&format!(
-                        "(Err.101) まだ実装してないぜ☆（＾～＾）！",
-                    ))),
-                }
+                prev_hash ^= self.piece[move_.destination.to_square_serial_number()]
+                    [drop.nonpromoted_piece() as usize];
             }
         }
-        // TODO 移動先にある駒
-        match move_.destination.to_address_pos() {
-            AddressPos::Board(dst_sq) => {
-                // 移動先にある駒があれば
-                if let Some(dst_piece_val) = table.piece_at(&move_.destination.to_address_pos()) {
-                    prev_hash ^= self.piece[dst_sq.serial_number()][dst_piece_val as usize];
-                    // 持ち駒になるとき。
-                    let double_faced_piece = dst_piece_val.double_faced_piece();
-                    let count = table.count_hand(double_faced_piece);
-                    // 打つ前の駒の枚数のハッシュ。
-                    prev_hash ^= self.hands[double_faced_piece as usize][count as usize + 1];
-                }
-            }
-            _ => panic!(Beam::trouble(&format!(
-                "(Err.123) まだ実装してないぜ☆（＾～＾）！",
-            ))),
+        // 移動先にある駒があれば
+        if let Some(dst_piece_val) = table.piece_at(&move_.destination.to_address_pos()) {
+            prev_hash ^=
+                self.piece[move_.destination.to_square_serial_number()][dst_piece_val as usize];
+            // 持ち駒になるとき。
+            let double_faced_piece = dst_piece_val.double_faced_piece();
+            let count = table.count_hand(double_faced_piece);
+            // 打つ前の駒の枚数のハッシュ。
+            prev_hash ^= self.hands[double_faced_piece as usize][count as usize + 1];
         }
 
         // TODO ハッシュ更新
