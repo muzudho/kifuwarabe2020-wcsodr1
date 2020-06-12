@@ -15,6 +15,673 @@ use std::*;
 
 pub const PIECE_LEN: usize = 28;
 
+// 配列へのアクセスは遅い気がするので、定数で作っておいて……☆（＾～＾）
+const UNIFIED_ADDRES_0_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 1 });
+const UNIFIED_ADDRES_1_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 2 });
+const UNIFIED_ADDRES_2_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 3 });
+const UNIFIED_ADDRES_3_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 4 });
+const UNIFIED_ADDRES_4_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 5 });
+const UNIFIED_ADDRES_5_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 6 });
+const UNIFIED_ADDRES_6_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 7 });
+const UNIFIED_ADDRES_7_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 8 });
+const UNIFIED_ADDRES_8_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 9 });
+const UNIFIED_ADDRES_9_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 1 });
+const UNIFIED_ADDRES_10_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 2 });
+const UNIFIED_ADDRES_11_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 3 });
+const UNIFIED_ADDRES_12_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 4 });
+const UNIFIED_ADDRES_13_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 5 });
+const UNIFIED_ADDRES_14_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 6 });
+const UNIFIED_ADDRES_15_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 7 });
+const UNIFIED_ADDRES_16_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 8 });
+const UNIFIED_ADDRES_17_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 9 });
+const UNIFIED_ADDRES_18_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 1 });
+const UNIFIED_ADDRES_19_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 2 });
+const UNIFIED_ADDRES_20_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 3 });
+const UNIFIED_ADDRES_21_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 4 });
+const UNIFIED_ADDRES_22_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 5 });
+const UNIFIED_ADDRES_23_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 6 });
+const UNIFIED_ADDRES_24_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 7 });
+const UNIFIED_ADDRES_25_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 8 });
+const UNIFIED_ADDRES_26_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 9 });
+const UNIFIED_ADDRES_27_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 1 });
+const UNIFIED_ADDRES_28_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 2 });
+const UNIFIED_ADDRES_29_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 3 });
+const UNIFIED_ADDRES_30_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 4 });
+const UNIFIED_ADDRES_31_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 5 });
+const UNIFIED_ADDRES_32_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 6 });
+const UNIFIED_ADDRES_33_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 7 });
+const UNIFIED_ADDRES_34_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 8 });
+const UNIFIED_ADDRES_35_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 9 });
+const UNIFIED_ADDRES_36_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 1 });
+const UNIFIED_ADDRES_37_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 2 });
+const UNIFIED_ADDRES_38_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 3 });
+const UNIFIED_ADDRES_39_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 4 });
+const UNIFIED_ADDRES_40_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 5 });
+const UNIFIED_ADDRES_41_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 6 });
+const UNIFIED_ADDRES_42_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 7 });
+const UNIFIED_ADDRES_43_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 8 });
+const UNIFIED_ADDRES_44_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 9 });
+const UNIFIED_ADDRES_45_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 1 });
+const UNIFIED_ADDRES_46_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 2 });
+const UNIFIED_ADDRES_47_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 3 });
+const UNIFIED_ADDRES_48_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 4 });
+const UNIFIED_ADDRES_49_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 5 });
+const UNIFIED_ADDRES_50_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 6 });
+const UNIFIED_ADDRES_51_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 7 });
+const UNIFIED_ADDRES_52_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 8 });
+const UNIFIED_ADDRES_53_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 9 });
+const UNIFIED_ADDRES_54_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 1 });
+const UNIFIED_ADDRES_55_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 2 });
+const UNIFIED_ADDRES_56_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 3 });
+const UNIFIED_ADDRES_57_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 4 });
+const UNIFIED_ADDRES_58_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 5 });
+const UNIFIED_ADDRES_59_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 6 });
+const UNIFIED_ADDRES_60_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 7 });
+const UNIFIED_ADDRES_61_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 8 });
+const UNIFIED_ADDRES_62_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 9 });
+const UNIFIED_ADDRES_63_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 1 });
+const UNIFIED_ADDRES_64_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 2 });
+const UNIFIED_ADDRES_65_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 3 });
+const UNIFIED_ADDRES_66_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 4 });
+const UNIFIED_ADDRES_67_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 5 });
+const UNIFIED_ADDRES_68_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 6 });
+const UNIFIED_ADDRES_69_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 7 });
+const UNIFIED_ADDRES_70_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 8 });
+const UNIFIED_ADDRES_71_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 9 });
+const UNIFIED_ADDRES_72_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 1 });
+const UNIFIED_ADDRES_73_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 2 });
+const UNIFIED_ADDRES_74_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 3 });
+const UNIFIED_ADDRES_75_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 4 });
+const UNIFIED_ADDRES_76_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 5 });
+const UNIFIED_ADDRES_77_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 6 });
+const UNIFIED_ADDRES_78_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 7 });
+const UNIFIED_ADDRES_79_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 8 });
+const UNIFIED_ADDRES_80_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 9 });
+const UNIFIED_ADDRES_81_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 1 });
+const UNIFIED_ADDRES_82_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 2 });
+const UNIFIED_ADDRES_83_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 3 });
+const UNIFIED_ADDRES_84_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 4 });
+const UNIFIED_ADDRES_85_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 5 });
+const UNIFIED_ADDRES_86_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 6 });
+const UNIFIED_ADDRES_87_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 7 });
+const UNIFIED_ADDRES_88_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 8 });
+const UNIFIED_ADDRES_89_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 9 });
+const UNIFIED_ADDRES_90_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 1 });
+const UNIFIED_ADDRES_91_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 2 });
+const UNIFIED_ADDRES_92_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 3 });
+const UNIFIED_ADDRES_93_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 4 });
+const UNIFIED_ADDRES_94_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 5 });
+const UNIFIED_ADDRES_95_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 6 });
+const UNIFIED_ADDRES_96_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 7 });
+const UNIFIED_ADDRES_97_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 8 });
+const UNIFIED_ADDRES_98_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 9 });
+const UNIFIED_ADDRES_99_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 1 });
+const UNIFIED_ADDRES_100_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 2 });
+const UNIFIED_ADDRES_101_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 3 });
+const UNIFIED_ADDRES_102_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 4 });
+const UNIFIED_ADDRES_103_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 5 });
+const UNIFIED_ADDRES_104_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 6 });
+const UNIFIED_ADDRES_105_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 7 });
+const UNIFIED_ADDRES_106_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 8 });
+const UNIFIED_ADDRES_107_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 9 });
+const UNIFIED_ADDRES_108_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 1 });
+const UNIFIED_ADDRES_109_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 2 });
+const UNIFIED_ADDRES_110_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 3 });
+const UNIFIED_ADDRES_111_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 4 });
+const UNIFIED_ADDRES_112_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 5 });
+const UNIFIED_ADDRES_113_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 6 });
+const UNIFIED_ADDRES_114_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 7 });
+const UNIFIED_ADDRES_115_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 8 });
+const UNIFIED_ADDRES_116_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 9 });
+const UNIFIED_ADDRES_117_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 1 });
+const UNIFIED_ADDRES_118_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 2 });
+const UNIFIED_ADDRES_119_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 3 });
+const UNIFIED_ADDRES_120_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 4 });
+const UNIFIED_ADDRES_121_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 5 });
+const UNIFIED_ADDRES_122_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 6 });
+const UNIFIED_ADDRES_123_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 7 });
+const UNIFIED_ADDRES_124_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 8 });
+const UNIFIED_ADDRES_125_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 9 });
+const UNIFIED_ADDRES_126_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 1 });
+const UNIFIED_ADDRES_127_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 2 });
+const UNIFIED_ADDRES_128_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 3 });
+const UNIFIED_ADDRES_129_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 4 });
+const UNIFIED_ADDRES_130_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 5 });
+const UNIFIED_ADDRES_131_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 6 });
+const UNIFIED_ADDRES_132_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 7 });
+const UNIFIED_ADDRES_133_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 8 });
+const UNIFIED_ADDRES_134_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 9 });
+const UNIFIED_ADDRES_135_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 1 });
+const UNIFIED_ADDRES_136_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 2 });
+const UNIFIED_ADDRES_137_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 3 });
+const UNIFIED_ADDRES_138_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 4 });
+const UNIFIED_ADDRES_139_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 5 });
+const UNIFIED_ADDRES_140_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 6 });
+const UNIFIED_ADDRES_141_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 7 });
+const UNIFIED_ADDRES_142_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 8 });
+const UNIFIED_ADDRES_143_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 9 });
+const UNIFIED_ADDRES_144_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 1 });
+const UNIFIED_ADDRES_145_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 2 });
+const UNIFIED_ADDRES_146_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 3 });
+const UNIFIED_ADDRES_147_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 4 });
+const UNIFIED_ADDRES_148_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 5 });
+const UNIFIED_ADDRES_149_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 6 });
+const UNIFIED_ADDRES_150_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 7 });
+const UNIFIED_ADDRES_151_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 8 });
+const UNIFIED_ADDRES_152_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 9 });
+const UNIFIED_ADDRES_153_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 1 });
+const UNIFIED_ADDRES_154_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 2 });
+const UNIFIED_ADDRES_155_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 3 });
+const UNIFIED_ADDRES_156_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 4 });
+const UNIFIED_ADDRES_157_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 5 });
+const UNIFIED_ADDRES_158_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 6 });
+const UNIFIED_ADDRES_159_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 7 });
+const UNIFIED_ADDRES_160_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 8 });
+const UNIFIED_ADDRES_161_TO_ADDRESS_POS: AddressPos =
+    AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 9 });
+const UNIFIED_ADDRES_162_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::King1);
+const UNIFIED_ADDRES_163_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Rook1);
+const UNIFIED_ADDRES_164_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Bishop1);
+const UNIFIED_ADDRES_165_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Gold1);
+const UNIFIED_ADDRES_166_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Silver1);
+const UNIFIED_ADDRES_167_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Knight1);
+const UNIFIED_ADDRES_168_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Lance1);
+const UNIFIED_ADDRES_169_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Pawn1);
+const UNIFIED_ADDRES_170_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::King2);
+const UNIFIED_ADDRES_171_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Rook2);
+const UNIFIED_ADDRES_172_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Bishop2);
+const UNIFIED_ADDRES_173_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Gold2);
+const UNIFIED_ADDRES_174_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Silver2);
+const UNIFIED_ADDRES_175_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Knight2);
+const UNIFIED_ADDRES_176_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Lance2);
+const UNIFIED_ADDRES_177_TO_ADDRESS_POS: AddressPos = AddressPos::Hand(DoubleFacedPiece::Pawn2);
+
+const UNIFIED_SQ_0_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 1, rank: 1 };
+const UNIFIED_SQ_1_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 1, rank: 2 };
+const UNIFIED_SQ_2_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 1, rank: 3 };
+const UNIFIED_SQ_3_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 1, rank: 4 };
+const UNIFIED_SQ_4_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 1, rank: 5 };
+const UNIFIED_SQ_5_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 1, rank: 6 };
+const UNIFIED_SQ_6_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 1, rank: 7 };
+const UNIFIED_SQ_7_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 1, rank: 8 };
+const UNIFIED_SQ_8_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 1, rank: 9 };
+const UNIFIED_SQ_9_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 2, rank: 1 };
+const UNIFIED_SQ_10_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 2, rank: 2 };
+const UNIFIED_SQ_11_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 2, rank: 3 };
+const UNIFIED_SQ_12_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 2, rank: 4 };
+const UNIFIED_SQ_13_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 2, rank: 5 };
+const UNIFIED_SQ_14_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 2, rank: 6 };
+const UNIFIED_SQ_15_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 2, rank: 7 };
+const UNIFIED_SQ_16_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 2, rank: 8 };
+const UNIFIED_SQ_17_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 2, rank: 9 };
+const UNIFIED_SQ_18_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 3, rank: 1 };
+const UNIFIED_SQ_19_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 3, rank: 2 };
+const UNIFIED_SQ_20_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 3, rank: 3 };
+const UNIFIED_SQ_21_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 3, rank: 4 };
+const UNIFIED_SQ_22_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 3, rank: 5 };
+const UNIFIED_SQ_23_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 3, rank: 6 };
+const UNIFIED_SQ_24_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 3, rank: 7 };
+const UNIFIED_SQ_25_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 3, rank: 8 };
+const UNIFIED_SQ_26_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 3, rank: 9 };
+const UNIFIED_SQ_27_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 4, rank: 1 };
+const UNIFIED_SQ_28_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 4, rank: 2 };
+const UNIFIED_SQ_29_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 4, rank: 3 };
+const UNIFIED_SQ_30_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 4, rank: 4 };
+const UNIFIED_SQ_31_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 4, rank: 5 };
+const UNIFIED_SQ_32_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 4, rank: 6 };
+const UNIFIED_SQ_33_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 4, rank: 7 };
+const UNIFIED_SQ_34_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 4, rank: 8 };
+const UNIFIED_SQ_35_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 4, rank: 9 };
+const UNIFIED_SQ_36_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 5, rank: 1 };
+const UNIFIED_SQ_37_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 5, rank: 2 };
+const UNIFIED_SQ_38_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 5, rank: 3 };
+const UNIFIED_SQ_39_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 5, rank: 4 };
+const UNIFIED_SQ_40_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 5, rank: 5 };
+const UNIFIED_SQ_41_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 5, rank: 6 };
+const UNIFIED_SQ_42_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 5, rank: 7 };
+const UNIFIED_SQ_43_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 5, rank: 8 };
+const UNIFIED_SQ_44_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 5, rank: 9 };
+const UNIFIED_SQ_45_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 6, rank: 1 };
+const UNIFIED_SQ_46_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 6, rank: 2 };
+const UNIFIED_SQ_47_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 6, rank: 3 };
+const UNIFIED_SQ_48_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 6, rank: 4 };
+const UNIFIED_SQ_49_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 6, rank: 5 };
+const UNIFIED_SQ_50_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 6, rank: 6 };
+const UNIFIED_SQ_51_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 6, rank: 7 };
+const UNIFIED_SQ_52_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 6, rank: 8 };
+const UNIFIED_SQ_53_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 6, rank: 9 };
+const UNIFIED_SQ_54_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 7, rank: 1 };
+const UNIFIED_SQ_55_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 7, rank: 2 };
+const UNIFIED_SQ_56_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 7, rank: 3 };
+const UNIFIED_SQ_57_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 7, rank: 4 };
+const UNIFIED_SQ_58_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 7, rank: 5 };
+const UNIFIED_SQ_59_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 7, rank: 6 };
+const UNIFIED_SQ_60_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 7, rank: 7 };
+const UNIFIED_SQ_61_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 7, rank: 8 };
+const UNIFIED_SQ_62_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 7, rank: 9 };
+const UNIFIED_SQ_63_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 8, rank: 1 };
+const UNIFIED_SQ_64_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 8, rank: 2 };
+const UNIFIED_SQ_65_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 8, rank: 3 };
+const UNIFIED_SQ_66_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 8, rank: 4 };
+const UNIFIED_SQ_67_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 8, rank: 5 };
+const UNIFIED_SQ_68_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 8, rank: 6 };
+const UNIFIED_SQ_69_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 8, rank: 7 };
+const UNIFIED_SQ_70_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 8, rank: 8 };
+const UNIFIED_SQ_71_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 8, rank: 9 };
+const UNIFIED_SQ_72_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 9, rank: 1 };
+const UNIFIED_SQ_73_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 9, rank: 2 };
+const UNIFIED_SQ_74_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 9, rank: 3 };
+const UNIFIED_SQ_75_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 9, rank: 4 };
+const UNIFIED_SQ_76_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 9, rank: 5 };
+const UNIFIED_SQ_77_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 9, rank: 6 };
+const UNIFIED_SQ_78_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 9, rank: 7 };
+const UNIFIED_SQ_79_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 9, rank: 8 };
+const UNIFIED_SQ_80_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 9, rank: 9 };
+const UNIFIED_SQ_81_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 1, rank: 1 };
+const UNIFIED_SQ_82_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 1, rank: 2 };
+const UNIFIED_SQ_83_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 1, rank: 3 };
+const UNIFIED_SQ_84_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 1, rank: 4 };
+const UNIFIED_SQ_85_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 1, rank: 5 };
+const UNIFIED_SQ_86_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 1, rank: 6 };
+const UNIFIED_SQ_87_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 1, rank: 7 };
+const UNIFIED_SQ_88_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 1, rank: 8 };
+const UNIFIED_SQ_89_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 1, rank: 9 };
+const UNIFIED_SQ_90_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 2, rank: 1 };
+const UNIFIED_SQ_91_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 2, rank: 2 };
+const UNIFIED_SQ_92_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 2, rank: 3 };
+const UNIFIED_SQ_93_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 2, rank: 4 };
+const UNIFIED_SQ_94_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 2, rank: 5 };
+const UNIFIED_SQ_95_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 2, rank: 6 };
+const UNIFIED_SQ_96_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 2, rank: 7 };
+const UNIFIED_SQ_97_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 2, rank: 8 };
+const UNIFIED_SQ_98_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 2, rank: 9 };
+const UNIFIED_SQ_99_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 3, rank: 1 };
+const UNIFIED_SQ_100_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 3, rank: 2 };
+const UNIFIED_SQ_101_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 3, rank: 3 };
+const UNIFIED_SQ_102_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 3, rank: 4 };
+const UNIFIED_SQ_103_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 3, rank: 5 };
+const UNIFIED_SQ_104_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 3, rank: 6 };
+const UNIFIED_SQ_105_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 3, rank: 7 };
+const UNIFIED_SQ_106_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 3, rank: 8 };
+const UNIFIED_SQ_107_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 3, rank: 9 };
+const UNIFIED_SQ_108_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 4, rank: 1 };
+const UNIFIED_SQ_109_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 4, rank: 2 };
+const UNIFIED_SQ_110_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 4, rank: 3 };
+const UNIFIED_SQ_111_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 4, rank: 4 };
+const UNIFIED_SQ_112_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 4, rank: 5 };
+const UNIFIED_SQ_113_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 4, rank: 6 };
+const UNIFIED_SQ_114_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 4, rank: 7 };
+const UNIFIED_SQ_115_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 4, rank: 8 };
+const UNIFIED_SQ_116_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 4, rank: 9 };
+const UNIFIED_SQ_117_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 5, rank: 1 };
+const UNIFIED_SQ_118_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 5, rank: 2 };
+const UNIFIED_SQ_119_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 5, rank: 3 };
+const UNIFIED_SQ_120_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 5, rank: 4 };
+const UNIFIED_SQ_121_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 5, rank: 5 };
+const UNIFIED_SQ_122_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 5, rank: 6 };
+const UNIFIED_SQ_123_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 5, rank: 7 };
+const UNIFIED_SQ_124_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 5, rank: 8 };
+const UNIFIED_SQ_125_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 5, rank: 9 };
+const UNIFIED_SQ_126_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 6, rank: 1 };
+const UNIFIED_SQ_127_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 6, rank: 2 };
+const UNIFIED_SQ_128_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 6, rank: 3 };
+const UNIFIED_SQ_129_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 6, rank: 4 };
+const UNIFIED_SQ_130_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 6, rank: 5 };
+const UNIFIED_SQ_131_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 6, rank: 6 };
+const UNIFIED_SQ_132_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 6, rank: 7 };
+const UNIFIED_SQ_133_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 6, rank: 8 };
+const UNIFIED_SQ_134_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 6, rank: 9 };
+const UNIFIED_SQ_135_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 7, rank: 1 };
+const UNIFIED_SQ_136_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 7, rank: 2 };
+const UNIFIED_SQ_137_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 7, rank: 3 };
+const UNIFIED_SQ_138_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 7, rank: 4 };
+const UNIFIED_SQ_139_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 7, rank: 5 };
+const UNIFIED_SQ_140_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 7, rank: 6 };
+const UNIFIED_SQ_141_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 7, rank: 7 };
+const UNIFIED_SQ_142_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 7, rank: 8 };
+const UNIFIED_SQ_143_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 7, rank: 9 };
+const UNIFIED_SQ_144_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 8, rank: 1 };
+const UNIFIED_SQ_145_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 8, rank: 2 };
+const UNIFIED_SQ_146_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 8, rank: 3 };
+const UNIFIED_SQ_147_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 8, rank: 4 };
+const UNIFIED_SQ_148_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 8, rank: 5 };
+const UNIFIED_SQ_149_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 8, rank: 6 };
+const UNIFIED_SQ_150_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 8, rank: 7 };
+const UNIFIED_SQ_151_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 8, rank: 8 };
+const UNIFIED_SQ_152_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 8, rank: 9 };
+const UNIFIED_SQ_153_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 9, rank: 1 };
+const UNIFIED_SQ_154_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 9, rank: 2 };
+const UNIFIED_SQ_155_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 9, rank: 3 };
+const UNIFIED_SQ_156_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 9, rank: 4 };
+const UNIFIED_SQ_157_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 9, rank: 5 };
+const UNIFIED_SQ_158_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 9, rank: 6 };
+const UNIFIED_SQ_159_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 9, rank: 7 };
+const UNIFIED_SQ_160_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 9, rank: 8 };
+const UNIFIED_SQ_161_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
+    AbsoluteAddress2D { file: 9, rank: 9 };
+
 /// 統一アドレス。
 #[derive(Copy, Clone, Debug, FromPrimitive)]
 pub enum UnifiedAddress {
@@ -275,47 +942,66 @@ impl UnifiedAddress {
     }
 
     pub fn from_double_faced_piece(drop: DoubleFacedPiece) -> UnifiedAddress {
-        const MAP: [UnifiedAddress; 16] = [
-            UnifiedAddress::King1,
-            UnifiedAddress::Rook1,
-            UnifiedAddress::Bishop1,
-            UnifiedAddress::Gold1,
-            UnifiedAddress::Silver1,
-            UnifiedAddress::Knight1,
-            UnifiedAddress::Lance1,
-            UnifiedAddress::Pawn1,
-            UnifiedAddress::King2,
-            UnifiedAddress::Rook2,
-            UnifiedAddress::Bishop2,
-            UnifiedAddress::Gold2,
-            UnifiedAddress::Silver2,
-            UnifiedAddress::Knight2,
-            UnifiedAddress::Lance2,
-            UnifiedAddress::Pawn2,
-        ];
-        MAP[drop as usize]
+        match drop {
+            DoubleFacedPiece::King1 => UnifiedAddress::King1,
+            DoubleFacedPiece::Rook1 => UnifiedAddress::Rook1,
+            DoubleFacedPiece::Bishop1 => UnifiedAddress::Bishop1,
+            DoubleFacedPiece::Gold1 => UnifiedAddress::Gold1,
+            DoubleFacedPiece::Silver1 => UnifiedAddress::Silver1,
+            DoubleFacedPiece::Knight1 => UnifiedAddress::Knight1,
+            DoubleFacedPiece::Lance1 => UnifiedAddress::Lance1,
+            DoubleFacedPiece::Pawn1 => UnifiedAddress::Pawn1,
+            DoubleFacedPiece::King2 => UnifiedAddress::King2,
+            DoubleFacedPiece::Rook2 => UnifiedAddress::Rook2,
+            DoubleFacedPiece::Bishop2 => UnifiedAddress::Bishop2,
+            DoubleFacedPiece::Gold2 => UnifiedAddress::Gold2,
+            DoubleFacedPiece::Silver2 => UnifiedAddress::Silver2,
+            DoubleFacedPiece::Knight2 => UnifiedAddress::Knight2,
+            DoubleFacedPiece::Lance2 => UnifiedAddress::Lance2,
+            DoubleFacedPiece::Pawn2 => UnifiedAddress::Pawn2,
+        }
     }
 
     pub fn to_double_faced_piece(self) -> DoubleFacedPiece {
-        const MAP: [DoubleFacedPiece; 16] = [
-            DoubleFacedPiece::King1,
-            DoubleFacedPiece::Rook1,
-            DoubleFacedPiece::Bishop1,
-            DoubleFacedPiece::Gold1,
-            DoubleFacedPiece::Silver1,
-            DoubleFacedPiece::Knight1,
-            DoubleFacedPiece::Lance1,
-            DoubleFacedPiece::Pawn1,
-            DoubleFacedPiece::King2,
-            DoubleFacedPiece::Rook2,
-            DoubleFacedPiece::Bishop2,
-            DoubleFacedPiece::Gold2,
-            DoubleFacedPiece::Silver2,
-            DoubleFacedPiece::Knight2,
-            DoubleFacedPiece::Lance2,
-            DoubleFacedPiece::Pawn2,
-        ];
-        MAP[self as usize]
+        use crate::cosmic::toy_box::UnifiedAddress::*;
+        match self {
+            Sq11_1 | Sq12_1 | Sq13_1 | Sq14_1 | Sq15_1 | Sq16_1 | Sq17_1 | Sq18_1 | Sq19_1
+            | Sq21_1 | Sq22_1 | Sq23_1 | Sq24_1 | Sq25_1 | Sq26_1 | Sq27_1 | Sq28_1 | Sq29_1
+            | Sq31_1 | Sq32_1 | Sq33_1 | Sq34_1 | Sq35_1 | Sq36_1 | Sq37_1 | Sq38_1 | Sq39_1
+            | Sq41_1 | Sq42_1 | Sq43_1 | Sq44_1 | Sq45_1 | Sq46_1 | Sq47_1 | Sq48_1 | Sq49_1
+            | Sq51_1 | Sq52_1 | Sq53_1 | Sq54_1 | Sq55_1 | Sq56_1 | Sq57_1 | Sq58_1 | Sq59_1
+            | Sq61_1 | Sq62_1 | Sq63_1 | Sq64_1 | Sq65_1 | Sq66_1 | Sq67_1 | Sq68_1 | Sq69_1
+            | Sq71_1 | Sq72_1 | Sq73_1 | Sq74_1 | Sq75_1 | Sq76_1 | Sq77_1 | Sq78_1 | Sq79_1
+            | Sq81_1 | Sq82_1 | Sq83_1 | Sq84_1 | Sq85_1 | Sq86_1 | Sq87_1 | Sq88_1 | Sq89_1
+            | Sq91_1 | Sq92_1 | Sq93_1 | Sq94_1 | Sq95_1 | Sq96_1 | Sq97_1 | Sq98_1 | Sq99_1
+            | Sq11_2 | Sq12_2 | Sq13_2 | Sq14_2 | Sq15_2 | Sq16_2 | Sq17_2 | Sq18_2 | Sq19_2
+            | Sq21_2 | Sq22_2 | Sq23_2 | Sq24_2 | Sq25_2 | Sq26_2 | Sq27_2 | Sq28_2 | Sq29_2
+            | Sq31_2 | Sq32_2 | Sq33_2 | Sq34_2 | Sq35_2 | Sq36_2 | Sq37_2 | Sq38_2 | Sq39_2
+            | Sq41_2 | Sq42_2 | Sq43_2 | Sq44_2 | Sq45_2 | Sq46_2 | Sq47_2 | Sq48_2 | Sq49_2
+            | Sq51_2 | Sq52_2 | Sq53_2 | Sq54_2 | Sq55_2 | Sq56_2 | Sq57_2 | Sq58_2 | Sq59_2
+            | Sq61_2 | Sq62_2 | Sq63_2 | Sq64_2 | Sq65_2 | Sq66_2 | Sq67_2 | Sq68_2 | Sq69_2
+            | Sq71_2 | Sq72_2 | Sq73_2 | Sq74_2 | Sq75_2 | Sq76_2 | Sq77_2 | Sq78_2 | Sq79_2
+            | Sq81_2 | Sq82_2 | Sq83_2 | Sq84_2 | Sq85_2 | Sq86_2 | Sq87_2 | Sq88_2 | Sq89_2
+            | Sq91_2 | Sq92_2 | Sq93_2 | Sq94_2 | Sq95_2 | Sq96_2 | Sq97_2 | Sq98_2 | Sq99_2 => {
+                panic!(Beam::trouble("(Err.176) 番地を変換できね☆（＾～＾）"))
+            }
+            King1 => DoubleFacedPiece::King1,
+            Rook1 => DoubleFacedPiece::Rook1,
+            Bishop1 => DoubleFacedPiece::Bishop1,
+            Gold1 => DoubleFacedPiece::Gold1,
+            Silver1 => DoubleFacedPiece::Silver1,
+            Knight1 => DoubleFacedPiece::Knight1,
+            Lance1 => DoubleFacedPiece::Lance1,
+            Pawn1 => DoubleFacedPiece::Pawn1,
+            King2 => DoubleFacedPiece::King2,
+            Rook2 => DoubleFacedPiece::Rook2,
+            Bishop2 => DoubleFacedPiece::Bishop2,
+            Gold2 => DoubleFacedPiece::Gold2,
+            Silver2 => DoubleFacedPiece::Silver2,
+            Knight2 => DoubleFacedPiece::Knight2,
+            Lance2 => DoubleFacedPiece::Lance2,
+            Pawn2 => DoubleFacedPiece::Pawn2,
+        }
     }
 
     pub fn from_address_pos(friend: Phase, addr: &AddressPos) -> Self {
@@ -511,206 +1197,704 @@ impl UnifiedAddress {
 
     /// 二歩チェックで使うぜ☆（＾～＾）
     pub fn to_file(self) -> usize {
-        const MAP: [usize; 178] = [
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4,
-            4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7,
-            7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 9, 1, 1, 1, 1, 1, 1,
-            1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4,
-            4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 8,
-            8, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0,
-        ];
-        let file = MAP[self as usize];
-        if file == 0 {
-            panic!(Beam::trouble(&format!(
-                "(Err.526) 盤上ではなかったぜ☆（＾～＾）！",
-            )))
+        use crate::cosmic::toy_box::UnifiedAddress::*;
+        match self {
+            Sq11_1 => 1,
+            Sq12_1 => 1,
+            Sq13_1 => 1,
+            Sq14_1 => 1,
+            Sq15_1 => 1,
+            Sq16_1 => 1,
+            Sq17_1 => 1,
+            Sq18_1 => 1,
+            Sq19_1 => 1,
+            Sq21_1 => 2,
+            Sq22_1 => 2,
+            Sq23_1 => 2,
+            Sq24_1 => 2,
+            Sq25_1 => 2,
+            Sq26_1 => 2,
+            Sq27_1 => 2,
+            Sq28_1 => 2,
+            Sq29_1 => 2,
+            Sq31_1 => 3,
+            Sq32_1 => 3,
+            Sq33_1 => 3,
+            Sq34_1 => 3,
+            Sq35_1 => 3,
+            Sq36_1 => 3,
+            Sq37_1 => 3,
+            Sq38_1 => 3,
+            Sq39_1 => 3,
+            Sq41_1 => 4,
+            Sq42_1 => 4,
+            Sq43_1 => 4,
+            Sq44_1 => 4,
+            Sq45_1 => 4,
+            Sq46_1 => 4,
+            Sq47_1 => 4,
+            Sq48_1 => 4,
+            Sq49_1 => 4,
+            Sq51_1 => 5,
+            Sq52_1 => 5,
+            Sq53_1 => 5,
+            Sq54_1 => 5,
+            Sq55_1 => 5,
+            Sq56_1 => 5,
+            Sq57_1 => 5,
+            Sq58_1 => 5,
+            Sq59_1 => 5,
+            Sq61_1 => 6,
+            Sq62_1 => 6,
+            Sq63_1 => 6,
+            Sq64_1 => 6,
+            Sq65_1 => 6,
+            Sq66_1 => 6,
+            Sq67_1 => 6,
+            Sq68_1 => 6,
+            Sq69_1 => 6,
+            Sq71_1 => 7,
+            Sq72_1 => 7,
+            Sq73_1 => 7,
+            Sq74_1 => 7,
+            Sq75_1 => 7,
+            Sq76_1 => 7,
+            Sq77_1 => 7,
+            Sq78_1 => 7,
+            Sq79_1 => 7,
+            Sq81_1 => 8,
+            Sq82_1 => 8,
+            Sq83_1 => 8,
+            Sq84_1 => 8,
+            Sq85_1 => 8,
+            Sq86_1 => 8,
+            Sq87_1 => 8,
+            Sq88_1 => 8,
+            Sq89_1 => 8,
+            Sq91_1 => 9,
+            Sq92_1 => 9,
+            Sq93_1 => 9,
+            Sq94_1 => 9,
+            Sq95_1 => 9,
+            Sq96_1 => 9,
+            Sq97_1 => 9,
+            Sq98_1 => 9,
+            Sq99_1 => 9,
+            Sq11_2 => 1,
+            Sq12_2 => 1,
+            Sq13_2 => 1,
+            Sq14_2 => 1,
+            Sq15_2 => 1,
+            Sq16_2 => 1,
+            Sq17_2 => 1,
+            Sq18_2 => 1,
+            Sq19_2 => 1,
+            Sq21_2 => 2,
+            Sq22_2 => 2,
+            Sq23_2 => 2,
+            Sq24_2 => 2,
+            Sq25_2 => 2,
+            Sq26_2 => 2,
+            Sq27_2 => 2,
+            Sq28_2 => 2,
+            Sq29_2 => 2,
+            Sq31_2 => 3,
+            Sq32_2 => 3,
+            Sq33_2 => 3,
+            Sq34_2 => 3,
+            Sq35_2 => 3,
+            Sq36_2 => 3,
+            Sq37_2 => 3,
+            Sq38_2 => 3,
+            Sq39_2 => 3,
+            Sq41_2 => 4,
+            Sq42_2 => 4,
+            Sq43_2 => 4,
+            Sq44_2 => 4,
+            Sq45_2 => 4,
+            Sq46_2 => 4,
+            Sq47_2 => 4,
+            Sq48_2 => 4,
+            Sq49_2 => 4,
+            Sq51_2 => 5,
+            Sq52_2 => 5,
+            Sq53_2 => 5,
+            Sq54_2 => 5,
+            Sq55_2 => 5,
+            Sq56_2 => 5,
+            Sq57_2 => 5,
+            Sq58_2 => 5,
+            Sq59_2 => 5,
+            Sq61_2 => 6,
+            Sq62_2 => 6,
+            Sq63_2 => 6,
+            Sq64_2 => 6,
+            Sq65_2 => 6,
+            Sq66_2 => 6,
+            Sq67_2 => 6,
+            Sq68_2 => 6,
+            Sq69_2 => 6,
+            Sq71_2 => 7,
+            Sq72_2 => 7,
+            Sq73_2 => 7,
+            Sq74_2 => 7,
+            Sq75_2 => 7,
+            Sq76_2 => 7,
+            Sq77_2 => 7,
+            Sq78_2 => 7,
+            Sq79_2 => 7,
+            Sq81_2 => 8,
+            Sq82_2 => 8,
+            Sq83_2 => 8,
+            Sq84_2 => 8,
+            Sq85_2 => 8,
+            Sq86_2 => 8,
+            Sq87_2 => 8,
+            Sq88_2 => 8,
+            Sq89_2 => 8,
+            Sq91_2 => 9,
+            Sq92_2 => 9,
+            Sq93_2 => 9,
+            Sq94_2 => 9,
+            Sq95_2 => 9,
+            Sq96_2 => 9,
+            Sq97_2 => 9,
+            Sq98_2 => 9,
+            Sq99_2 => 9,
+            King1 | Rook1 | Bishop1 | Gold1 | Silver1 | Knight1 | Lance1 | Pawn1 | King2
+            | Rook2 | Bishop2 | Gold2 | Silver2 | Knight2 | Lance2 | Pawn2 => panic!(
+                Beam::trouble(&format!("(Err.526) 盤上ではなかったぜ☆（＾～＾）！",))
+            ),
         }
-        file
     }
 
-    pub fn to_address_pos(self) -> AddressPos {
-        const MAP: [AddressPos; 178] = [
-            AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 1 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 2 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 3 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 4 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 5 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 6 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 7 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 8 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 9 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 1 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 2 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 3 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 4 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 5 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 6 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 7 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 8 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 9 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 1 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 2 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 3 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 4 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 5 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 6 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 7 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 8 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 9 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 1 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 2 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 3 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 4 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 5 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 6 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 7 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 8 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 9 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 1 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 2 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 3 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 4 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 5 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 6 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 7 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 8 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 9 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 1 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 2 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 3 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 4 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 5 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 6 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 7 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 8 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 9 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 1 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 2 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 3 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 4 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 5 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 6 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 7 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 8 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 9 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 1 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 2 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 3 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 4 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 5 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 6 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 7 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 8 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 9 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 1 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 2 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 3 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 4 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 5 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 6 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 7 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 8 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 9 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 1 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 2 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 3 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 4 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 5 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 6 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 7 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 8 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 1, rank: 9 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 1 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 2 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 3 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 4 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 5 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 6 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 7 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 8 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 2, rank: 9 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 1 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 2 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 3 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 4 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 5 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 6 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 7 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 8 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 3, rank: 9 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 1 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 2 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 3 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 4 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 5 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 6 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 7 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 8 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 4, rank: 9 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 1 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 2 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 3 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 4 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 5 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 6 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 7 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 8 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 5, rank: 9 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 1 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 2 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 3 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 4 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 5 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 6 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 7 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 8 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 6, rank: 9 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 1 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 2 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 3 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 4 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 5 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 6 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 7 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 8 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 7, rank: 9 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 1 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 2 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 3 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 4 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 5 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 6 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 7 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 8 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 8, rank: 9 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 1 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 2 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 3 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 4 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 5 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 6 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 7 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 8 }),
-            AddressPos::Board(AbsoluteAddress2D { file: 9, rank: 9 }),
-            AddressPos::Hand(DoubleFacedPiece::King1),
-            AddressPos::Hand(DoubleFacedPiece::Rook1),
-            AddressPos::Hand(DoubleFacedPiece::Bishop1),
-            AddressPos::Hand(DoubleFacedPiece::Gold1),
-            AddressPos::Hand(DoubleFacedPiece::Silver1),
-            AddressPos::Hand(DoubleFacedPiece::Knight1),
-            AddressPos::Hand(DoubleFacedPiece::Lance1),
-            AddressPos::Hand(DoubleFacedPiece::Pawn1),
-            AddressPos::Hand(DoubleFacedPiece::King2),
-            AddressPos::Hand(DoubleFacedPiece::Rook2),
-            AddressPos::Hand(DoubleFacedPiece::Bishop2),
-            AddressPos::Hand(DoubleFacedPiece::Gold2),
-            AddressPos::Hand(DoubleFacedPiece::Silver2),
-            AddressPos::Hand(DoubleFacedPiece::Knight2),
-            AddressPos::Hand(DoubleFacedPiece::Lance2),
-            AddressPos::Hand(DoubleFacedPiece::Pawn2),
-        ];
-        MAP[self as usize]
+    /// 打の範囲チェックに使うぜ☆（＾～＾）
+    pub fn to_rank(self) -> usize {
+        use crate::cosmic::toy_box::UnifiedAddress::*;
+        match self {
+            Sq11_1 => 1,
+            Sq12_1 => 2,
+            Sq13_1 => 3,
+            Sq14_1 => 4,
+            Sq15_1 => 5,
+            Sq16_1 => 6,
+            Sq17_1 => 7,
+            Sq18_1 => 8,
+            Sq19_1 => 9,
+            Sq21_1 => 1,
+            Sq22_1 => 2,
+            Sq23_1 => 3,
+            Sq24_1 => 4,
+            Sq25_1 => 5,
+            Sq26_1 => 6,
+            Sq27_1 => 7,
+            Sq28_1 => 8,
+            Sq29_1 => 9,
+            Sq31_1 => 1,
+            Sq32_1 => 2,
+            Sq33_1 => 3,
+            Sq34_1 => 4,
+            Sq35_1 => 5,
+            Sq36_1 => 6,
+            Sq37_1 => 7,
+            Sq38_1 => 8,
+            Sq39_1 => 9,
+            Sq41_1 => 1,
+            Sq42_1 => 2,
+            Sq43_1 => 3,
+            Sq44_1 => 4,
+            Sq45_1 => 5,
+            Sq46_1 => 6,
+            Sq47_1 => 7,
+            Sq48_1 => 8,
+            Sq49_1 => 9,
+            Sq51_1 => 1,
+            Sq52_1 => 2,
+            Sq53_1 => 3,
+            Sq54_1 => 4,
+            Sq55_1 => 5,
+            Sq56_1 => 6,
+            Sq57_1 => 7,
+            Sq58_1 => 8,
+            Sq59_1 => 9,
+            Sq61_1 => 1,
+            Sq62_1 => 2,
+            Sq63_1 => 3,
+            Sq64_1 => 4,
+            Sq65_1 => 5,
+            Sq66_1 => 6,
+            Sq67_1 => 7,
+            Sq68_1 => 8,
+            Sq69_1 => 9,
+            Sq71_1 => 1,
+            Sq72_1 => 2,
+            Sq73_1 => 3,
+            Sq74_1 => 4,
+            Sq75_1 => 5,
+            Sq76_1 => 6,
+            Sq77_1 => 7,
+            Sq78_1 => 8,
+            Sq79_1 => 9,
+            Sq81_1 => 1,
+            Sq82_1 => 2,
+            Sq83_1 => 3,
+            Sq84_1 => 4,
+            Sq85_1 => 5,
+            Sq86_1 => 6,
+            Sq87_1 => 7,
+            Sq88_1 => 8,
+            Sq89_1 => 9,
+            Sq91_1 => 1,
+            Sq92_1 => 2,
+            Sq93_1 => 3,
+            Sq94_1 => 4,
+            Sq95_1 => 5,
+            Sq96_1 => 6,
+            Sq97_1 => 7,
+            Sq98_1 => 8,
+            Sq99_1 => 9,
+            Sq11_2 => 1,
+            Sq12_2 => 2,
+            Sq13_2 => 3,
+            Sq14_2 => 4,
+            Sq15_2 => 5,
+            Sq16_2 => 6,
+            Sq17_2 => 7,
+            Sq18_2 => 8,
+            Sq19_2 => 9,
+            Sq21_2 => 1,
+            Sq22_2 => 2,
+            Sq23_2 => 3,
+            Sq24_2 => 4,
+            Sq25_2 => 5,
+            Sq26_2 => 6,
+            Sq27_2 => 7,
+            Sq28_2 => 8,
+            Sq29_2 => 9,
+            Sq31_2 => 1,
+            Sq32_2 => 2,
+            Sq33_2 => 3,
+            Sq34_2 => 4,
+            Sq35_2 => 5,
+            Sq36_2 => 6,
+            Sq37_2 => 7,
+            Sq38_2 => 8,
+            Sq39_2 => 9,
+            Sq41_2 => 1,
+            Sq42_2 => 2,
+            Sq43_2 => 3,
+            Sq44_2 => 4,
+            Sq45_2 => 5,
+            Sq46_2 => 6,
+            Sq47_2 => 7,
+            Sq48_2 => 8,
+            Sq49_2 => 9,
+            Sq51_2 => 1,
+            Sq52_2 => 2,
+            Sq53_2 => 3,
+            Sq54_2 => 4,
+            Sq55_2 => 5,
+            Sq56_2 => 6,
+            Sq57_2 => 7,
+            Sq58_2 => 8,
+            Sq59_2 => 9,
+            Sq61_2 => 1,
+            Sq62_2 => 2,
+            Sq63_2 => 3,
+            Sq64_2 => 4,
+            Sq65_2 => 5,
+            Sq66_2 => 6,
+            Sq67_2 => 7,
+            Sq68_2 => 8,
+            Sq69_2 => 9,
+            Sq71_2 => 1,
+            Sq72_2 => 2,
+            Sq73_2 => 3,
+            Sq74_2 => 4,
+            Sq75_2 => 5,
+            Sq76_2 => 6,
+            Sq77_2 => 7,
+            Sq78_2 => 8,
+            Sq79_2 => 9,
+            Sq81_2 => 1,
+            Sq82_2 => 2,
+            Sq83_2 => 3,
+            Sq84_2 => 4,
+            Sq85_2 => 5,
+            Sq86_2 => 6,
+            Sq87_2 => 7,
+            Sq88_2 => 8,
+            Sq89_2 => 9,
+            Sq91_2 => 1,
+            Sq92_2 => 2,
+            Sq93_2 => 3,
+            Sq94_2 => 4,
+            Sq95_2 => 5,
+            Sq96_2 => 6,
+            Sq97_2 => 7,
+            Sq98_2 => 8,
+            Sq99_2 => 9,
+            King1 | Rook1 | Bishop1 | Gold1 | Silver1 | Knight1 | Lance1 | Pawn1 | King2
+            | Rook2 | Bishop2 | Gold2 | Silver2 | Knight2 | Lance2 | Pawn2 => panic!(
+                Beam::trouble(&format!("(Err.546) 盤上ではなかったぜ☆（＾～＾）！",))
+            ),
+        }
+    }
+
+    pub fn to_absolute_address_2d(self) -> &'static AbsoluteAddress2D {
+        // 配列アクセスは遅い気がするので、match構文で書こうぜ☆（＾～＾）
+        use crate::cosmic::toy_box::UnifiedAddress::*;
+        match self {
+            Sq11_1 => &UNIFIED_SQ_0_TO_ABSOLUTE_ADDRESS_2D,
+            Sq12_1 => &UNIFIED_SQ_1_TO_ABSOLUTE_ADDRESS_2D,
+            Sq13_1 => &UNIFIED_SQ_2_TO_ABSOLUTE_ADDRESS_2D,
+            Sq14_1 => &UNIFIED_SQ_3_TO_ABSOLUTE_ADDRESS_2D,
+            Sq15_1 => &UNIFIED_SQ_4_TO_ABSOLUTE_ADDRESS_2D,
+            Sq16_1 => &UNIFIED_SQ_5_TO_ABSOLUTE_ADDRESS_2D,
+            Sq17_1 => &UNIFIED_SQ_6_TO_ABSOLUTE_ADDRESS_2D,
+            Sq18_1 => &UNIFIED_SQ_7_TO_ABSOLUTE_ADDRESS_2D,
+            Sq19_1 => &UNIFIED_SQ_8_TO_ABSOLUTE_ADDRESS_2D,
+            Sq21_1 => &UNIFIED_SQ_9_TO_ABSOLUTE_ADDRESS_2D,
+            Sq22_1 => &UNIFIED_SQ_10_TO_ABSOLUTE_ADDRESS_2D,
+            Sq23_1 => &UNIFIED_SQ_11_TO_ABSOLUTE_ADDRESS_2D,
+            Sq24_1 => &UNIFIED_SQ_12_TO_ABSOLUTE_ADDRESS_2D,
+            Sq25_1 => &UNIFIED_SQ_13_TO_ABSOLUTE_ADDRESS_2D,
+            Sq26_1 => &UNIFIED_SQ_14_TO_ABSOLUTE_ADDRESS_2D,
+            Sq27_1 => &UNIFIED_SQ_15_TO_ABSOLUTE_ADDRESS_2D,
+            Sq28_1 => &UNIFIED_SQ_16_TO_ABSOLUTE_ADDRESS_2D,
+            Sq29_1 => &UNIFIED_SQ_17_TO_ABSOLUTE_ADDRESS_2D,
+            Sq31_1 => &UNIFIED_SQ_18_TO_ABSOLUTE_ADDRESS_2D,
+            Sq32_1 => &UNIFIED_SQ_19_TO_ABSOLUTE_ADDRESS_2D,
+            Sq33_1 => &UNIFIED_SQ_20_TO_ABSOLUTE_ADDRESS_2D,
+            Sq34_1 => &UNIFIED_SQ_21_TO_ABSOLUTE_ADDRESS_2D,
+            Sq35_1 => &UNIFIED_SQ_22_TO_ABSOLUTE_ADDRESS_2D,
+            Sq36_1 => &UNIFIED_SQ_23_TO_ABSOLUTE_ADDRESS_2D,
+            Sq37_1 => &UNIFIED_SQ_24_TO_ABSOLUTE_ADDRESS_2D,
+            Sq38_1 => &UNIFIED_SQ_25_TO_ABSOLUTE_ADDRESS_2D,
+            Sq39_1 => &UNIFIED_SQ_26_TO_ABSOLUTE_ADDRESS_2D,
+            Sq41_1 => &UNIFIED_SQ_27_TO_ABSOLUTE_ADDRESS_2D,
+            Sq42_1 => &UNIFIED_SQ_28_TO_ABSOLUTE_ADDRESS_2D,
+            Sq43_1 => &UNIFIED_SQ_29_TO_ABSOLUTE_ADDRESS_2D,
+            Sq44_1 => &UNIFIED_SQ_30_TO_ABSOLUTE_ADDRESS_2D,
+            Sq45_1 => &UNIFIED_SQ_31_TO_ABSOLUTE_ADDRESS_2D,
+            Sq46_1 => &UNIFIED_SQ_32_TO_ABSOLUTE_ADDRESS_2D,
+            Sq47_1 => &UNIFIED_SQ_33_TO_ABSOLUTE_ADDRESS_2D,
+            Sq48_1 => &UNIFIED_SQ_34_TO_ABSOLUTE_ADDRESS_2D,
+            Sq49_1 => &UNIFIED_SQ_35_TO_ABSOLUTE_ADDRESS_2D,
+            Sq51_1 => &UNIFIED_SQ_36_TO_ABSOLUTE_ADDRESS_2D,
+            Sq52_1 => &UNIFIED_SQ_37_TO_ABSOLUTE_ADDRESS_2D,
+            Sq53_1 => &UNIFIED_SQ_38_TO_ABSOLUTE_ADDRESS_2D,
+            Sq54_1 => &UNIFIED_SQ_39_TO_ABSOLUTE_ADDRESS_2D,
+            Sq55_1 => &UNIFIED_SQ_40_TO_ABSOLUTE_ADDRESS_2D,
+            Sq56_1 => &UNIFIED_SQ_41_TO_ABSOLUTE_ADDRESS_2D,
+            Sq57_1 => &UNIFIED_SQ_42_TO_ABSOLUTE_ADDRESS_2D,
+            Sq58_1 => &UNIFIED_SQ_43_TO_ABSOLUTE_ADDRESS_2D,
+            Sq59_1 => &UNIFIED_SQ_44_TO_ABSOLUTE_ADDRESS_2D,
+            Sq61_1 => &UNIFIED_SQ_45_TO_ABSOLUTE_ADDRESS_2D,
+            Sq62_1 => &UNIFIED_SQ_46_TO_ABSOLUTE_ADDRESS_2D,
+            Sq63_1 => &UNIFIED_SQ_47_TO_ABSOLUTE_ADDRESS_2D,
+            Sq64_1 => &UNIFIED_SQ_48_TO_ABSOLUTE_ADDRESS_2D,
+            Sq65_1 => &UNIFIED_SQ_49_TO_ABSOLUTE_ADDRESS_2D,
+            Sq66_1 => &UNIFIED_SQ_50_TO_ABSOLUTE_ADDRESS_2D,
+            Sq67_1 => &UNIFIED_SQ_51_TO_ABSOLUTE_ADDRESS_2D,
+            Sq68_1 => &UNIFIED_SQ_52_TO_ABSOLUTE_ADDRESS_2D,
+            Sq69_1 => &UNIFIED_SQ_53_TO_ABSOLUTE_ADDRESS_2D,
+            Sq71_1 => &UNIFIED_SQ_54_TO_ABSOLUTE_ADDRESS_2D,
+            Sq72_1 => &UNIFIED_SQ_55_TO_ABSOLUTE_ADDRESS_2D,
+            Sq73_1 => &UNIFIED_SQ_56_TO_ABSOLUTE_ADDRESS_2D,
+            Sq74_1 => &UNIFIED_SQ_57_TO_ABSOLUTE_ADDRESS_2D,
+            Sq75_1 => &UNIFIED_SQ_58_TO_ABSOLUTE_ADDRESS_2D,
+            Sq76_1 => &UNIFIED_SQ_59_TO_ABSOLUTE_ADDRESS_2D,
+            Sq77_1 => &UNIFIED_SQ_60_TO_ABSOLUTE_ADDRESS_2D,
+            Sq78_1 => &UNIFIED_SQ_61_TO_ABSOLUTE_ADDRESS_2D,
+            Sq79_1 => &UNIFIED_SQ_62_TO_ABSOLUTE_ADDRESS_2D,
+            Sq81_1 => &UNIFIED_SQ_63_TO_ABSOLUTE_ADDRESS_2D,
+            Sq82_1 => &UNIFIED_SQ_64_TO_ABSOLUTE_ADDRESS_2D,
+            Sq83_1 => &UNIFIED_SQ_65_TO_ABSOLUTE_ADDRESS_2D,
+            Sq84_1 => &UNIFIED_SQ_66_TO_ABSOLUTE_ADDRESS_2D,
+            Sq85_1 => &UNIFIED_SQ_67_TO_ABSOLUTE_ADDRESS_2D,
+            Sq86_1 => &UNIFIED_SQ_68_TO_ABSOLUTE_ADDRESS_2D,
+            Sq87_1 => &UNIFIED_SQ_69_TO_ABSOLUTE_ADDRESS_2D,
+            Sq88_1 => &UNIFIED_SQ_70_TO_ABSOLUTE_ADDRESS_2D,
+            Sq89_1 => &UNIFIED_SQ_71_TO_ABSOLUTE_ADDRESS_2D,
+            Sq91_1 => &UNIFIED_SQ_72_TO_ABSOLUTE_ADDRESS_2D,
+            Sq92_1 => &UNIFIED_SQ_73_TO_ABSOLUTE_ADDRESS_2D,
+            Sq93_1 => &UNIFIED_SQ_74_TO_ABSOLUTE_ADDRESS_2D,
+            Sq94_1 => &UNIFIED_SQ_75_TO_ABSOLUTE_ADDRESS_2D,
+            Sq95_1 => &UNIFIED_SQ_76_TO_ABSOLUTE_ADDRESS_2D,
+            Sq96_1 => &UNIFIED_SQ_77_TO_ABSOLUTE_ADDRESS_2D,
+            Sq97_1 => &UNIFIED_SQ_78_TO_ABSOLUTE_ADDRESS_2D,
+            Sq98_1 => &UNIFIED_SQ_79_TO_ABSOLUTE_ADDRESS_2D,
+            Sq99_1 => &UNIFIED_SQ_80_TO_ABSOLUTE_ADDRESS_2D,
+            Sq11_2 => &UNIFIED_SQ_81_TO_ABSOLUTE_ADDRESS_2D,
+            Sq12_2 => &UNIFIED_SQ_82_TO_ABSOLUTE_ADDRESS_2D,
+            Sq13_2 => &UNIFIED_SQ_83_TO_ABSOLUTE_ADDRESS_2D,
+            Sq14_2 => &UNIFIED_SQ_84_TO_ABSOLUTE_ADDRESS_2D,
+            Sq15_2 => &UNIFIED_SQ_85_TO_ABSOLUTE_ADDRESS_2D,
+            Sq16_2 => &UNIFIED_SQ_86_TO_ABSOLUTE_ADDRESS_2D,
+            Sq17_2 => &UNIFIED_SQ_87_TO_ABSOLUTE_ADDRESS_2D,
+            Sq18_2 => &UNIFIED_SQ_88_TO_ABSOLUTE_ADDRESS_2D,
+            Sq19_2 => &UNIFIED_SQ_89_TO_ABSOLUTE_ADDRESS_2D,
+            Sq21_2 => &UNIFIED_SQ_90_TO_ABSOLUTE_ADDRESS_2D,
+            Sq22_2 => &UNIFIED_SQ_91_TO_ABSOLUTE_ADDRESS_2D,
+            Sq23_2 => &UNIFIED_SQ_92_TO_ABSOLUTE_ADDRESS_2D,
+            Sq24_2 => &UNIFIED_SQ_93_TO_ABSOLUTE_ADDRESS_2D,
+            Sq25_2 => &UNIFIED_SQ_94_TO_ABSOLUTE_ADDRESS_2D,
+            Sq26_2 => &UNIFIED_SQ_95_TO_ABSOLUTE_ADDRESS_2D,
+            Sq27_2 => &UNIFIED_SQ_96_TO_ABSOLUTE_ADDRESS_2D,
+            Sq28_2 => &UNIFIED_SQ_97_TO_ABSOLUTE_ADDRESS_2D,
+            Sq29_2 => &UNIFIED_SQ_98_TO_ABSOLUTE_ADDRESS_2D,
+            Sq31_2 => &UNIFIED_SQ_99_TO_ABSOLUTE_ADDRESS_2D,
+            Sq32_2 => &UNIFIED_SQ_100_TO_ABSOLUTE_ADDRESS_2D,
+            Sq33_2 => &UNIFIED_SQ_101_TO_ABSOLUTE_ADDRESS_2D,
+            Sq34_2 => &UNIFIED_SQ_102_TO_ABSOLUTE_ADDRESS_2D,
+            Sq35_2 => &UNIFIED_SQ_103_TO_ABSOLUTE_ADDRESS_2D,
+            Sq36_2 => &UNIFIED_SQ_104_TO_ABSOLUTE_ADDRESS_2D,
+            Sq37_2 => &UNIFIED_SQ_105_TO_ABSOLUTE_ADDRESS_2D,
+            Sq38_2 => &UNIFIED_SQ_106_TO_ABSOLUTE_ADDRESS_2D,
+            Sq39_2 => &UNIFIED_SQ_107_TO_ABSOLUTE_ADDRESS_2D,
+            Sq41_2 => &UNIFIED_SQ_108_TO_ABSOLUTE_ADDRESS_2D,
+            Sq42_2 => &UNIFIED_SQ_109_TO_ABSOLUTE_ADDRESS_2D,
+            Sq43_2 => &UNIFIED_SQ_110_TO_ABSOLUTE_ADDRESS_2D,
+            Sq44_2 => &UNIFIED_SQ_111_TO_ABSOLUTE_ADDRESS_2D,
+            Sq45_2 => &UNIFIED_SQ_112_TO_ABSOLUTE_ADDRESS_2D,
+            Sq46_2 => &UNIFIED_SQ_113_TO_ABSOLUTE_ADDRESS_2D,
+            Sq47_2 => &UNIFIED_SQ_114_TO_ABSOLUTE_ADDRESS_2D,
+            Sq48_2 => &UNIFIED_SQ_115_TO_ABSOLUTE_ADDRESS_2D,
+            Sq49_2 => &UNIFIED_SQ_116_TO_ABSOLUTE_ADDRESS_2D,
+            Sq51_2 => &UNIFIED_SQ_117_TO_ABSOLUTE_ADDRESS_2D,
+            Sq52_2 => &UNIFIED_SQ_118_TO_ABSOLUTE_ADDRESS_2D,
+            Sq53_2 => &UNIFIED_SQ_119_TO_ABSOLUTE_ADDRESS_2D,
+            Sq54_2 => &UNIFIED_SQ_120_TO_ABSOLUTE_ADDRESS_2D,
+            Sq55_2 => &UNIFIED_SQ_121_TO_ABSOLUTE_ADDRESS_2D,
+            Sq56_2 => &UNIFIED_SQ_122_TO_ABSOLUTE_ADDRESS_2D,
+            Sq57_2 => &UNIFIED_SQ_123_TO_ABSOLUTE_ADDRESS_2D,
+            Sq58_2 => &UNIFIED_SQ_124_TO_ABSOLUTE_ADDRESS_2D,
+            Sq59_2 => &UNIFIED_SQ_125_TO_ABSOLUTE_ADDRESS_2D,
+            Sq61_2 => &UNIFIED_SQ_126_TO_ABSOLUTE_ADDRESS_2D,
+            Sq62_2 => &UNIFIED_SQ_127_TO_ABSOLUTE_ADDRESS_2D,
+            Sq63_2 => &UNIFIED_SQ_128_TO_ABSOLUTE_ADDRESS_2D,
+            Sq64_2 => &UNIFIED_SQ_129_TO_ABSOLUTE_ADDRESS_2D,
+            Sq65_2 => &UNIFIED_SQ_130_TO_ABSOLUTE_ADDRESS_2D,
+            Sq66_2 => &UNIFIED_SQ_131_TO_ABSOLUTE_ADDRESS_2D,
+            Sq67_2 => &UNIFIED_SQ_132_TO_ABSOLUTE_ADDRESS_2D,
+            Sq68_2 => &UNIFIED_SQ_133_TO_ABSOLUTE_ADDRESS_2D,
+            Sq69_2 => &UNIFIED_SQ_134_TO_ABSOLUTE_ADDRESS_2D,
+            Sq71_2 => &UNIFIED_SQ_135_TO_ABSOLUTE_ADDRESS_2D,
+            Sq72_2 => &UNIFIED_SQ_136_TO_ABSOLUTE_ADDRESS_2D,
+            Sq73_2 => &UNIFIED_SQ_137_TO_ABSOLUTE_ADDRESS_2D,
+            Sq74_2 => &UNIFIED_SQ_138_TO_ABSOLUTE_ADDRESS_2D,
+            Sq75_2 => &UNIFIED_SQ_139_TO_ABSOLUTE_ADDRESS_2D,
+            Sq76_2 => &UNIFIED_SQ_140_TO_ABSOLUTE_ADDRESS_2D,
+            Sq77_2 => &UNIFIED_SQ_141_TO_ABSOLUTE_ADDRESS_2D,
+            Sq78_2 => &UNIFIED_SQ_142_TO_ABSOLUTE_ADDRESS_2D,
+            Sq79_2 => &UNIFIED_SQ_143_TO_ABSOLUTE_ADDRESS_2D,
+            Sq81_2 => &UNIFIED_SQ_144_TO_ABSOLUTE_ADDRESS_2D,
+            Sq82_2 => &UNIFIED_SQ_145_TO_ABSOLUTE_ADDRESS_2D,
+            Sq83_2 => &UNIFIED_SQ_146_TO_ABSOLUTE_ADDRESS_2D,
+            Sq84_2 => &UNIFIED_SQ_147_TO_ABSOLUTE_ADDRESS_2D,
+            Sq85_2 => &UNIFIED_SQ_148_TO_ABSOLUTE_ADDRESS_2D,
+            Sq86_2 => &UNIFIED_SQ_149_TO_ABSOLUTE_ADDRESS_2D,
+            Sq87_2 => &UNIFIED_SQ_150_TO_ABSOLUTE_ADDRESS_2D,
+            Sq88_2 => &UNIFIED_SQ_151_TO_ABSOLUTE_ADDRESS_2D,
+            Sq89_2 => &UNIFIED_SQ_152_TO_ABSOLUTE_ADDRESS_2D,
+            Sq91_2 => &UNIFIED_SQ_153_TO_ABSOLUTE_ADDRESS_2D,
+            Sq92_2 => &UNIFIED_SQ_154_TO_ABSOLUTE_ADDRESS_2D,
+            Sq93_2 => &UNIFIED_SQ_155_TO_ABSOLUTE_ADDRESS_2D,
+            Sq94_2 => &UNIFIED_SQ_156_TO_ABSOLUTE_ADDRESS_2D,
+            Sq95_2 => &UNIFIED_SQ_157_TO_ABSOLUTE_ADDRESS_2D,
+            Sq96_2 => &UNIFIED_SQ_158_TO_ABSOLUTE_ADDRESS_2D,
+            Sq97_2 => &UNIFIED_SQ_159_TO_ABSOLUTE_ADDRESS_2D,
+            Sq98_2 => &UNIFIED_SQ_160_TO_ABSOLUTE_ADDRESS_2D,
+            Sq99_2 => &UNIFIED_SQ_161_TO_ABSOLUTE_ADDRESS_2D,
+            _ => panic!("（＾～＾）"),
+        }
+    }
+
+    pub fn to_address_pos(self) -> &'static AddressPos {
+        // UNIFIED_ADDRES_TO_ADDRESS_POS_178[self as usize]
+        // 配列アクセスは遅い気がするので、match構文で書こうぜ☆（＾～＾）
+        use crate::cosmic::toy_box::UnifiedAddress::*;
+        match self {
+            Sq11_1 => &UNIFIED_ADDRES_0_TO_ADDRESS_POS,
+            Sq12_1 => &UNIFIED_ADDRES_1_TO_ADDRESS_POS,
+            Sq13_1 => &UNIFIED_ADDRES_2_TO_ADDRESS_POS,
+            Sq14_1 => &UNIFIED_ADDRES_3_TO_ADDRESS_POS,
+            Sq15_1 => &UNIFIED_ADDRES_4_TO_ADDRESS_POS,
+            Sq16_1 => &UNIFIED_ADDRES_5_TO_ADDRESS_POS,
+            Sq17_1 => &UNIFIED_ADDRES_6_TO_ADDRESS_POS,
+            Sq18_1 => &UNIFIED_ADDRES_7_TO_ADDRESS_POS,
+            Sq19_1 => &UNIFIED_ADDRES_8_TO_ADDRESS_POS,
+            Sq21_1 => &UNIFIED_ADDRES_9_TO_ADDRESS_POS,
+            Sq22_1 => &UNIFIED_ADDRES_10_TO_ADDRESS_POS,
+            Sq23_1 => &UNIFIED_ADDRES_11_TO_ADDRESS_POS,
+            Sq24_1 => &UNIFIED_ADDRES_12_TO_ADDRESS_POS,
+            Sq25_1 => &UNIFIED_ADDRES_13_TO_ADDRESS_POS,
+            Sq26_1 => &UNIFIED_ADDRES_14_TO_ADDRESS_POS,
+            Sq27_1 => &UNIFIED_ADDRES_15_TO_ADDRESS_POS,
+            Sq28_1 => &UNIFIED_ADDRES_16_TO_ADDRESS_POS,
+            Sq29_1 => &UNIFIED_ADDRES_17_TO_ADDRESS_POS,
+            Sq31_1 => &UNIFIED_ADDRES_18_TO_ADDRESS_POS,
+            Sq32_1 => &UNIFIED_ADDRES_19_TO_ADDRESS_POS,
+            Sq33_1 => &UNIFIED_ADDRES_20_TO_ADDRESS_POS,
+            Sq34_1 => &UNIFIED_ADDRES_21_TO_ADDRESS_POS,
+            Sq35_1 => &UNIFIED_ADDRES_22_TO_ADDRESS_POS,
+            Sq36_1 => &UNIFIED_ADDRES_23_TO_ADDRESS_POS,
+            Sq37_1 => &UNIFIED_ADDRES_24_TO_ADDRESS_POS,
+            Sq38_1 => &UNIFIED_ADDRES_25_TO_ADDRESS_POS,
+            Sq39_1 => &UNIFIED_ADDRES_26_TO_ADDRESS_POS,
+            Sq41_1 => &UNIFIED_ADDRES_27_TO_ADDRESS_POS,
+            Sq42_1 => &UNIFIED_ADDRES_28_TO_ADDRESS_POS,
+            Sq43_1 => &UNIFIED_ADDRES_29_TO_ADDRESS_POS,
+            Sq44_1 => &UNIFIED_ADDRES_30_TO_ADDRESS_POS,
+            Sq45_1 => &UNIFIED_ADDRES_31_TO_ADDRESS_POS,
+            Sq46_1 => &UNIFIED_ADDRES_32_TO_ADDRESS_POS,
+            Sq47_1 => &UNIFIED_ADDRES_33_TO_ADDRESS_POS,
+            Sq48_1 => &UNIFIED_ADDRES_34_TO_ADDRESS_POS,
+            Sq49_1 => &UNIFIED_ADDRES_35_TO_ADDRESS_POS,
+            Sq51_1 => &UNIFIED_ADDRES_36_TO_ADDRESS_POS,
+            Sq52_1 => &UNIFIED_ADDRES_37_TO_ADDRESS_POS,
+            Sq53_1 => &UNIFIED_ADDRES_38_TO_ADDRESS_POS,
+            Sq54_1 => &UNIFIED_ADDRES_39_TO_ADDRESS_POS,
+            Sq55_1 => &UNIFIED_ADDRES_40_TO_ADDRESS_POS,
+            Sq56_1 => &UNIFIED_ADDRES_41_TO_ADDRESS_POS,
+            Sq57_1 => &UNIFIED_ADDRES_42_TO_ADDRESS_POS,
+            Sq58_1 => &UNIFIED_ADDRES_43_TO_ADDRESS_POS,
+            Sq59_1 => &UNIFIED_ADDRES_44_TO_ADDRESS_POS,
+            Sq61_1 => &UNIFIED_ADDRES_45_TO_ADDRESS_POS,
+            Sq62_1 => &UNIFIED_ADDRES_46_TO_ADDRESS_POS,
+            Sq63_1 => &UNIFIED_ADDRES_47_TO_ADDRESS_POS,
+            Sq64_1 => &UNIFIED_ADDRES_48_TO_ADDRESS_POS,
+            Sq65_1 => &UNIFIED_ADDRES_49_TO_ADDRESS_POS,
+            Sq66_1 => &UNIFIED_ADDRES_50_TO_ADDRESS_POS,
+            Sq67_1 => &UNIFIED_ADDRES_51_TO_ADDRESS_POS,
+            Sq68_1 => &UNIFIED_ADDRES_52_TO_ADDRESS_POS,
+            Sq69_1 => &UNIFIED_ADDRES_53_TO_ADDRESS_POS,
+            Sq71_1 => &UNIFIED_ADDRES_54_TO_ADDRESS_POS,
+            Sq72_1 => &UNIFIED_ADDRES_55_TO_ADDRESS_POS,
+            Sq73_1 => &UNIFIED_ADDRES_56_TO_ADDRESS_POS,
+            Sq74_1 => &UNIFIED_ADDRES_57_TO_ADDRESS_POS,
+            Sq75_1 => &UNIFIED_ADDRES_58_TO_ADDRESS_POS,
+            Sq76_1 => &UNIFIED_ADDRES_59_TO_ADDRESS_POS,
+            Sq77_1 => &UNIFIED_ADDRES_60_TO_ADDRESS_POS,
+            Sq78_1 => &UNIFIED_ADDRES_61_TO_ADDRESS_POS,
+            Sq79_1 => &UNIFIED_ADDRES_62_TO_ADDRESS_POS,
+            Sq81_1 => &UNIFIED_ADDRES_63_TO_ADDRESS_POS,
+            Sq82_1 => &UNIFIED_ADDRES_64_TO_ADDRESS_POS,
+            Sq83_1 => &UNIFIED_ADDRES_65_TO_ADDRESS_POS,
+            Sq84_1 => &UNIFIED_ADDRES_66_TO_ADDRESS_POS,
+            Sq85_1 => &UNIFIED_ADDRES_67_TO_ADDRESS_POS,
+            Sq86_1 => &UNIFIED_ADDRES_68_TO_ADDRESS_POS,
+            Sq87_1 => &UNIFIED_ADDRES_69_TO_ADDRESS_POS,
+            Sq88_1 => &UNIFIED_ADDRES_70_TO_ADDRESS_POS,
+            Sq89_1 => &UNIFIED_ADDRES_71_TO_ADDRESS_POS,
+            Sq91_1 => &UNIFIED_ADDRES_72_TO_ADDRESS_POS,
+            Sq92_1 => &UNIFIED_ADDRES_73_TO_ADDRESS_POS,
+            Sq93_1 => &UNIFIED_ADDRES_74_TO_ADDRESS_POS,
+            Sq94_1 => &UNIFIED_ADDRES_75_TO_ADDRESS_POS,
+            Sq95_1 => &UNIFIED_ADDRES_76_TO_ADDRESS_POS,
+            Sq96_1 => &UNIFIED_ADDRES_77_TO_ADDRESS_POS,
+            Sq97_1 => &UNIFIED_ADDRES_78_TO_ADDRESS_POS,
+            Sq98_1 => &UNIFIED_ADDRES_79_TO_ADDRESS_POS,
+            Sq99_1 => &UNIFIED_ADDRES_80_TO_ADDRESS_POS,
+            Sq11_2 => &UNIFIED_ADDRES_81_TO_ADDRESS_POS,
+            Sq12_2 => &UNIFIED_ADDRES_82_TO_ADDRESS_POS,
+            Sq13_2 => &UNIFIED_ADDRES_83_TO_ADDRESS_POS,
+            Sq14_2 => &UNIFIED_ADDRES_84_TO_ADDRESS_POS,
+            Sq15_2 => &UNIFIED_ADDRES_85_TO_ADDRESS_POS,
+            Sq16_2 => &UNIFIED_ADDRES_86_TO_ADDRESS_POS,
+            Sq17_2 => &UNIFIED_ADDRES_87_TO_ADDRESS_POS,
+            Sq18_2 => &UNIFIED_ADDRES_88_TO_ADDRESS_POS,
+            Sq19_2 => &UNIFIED_ADDRES_89_TO_ADDRESS_POS,
+            Sq21_2 => &UNIFIED_ADDRES_90_TO_ADDRESS_POS,
+            Sq22_2 => &UNIFIED_ADDRES_91_TO_ADDRESS_POS,
+            Sq23_2 => &UNIFIED_ADDRES_92_TO_ADDRESS_POS,
+            Sq24_2 => &UNIFIED_ADDRES_93_TO_ADDRESS_POS,
+            Sq25_2 => &UNIFIED_ADDRES_94_TO_ADDRESS_POS,
+            Sq26_2 => &UNIFIED_ADDRES_95_TO_ADDRESS_POS,
+            Sq27_2 => &UNIFIED_ADDRES_96_TO_ADDRESS_POS,
+            Sq28_2 => &UNIFIED_ADDRES_97_TO_ADDRESS_POS,
+            Sq29_2 => &UNIFIED_ADDRES_98_TO_ADDRESS_POS,
+            Sq31_2 => &UNIFIED_ADDRES_99_TO_ADDRESS_POS,
+            Sq32_2 => &UNIFIED_ADDRES_100_TO_ADDRESS_POS,
+            Sq33_2 => &UNIFIED_ADDRES_101_TO_ADDRESS_POS,
+            Sq34_2 => &UNIFIED_ADDRES_102_TO_ADDRESS_POS,
+            Sq35_2 => &UNIFIED_ADDRES_103_TO_ADDRESS_POS,
+            Sq36_2 => &UNIFIED_ADDRES_104_TO_ADDRESS_POS,
+            Sq37_2 => &UNIFIED_ADDRES_105_TO_ADDRESS_POS,
+            Sq38_2 => &UNIFIED_ADDRES_106_TO_ADDRESS_POS,
+            Sq39_2 => &UNIFIED_ADDRES_107_TO_ADDRESS_POS,
+            Sq41_2 => &UNIFIED_ADDRES_108_TO_ADDRESS_POS,
+            Sq42_2 => &UNIFIED_ADDRES_109_TO_ADDRESS_POS,
+            Sq43_2 => &UNIFIED_ADDRES_110_TO_ADDRESS_POS,
+            Sq44_2 => &UNIFIED_ADDRES_111_TO_ADDRESS_POS,
+            Sq45_2 => &UNIFIED_ADDRES_112_TO_ADDRESS_POS,
+            Sq46_2 => &UNIFIED_ADDRES_113_TO_ADDRESS_POS,
+            Sq47_2 => &UNIFIED_ADDRES_114_TO_ADDRESS_POS,
+            Sq48_2 => &UNIFIED_ADDRES_115_TO_ADDRESS_POS,
+            Sq49_2 => &UNIFIED_ADDRES_116_TO_ADDRESS_POS,
+            Sq51_2 => &UNIFIED_ADDRES_117_TO_ADDRESS_POS,
+            Sq52_2 => &UNIFIED_ADDRES_118_TO_ADDRESS_POS,
+            Sq53_2 => &UNIFIED_ADDRES_119_TO_ADDRESS_POS,
+            Sq54_2 => &UNIFIED_ADDRES_120_TO_ADDRESS_POS,
+            Sq55_2 => &UNIFIED_ADDRES_121_TO_ADDRESS_POS,
+            Sq56_2 => &UNIFIED_ADDRES_122_TO_ADDRESS_POS,
+            Sq57_2 => &UNIFIED_ADDRES_123_TO_ADDRESS_POS,
+            Sq58_2 => &UNIFIED_ADDRES_124_TO_ADDRESS_POS,
+            Sq59_2 => &UNIFIED_ADDRES_125_TO_ADDRESS_POS,
+            Sq61_2 => &UNIFIED_ADDRES_126_TO_ADDRESS_POS,
+            Sq62_2 => &UNIFIED_ADDRES_127_TO_ADDRESS_POS,
+            Sq63_2 => &UNIFIED_ADDRES_128_TO_ADDRESS_POS,
+            Sq64_2 => &UNIFIED_ADDRES_129_TO_ADDRESS_POS,
+            Sq65_2 => &UNIFIED_ADDRES_130_TO_ADDRESS_POS,
+            Sq66_2 => &UNIFIED_ADDRES_131_TO_ADDRESS_POS,
+            Sq67_2 => &UNIFIED_ADDRES_132_TO_ADDRESS_POS,
+            Sq68_2 => &UNIFIED_ADDRES_133_TO_ADDRESS_POS,
+            Sq69_2 => &UNIFIED_ADDRES_134_TO_ADDRESS_POS,
+            Sq71_2 => &UNIFIED_ADDRES_135_TO_ADDRESS_POS,
+            Sq72_2 => &UNIFIED_ADDRES_136_TO_ADDRESS_POS,
+            Sq73_2 => &UNIFIED_ADDRES_137_TO_ADDRESS_POS,
+            Sq74_2 => &UNIFIED_ADDRES_138_TO_ADDRESS_POS,
+            Sq75_2 => &UNIFIED_ADDRES_139_TO_ADDRESS_POS,
+            Sq76_2 => &UNIFIED_ADDRES_140_TO_ADDRESS_POS,
+            Sq77_2 => &UNIFIED_ADDRES_141_TO_ADDRESS_POS,
+            Sq78_2 => &UNIFIED_ADDRES_142_TO_ADDRESS_POS,
+            Sq79_2 => &UNIFIED_ADDRES_143_TO_ADDRESS_POS,
+            Sq81_2 => &UNIFIED_ADDRES_144_TO_ADDRESS_POS,
+            Sq82_2 => &UNIFIED_ADDRES_145_TO_ADDRESS_POS,
+            Sq83_2 => &UNIFIED_ADDRES_146_TO_ADDRESS_POS,
+            Sq84_2 => &UNIFIED_ADDRES_147_TO_ADDRESS_POS,
+            Sq85_2 => &UNIFIED_ADDRES_148_TO_ADDRESS_POS,
+            Sq86_2 => &UNIFIED_ADDRES_149_TO_ADDRESS_POS,
+            Sq87_2 => &UNIFIED_ADDRES_150_TO_ADDRESS_POS,
+            Sq88_2 => &UNIFIED_ADDRES_151_TO_ADDRESS_POS,
+            Sq89_2 => &UNIFIED_ADDRES_152_TO_ADDRESS_POS,
+            Sq91_2 => &UNIFIED_ADDRES_153_TO_ADDRESS_POS,
+            Sq92_2 => &UNIFIED_ADDRES_154_TO_ADDRESS_POS,
+            Sq93_2 => &UNIFIED_ADDRES_155_TO_ADDRESS_POS,
+            Sq94_2 => &UNIFIED_ADDRES_156_TO_ADDRESS_POS,
+            Sq95_2 => &UNIFIED_ADDRES_157_TO_ADDRESS_POS,
+            Sq96_2 => &UNIFIED_ADDRES_158_TO_ADDRESS_POS,
+            Sq97_2 => &UNIFIED_ADDRES_159_TO_ADDRESS_POS,
+            Sq98_2 => &UNIFIED_ADDRES_160_TO_ADDRESS_POS,
+            Sq99_2 => &UNIFIED_ADDRES_161_TO_ADDRESS_POS,
+            King1 => &UNIFIED_ADDRES_162_TO_ADDRESS_POS,
+            Rook1 => &UNIFIED_ADDRES_163_TO_ADDRESS_POS,
+            Bishop1 => &UNIFIED_ADDRES_164_TO_ADDRESS_POS,
+            Gold1 => &UNIFIED_ADDRES_165_TO_ADDRESS_POS,
+            Silver1 => &UNIFIED_ADDRES_166_TO_ADDRESS_POS,
+            Knight1 => &UNIFIED_ADDRES_167_TO_ADDRESS_POS,
+            Lance1 => &UNIFIED_ADDRES_168_TO_ADDRESS_POS,
+            Pawn1 => &UNIFIED_ADDRES_169_TO_ADDRESS_POS,
+            King2 => &UNIFIED_ADDRES_170_TO_ADDRESS_POS,
+            Rook2 => &UNIFIED_ADDRES_171_TO_ADDRESS_POS,
+            Bishop2 => &UNIFIED_ADDRES_172_TO_ADDRESS_POS,
+            Gold2 => &UNIFIED_ADDRES_173_TO_ADDRESS_POS,
+            Silver2 => &UNIFIED_ADDRES_174_TO_ADDRESS_POS,
+            Knight2 => &UNIFIED_ADDRES_175_TO_ADDRESS_POS,
+            Lance2 => &UNIFIED_ADDRES_176_TO_ADDRESS_POS,
+            Pawn2 => &UNIFIED_ADDRES_177_TO_ADDRESS_POS,
+        }
     }
 
     pub fn to_address_pos3(self) -> AddressPos3 {
@@ -898,23 +2082,175 @@ impl UnifiedAddress {
     }
 
     pub fn to_square_serial_number(self) -> usize {
-        const MAP: [usize; 178] = [
-            11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34,
-            35, 36, 37, 38, 39, 41, 42, 43, 44, 45, 46, 47, 48, 49, 51, 52, 53, 54, 55, 56, 57, 58,
-            59, 61, 62, 63, 64, 65, 66, 67, 68, 69, 71, 72, 73, 74, 75, 76, 77, 78, 79, 81, 82, 83,
-            84, 85, 86, 87, 88, 89, 91, 92, 93, 94, 95, 96, 97, 98, 99, 11, 12, 13, 14, 15, 16, 17,
-            18, 19, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 41, 42,
-            43, 44, 45, 46, 47, 48, 49, 51, 52, 53, 54, 55, 56, 57, 58, 59, 61, 62, 63, 64, 65, 66,
-            67, 68, 69, 71, 72, 73, 74, 75, 76, 77, 78, 79, 81, 82, 83, 84, 85, 86, 87, 88, 89, 91,
-            92, 93, 94, 95, 96, 97, 98, 99, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        ];
-        let sq = MAP[self as usize];
-        if sq == 0 {
-            panic!(Beam::trouble(&format!(
-                "(Err.710) 盤上ではなかったぜ☆（＾～＾）！",
-            )))
+        use crate::cosmic::toy_box::UnifiedAddress::*;
+        match self {
+            Sq11_1 => 11,
+            Sq12_1 => 12,
+            Sq13_1 => 13,
+            Sq14_1 => 14,
+            Sq15_1 => 15,
+            Sq16_1 => 16,
+            Sq17_1 => 17,
+            Sq18_1 => 18,
+            Sq19_1 => 19,
+            Sq21_1 => 21,
+            Sq22_1 => 22,
+            Sq23_1 => 23,
+            Sq24_1 => 24,
+            Sq25_1 => 25,
+            Sq26_1 => 26,
+            Sq27_1 => 27,
+            Sq28_1 => 28,
+            Sq29_1 => 29,
+            Sq31_1 => 31,
+            Sq32_1 => 32,
+            Sq33_1 => 33,
+            Sq34_1 => 34,
+            Sq35_1 => 35,
+            Sq36_1 => 36,
+            Sq37_1 => 37,
+            Sq38_1 => 38,
+            Sq39_1 => 39,
+            Sq41_1 => 41,
+            Sq42_1 => 42,
+            Sq43_1 => 43,
+            Sq44_1 => 44,
+            Sq45_1 => 45,
+            Sq46_1 => 46,
+            Sq47_1 => 47,
+            Sq48_1 => 48,
+            Sq49_1 => 49,
+            Sq51_1 => 51,
+            Sq52_1 => 52,
+            Sq53_1 => 53,
+            Sq54_1 => 54,
+            Sq55_1 => 55,
+            Sq56_1 => 56,
+            Sq57_1 => 57,
+            Sq58_1 => 58,
+            Sq59_1 => 59,
+            Sq61_1 => 61,
+            Sq62_1 => 62,
+            Sq63_1 => 63,
+            Sq64_1 => 64,
+            Sq65_1 => 65,
+            Sq66_1 => 66,
+            Sq67_1 => 67,
+            Sq68_1 => 68,
+            Sq69_1 => 69,
+            Sq71_1 => 71,
+            Sq72_1 => 72,
+            Sq73_1 => 73,
+            Sq74_1 => 74,
+            Sq75_1 => 75,
+            Sq76_1 => 76,
+            Sq77_1 => 77,
+            Sq78_1 => 78,
+            Sq79_1 => 79,
+            Sq81_1 => 81,
+            Sq82_1 => 82,
+            Sq83_1 => 83,
+            Sq84_1 => 84,
+            Sq85_1 => 85,
+            Sq86_1 => 86,
+            Sq87_1 => 87,
+            Sq88_1 => 88,
+            Sq89_1 => 89,
+            Sq91_1 => 91,
+            Sq92_1 => 92,
+            Sq93_1 => 93,
+            Sq94_1 => 94,
+            Sq95_1 => 95,
+            Sq96_1 => 96,
+            Sq97_1 => 97,
+            Sq98_1 => 98,
+            Sq99_1 => 99,
+            Sq11_2 => 11,
+            Sq12_2 => 12,
+            Sq13_2 => 13,
+            Sq14_2 => 14,
+            Sq15_2 => 15,
+            Sq16_2 => 16,
+            Sq17_2 => 17,
+            Sq18_2 => 18,
+            Sq19_2 => 19,
+            Sq21_2 => 21,
+            Sq22_2 => 22,
+            Sq23_2 => 23,
+            Sq24_2 => 24,
+            Sq25_2 => 25,
+            Sq26_2 => 26,
+            Sq27_2 => 27,
+            Sq28_2 => 28,
+            Sq29_2 => 29,
+            Sq31_2 => 31,
+            Sq32_2 => 32,
+            Sq33_2 => 33,
+            Sq34_2 => 34,
+            Sq35_2 => 35,
+            Sq36_2 => 36,
+            Sq37_2 => 37,
+            Sq38_2 => 38,
+            Sq39_2 => 39,
+            Sq41_2 => 41,
+            Sq42_2 => 42,
+            Sq43_2 => 43,
+            Sq44_2 => 44,
+            Sq45_2 => 45,
+            Sq46_2 => 46,
+            Sq47_2 => 47,
+            Sq48_2 => 48,
+            Sq49_2 => 49,
+            Sq51_2 => 51,
+            Sq52_2 => 52,
+            Sq53_2 => 53,
+            Sq54_2 => 54,
+            Sq55_2 => 55,
+            Sq56_2 => 56,
+            Sq57_2 => 57,
+            Sq58_2 => 58,
+            Sq59_2 => 59,
+            Sq61_2 => 61,
+            Sq62_2 => 62,
+            Sq63_2 => 63,
+            Sq64_2 => 64,
+            Sq65_2 => 65,
+            Sq66_2 => 66,
+            Sq67_2 => 67,
+            Sq68_2 => 68,
+            Sq69_2 => 69,
+            Sq71_2 => 71,
+            Sq72_2 => 72,
+            Sq73_2 => 73,
+            Sq74_2 => 74,
+            Sq75_2 => 75,
+            Sq76_2 => 76,
+            Sq77_2 => 77,
+            Sq78_2 => 78,
+            Sq79_2 => 79,
+            Sq81_2 => 81,
+            Sq82_2 => 82,
+            Sq83_2 => 83,
+            Sq84_2 => 84,
+            Sq85_2 => 85,
+            Sq86_2 => 86,
+            Sq87_2 => 87,
+            Sq88_2 => 88,
+            Sq89_2 => 89,
+            Sq91_2 => 91,
+            Sq92_2 => 92,
+            Sq93_2 => 93,
+            Sq94_2 => 94,
+            Sq95_2 => 95,
+            Sq96_2 => 96,
+            Sq97_2 => 97,
+            Sq98_2 => 98,
+            Sq99_2 => 99,
+            King1 | Rook1 | Bishop1 | Gold1 | Silver1 | Knight1 | Lance1 | Pawn1 | King2
+            | Rook2 | Bishop2 | Gold2 | Silver2 | Knight2 | Lance2 | Pawn2 => panic!(
+                Beam::trouble(&format!("(Err.710) 盤上ではなかったぜ☆（＾～＾）！",))
+            ),
         }
-        sq
     }
 
     pub fn to_phase(self) -> Phase {
@@ -1491,7 +2827,7 @@ impl GameTable {
                     // 背番号に番地を紐づけます。
                     self.address_list[piece_num_val as usize] = UnifiedAddress::from_address_pos(
                         self.get_phase(piece_num_val),
-                        &AddressPos::Board(sq),
+                        &AddressPos::Board(*sq),
                     );
                 } else {
                     // マスを空にします。
@@ -1501,7 +2837,7 @@ impl GameTable {
             AddressPos::Hand(drop) => {
                 if let Some(piece_num_val) = piece_num {
                     // 持ち駒を１つ増やします。
-                    self.phase_classification.push(drop, piece_num_val);
+                    self.phase_classification.push(*drop, piece_num_val);
                     // 背番号に番地を紐づけます。
                     self.address_list[piece_num_val as usize] = addr;
                 }
@@ -1527,7 +2863,7 @@ impl GameTable {
             AddressPos::Hand(drop) => {
                 // 場所で指定します。
                 // 台から取りのぞきます。
-                let piece_num = self.phase_classification.pop(drop);
+                let piece_num = self.phase_classification.pop(*drop);
                 // TODO 背番号の番地に、ゴミ値を入れて消去するが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
                 self.address_list[piece_num as usize] = UnifiedAddress::from_address_pos(
                     self.get_phase(piece_num),

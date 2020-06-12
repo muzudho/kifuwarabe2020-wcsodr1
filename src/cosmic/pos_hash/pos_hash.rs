@@ -81,9 +81,9 @@ impl GameHashSeed {
                 prev_hash ^= self.piece[move_.destination.to_square_serial_number()][source_piece];
             }
             AddressPos::Hand(drop) => {
-                let count = table.count_hand(drop);
+                let count = table.count_hand(*drop);
                 // 打つ前の駒の枚数のハッシュ。
-                prev_hash ^= self.hands[drop as usize][count as usize];
+                prev_hash ^= self.hands[*drop as usize][count as usize];
                 // 移動後マスに、打った駒があるときのハッシュ。
                 prev_hash ^= self.piece[move_.destination.to_square_serial_number()]
                     [drop.nonpromoted_piece() as usize];

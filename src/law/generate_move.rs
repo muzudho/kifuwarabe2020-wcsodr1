@@ -105,7 +105,7 @@ impl PseudoLegalMoves {
                 listen_move,
             ),
             AddressPos::Hand(drop) => {
-                PseudoLegalMoves::make_drop(drop, table, listen_move);
+                PseudoLegalMoves::make_drop(*drop, table, listen_move);
             }
         });
     }
@@ -789,15 +789,9 @@ impl MovePermission {
         }
     }
     fn check(&self, dst_addr: UnifiedAddress) -> bool {
-        match dst_addr.to_address_pos() {
-            AddressPos::Board(dst_sq) => {
-                if dst_sq.rank() < self.min_rank || self.max_rank < dst_sq.rank() {
-                    return false;
-                }
-            }
-            _ => panic!(Beam::trouble(&format!(
-                "(Err.727) まだ実装してないぜ☆（＾～＾）！",
-            ))),
+        let rank = dst_addr.to_rank();
+        if rank < self.min_rank || self.max_rank < rank {
+            return false;
         }
         true
     }
