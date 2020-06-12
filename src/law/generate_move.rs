@@ -2,6 +2,7 @@
 //! 現局面を使った指し手生成☆（＾～＾）
 //!
 
+use crate::cosmic::fire::{Fire,FireAddress};
 use crate::cosmic::recording::PHASE_LEN;
 use crate::cosmic::recording::{AddressPos1, AddressPos3,CapturedMove, Movement, Phase};
 use crate::cosmic::smart::features::{DoubleFacedPiece, PieceType};
@@ -97,10 +98,12 @@ impl PseudoLegalMoves {
     where
         F1: FnMut(Movement),
     {
-        table.for_some_pieces_on_list40(friend, &mut |addr:UnifiedAddress, piece_type| match addr.to_address_pos1() {
+        table.for_some_pieces_on_list40(friend,
+            // 移動元と、その駒の種類。
+             &mut |src_addr:UnifiedAddress, src_piece_type| match src_addr.to_address_pos1() {
             AddressPos1::Board(_src_sq) => PseudoLegalMoves::start_on_board(
-                addr,
-                piece_type,
+                src_addr,
+                src_piece_type,
                 table,
                 listen_move,
             ),
@@ -870,7 +873,7 @@ impl Promoting {
                 Agility::Knight,
                 move_permission,
             )
-        } else if Promoting::is_third_farthest_rank_from_friend(destination) {
+        } else if Promoting::is_third_farthest_rank_from_friend(destination.to_fire()) {
             callback(
                 destination,
                 Promotability::Any,
@@ -904,14 +907,14 @@ impl Promoting {
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        if Promoting::is_third_farthest_rank_from_friend(source) {
+        if Promoting::is_third_farthest_rank_from_friend(source.to_fire()) {
             callback(
                 destination,
                 Promotability::Any,
                 Agility::Hopping,
                 None,
             )
-        } else if Promoting::is_opponent_region(destination) {
+        } else if Promoting::is_opponent_region(destination.to_fire()) {
             callback(
                 destination,
                 Promotability::Any,
@@ -946,8 +949,8 @@ impl Promoting {
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        if Promoting::is_opponent_region(source)
-            || Promoting::is_opponent_region(destination)
+        if Promoting::is_opponent_region(source.to_fire())
+            || Promoting::is_opponent_region(destination.to_fire())
         {
             callback(
                 destination,
@@ -1036,13 +1039,17 @@ impl Promoting {
     ///
     /// * `friend` -
     /// * `destination` -
-    fn is_third_farthest_rank_from_friend(destination: UnifiedAddress) -> bool {
-        match destination.to_address_pos3() {
-            AddressPos3::FirstBoard(dst_sq) => {
-                dst_sq.to_rank() == RANK_3
-            }
-            AddressPos3::SecondBoard(dst_sq) => {
-                RANK_7 == dst_sq.to_rank()
+    fn is_third_farthest_rank_from_friend(destination: Fire) -> bool {
+        match destination.address {
+            FireAddress::Board(dst_sq) => {
+                match destination.phase {
+                    Phase::First=>{
+                        dst_sq.rank == RANK_3
+                    }
+                    Phase::Second=>{
+                        RANK_7 == dst_sq.rank
+                    }
+                }
             }
             _ => panic!(Beam::trouble(&format!(
                 "(Err.946) まだ実装してないぜ☆（＾～＾）！",
@@ -1056,13 +1063,17 @@ impl Promoting {
     ///
     /// * `friend` -
     /// * `destination` -
-    fn is_opponent_region(destination: UnifiedAddress) -> bool {
-        match destination.to_address_pos3() {
-            AddressPos3::FirstBoard(dst_sq) => {
-                dst_sq.to_rank() < RANK_4
-            }
-            AddressPos3::SecondBoard(dst_sq) => {
-                RANK_6 < dst_sq.to_rank()
+    fn is_opponent_region(destination: Fire) -> bool {
+        match destination.address {
+            FireAddress::Board(dst_sq) => {
+                match destination.phase {
+                    Phase::First=>{
+                        dst_sq.rank < RANK_4
+                    },
+                    Phase::Second=>{
+                        RANK_6 < dst_sq.rank
+                    }
+                }
             }
             _ => panic!(Beam::trouble(&format!(
                 "(Err.957) まだ実装してないぜ☆（＾～＾）！",
