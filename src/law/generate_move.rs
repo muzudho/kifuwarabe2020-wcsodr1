@@ -251,16 +251,9 @@ impl PseudoLegalMoves {
                     use crate::cosmic::smart::features::PieceType::*;
                     match piece_type {
                         Pawn => {
-                            // ひよこ　は２歩できない☆（＾～＾）
-                            match destination.to_address_pos() {
-                                AddressPos::Board(dst_sq) => {
-                                    if table.exists_pawn_on_file(friend, dst_sq.file()) {
-                                        return;
-                                    }
-                                }
-                                _ => panic!(Beam::trouble(&format!(
-                                    "(Err.261) まだ実装してないぜ☆（＾～＾）！",
-                                ))),
+                            // ひよこ　は２歩できない☆（＾～＾
+                            if table.exists_pawn_on_file(friend, destination.to_file()) {
+                                return;
                             }
                         }
                         _ => {}
