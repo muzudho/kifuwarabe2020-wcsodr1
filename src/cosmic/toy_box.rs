@@ -2912,7 +2912,7 @@ pub struct GameTable {
     /// 盤に、駒が紐づくぜ☆（＾～＾）
     board: [Option<PieceNum>; BOARD_MEMORY_AREA as usize],
     /// 背番号付きの駒に、番地が紐づいているぜ☆（＾～＾）
-    address_list: [UnifiedAddress; NAMED_PIECES_LEN],
+    address_list: [Fire; NAMED_PIECES_LEN],
     /// 駒の背番号に、駒が紐づくぜ☆（＾～＾）
     piece_list: [Piece; NAMED_PIECES_LEN],
     /// 駒の背番号を付けるのに使うぜ☆（＾～＾）
@@ -2937,7 +2937,7 @@ impl Default for GameTable {
                 None, None, None, None, None, None, None, None, None, None, None, None, None,
             ],
             /// 初期値はゴミ値だぜ☆（＾～＾）上書きして消せだぜ☆（＾～＾）
-            address_list: [UnifiedAddress::default(); NAMED_PIECES_LEN],
+            address_list: [Fire::default(); NAMED_PIECES_LEN],
             /// 初期値はゴミ値だぜ☆（＾～＾）上書きして消せだぜ☆（＾～＾）
             piece_list: [Piece::King1; NAMED_PIECES_LEN],
             double_faced_piece_type_index: [
@@ -2969,7 +2969,7 @@ impl GameTable {
             None, None, None, None, None, None, None, None, None, None, None, None, None,
         ];
         // 初期値はゴミ値だぜ☆（＾～＾）上書きして消せだぜ☆（＾～＾）
-        self.address_list = [UnifiedAddress::default(); NAMED_PIECES_LEN];
+        self.address_list = [Fire::default(); NAMED_PIECES_LEN];
         // 初期値はゴミ値だぜ☆（＾～＾）上書きして消せだぜ☆（＾～＾）
         self.piece_list = [Piece::King1; NAMED_PIECES_LEN];
         self.double_faced_piece_type_index = [
@@ -3087,8 +3087,9 @@ impl GameTable {
                     // マスに駒を置きます。
                     self.board[sq.to_serial_number() as usize] = piece_num;
                     // 背番号に番地を紐づけます。
-                    self.address_list[piece_num_val as usize] =
-                        sq.to_unified_address(self.get_phase(piece_num_val));
+                    self.address_list[piece_num_val as usize] = sq
+                        .to_unified_address(self.get_phase(piece_num_val))
+                        .to_fire();
                 } else {
                     // マスを空にします。
                     self.board[sq.to_serial_number() as usize] = None;
@@ -3099,7 +3100,7 @@ impl GameTable {
                     // 持ち駒を１つ増やします。
                     self.phase_classification.push(drop, piece_num_val);
                     // 背番号に番地を紐づけます。
-                    self.address_list[piece_num_val as usize] = addr;
+                    self.address_list[piece_num_val as usize] = addr.to_fire();
                 }
             }
         }
@@ -3116,7 +3117,8 @@ impl GameTable {
                     self.address_list[piece_num_val as usize] = UnifiedAddress::from_address_pos1(
                         self.get_phase(piece_num_val),
                         AddressPos1::default(),
-                    );
+                    )
+                    .to_fire();
                 }
                 piece_num
             }
@@ -3128,7 +3130,8 @@ impl GameTable {
                 self.address_list[piece_num as usize] = UnifiedAddress::from_address_pos1(
                     self.get_phase(piece_num),
                     AddressPos1::default(),
-                );
+                )
+                .to_fire();
                 Some(piece_num)
             }
         }
@@ -3258,14 +3261,16 @@ impl GameTable {
     where
         F: FnMut(usize, Option<&AbsoluteAddress2D>, Option<PieceInfo>),
     {
-        for (i, addr) in self.address_list.iter().enumerate() {
-            match addr.to_address_pos1() {
-                AddressPos1::Board(sq) => {
+        for (i, fire) in self.address_list.iter().enumerate() {
+            match fire.address {
+                FireAddress::Board(sq) => {
                     // 盤上の駒☆（＾～＾）
-                    let piece_info = self.piece_info_at1(addr.to_address_pos1()).unwrap();
-                    piece_get(i, Some(&sq.to_absolute_address_2d()), Some(piece_info));
+                    let piece_info = self
+                        .piece_info_at1(UnifiedAddress::from_fire(&fire).to_address_pos1())
+                        .unwrap();
+                    piece_get(i, Some(&sq), Some(piece_info));
                 }
-                AddressPos1::Hand(_drop) => {
+                FireAddress::Hand(_drop) => {
                     // TODO 持ち駒☆（＾～＾）
                     piece_get(i, None, None);
                 }
@@ -3278,18 +3283,18 @@ impl GameTable {
     /// TODO できれば、「自分の盤上の駒」「自分の持ち駒」「相手の盤上の駒」「相手の持ち駒」の４チャンネルで分けておけないか☆（＾～＾）？
     pub fn for_some_pieces_on_list40<F>(&self, friend: Phase, piece_get: &mut F)
     where
-        F: FnMut(UnifiedAddress, PieceType),
+        F: FnMut(&Fire, PieceType),
     {
         for piece_num in Nine299792458::piece_numbers().iter() {
             // 盤上の駒だけを調べようぜ☆（＾～＾）
-            let addr = self.address_list[*piece_num as usize];
-            match addr.to_address_pos1() {
-                AddressPos1::Board(_sq) => {
+            let fire = self.address_list[*piece_num as usize];
+            match fire.address {
+                FireAddress::Board(_sq) => {
                     if self.get_phase(*piece_num) == friend {
-                        piece_get(addr, self.get_type(*piece_num));
+                        piece_get(&fire, self.get_type(*piece_num));
                     }
                 }
-                AddressPos1::Hand(_drop) => {
+                FireAddress::Hand(_drop) => {
                     // 持ち駒はここで調べるのは無駄な気がするよな☆（＾～＾）持ち駒に歩が１８個とか☆（＾～＾）
                 }
             }
@@ -3320,7 +3325,10 @@ impl GameTable {
         for drop in &FIRST_SECOND[friend as usize] {
             if let Some(piece_type) = self.last_hand_type(*drop) {
                 // 有無を確認しているぜ☆（＾～＾）
-                piece_get(UnifiedAddress::from_double_faced_piece(*drop), piece_type);
+                piece_get(
+                    &UnifiedAddress::from_double_faced_piece(*drop).to_fire(),
+                    piece_type,
+                );
             }
         }
     }

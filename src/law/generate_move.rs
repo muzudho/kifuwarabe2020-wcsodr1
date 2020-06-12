@@ -101,12 +101,16 @@ impl PseudoLegalMoves {
         table.for_some_pieces_on_list40(
             friend,
             // 移動元と、その駒の種類。
-            &mut |src_addr: UnifiedAddress, src_piece_type| match src_addr.to_address_pos1() {
-                AddressPos1::Board(_src_sq) => {
-                    PseudoLegalMoves::start_on_board(src_addr, src_piece_type, table, listen_move)
+            &mut |src_fire: &Fire, src_piece_type| match src_fire.address {
+                FireAddress::Board(_src_sq) => {
+                    PseudoLegalMoves::start_on_board(src_fire, src_piece_type, table, listen_move)
                 }
-                AddressPos1::Hand(drop) => {
-                    PseudoLegalMoves::make_drop(drop, table, listen_move);
+                FireAddress::Hand(drop_type) => {
+                    PseudoLegalMoves::make_drop(
+                        DoubleFacedPiece::from_phase_and_type(src_fire.friend, drop_type),
+                        table,
+                        listen_move,
+                    );
                 }
             },
         );
@@ -128,14 +132,14 @@ impl PseudoLegalMoves {
     /// * 指し手ハッシュ
     /// * 移動先にあった駒
     fn start_on_board<F1>(
-        source: UnifiedAddress,
+        source: &Fire,
         piece_type: PieceType,
         table: &GameTable,
         listen_move: &mut F1,
     ) where
         F1: FnMut(Movement),
     {
-        let friend = source.to_phase();
+        let friend = source.friend;
         let moving = &mut |destination: UnifiedAddress,
                            promotability,
                            _agility,
@@ -177,7 +181,7 @@ impl PseudoLegalMoves {
                         // 成ったり、成れなかったりできるとき。
                         if !forbidden {
                             listen_move(Movement::new(
-                                source,
+                                UnifiedAddress::from_fire(&source),
                                 destination,
                                 false,
                                 if let Some(piece_num_val) = pseudo_captured_num {
@@ -191,7 +195,7 @@ impl PseudoLegalMoves {
                             ));
                         }
                         listen_move(Movement::new(
-                            source,
+                            UnifiedAddress::from_fire(&source),
                             destination,
                             true,
                             if let Some(piece_num_val) = pseudo_captured_num {
@@ -208,7 +212,7 @@ impl PseudoLegalMoves {
                         // 成れるか、成れないかのどちらかのとき。
                         if promotion || !forbidden {
                             listen_move(Movement::new(
-                                source,
+                                UnifiedAddress::from_fire(&source),
                                 destination,
                                 promotion,
                                 if let Some(piece_num_val) = pseudo_captured_num {
@@ -435,7 +439,7 @@ impl Area {
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `hopping` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     /// * `sliding` -
-    fn piece_of<F1>(piece_type: PieceType, source: UnifiedAddress, moving: &mut F1)
+    fn piece_of<F1>(piece_type: PieceType, source: &Fire, moving: &mut F1)
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
@@ -465,11 +469,11 @@ impl Area {
     /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn pawn<F1>(source: UnifiedAddress, moving: &mut F1)
+    fn pawn<F1>(source: &Fire, moving: &mut F1)
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        let friend = source.to_phase();
+        let friend = source.friend;
         let moving = &mut |destination: UnifiedAddress, _agility| {
             Promoting::pawn_lance(
                 &destination.to_fire(),
@@ -491,11 +495,11 @@ impl Area {
     /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn lance<F1>(source: UnifiedAddress, moving: &mut F1)
+    fn lance<F1>(source: &Fire, moving: &mut F1)
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        let friend = source.to_phase();
+        let friend = source.friend;
         let moving = &mut |destination: UnifiedAddress, _agility| {
             Promoting::pawn_lance(
                 &destination.to_fire(),
@@ -517,11 +521,11 @@ impl Area {
     /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn knight<F1>(source: UnifiedAddress, moving: &mut F1)
+    fn knight<F1>(source: &Fire, moving: &mut F1)
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        let friend = source.to_phase();
+        let friend = source.friend;
         let moving = &mut |destination: UnifiedAddress, _agility| {
             Promoting::knight(
                 &destination.to_fire(),
@@ -542,12 +546,12 @@ impl Area {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn silver<F1>(source: UnifiedAddress, moving: &mut F1)
+    fn silver<F1>(source: &Fire, moving: &mut F1)
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving = &mut |destination: UnifiedAddress, _agility| {
-            Promoting::silver(&source.to_fire(), &destination.to_fire(), moving)
+            Promoting::silver(&source, &destination.to_fire(), moving)
         };
 
         for mobility in PieceType::Silver.mobility().iter() {
@@ -563,7 +567,7 @@ impl Area {
     /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn gold<F1>(source: UnifiedAddress, moving: &mut F1)
+    fn gold<F1>(source: &Fire, moving: &mut F1)
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
@@ -583,7 +587,7 @@ impl Area {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn king<F1>(source: UnifiedAddress, moving: &mut F1)
+    fn king<F1>(source: &Fire, moving: &mut F1)
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
@@ -603,12 +607,12 @@ impl Area {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn bishop<F1>(source: UnifiedAddress, moving: &mut F1)
+    fn bishop<F1>(source: &Fire, moving: &mut F1)
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving = &mut |destination: UnifiedAddress, _agility| {
-            Promoting::bishop_rook(&source.to_fire(), &destination.to_fire(), moving)
+            Promoting::bishop_rook(source, &destination.to_fire(), moving)
         };
         for mobility in PieceType::Bishop.mobility().iter() {
             Area::move_(source, *mobility, moving);
@@ -622,12 +626,12 @@ impl Area {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn rook<F1>(source: UnifiedAddress, moving: &mut F1)
+    fn rook<F1>(source: &Fire, moving: &mut F1)
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving = &mut |destination: UnifiedAddress, _agility| {
-            Promoting::bishop_rook(&source.to_fire(), &destination.to_fire(), moving)
+            Promoting::bishop_rook(source, &destination.to_fire(), moving)
         };
         for mobility in PieceType::Rook.mobility().iter() {
             Area::move_(source, *mobility, moving);
@@ -641,7 +645,7 @@ impl Area {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn horse<F1>(source: UnifiedAddress, moving: &mut F1)
+    fn horse<F1>(source: &Fire, moving: &mut F1)
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
@@ -660,7 +664,7 @@ impl Area {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn dragon<F1>(source: UnifiedAddress, moving: &mut F1)
+    fn dragon<F1>(source: &Fire, moving: &mut F1)
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
@@ -681,11 +685,11 @@ impl Area {
     /// * `angle` - 角度☆（＾～＾）
     /// * `agility` - 動き方☆（＾～＾）
     /// * `callback` - 絶対番地を受け取れだぜ☆（＾～＾）
-    fn move_<F1>(start: UnifiedAddress, mobility: Mobility, moving: &mut F1)
+    fn move_<F1>(start: &Fire, mobility: Mobility, moving: &mut F1)
     where
         F1: FnMut(UnifiedAddress, Agility) -> bool,
     {
-        let friend = start.to_phase();
+        let friend = start.friend;
         let angle =
             // 後手なら１８０°回転だぜ☆（＾～＾）
             if friend == Phase::Second {
@@ -694,11 +698,11 @@ impl Area {
                 mobility.angle
             };
 
-        match start.to_address_pos1() {
-            AddressPos1::Board(start_sq) => {
+        match start.address {
+            FireAddress::Board(start_sq) => {
                 match mobility.agility {
                     Agility::Sliding => {
-                        let mut cur = start_sq.to_absolute_address_2d(); //.clone();
+                        let mut cur = start_sq.clone();
                         let r = RelAdr2D::new(1, 0).rotate(angle).clone();
                         loop {
                             // 西隣から反時計回りだぜ☆（＾～＾）
@@ -715,8 +719,8 @@ impl Area {
                     }
                     // 桂馬専用☆（＾～＾）行き先の無いところに置いてないはずだぜ☆（＾～＾）
                     Agility::Knight => {
-                        let mut cur = start_sq.to_absolute_address_2d(); //.clone();
-                                                                         // 西隣から反時計回りだぜ☆（＾～＾）
+                        let mut cur = start_sq.clone();
+                        // 西隣から反時計回りだぜ☆（＾～＾）
                         if !cur.offset(&angle.west_ccw_double_rank()).wall() {
                             moving(
                                 UnifiedAddress::from_absolute_address(friend, &cur),
@@ -725,8 +729,8 @@ impl Area {
                         }
                     }
                     Agility::Hopping => {
-                        let mut cur = start_sq.to_absolute_address_2d(); //.clone();
-                                                                         // 西隣から反時計回りだぜ☆（＾～＾）
+                        let mut cur = start_sq.clone();
+                        // 西隣から反時計回りだぜ☆（＾～＾）
                         if !cur.offset(&angle.west_ccw()).wall() {
                             moving(
                                 UnifiedAddress::from_absolute_address(friend, &cur),
