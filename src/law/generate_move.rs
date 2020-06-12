@@ -3,7 +3,7 @@
 //!
 
 use crate::cosmic::recording::PHASE_LEN;
-use crate::cosmic::recording::{AddressPos, AddressPos3,CapturedMove, Movement, Phase};
+use crate::cosmic::recording::{AddressPos1, AddressPos3,CapturedMove, Movement, Phase};
 use crate::cosmic::smart::features::{DoubleFacedPiece, PieceType};
 use crate::cosmic::smart::square::{
     AbsoluteAddress2D, Angle, RelAdr2D, FILE_1, FILE_10, RANK_1, RANK_10, RANK_2, RANK_3, RANK_4,
@@ -97,15 +97,15 @@ impl PseudoLegalMoves {
     where
         F1: FnMut(Movement),
     {
-        table.for_some_pieces_on_list40(friend, &mut |addr:UnifiedAddress, piece_type| match addr.to_address_pos() {
-            AddressPos::Board(_src_sq) => PseudoLegalMoves::start_on_board(
+        table.for_some_pieces_on_list40(friend, &mut |addr:UnifiedAddress, piece_type| match addr.to_address_pos1() {
+            AddressPos1::Board(_src_sq) => PseudoLegalMoves::start_on_board(
                 addr,
                 piece_type,
                 table,
                 listen_move,
             ),
-            AddressPos::Hand(drop) => {
-                PseudoLegalMoves::make_drop(*drop, table, listen_move);
+            AddressPos1::Hand(drop) => {
+                PseudoLegalMoves::make_drop(drop, table, listen_move);
             }
         });
     }
@@ -692,11 +692,11 @@ impl Area {
                 mobility.angle
             };
 
-        match start.to_address_pos() {
-            AddressPos::Board(start_sq) => {
+        match start.to_address_pos1() {
+            AddressPos1::Board(start_sq) => {
                 match mobility.agility {
                     Agility::Sliding => {
-                        let mut cur = start_sq.clone();
+                        let mut cur = start_sq.to_absolute_address_2d();//.clone();
                         let r = RelAdr2D::new(1, 0).rotate(angle).clone();
                         loop {
                             // 西隣から反時計回りだぜ☆（＾～＾）
@@ -713,14 +713,14 @@ impl Area {
                     }
                     // 桂馬専用☆（＾～＾）行き先の無いところに置いてないはずだぜ☆（＾～＾）
                     Agility::Knight => {
-                        let mut cur = start_sq.clone();
+                        let mut cur = start_sq.to_absolute_address_2d();//.clone();
                         // 西隣から反時計回りだぜ☆（＾～＾）
                         if !cur.offset(&angle.west_ccw_double_rank()).wall() {
                             moving(UnifiedAddress::from_absolute_address(friend, &cur), mobility.agility);
                         }
                     }
                     Agility::Hopping => {
-                        let mut cur = start_sq.clone();
+                        let mut cur = start_sq.to_absolute_address_2d();//.clone();
                         // 西隣から反時計回りだぜ☆（＾～＾）
                         if !cur.offset(&angle.west_ccw()).wall() {
                             moving(UnifiedAddress::from_absolute_address(friend, &cur), mobility.agility);
