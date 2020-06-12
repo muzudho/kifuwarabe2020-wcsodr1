@@ -1,7 +1,7 @@
 //!
 //! 駒 と 盤
 //!
-use crate::cosmic::fire::Fire;
+use crate::cosmic::fire::{Fire, FireAddress};
 use crate::cosmic::recording::AddressPos0;
 use crate::cosmic::recording::AddressPos1;
 use crate::cosmic::recording::Movement;
@@ -1355,6 +1355,15 @@ impl UnifiedAddress {
             }
         } else {
             panic!(Beam::trouble("(Err.176) 番地を変換できね☆（＾～＾）"))
+        }
+    }
+
+    pub fn from_fire(fire: &Fire) -> Self {
+        match fire.address {
+            FireAddress::Board(sq) => UnifiedAddress::from_absolute_address(fire.friend, &sq),
+            FireAddress::Hand(drop_type) => UnifiedAddress::from_double_faced_piece(
+                DoubleFacedPiece::from_phase_and_type(fire.friend, drop_type),
+            ),
         }
     }
 

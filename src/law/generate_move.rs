@@ -824,7 +824,7 @@ impl Promoting {
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        if Promoting::is_farthest_rank_from_friend(destinaion) {
+        if Promoting::is_farthest_rank_from_friend(&destinaion.to_fire()) {
             // 自陣から見て一番奥の段
             callback(
                 destinaion,
@@ -832,7 +832,7 @@ impl Promoting {
                 Agility::Hopping,
                 move_permission,
             )
-        } else if Promoting::is_second_third_farthest_rank_from_friend(destinaion.to_fire()) {
+        } else if Promoting::is_second_third_farthest_rank_from_friend(&destinaion.to_fire()) {
             // 自陣から見て二番、三番目の奥の段
             callback(
                 destinaion,
@@ -866,14 +866,14 @@ impl Promoting {
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        if Promoting::is_first_second_farthest_rank_from_friend(destination.to_fire()) {
+        if Promoting::is_first_second_farthest_rank_from_friend(&destination.to_fire()) {
             callback(
                 destination,
                 Promotability::Forced,
                 Agility::Knight,
                 move_permission,
             )
-        } else if Promoting::is_third_farthest_rank_from_friend(destination.to_fire()) {
+        } else if Promoting::is_third_farthest_rank_from_friend(&destination.to_fire()) {
             callback(
                 destination,
                 Promotability::Any,
@@ -907,14 +907,14 @@ impl Promoting {
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        if Promoting::is_third_farthest_rank_from_friend(source.to_fire()) {
+        if Promoting::is_third_farthest_rank_from_friend(&source.to_fire()) {
             callback(
                 destination,
                 Promotability::Any,
                 Agility::Hopping,
                 None,
             )
-        } else if Promoting::is_opponent_region(destination.to_fire()) {
+        } else if Promoting::is_opponent_region(&destination.to_fire()) {
             callback(
                 destination,
                 Promotability::Any,
@@ -949,8 +949,8 @@ impl Promoting {
     where
         F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        if Promoting::is_opponent_region(source.to_fire())
-            || Promoting::is_opponent_region(destination.to_fire())
+        if Promoting::is_opponent_region(&source.to_fire())
+            || Promoting::is_opponent_region(&destination.to_fire())
         {
             callback(
                 destination,
@@ -975,13 +975,17 @@ impl Promoting {
     ///
     /// * `friend` -
     /// * `destination` -
-    fn is_farthest_rank_from_friend(destination: UnifiedAddress) -> bool {
-        match destination.to_address_pos3() {
-            AddressPos3::FirstBoard(dst_sq) => {
-                dst_sq.to_rank() < RANK_2
-            }
-            AddressPos3::SecondBoard(dst_sq) => {
-                    RANK_8 < dst_sq.to_rank()
+    fn is_farthest_rank_from_friend(destination: &Fire) -> bool {
+        match destination.address {
+            FireAddress::Board(dst_sq) => {
+                match destination.friend{
+                    Phase::First=>{
+                        dst_sq.rank < RANK_2
+                    }
+                    Phase::Second=>{
+                        RANK_8 < dst_sq.rank
+                    }
+                }
             }
             _ => panic!(Beam::trouble(&format!(
                 "(Err.905) まだ実装してないぜ☆（＾～＾）！",
@@ -996,11 +1000,11 @@ impl Promoting {
     /// * `friend` -
     /// * `destination` -
     fn is_first_second_farthest_rank_from_friend(
-        destination: Fire,
+        destination: &Fire,
     ) -> bool {
         match destination.address {
             FireAddress::Board(dst_sq) => {
-                match destination.phase{
+                match destination.friend{
                     Phase::First=>{
                         dst_sq.rank < RANK_3
 
@@ -1024,11 +1028,11 @@ impl Promoting {
     /// * `friend` -
     /// * `destination` -
     fn is_second_third_farthest_rank_from_friend(
-        destination: Fire,
+        destination: &Fire,
     ) -> bool {
         match destination.address {
             FireAddress::Board(dst_sq) => {
-                match destination.phase{
+                match destination.friend{
                     Phase::First=>{
                         RANK_1 < dst_sq.rank && dst_sq.rank < RANK_4
                     }
@@ -1050,10 +1054,10 @@ impl Promoting {
     ///
     /// * `friend` -
     /// * `destination` -
-    fn is_third_farthest_rank_from_friend(destination: Fire) -> bool {
+    fn is_third_farthest_rank_from_friend(destination: &Fire) -> bool {
         match destination.address {
             FireAddress::Board(dst_sq) => {
-                match destination.phase {
+                match destination.friend {
                     Phase::First=>{
                         dst_sq.rank == RANK_3
                     }
@@ -1074,10 +1078,10 @@ impl Promoting {
     ///
     /// * `friend` -
     /// * `destination` -
-    fn is_opponent_region(destination: Fire) -> bool {
+    fn is_opponent_region(destination: &Fire) -> bool {
         match destination.address {
             FireAddress::Board(dst_sq) => {
-                match destination.phase {
+                match destination.friend {
                     Phase::First=>{
                         dst_sq.rank < RANK_4
                     },

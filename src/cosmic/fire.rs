@@ -5,19 +5,19 @@ use crate::cosmic::smart::square::AbsoluteAddress2D;
 /// TODO 局面の差分
 #[derive(Debug)]
 pub struct Fire {
-    pub phase: Phase,
+    pub friend: Phase,
     pub address: FireAddress,
 }
 impl Fire {
-    pub fn new_board(phase: Phase, addr: AbsoluteAddress2D) -> Self {
+    pub fn new_board(friend: Phase, addr: AbsoluteAddress2D) -> Self {
         Fire {
-            phase: phase,
+            friend: friend,
             address: FireAddress::Board(addr),
         }
     }
-    pub fn new_hand(phase: Phase, drop_type: DoubleFacedPieceType) -> Self {
+    pub fn new_hand(friend: Phase, drop_type: DoubleFacedPieceType) -> Self {
         Fire {
-            phase: phase,
+            friend: friend,
             address: FireAddress::Hand(drop_type),
         }
     }
