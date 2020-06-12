@@ -474,21 +474,21 @@ pub fn set_position(line: &str, game: &mut Game) {
                     };
 
                     use crate::cosmic::toy_box::Piece::*;
-                    let (hand, friend) = match &line[starts..=starts] {
-                        "R" => (Rook1, Phase::First),
-                        "B" => (Bishop1, Phase::First),
-                        "G" => (Gold1, Phase::First),
-                        "S" => (Silver1, Phase::First),
-                        "N" => (Knight1, Phase::First),
-                        "L" => (Lance1, Phase::First),
-                        "P" => (Pawn1, Phase::First),
-                        "r" => (Rook2, Phase::Second),
-                        "b" => (Bishop2, Phase::Second),
-                        "g" => (Gold2, Phase::Second),
-                        "s" => (Silver2, Phase::Second),
-                        "n" => (Knight2, Phase::Second),
-                        "l" => (Lance2, Phase::Second),
-                        "p" => (Pawn2, Phase::Second),
+                    let hand = match &line[starts..=starts] {
+                        "R" => Rook1,
+                        "B" => Bishop1,
+                        "G" => Gold1,
+                        "S" => Silver1,
+                        "N" => Knight1,
+                        "L" => Lance1,
+                        "P" => Pawn1,
+                        "r" => Rook2,
+                        "b" => Bishop2,
+                        "g" => Gold2,
+                        "s" => Silver2,
+                        "n" => Knight2,
+                        "l" => Lance2,
+                        "p" => Pawn2,
                         _ => {
                             break 'mg;
                         } // 持駒部 正常終了
@@ -499,9 +499,8 @@ pub fn set_position(line: &str, game: &mut Game) {
                         // 駒に背番号を付けるぜ☆（＾～＾）
                         let piece_num = game.mut_starting().numbering_piece(hand);
                         // 駒台に置くぜ☆（＾～＾）
-                        let drop = UnifiedAddress::from_address_pos(
-                            friend,
-                            &AddressPos::Hand(game.table.get_double_faced_piece(piece_num)),
+                        let drop = UnifiedAddress::from_double_faced_piece(
+                            game.table.get_double_faced_piece(piece_num),
                         );
                         game.mut_starting().push_piece(drop, Some(piece_num));
                     }
