@@ -799,6 +799,68 @@ impl Default for UnifiedSq {
     }
 }
 impl UnifiedSq {
+    pub fn from_file_rank(friend: Phase, file: usize, rank: usize) -> UnifiedSq {
+        let second = if friend == Phase::Second { 81 } else { 0 };
+        let num = file * 10 + rank;
+        if 10 < num && num < 20 {
+            if let Some(val) = UnifiedSq::from_usize(second + num - 11) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.124) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 20 < num && num < 30 {
+            if let Some(val) = UnifiedSq::from_usize(second + num - 21 + 9) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.131) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 30 < num && num < 40 {
+            if let Some(val) = UnifiedSq::from_usize(second + num - 31 + 2 * 9) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.137) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 40 < num && num < 50 {
+            if let Some(val) = UnifiedSq::from_usize(second + num - 41 + 3 * 9) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.143) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 50 < num && num < 60 {
+            if let Some(val) = UnifiedSq::from_usize(second + num - 51 + 4 * 9) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.149) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 60 < num && num < 70 {
+            if let Some(val) = UnifiedSq::from_usize(second + num - 61 + 5 * 9) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.155) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 70 < num && num < 80 {
+            if let Some(val) = UnifiedSq::from_usize(second + num - 71 + 6 * 9) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.161) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 80 < num && num < 90 {
+            if let Some(val) = UnifiedSq::from_usize(second + num - 81 + 7 * 9) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.167) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 90 < num && num < 100 {
+            if let Some(val) = UnifiedSq::from_usize(second + num - 91 + 8 * 9) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.173) 番地を変換できね☆（＾～＾）"))
+            }
+        } else {
+            panic!(Beam::trouble("(Err.176) 番地を変換できね☆（＾～＾）"))
+        }
+    }
+
     pub fn to_serial_number(&self) -> usize {
         use crate::cosmic::toy_box::UnifiedSq::*;
         match self {
@@ -3291,6 +3353,21 @@ impl GameTable {
                 }
             }
             AddressPos::Hand(_drop) => panic!(Beam::trouble(&format!(
+                "(Err.345) 駒台は非対応☆（＾～＾）！",
+            ))),
+        }
+    }
+    /// ハッシュを作るときにも利用。盤上専用。
+    pub fn piece_at1(&self, addr: AddressPos1) -> Option<Piece> {
+        match addr {
+            AddressPos1::Board(sq) => {
+                if let Some(piece_num) = self.board[sq.to_serial_number() as usize] {
+                    Some(self.get_piece(piece_num))
+                } else {
+                    None
+                }
+            }
+            AddressPos1::Hand(_drop) => panic!(Beam::trouble(&format!(
                 "(Err.345) 駒台は非対応☆（＾～＾）！",
             ))),
         }

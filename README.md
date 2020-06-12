@@ -6,6 +6,7 @@
 
 * [ ] できれば、「自分の盤上の駒」「自分の持ち駒」「相手の盤上の駒」「相手の持ち駒」の４チャンネルでミーシーに分けておけないか☆（＾～＾）？
   * [ ] AddressPos::Board を先手盤上、後手盤上の２つに分けれる☆（＾～＾）
+  * [ ] enum型にobjectを入れない方針☆（＾～＾）AddressPos -> AddressPos1
 * [x] 最大手数 320 か 512 か☆（＾～＾）
 * [x] 指し手の AbsoluteAddress と PhisicalPieceType を共有する型 AddressTypeOfPosition を作る。
 * [x] タイムマン(^_^)

@@ -3,13 +3,13 @@
 
 use crate::cosmic::playing::Game;
 use crate::cosmic::recording::{
-    AddressPos, AddressPos1, History, Movement, PHASE_LEN, PHASE_SECOND,
+    AddressPos, AddressPos1, History, Movement, Phase, PHASE_LEN, PHASE_SECOND,
 };
 use crate::cosmic::smart::features::{HAND_MAX, PHYSICAL_PIECES_LEN};
 use crate::cosmic::smart::square::{
     AbsoluteAddress2D, BOARD_MEMORY_AREA, FILE_1, FILE_10, RANK_1, RANK_10, SQUARE_NONE,
 };
-use crate::cosmic::toy_box::{GameTable, UnifiedAddress, PIECE_LEN};
+use crate::cosmic::toy_box::{GameTable, UnifiedAddress, UnifiedSq, PIECE_LEN};
 use crate::law::speed_of_light::HandAddresses;
 use crate::spaceship::equipment::Beam;
 use rand::Rng;
@@ -76,7 +76,8 @@ impl GameHashSeed {
         // 移動する駒。
         match move_.source.to_address_pos1() {
             AddressPos1::Board(src_sq) => {
-                let source_piece = table.piece_at(&move_.source.to_address_pos()).unwrap() as usize;
+                let source_piece =
+                    table.piece_at1(move_.source.to_address_pos1()).unwrap() as usize;
                 // 移動前マスに、動かしたい駒があるときのハッシュ。
                 prev_hash ^= self.piece[src_sq.to_serial_number()][source_piece];
                 // 移動後マスに、動かしたい駒があるときのハッシュ。
@@ -92,7 +93,7 @@ impl GameHashSeed {
             }
         }
         // 移動先にある駒があれば
-        if let Some(dst_piece_val) = table.piece_at(&move_.destination.to_address_pos()) {
+        if let Some(dst_piece_val) = table.piece_at1(move_.destination.to_address_pos1()) {
             prev_hash ^=
                 self.piece[move_.destination.to_square_serial_number()][dst_piece_val as usize];
             // 持ち駒になるとき。
@@ -139,9 +140,9 @@ impl GameHashSeed {
         // 盤上の駒
         for rank in RANK_1..RANK_10 {
             for file in (FILE_1..FILE_10).rev() {
-                let sq = AbsoluteAddress2D::new(file, rank);
-                if let Some(piece_val) = table.piece_at(&AddressPos::Board(sq)) {
-                    hash ^= self.piece[sq.serial_number()][piece_val as usize];
+                let sq = UnifiedSq::from_file_rank(Phase::First, file, rank); // 先後は使わないから、どっちでもいいぜ☆（＾～＾）
+                if let Some(piece_val) = table.piece_at1(AddressPos1::Board(sq)) {
+                    hash ^= self.piece[sq.to_serial_number()][piece_val as usize];
                 }
             }
         }
