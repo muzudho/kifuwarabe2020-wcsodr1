@@ -47,10 +47,8 @@ impl CommandRoom {
 pub struct GameRoom {}
 impl GameRoom {
     fn to_string3(table: &GameTable, file: usize, rank: usize) -> String {
-        if let Some(piece_info_val) = table.piece_info_at1(AddressPos1::Board(
-            UnifiedSq::from_file_rank(Phase::First, file, rank),
-        ))
-        //先後は使ってないからどっちでもいいぜ☆（＾～＾）
+        if let Some(piece_info_val) =
+            table.piece_info_at1(AddressPos1::Board(UnifiedSq::from_file_rank(file, rank)))
         {
             format!("{}", piece_info_val.piece)
         } else {

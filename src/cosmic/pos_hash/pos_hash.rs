@@ -137,7 +137,7 @@ impl GameHashSeed {
         // 盤上の駒
         for rank in RANK_1..RANK_10 {
             for file in (FILE_1..FILE_10).rev() {
-                let sq = UnifiedSq::from_file_rank(Phase::First, file, rank); // 先後は使わないから、どっちでもいいぜ☆（＾～＾）
+                let sq = UnifiedSq::from_file_rank(file, rank);
                 if let Some(piece_val) = table.piece_at1(AddressPos1::Board(sq)) {
                     hash ^= self.piece[sq.to_serial_number()][piece_val as usize];
                 }

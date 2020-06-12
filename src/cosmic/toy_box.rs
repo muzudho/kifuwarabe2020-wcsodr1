@@ -707,7 +707,8 @@ const UNIFIED_ADDRESS_175_TO_ADDRESS_POS1: AddressPos1 =
 const UNIFIED_ADDRESS_176_TO_ADDRESS_POS1: AddressPos1 =
     AddressPos1::Hand(DoubleFacedPiece::Lance2);
 const UNIFIED_ADDRESS_177_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Hand(DoubleFacedPiece::Pawn2);
-/// 統一盤上アドレス。
+
+/// 統一盤上アドレス。先後の区別はありません。
 #[derive(Copy, Clone, Debug, FromPrimitive)]
 pub enum UnifiedSq {
     Sq11,
@@ -799,59 +800,58 @@ impl Default for UnifiedSq {
     }
 }
 impl UnifiedSq {
-    pub fn from_file_rank(friend: Phase, file: usize, rank: usize) -> UnifiedSq {
-        let second = if friend == Phase::Second { 81 } else { 0 };
+    pub fn from_file_rank(file: usize, rank: usize) -> UnifiedSq {
         let num = file * 10 + rank;
         if 10 < num && num < 20 {
-            if let Some(val) = UnifiedSq::from_usize(second + num - 11) {
+            if let Some(val) = UnifiedSq::from_usize(num - 11) {
                 val
             } else {
                 panic!(Beam::trouble("(Err.124) 番地を変換できね☆（＾～＾）"))
             }
         } else if 20 < num && num < 30 {
-            if let Some(val) = UnifiedSq::from_usize(second + num - 21 + 9) {
+            if let Some(val) = UnifiedSq::from_usize(num - 21 + 9) {
                 val
             } else {
                 panic!(Beam::trouble("(Err.131) 番地を変換できね☆（＾～＾）"))
             }
         } else if 30 < num && num < 40 {
-            if let Some(val) = UnifiedSq::from_usize(second + num - 31 + 2 * 9) {
+            if let Some(val) = UnifiedSq::from_usize(num - 31 + 2 * 9) {
                 val
             } else {
                 panic!(Beam::trouble("(Err.137) 番地を変換できね☆（＾～＾）"))
             }
         } else if 40 < num && num < 50 {
-            if let Some(val) = UnifiedSq::from_usize(second + num - 41 + 3 * 9) {
+            if let Some(val) = UnifiedSq::from_usize(num - 41 + 3 * 9) {
                 val
             } else {
                 panic!(Beam::trouble("(Err.143) 番地を変換できね☆（＾～＾）"))
             }
         } else if 50 < num && num < 60 {
-            if let Some(val) = UnifiedSq::from_usize(second + num - 51 + 4 * 9) {
+            if let Some(val) = UnifiedSq::from_usize(num - 51 + 4 * 9) {
                 val
             } else {
                 panic!(Beam::trouble("(Err.149) 番地を変換できね☆（＾～＾）"))
             }
         } else if 60 < num && num < 70 {
-            if let Some(val) = UnifiedSq::from_usize(second + num - 61 + 5 * 9) {
+            if let Some(val) = UnifiedSq::from_usize(num - 61 + 5 * 9) {
                 val
             } else {
                 panic!(Beam::trouble("(Err.155) 番地を変換できね☆（＾～＾）"))
             }
         } else if 70 < num && num < 80 {
-            if let Some(val) = UnifiedSq::from_usize(second + num - 71 + 6 * 9) {
+            if let Some(val) = UnifiedSq::from_usize(num - 71 + 6 * 9) {
                 val
             } else {
                 panic!(Beam::trouble("(Err.161) 番地を変換できね☆（＾～＾）"))
             }
         } else if 80 < num && num < 90 {
-            if let Some(val) = UnifiedSq::from_usize(second + num - 81 + 7 * 9) {
+            if let Some(val) = UnifiedSq::from_usize(num - 81 + 7 * 9) {
                 val
             } else {
                 panic!(Beam::trouble("(Err.167) 番地を変換できね☆（＾～＾）"))
             }
         } else if 90 < num && num < 100 {
-            if let Some(val) = UnifiedSq::from_usize(second + num - 91 + 8 * 9) {
+            if let Some(val) = UnifiedSq::from_usize(num - 91 + 8 * 9) {
                 val
             } else {
                 panic!(Beam::trouble("(Err.173) 番地を変換できね☆（＾～＾）"))
@@ -1121,6 +1121,178 @@ impl UnifiedSq {
             Sq98 => UNIFIED_SQ_79_TO_ABSOLUTE_ADDRESS_2D,
             Sq99 => UNIFIED_SQ_80_TO_ABSOLUTE_ADDRESS_2D,
             _ => panic!("（＾～＾）"),
+        }
+    }
+
+    pub fn to_unified_address(&self, friend: Phase) -> UnifiedAddress {
+        use crate::cosmic::toy_box::UnifiedSq::*;
+        match friend {
+            Phase::First => match self {
+                Sq11 => UnifiedAddress::Sq11_1,
+                Sq12 => UnifiedAddress::Sq12_1,
+                Sq13 => UnifiedAddress::Sq13_1,
+                Sq14 => UnifiedAddress::Sq14_1,
+                Sq15 => UnifiedAddress::Sq15_1,
+                Sq16 => UnifiedAddress::Sq16_1,
+                Sq17 => UnifiedAddress::Sq17_1,
+                Sq18 => UnifiedAddress::Sq18_1,
+                Sq19 => UnifiedAddress::Sq19_1,
+                Sq21 => UnifiedAddress::Sq21_1,
+                Sq22 => UnifiedAddress::Sq22_1,
+                Sq23 => UnifiedAddress::Sq23_1,
+                Sq24 => UnifiedAddress::Sq24_1,
+                Sq25 => UnifiedAddress::Sq25_1,
+                Sq26 => UnifiedAddress::Sq26_1,
+                Sq27 => UnifiedAddress::Sq27_1,
+                Sq28 => UnifiedAddress::Sq28_1,
+                Sq29 => UnifiedAddress::Sq29_1,
+                Sq31 => UnifiedAddress::Sq31_1,
+                Sq32 => UnifiedAddress::Sq32_1,
+                Sq33 => UnifiedAddress::Sq33_1,
+                Sq34 => UnifiedAddress::Sq34_1,
+                Sq35 => UnifiedAddress::Sq35_1,
+                Sq36 => UnifiedAddress::Sq36_1,
+                Sq37 => UnifiedAddress::Sq37_1,
+                Sq38 => UnifiedAddress::Sq38_1,
+                Sq39 => UnifiedAddress::Sq39_1,
+                Sq41 => UnifiedAddress::Sq41_1,
+                Sq42 => UnifiedAddress::Sq42_1,
+                Sq43 => UnifiedAddress::Sq43_1,
+                Sq44 => UnifiedAddress::Sq44_1,
+                Sq45 => UnifiedAddress::Sq45_1,
+                Sq46 => UnifiedAddress::Sq46_1,
+                Sq47 => UnifiedAddress::Sq47_1,
+                Sq48 => UnifiedAddress::Sq48_1,
+                Sq49 => UnifiedAddress::Sq49_1,
+                Sq51 => UnifiedAddress::Sq51_1,
+                Sq52 => UnifiedAddress::Sq52_1,
+                Sq53 => UnifiedAddress::Sq53_1,
+                Sq54 => UnifiedAddress::Sq54_1,
+                Sq55 => UnifiedAddress::Sq55_1,
+                Sq56 => UnifiedAddress::Sq56_1,
+                Sq57 => UnifiedAddress::Sq57_1,
+                Sq58 => UnifiedAddress::Sq58_1,
+                Sq59 => UnifiedAddress::Sq59_1,
+                Sq61 => UnifiedAddress::Sq61_1,
+                Sq62 => UnifiedAddress::Sq62_1,
+                Sq63 => UnifiedAddress::Sq63_1,
+                Sq64 => UnifiedAddress::Sq64_1,
+                Sq65 => UnifiedAddress::Sq65_1,
+                Sq66 => UnifiedAddress::Sq66_1,
+                Sq67 => UnifiedAddress::Sq67_1,
+                Sq68 => UnifiedAddress::Sq68_1,
+                Sq69 => UnifiedAddress::Sq69_1,
+                Sq71 => UnifiedAddress::Sq71_1,
+                Sq72 => UnifiedAddress::Sq72_1,
+                Sq73 => UnifiedAddress::Sq73_1,
+                Sq74 => UnifiedAddress::Sq74_1,
+                Sq75 => UnifiedAddress::Sq75_1,
+                Sq76 => UnifiedAddress::Sq76_1,
+                Sq77 => UnifiedAddress::Sq77_1,
+                Sq78 => UnifiedAddress::Sq78_1,
+                Sq79 => UnifiedAddress::Sq79_1,
+                Sq81 => UnifiedAddress::Sq81_1,
+                Sq82 => UnifiedAddress::Sq82_1,
+                Sq83 => UnifiedAddress::Sq83_1,
+                Sq84 => UnifiedAddress::Sq84_1,
+                Sq85 => UnifiedAddress::Sq85_1,
+                Sq86 => UnifiedAddress::Sq86_1,
+                Sq87 => UnifiedAddress::Sq87_1,
+                Sq88 => UnifiedAddress::Sq88_1,
+                Sq89 => UnifiedAddress::Sq89_1,
+                Sq91 => UnifiedAddress::Sq91_1,
+                Sq92 => UnifiedAddress::Sq92_1,
+                Sq93 => UnifiedAddress::Sq93_1,
+                Sq94 => UnifiedAddress::Sq94_1,
+                Sq95 => UnifiedAddress::Sq95_1,
+                Sq96 => UnifiedAddress::Sq96_1,
+                Sq97 => UnifiedAddress::Sq97_1,
+                Sq98 => UnifiedAddress::Sq98_1,
+                Sq99 => UnifiedAddress::Sq99_1,
+            },
+            Phase::Second => match self {
+                Sq11 => UnifiedAddress::Sq11_2,
+                Sq12 => UnifiedAddress::Sq12_2,
+                Sq13 => UnifiedAddress::Sq13_2,
+                Sq14 => UnifiedAddress::Sq14_2,
+                Sq15 => UnifiedAddress::Sq15_2,
+                Sq16 => UnifiedAddress::Sq16_2,
+                Sq17 => UnifiedAddress::Sq17_2,
+                Sq18 => UnifiedAddress::Sq18_2,
+                Sq19 => UnifiedAddress::Sq19_2,
+                Sq21 => UnifiedAddress::Sq21_2,
+                Sq22 => UnifiedAddress::Sq22_2,
+                Sq23 => UnifiedAddress::Sq23_2,
+                Sq24 => UnifiedAddress::Sq24_2,
+                Sq25 => UnifiedAddress::Sq25_2,
+                Sq26 => UnifiedAddress::Sq26_2,
+                Sq27 => UnifiedAddress::Sq27_2,
+                Sq28 => UnifiedAddress::Sq28_2,
+                Sq29 => UnifiedAddress::Sq29_2,
+                Sq31 => UnifiedAddress::Sq31_2,
+                Sq32 => UnifiedAddress::Sq32_2,
+                Sq33 => UnifiedAddress::Sq33_2,
+                Sq34 => UnifiedAddress::Sq34_2,
+                Sq35 => UnifiedAddress::Sq35_2,
+                Sq36 => UnifiedAddress::Sq36_2,
+                Sq37 => UnifiedAddress::Sq37_2,
+                Sq38 => UnifiedAddress::Sq38_2,
+                Sq39 => UnifiedAddress::Sq39_2,
+                Sq41 => UnifiedAddress::Sq41_2,
+                Sq42 => UnifiedAddress::Sq42_2,
+                Sq43 => UnifiedAddress::Sq43_2,
+                Sq44 => UnifiedAddress::Sq44_2,
+                Sq45 => UnifiedAddress::Sq45_2,
+                Sq46 => UnifiedAddress::Sq46_2,
+                Sq47 => UnifiedAddress::Sq47_2,
+                Sq48 => UnifiedAddress::Sq48_2,
+                Sq49 => UnifiedAddress::Sq49_2,
+                Sq51 => UnifiedAddress::Sq51_2,
+                Sq52 => UnifiedAddress::Sq52_2,
+                Sq53 => UnifiedAddress::Sq53_2,
+                Sq54 => UnifiedAddress::Sq54_2,
+                Sq55 => UnifiedAddress::Sq55_2,
+                Sq56 => UnifiedAddress::Sq56_2,
+                Sq57 => UnifiedAddress::Sq57_2,
+                Sq58 => UnifiedAddress::Sq58_2,
+                Sq59 => UnifiedAddress::Sq59_2,
+                Sq61 => UnifiedAddress::Sq61_2,
+                Sq62 => UnifiedAddress::Sq62_2,
+                Sq63 => UnifiedAddress::Sq63_2,
+                Sq64 => UnifiedAddress::Sq64_2,
+                Sq65 => UnifiedAddress::Sq65_2,
+                Sq66 => UnifiedAddress::Sq66_2,
+                Sq67 => UnifiedAddress::Sq67_2,
+                Sq68 => UnifiedAddress::Sq68_2,
+                Sq69 => UnifiedAddress::Sq69_2,
+                Sq71 => UnifiedAddress::Sq71_2,
+                Sq72 => UnifiedAddress::Sq72_2,
+                Sq73 => UnifiedAddress::Sq73_2,
+                Sq74 => UnifiedAddress::Sq74_2,
+                Sq75 => UnifiedAddress::Sq75_2,
+                Sq76 => UnifiedAddress::Sq76_2,
+                Sq77 => UnifiedAddress::Sq77_2,
+                Sq78 => UnifiedAddress::Sq78_2,
+                Sq79 => UnifiedAddress::Sq79_2,
+                Sq81 => UnifiedAddress::Sq81_2,
+                Sq82 => UnifiedAddress::Sq82_2,
+                Sq83 => UnifiedAddress::Sq83_2,
+                Sq84 => UnifiedAddress::Sq84_2,
+                Sq85 => UnifiedAddress::Sq85_2,
+                Sq86 => UnifiedAddress::Sq86_2,
+                Sq87 => UnifiedAddress::Sq87_2,
+                Sq88 => UnifiedAddress::Sq88_2,
+                Sq89 => UnifiedAddress::Sq89_2,
+                Sq91 => UnifiedAddress::Sq91_2,
+                Sq92 => UnifiedAddress::Sq92_2,
+                Sq93 => UnifiedAddress::Sq93_2,
+                Sq94 => UnifiedAddress::Sq94_2,
+                Sq95 => UnifiedAddress::Sq95_2,
+                Sq96 => UnifiedAddress::Sq96_2,
+                Sq97 => UnifiedAddress::Sq97_2,
+                Sq98 => UnifiedAddress::Sq98_2,
+                Sq99 => UnifiedAddress::Sq99_2,
+            },
         }
     }
 }
@@ -1515,6 +1687,12 @@ impl UnifiedAddress {
         match addr {
             AddressPos::Board(sq) => UnifiedAddress::from_absolute_address(friend, sq),
             AddressPos::Hand(drop) => UnifiedAddress::from_double_faced_piece(*drop),
+        }
+    }
+    pub fn from_address_pos1(friend: Phase, addr: AddressPos1) -> Self {
+        match addr {
+            AddressPos1::Board(sq) => sq.to_unified_address(friend),
+            AddressPos1::Hand(drop) => UnifiedAddress::from_double_faced_piece(drop),
         }
     }
 
@@ -3417,9 +3595,9 @@ impl GameTable {
     /// 歩が置いてあるか確認
     pub fn exists_pawn_on_file(&self, friend: Phase, file: usize) -> bool {
         for rank in RANK_1..RANK_10 {
-            let addr = UnifiedAddress::from_address_pos(
+            let addr = UnifiedAddress::from_address_pos1(
                 friend,
-                &AddressPos::Board(AbsoluteAddress2D::new(file, rank)),
+                AddressPos1::Board(UnifiedSq::from_file_rank(file, rank)),
             );
             if let Some(piece_val) = self.piece_at1(addr.to_address_pos1()) {
                 if piece_val.phase() == friend && piece_val.type_() == PieceType::Pawn {
