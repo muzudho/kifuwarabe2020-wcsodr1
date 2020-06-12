@@ -182,9 +182,8 @@ impl Game {
                     let piece_num = moveing_piece_num.unwrap();
                     // 自分の持ち駒を増やそうぜ☆（＾～＾）！
                     self.table.push_piece(
-                        UnifiedAddress::from_address_pos(
-                            self.history.get_friend(),
-                            &AddressPos::Hand(self.table.get_double_faced_piece(piece_num)),
+                        UnifiedAddress::from_double_faced_piece(
+                            self.table.get_double_faced_piece(piece_num),
                         ),
                         moveing_piece_num,
                     );
