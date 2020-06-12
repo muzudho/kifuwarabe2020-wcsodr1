@@ -48,74 +48,129 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
 
     let mut buffer = Movement::default();
 
-    // 1文字目と2文字目
-    // 移動元とドロップ。
-    enum Source {
-        Move(usize, usize),
-        Drop(DoubleFacedPieceType),
-    }
+    let friend = game.history.get_friend();
 
-    let source = match &line[*starts..=*starts] {
-        // 1文字目が駒だったら打。2文字目は必ず「*」なはずなので読み飛ばす。
-        "R" => Source::Drop(DoubleFacedPieceType::Rook),
-        "B" => Source::Drop(DoubleFacedPieceType::Bishop),
-        "G" => Source::Drop(DoubleFacedPieceType::Gold),
-        "S" => Source::Drop(DoubleFacedPieceType::Silver),
-        "N" => Source::Drop(DoubleFacedPieceType::Knight),
-        "L" => Source::Drop(DoubleFacedPieceType::Lance),
-        "P" => Source::Drop(DoubleFacedPieceType::Pawn),
-        _ => {
-            // 残りは「筋の数字」、「段のアルファベット」のはず。
-            // 数字じゃないものが入ったら強制終了するんじゃないか☆（＾～＾）
-            let file = if let Some(num) = atoi::<usize>(line[*starts..=*starts].as_bytes()) {
-                num
-            } else {
-                panic!(Beam::trouble(&format!(
-                    "(Err.72)  '{}' だった。",
-                    &line[*starts..=*starts]
-                )))
-            };
-            *starts += 1;
-
-            match &line[*starts..=*starts] {
-                "a" => Source::Move(file, 1),
-                "b" => Source::Move(file, 2),
-                "c" => Source::Move(file, 3),
-                "d" => Source::Move(file, 4),
-                "e" => Source::Move(file, 5),
-                "f" => Source::Move(file, 6),
-                "g" => Source::Move(file, 7),
-                "h" => Source::Move(file, 8),
-                "i" => Source::Move(file, 9),
-                _ => {
+    // 1文字目と2文字目。盤上の移動元か、ドロップする駒種類。
+    buffer.source = UnifiedAddress::from_address_pos(
+        friend,
+        &match &line[*starts..=*starts] {
+            // 1文字目が駒だったら打。2文字目は必ず「*」なはずなので読み飛ばす。
+            "R" => {
+                *starts += 2;
+                AddressPos::Hand(if friend == Phase::First {
+                    DoubleFacedPiece::Rook1
+                } else {
+                    DoubleFacedPiece::Rook2
+                })
+            }
+            "B" => {
+                *starts += 2;
+                AddressPos::Hand(if friend == Phase::First {
+                    DoubleFacedPiece::Bishop1
+                } else {
+                    DoubleFacedPiece::Bishop2
+                })
+            }
+            "G" => {
+                *starts += 2;
+                AddressPos::Hand(if friend == Phase::First {
+                    DoubleFacedPiece::Gold1
+                } else {
+                    DoubleFacedPiece::Gold2
+                })
+            }
+            "S" => {
+                *starts += 2;
+                AddressPos::Hand(if friend == Phase::First {
+                    DoubleFacedPiece::Silver1
+                } else {
+                    DoubleFacedPiece::Silver2
+                })
+            }
+            "N" => {
+                *starts += 2;
+                AddressPos::Hand(if friend == Phase::First {
+                    DoubleFacedPiece::Knight1
+                } else {
+                    DoubleFacedPiece::Knight2
+                })
+            }
+            "L" => {
+                *starts += 2;
+                AddressPos::Hand(if friend == Phase::First {
+                    DoubleFacedPiece::Lance1
+                } else {
+                    DoubleFacedPiece::Lance2
+                })
+            }
+            "P" => {
+                *starts += 2;
+                AddressPos::Hand(if friend == Phase::First {
+                    DoubleFacedPiece::Pawn1
+                } else {
+                    DoubleFacedPiece::Pawn2
+                })
+            }
+            _ => {
+                // 残りは「筋の数字」、「段のアルファベット」のはず。
+                // 数字じゃないものが入ったら強制終了するんじゃないか☆（＾～＾）
+                let file = if let Some(num) = atoi::<usize>(line[*starts..=*starts].as_bytes()) {
+                    num
+                } else {
                     panic!(Beam::trouble(&format!(
-                        "(Err.90)  '{}' だった。",
+                        "(Err.72)  '{}' だった。",
                         &line[*starts..=*starts]
-                    )));
+                    )))
+                };
+                *starts += 1;
+
+                match &line[*starts..=*starts] {
+                    "a" => {
+                        *starts += 1;
+                        AddressPos::Board(AbsoluteAddress2D::new(file, 1))
+                    }
+                    "b" => {
+                        *starts += 1;
+                        AddressPos::Board(AbsoluteAddress2D::new(file, 2))
+                    }
+                    "c" => {
+                        *starts += 1;
+                        AddressPos::Board(AbsoluteAddress2D::new(file, 3))
+                    }
+                    "d" => {
+                        *starts += 1;
+                        AddressPos::Board(AbsoluteAddress2D::new(file, 4))
+                    }
+                    "e" => {
+                        *starts += 1;
+                        AddressPos::Board(AbsoluteAddress2D::new(file, 5))
+                    }
+                    "f" => {
+                        *starts += 1;
+                        AddressPos::Board(AbsoluteAddress2D::new(file, 6))
+                    }
+                    "g" => {
+                        *starts += 1;
+                        AddressPos::Board(AbsoluteAddress2D::new(file, 7))
+                    }
+                    "h" => {
+                        *starts += 1;
+                        AddressPos::Board(AbsoluteAddress2D::new(file, 8))
+                    }
+                    "i" => {
+                        *starts += 1;
+                        AddressPos::Board(AbsoluteAddress2D::new(file, 9))
+                    }
+                    _ => {
+                        panic!(Beam::trouble(&format!(
+                            "(Err.90)  '{}' だった。",
+                            &line[*starts..=*starts]
+                        )));
+                    }
                 }
             }
-        }
-    };
-
-    match source {
-        Source::Move(file, rank) => {
-            *starts += 1;
-            buffer.source = UnifiedAddress::from_address_pos(
-                game.history.get_friend(),
-                &AddressPos::Board(AbsoluteAddress2D::new(file, rank)),
-            );
-        }
-        Source::Drop(hand) => {
-            *starts += 2;
-            buffer.source = UnifiedAddress::from_address_pos(
-                game.history.get_friend(),
-                &AddressPos::Hand(DoubleFacedPiece::from_phase_and_type(
-                    game.history.get_friend(),
-                    hand,
-                )),
-            );
-        }
-    }
+        },
+    );
 
     // 残りは「筋の数字」、「段のアルファベット」のはず。
 
