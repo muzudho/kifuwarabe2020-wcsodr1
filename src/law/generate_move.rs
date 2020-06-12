@@ -1008,11 +1008,12 @@ impl Promoting {
     fn is_first_second_farthest_rank_from_friend(
         destination: UnifiedAddress,
     ) -> bool {
-        let friend = destination.to_phase();
-        match destination.to_address_pos() {
-            AddressPos::Board(dst_sq) => {
-                (friend == Phase::First && dst_sq.rank() < RANK_3)
-                    || (friend == Phase::Second && RANK_7 < dst_sq.rank())
+        match destination.to_address_pos3() {
+            AddressPos3::FirstBoard(dst_sq) => {
+                dst_sq.rank() < RANK_3
+            }
+            AddressPos3::SecondBoard(dst_sq) => {
+                RANK_7 < dst_sq.rank()
             }
             _ => panic!(Beam::trouble(&format!(
                 "(Err.919) まだ実装してないぜ☆（＾～＾）！",
@@ -1029,11 +1030,12 @@ impl Promoting {
     fn is_second_third_farthest_rank_from_friend(
         destination: UnifiedAddress,
     ) -> bool {
-        let friend = destination.to_phase();
-        match destination.to_address_pos() {
-            AddressPos::Board(dst_sq) => {
-                (friend == Phase::First && RANK_1 < dst_sq.rank() && dst_sq.rank() < RANK_4)
-                    || (friend == Phase::Second && RANK_6 < dst_sq.rank() && dst_sq.rank() < RANK_9)
+        match destination.to_address_pos3() {
+            AddressPos3::FirstBoard(dst_sq) => {
+                RANK_1 < dst_sq.rank() && dst_sq.rank() < RANK_4
+            }
+            AddressPos3::SecondBoard(dst_sq) => {
+                    RANK_6 < dst_sq.rank() && dst_sq.rank() < RANK_9
             }
             _ => panic!(Beam::trouble(&format!(
                 "(Err.937) まだ実装してないぜ☆（＾～＾）！",
@@ -1048,11 +1050,12 @@ impl Promoting {
     /// * `friend` -
     /// * `destination` -
     fn is_third_farthest_rank_from_friend(destination: UnifiedAddress) -> bool {
-        let friend = destination.to_phase();
-        match destination.to_address_pos() {
-            AddressPos::Board(dst_sq) => {
-                (friend == Phase::First && dst_sq.rank() == RANK_3)
-                    || (friend == Phase::Second && RANK_7 == dst_sq.rank())
+        match destination.to_address_pos3() {
+            AddressPos3::FirstBoard(dst_sq) => {
+                dst_sq.rank() == RANK_3
+            }
+            AddressPos3::SecondBoard(dst_sq) => {
+                RANK_7 == dst_sq.rank()
             }
             _ => panic!(Beam::trouble(&format!(
                 "(Err.946) まだ実装してないぜ☆（＾～＾）！",
@@ -1067,11 +1070,12 @@ impl Promoting {
     /// * `friend` -
     /// * `destination` -
     fn is_opponent_region(destination: UnifiedAddress) -> bool {
-        let friend = destination.to_phase();
-        match destination.to_address_pos() {
-            AddressPos::Board(dst_sq) => {
-                (friend == Phase::First && dst_sq.rank() < RANK_4)
-                    || (friend == Phase::Second && RANK_6 < dst_sq.rank())
+        match destination.to_address_pos3() {
+            AddressPos3::FirstBoard(dst_sq) => {
+                dst_sq.rank() < RANK_4
+            }
+            AddressPos3::SecondBoard(dst_sq) => {
+                RANK_6 < dst_sq.rank()
             }
             _ => panic!(Beam::trouble(&format!(
                 "(Err.957) まだ実装してないぜ☆（＾～＾）！",
