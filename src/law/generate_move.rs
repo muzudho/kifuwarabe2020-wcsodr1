@@ -140,11 +140,11 @@ impl PseudoLegalMoves {
         F1: FnMut(Movement),
     {
         let friend = source.friend;
-        let moving = &mut |destination: UnifiedAddress,
+        let moving = &mut |destination: &Fire,
                            promotability,
                            _agility,
                            move_permission: Option<MovePermission>| {
-            let pseudo_captured_num = table.piece_num_at(destination);
+            let pseudo_captured_num = table.piece_num_at(UnifiedAddress::from_fire(&destination));
 
             let (ok, space) = if let Some(pseudo_captured_num_val) = pseudo_captured_num {
                 if table.get_phase(pseudo_captured_num_val) == friend {
@@ -182,11 +182,11 @@ impl PseudoLegalMoves {
                         if !forbidden {
                             listen_move(Movement::new(
                                 UnifiedAddress::from_fire(&source),
-                                destination,
+                                UnifiedAddress::from_fire(&destination),
                                 false,
                                 if let Some(piece_num_val) = pseudo_captured_num {
                                     Some(CapturedMove::new(
-                                        destination,
+                                        UnifiedAddress::from_fire(&destination),
                                         table.get_type(piece_num_val),
                                     ))
                                 } else {
@@ -196,11 +196,11 @@ impl PseudoLegalMoves {
                         }
                         listen_move(Movement::new(
                             UnifiedAddress::from_fire(&source),
-                            destination,
+                            UnifiedAddress::from_fire(&destination),
                             true,
                             if let Some(piece_num_val) = pseudo_captured_num {
                                 Some(CapturedMove::new(
-                                    destination,
+                                    UnifiedAddress::from_fire(&destination),
                                     table.get_type(piece_num_val),
                                 ))
                             } else {
@@ -213,11 +213,11 @@ impl PseudoLegalMoves {
                         if promotion || !forbidden {
                             listen_move(Movement::new(
                                 UnifiedAddress::from_fire(&source),
-                                destination,
+                                UnifiedAddress::from_fire(&destination),
                                 promotion,
                                 if let Some(piece_num_val) = pseudo_captured_num {
                                     Some(CapturedMove::new(
-                                        destination,
+                                        UnifiedAddress::from_fire(&destination),
                                         table.get_type(piece_num_val),
                                     ))
                                 } else {
@@ -251,24 +251,31 @@ impl PseudoLegalMoves {
         let friend = drop.phase();
         if let Some((piece_type, hand_addr)) = table.last_hand(drop) {
             // 打つぜ☆（＾～＾）
-            let drop_fn = &mut |destination: UnifiedAddress| {
-                if let None = table.piece_num_at(destination) {
+            let drop_fn = &mut |destination: &Fire| {
+                if let None = table.piece_num_at(UnifiedAddress::from_fire(&destination)) {
                     // 駒が無いところに打つ
                     use crate::cosmic::smart::features::PieceType::*;
                     match piece_type {
                         Pawn => {
-                            // ひよこ　は２歩できない☆（＾～＾
-                            if table.exists_pawn_on_file(friend, destination.to_file()) {
-                                return;
+                            match destination.address {
+                                FireAddress::Board(sq) => {
+                                    // ひよこ　は２歩できない☆（＾～＾
+                                    if table.exists_pawn_on_file(friend, sq.file) {
+                                        return;
+                                    }
+                                }
+                                _ => panic!(Beam::trouble(&format!(
+                                    "(Err.641) 盤上じゃなかったぜ☆（＾～＾）！",
+                                ))),
                             }
                         }
                         _ => {}
                     }
                     listen_move(Movement::new(
-                        hand_addr,   // 打った駒種類
-                        destination, // どの升へ行きたいか
-                        false,       // 打に成りは無し
-                        None,        // 打で取れる駒無し
+                        hand_addr,                               // 打った駒種類
+                        UnifiedAddress::from_fire(&destination), // どの升へ行きたいか
+                        false,                                   // 打に成りは無し
+                        None,                                    // 打で取れる駒無し
                     ));
                 }
             };
@@ -281,21 +288,21 @@ impl PseudoLegalMoves {
                 Pawn | Lance => {
                     // 先手から見た歩、香車の打てる面積だぜ☆（＾～＾）
                     for sq in table.area.drop_pawn_lance[friend as usize].iter() {
-                        drop_fn(*sq);
+                        drop_fn(sq);
                     }
                 }
                 // 桂
                 Knight => {
                     // 先手から見た桂馬の打てる面積だぜ☆（＾～＾）
                     for sq in table.area.drop_knight[friend as usize].iter() {
-                        drop_fn(*sq);
+                        drop_fn(sq);
                     }
                 }
                 // それ以外の駒が打てる範囲は盤面全体。
                 _ => {
                     // 全升の面積だぜ☆（＾～＾）駒を打つときに使うぜ☆（＾～＾）
                     for sq in table.area.all_squares[friend as usize].iter() {
-                        drop_fn(*sq);
+                        drop_fn(sq);
                     }
                 }
             }
@@ -303,6 +310,7 @@ impl PseudoLegalMoves {
     }
 }
 
+/*
 pub fn test_area() {
     let area = Area::default();
     /*
@@ -327,94 +335,80 @@ pub fn test_area() {
         }
     }
 }
+*/
 
 /// 次の升☆（＾～＾）
 pub struct Area {
     /// 変わっているが、すべてのマスは先後に分かれているぜ☆（＾～＾）
-    all_squares: [[UnifiedAddress; 81]; PHASE_LEN],
-    drop_pawn_lance: [[UnifiedAddress; 72]; PHASE_LEN],
-    drop_knight: [[UnifiedAddress; 63]; PHASE_LEN],
+    all_squares: [[Fire; 81]; PHASE_LEN],
+    drop_pawn_lance: [[Fire; 72]; PHASE_LEN],
+    drop_knight: [[Fire; 63]; PHASE_LEN],
 }
 impl Default for Area {
     fn default() -> Self {
-        fn all_first_sq_fn() -> [UnifiedAddress; 81] {
-            let mut v = [UnifiedAddress::default(); 81];
+        fn all_first_sq_fn() -> [Fire; 81] {
+            let mut v = [Fire::default(); 81];
             let mut i = 0;
             for file in FILE_1..FILE_10 {
                 for rank in RANK_1..RANK_10 {
-                    v[i] = UnifiedAddress::from_absolute_address(
-                        Phase::First,
-                        &AbsoluteAddress2D::new(file, rank),
-                    );
+                    v[i] = Fire::new_board(Phase::First, AbsoluteAddress2D::new(file, rank));
                     i += 1;
                 }
             }
             v
         }
-        fn all_second_sq_fn() -> [UnifiedAddress; 81] {
-            let mut v = [UnifiedAddress::default(); 81];
+        fn all_second_sq_fn() -> [Fire; 81] {
+            let mut v = [Fire::default(); 81];
             let mut i = 0;
             for file in FILE_1..FILE_10 {
                 for rank in RANK_1..RANK_10 {
-                    v[i] = UnifiedAddress::from_absolute_address(
-                        Phase::Second,
-                        &AbsoluteAddress2D::new(file, rank),
-                    );
+                    v[i] = Fire::new_board(Phase::Second, AbsoluteAddress2D::new(file, rank));
                     i += 1;
                 }
             }
             v
         }
-        fn first_drop_pawn_fn() -> [UnifiedAddress; 72] {
-            let mut v = [UnifiedAddress::default(); 72];
+        fn first_drop_pawn_fn() -> [Fire; 72] {
+            let mut v = [Fire::default(); 72];
             let mut i = 0;
             for rank in RANK_2..RANK_10 {
                 for file in (FILE_1..FILE_10).rev() {
-                    v[i] = UnifiedAddress::from_absolute_address(
-                        Phase::First,
-                        &AbsoluteAddress2D::new(file, rank),
-                    );
+                    v[i] = Fire::new_board(Phase::First, AbsoluteAddress2D::new(file, rank));
                     i += 1;
                 }
             }
             v
         }
-        fn second_drop_pawn_fn() -> [UnifiedAddress; 72] {
-            let mut v = [UnifiedAddress::default(); 72];
+        fn second_drop_pawn_fn() -> [Fire; 72] {
+            let mut v = [Fire::default(); 72];
             let mut i = 0;
             for rank in RANK_1..RANK_9 {
                 for file in (FILE_1..FILE_10).rev() {
-                    v[i] = UnifiedAddress::from_absolute_address(
-                        Phase::Second,
-                        &AbsoluteAddress2D::new(file, rank),
-                    );
+                    v[i] = Fire::new_board(Phase::Second, AbsoluteAddress2D::new(file, rank));
                     i += 1;
                 }
             }
             v
         }
-        fn first_drop_knight_fn() -> [UnifiedAddress; 63] {
-            let mut v = [UnifiedAddress::default(); 63];
+        fn first_drop_knight_fn() -> [Fire; 63] {
+            let mut v = [Fire::default(); 63];
             let mut i = 0;
             for rank in RANK_3..RANK_10 {
                 for file in (FILE_1..FILE_10).rev() {
-                    v[i] = UnifiedAddress::from_absolute_address(
-                        Phase::First,
-                        &AbsoluteAddress2D::new(file, rank),
-                    );
+                    v[i] = Fire::new_board(Phase::First, AbsoluteAddress2D::new(file, rank));
                     i += 1;
                 }
             }
             v
         }
-        fn second_drop_knight_fn() -> [UnifiedAddress; 63] {
-            let mut v = [UnifiedAddress::default(); 63];
+        fn second_drop_knight_fn() -> [Fire; 63] {
+            let mut v = [Fire::default(); 63];
             let mut i = 0;
             for rank in RANK_3..RANK_10 {
                 for file in (FILE_1..FILE_10).rev() {
-                    v[i] = UnifiedAddress::from_absolute_address(
+                    v[i] = Fire::new_board(
                         Phase::Second,
-                        &AbsoluteAddress2D::new(file, rank).rotate_180(),
+                        AbsoluteAddress2D::new(file, rank).rotate_180(),
                     );
                     i += 1;
                 }
@@ -441,7 +435,7 @@ impl Area {
     /// * `sliding` -
     fn piece_of<F1>(piece_type: PieceType, source: &Fire, moving: &mut F1)
     where
-        F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&Fire, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         match piece_type {
             PieceType::Pawn => Area::pawn(source, moving),
@@ -471,12 +465,12 @@ impl Area {
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn pawn<F1>(source: &Fire, moving: &mut F1)
     where
-        F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&Fire, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let friend = source.friend;
-        let moving = &mut |destination: UnifiedAddress, _agility| {
+        let moving = &mut |destination: &Fire, _agility| {
             Promoting::pawn_lance(
-                &destination.to_fire(),
+                destination,
                 moving,
                 Some(MovePermission::from_pawn_or_lance(friend)),
             )
@@ -497,12 +491,12 @@ impl Area {
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn lance<F1>(source: &Fire, moving: &mut F1)
     where
-        F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&Fire, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let friend = source.friend;
-        let moving = &mut |destination: UnifiedAddress, _agility| {
+        let moving = &mut |destination: &Fire, _agility| {
             Promoting::pawn_lance(
-                &destination.to_fire(),
+                destination,
                 moving,
                 Some(MovePermission::from_pawn_or_lance(friend)),
             )
@@ -523,12 +517,12 @@ impl Area {
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn knight<F1>(source: &Fire, moving: &mut F1)
     where
-        F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&Fire, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let friend = source.friend;
-        let moving = &mut |destination: UnifiedAddress, _agility| {
+        let moving = &mut |destination: &Fire, _agility| {
             Promoting::knight(
-                &destination.to_fire(),
+                destination,
                 moving,
                 Some(MovePermission::from_knight(friend)),
             )
@@ -548,11 +542,10 @@ impl Area {
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn silver<F1>(source: &Fire, moving: &mut F1)
     where
-        F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&Fire, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        let moving = &mut |destination: UnifiedAddress, _agility| {
-            Promoting::silver(&source, &destination.to_fire(), moving)
-        };
+        let moving =
+            &mut |destination: &Fire, _agility| Promoting::silver(&source, destination, moving);
 
         for mobility in PieceType::Silver.mobility().iter() {
             Area::move_(source, *mobility, moving);
@@ -569,9 +562,9 @@ impl Area {
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn gold<F1>(source: &Fire, moving: &mut F1)
     where
-        F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&Fire, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        let moving = &mut |destination, _agility| {
+        let moving = &mut |destination: &Fire, _agility| {
             moving(destination, Promotability::Deny, Agility::Hopping, None)
         };
 
@@ -589,9 +582,9 @@ impl Area {
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn king<F1>(source: &Fire, moving: &mut F1)
     where
-        F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&Fire, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        let moving = &mut |destination, _agility| {
+        let moving = &mut |destination: &Fire, _agility| {
             moving(destination, Promotability::Deny, Agility::Hopping, None)
         };
 
@@ -609,11 +602,10 @@ impl Area {
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn bishop<F1>(source: &Fire, moving: &mut F1)
     where
-        F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&Fire, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        let moving = &mut |destination: UnifiedAddress, _agility| {
-            Promoting::bishop_rook(source, &destination.to_fire(), moving)
-        };
+        let moving =
+            &mut |destination: &Fire, _agility| Promoting::bishop_rook(source, destination, moving);
         for mobility in PieceType::Bishop.mobility().iter() {
             Area::move_(source, *mobility, moving);
         }
@@ -628,11 +620,10 @@ impl Area {
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn rook<F1>(source: &Fire, moving: &mut F1)
     where
-        F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&Fire, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        let moving = &mut |destination: UnifiedAddress, _agility| {
-            Promoting::bishop_rook(source, &destination.to_fire(), moving)
-        };
+        let moving =
+            &mut |destination: &Fire, _agility| Promoting::bishop_rook(source, destination, moving);
         for mobility in PieceType::Rook.mobility().iter() {
             Area::move_(source, *mobility, moving);
         }
@@ -647,10 +638,11 @@ impl Area {
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn horse<F1>(source: &Fire, moving: &mut F1)
     where
-        F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&Fire, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        let moving =
-            &mut |destination, agility| moving(destination, Promotability::Deny, agility, None);
+        let moving = &mut |destination: &Fire, agility| {
+            moving(destination, Promotability::Deny, agility, None)
+        };
 
         for mobility in PieceType::Horse.mobility().iter() {
             Area::move_(source, *mobility, moving);
@@ -666,10 +658,11 @@ impl Area {
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn dragon<F1>(source: &Fire, moving: &mut F1)
     where
-        F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&Fire, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        let moving =
-            &mut |destination, agility| moving(destination, Promotability::Deny, agility, None);
+        let moving = &mut |destination: &Fire, agility| {
+            moving(destination, Promotability::Deny, agility, None)
+        };
 
         for mobility in PieceType::Dragon.mobility().iter() {
             Area::move_(source, *mobility, moving);
@@ -687,7 +680,7 @@ impl Area {
     /// * `callback` - 絶対番地を受け取れだぜ☆（＾～＾）
     fn move_<F1>(start: &Fire, mobility: Mobility, moving: &mut F1)
     where
-        F1: FnMut(UnifiedAddress, Agility) -> bool,
+        F1: FnMut(&Fire, Agility) -> bool,
     {
         let friend = start.friend;
         let angle =
@@ -709,10 +702,7 @@ impl Area {
                             if cur.offset(&r).wall() {
                                 break;
                             }
-                            if moving(
-                                UnifiedAddress::from_absolute_address(friend, &cur),
-                                mobility.agility,
-                            ) {
+                            if moving(&Fire::new_board(friend, cur), mobility.agility) {
                                 break;
                             }
                         }
@@ -722,20 +712,14 @@ impl Area {
                         let mut cur = start_sq.clone();
                         // 西隣から反時計回りだぜ☆（＾～＾）
                         if !cur.offset(&angle.west_ccw_double_rank()).wall() {
-                            moving(
-                                UnifiedAddress::from_absolute_address(friend, &cur),
-                                mobility.agility,
-                            );
+                            moving(&Fire::new_board(friend, cur), mobility.agility);
                         }
                     }
                     Agility::Hopping => {
                         let mut cur = start_sq.clone();
                         // 西隣から反時計回りだぜ☆（＾～＾）
                         if !cur.offset(&angle.west_ccw()).wall() {
-                            moving(
-                                UnifiedAddress::from_absolute_address(friend, &cur),
-                                mobility.agility,
-                            );
+                            moving(&Fire::new_board(friend, cur), mobility.agility);
                         }
                     }
                 }
@@ -800,12 +784,18 @@ impl MovePermission {
             },
         }
     }
-    fn check(&self, dst_addr: UnifiedAddress) -> bool {
-        let rank = dst_addr.to_rank();
-        if rank < self.min_rank || self.max_rank < rank {
-            return false;
+    fn check(&self, dst_fire: &Fire) -> bool {
+        match dst_fire.address {
+            FireAddress::Board(sq) => {
+                if sq.rank < self.min_rank || self.max_rank < sq.rank {
+                    return false;
+                }
+                true
+            }
+            FireAddress::Hand(drop_type) => panic!(Beam::trouble(&format!(
+                "(Err.546) 盤上ではなかったぜ☆（＾～＾）！",
+            ))),
         }
-        true
     }
 }
 impl fmt::Debug for MovePermission {
@@ -831,12 +821,12 @@ impl Promoting {
         move_permission: Option<MovePermission>,
     ) -> bool
     where
-        F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&Fire, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         if Promoting::is_farthest_rank_from_friend(destination) {
             // 自陣から見て一番奥の段
             callback(
-                UnifiedAddress::from_fire(destination),
+                destination,
                 Promotability::Forced,
                 Agility::Hopping,
                 move_permission,
@@ -844,14 +834,14 @@ impl Promoting {
         } else if Promoting::is_second_third_farthest_rank_from_friend(destination) {
             // 自陣から見て二番、三番目の奥の段
             callback(
-                UnifiedAddress::from_fire(destination),
+                destination,
                 Promotability::Any,
                 Agility::Hopping,
                 move_permission,
             )
         } else {
             callback(
-                UnifiedAddress::from_fire(destination),
+                destination,
                 Promotability::Deny,
                 Agility::Hopping,
                 move_permission,
@@ -873,25 +863,25 @@ impl Promoting {
         move_permission: Option<MovePermission>,
     ) -> bool
     where
-        F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&Fire, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         if Promoting::is_first_second_farthest_rank_from_friend(destination) {
             callback(
-                UnifiedAddress::from_fire(&destination),
+                destination,
                 Promotability::Forced,
                 Agility::Knight,
                 move_permission,
             )
         } else if Promoting::is_third_farthest_rank_from_friend(destination) {
             callback(
-                UnifiedAddress::from_fire(&destination),
+                destination,
                 Promotability::Any,
                 Agility::Knight,
                 move_permission,
             )
         } else {
             callback(
-                UnifiedAddress::from_fire(&destination),
+                destination,
                 Promotability::Deny,
                 Agility::Knight,
                 move_permission,
@@ -910,29 +900,14 @@ impl Promoting {
     /// * `callback` -
     fn silver<F1>(source: &Fire, destination: &Fire, callback: &mut F1) -> bool
     where
-        F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&Fire, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         if Promoting::is_third_farthest_rank_from_friend(source) {
-            callback(
-                UnifiedAddress::from_fire(destination),
-                Promotability::Any,
-                Agility::Hopping,
-                None,
-            )
+            callback(destination, Promotability::Any, Agility::Hopping, None)
         } else if Promoting::is_opponent_region(destination) {
-            callback(
-                UnifiedAddress::from_fire(destination),
-                Promotability::Any,
-                Agility::Hopping,
-                None,
-            )
+            callback(destination, Promotability::Any, Agility::Hopping, None)
         } else {
-            callback(
-                UnifiedAddress::from_fire(destination),
-                Promotability::Deny,
-                Agility::Hopping,
-                None,
-            )
+            callback(destination, Promotability::Deny, Agility::Hopping, None)
         }
     }
 
@@ -948,22 +923,12 @@ impl Promoting {
     /// * `callback` -
     fn bishop_rook<F1>(source: &Fire, destination: &Fire, callback: &mut F1) -> bool
     where
-        F1: FnMut(UnifiedAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&Fire, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         if Promoting::is_opponent_region(source) || Promoting::is_opponent_region(destination) {
-            callback(
-                UnifiedAddress::from_fire(&destination),
-                Promotability::Any,
-                Agility::Sliding,
-                None,
-            )
+            callback(destination, Promotability::Any, Agility::Sliding, None)
         } else {
-            callback(
-                UnifiedAddress::from_fire(&destination),
-                Promotability::Deny,
-                Agility::Sliding,
-                None,
-            )
+            callback(destination, Promotability::Deny, Agility::Sliding, None)
         }
     }
 
