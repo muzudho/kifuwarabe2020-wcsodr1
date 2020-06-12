@@ -3399,6 +3399,22 @@ impl GameTable {
             ))),
         }
     }
+    /// 駒台には対応してない。 -> 何に使っている？
+    pub fn piece_info_at1(&self, addr: AddressPos1) -> Option<PieceInfo> {
+        match addr {
+            AddressPos1::Board(sq) => {
+                let piece_num = self.board[sq.to_serial_number() as usize];
+                if let Some(piece_num_val) = piece_num {
+                    Some(PieceInfo::new(self.get_piece(piece_num_val), piece_num_val))
+                } else {
+                    None
+                }
+            }
+            _ => panic!(Beam::trouble(&format!(
+                "(Err.321) まだ実装してないぜ☆（＾～＾）！",
+            ))),
+        }
+    }
     pub fn promotion_value_at(&self, table: &GameTable, addr: UnifiedAddress) -> isize {
         match addr.to_address_pos() {
             AddressPos::Board(sq) => {

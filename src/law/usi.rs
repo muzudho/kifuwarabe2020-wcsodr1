@@ -2,8 +2,8 @@
 //! USIプロトコル
 //!
 use crate::cosmic::playing::Game;
-use crate::cosmic::recording::{AddressPos, CapturedMove, Movement, Phase};
-use crate::cosmic::smart::features::{DoubleFacedPiece, DoubleFacedPieceType};
+use crate::cosmic::recording::{CapturedMove, Movement, Phase};
+use crate::cosmic::smart::features::DoubleFacedPiece;
 use crate::cosmic::smart::square::{AbsoluteAddress2D, FILE_9, RANK_1};
 use crate::cosmic::toy_box::{Piece, UnifiedAddress};
 use crate::spaceship::equipment::Beam;
