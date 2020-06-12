@@ -131,8 +131,6 @@ impl Game {
                 let piece_num152: Option<PieceNum> = if move_.promote {
                     if let Some(piece_num) = self.table.pop_piece(move_.source) {
                         // 成ったのなら、元のマスの駒を成らすぜ☆（＾～＾）
-                        // let piece = self.table.get_piece(piece_num).promoted();
-                        // Some(self.table.new_piece_num(piece, piece_num))
                         self.table.promote(piece_num);
                         Some(piece_num)
                     } else {
@@ -182,8 +180,6 @@ impl Game {
                             // 成ったなら、成る前へ
                             if let Some(source_piece_num) = self.table.pop_piece(move_.destination)
                             {
-                                // let piece = self.table.get_piece(source_piece_num).demoted();
-                                // Some(self.table.new_piece_num(piece, source_piece_num))
                                 self.table.demote(source_piece_num);
                                 Some(source_piece_num)
                             } else {

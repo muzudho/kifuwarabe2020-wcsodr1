@@ -108,6 +108,55 @@ impl fmt::Debug for AddressPos {
     }
 }
 
+/// 局面(Position)全体を範囲にして振られた番地(Address)。
+#[derive(Clone, Copy)]
+pub enum AddressPos3 {
+    // 先手の盤上の番地
+    FirstBoard(AbsoluteAddress2D),
+    // 後手の盤上の番地
+    SecondBoard(AbsoluteAddress2D),
+    // 持ち駒の種類
+    Hand(DoubleFacedPiece),
+}
+impl Default for AddressPos3 {
+    // ゴミ値だぜ☆（＾～＾）
+    fn default() -> Self {
+        AddressPos3::FirstBoard(AbsoluteAddress2D::default())
+    }
+}
+impl fmt::Display for AddressPos3 {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                AddressPos3::FirstBoard(addr) | AddressPos3::SecondBoard(addr) => {
+                    format!("{}", addr)
+                }
+                AddressPos3::Hand(drop) => {
+                    format!("{}", drop)
+                }
+            },
+        )
+    }
+}
+impl fmt::Debug for AddressPos3 {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                AddressPos3::FirstBoard(addr) | AddressPos3::SecondBoard(addr) => {
+                    addr.serial_number().to_string()
+                }
+                AddressPos3::Hand(drop) => {
+                    format!("{:?}", drop)
+                }
+            },
+        )
+    }
+}
+
 /// 取ることになる駒の移動。
 #[derive(Clone, Copy)]
 pub struct CapturedMove {
