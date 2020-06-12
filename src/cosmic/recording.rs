@@ -137,6 +137,24 @@ impl Default for AddressPos1 {
         AddressPos1::Board(UnifiedSq::Sq11)
     }
 }
+/// USI向け。
+impl fmt::Display for AddressPos1 {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                AddressPos1::Board(sq) => {
+                    let (file, rank) = sq.to_file_rank();
+                    format!("{}{}", file, num_to_lower_case(rank))
+                }
+                AddressPos1::Hand(drop) => {
+                    format!("{}", drop)
+                }
+            },
+        )
+    }
+}
 
 /// 局面(Position)全体を範囲にして振られた番地(Address)。
 #[derive(Clone, Copy)]
@@ -268,7 +286,7 @@ impl fmt::Display for Movement {
                     "{}{}{}{}",
                     sx,
                     num_to_lower_case(sy),
-                    self.destination.to_address_pos(),
+                    self.destination.to_address_pos1(),
                     if self.promote { "+" } else { "" }
                 )
             }
@@ -276,7 +294,7 @@ impl fmt::Display for Movement {
                 f,
                 "{}{}{}",
                 drop,
-                self.destination.to_address_pos(),
+                self.destination.to_address_pos1(),
                 if self.promote { "+" } else { "" }
             ),
         }

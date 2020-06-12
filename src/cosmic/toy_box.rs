@@ -2226,192 +2226,6 @@ impl UnifiedAddress {
         }
     }
 
-    pub fn to_address_pos(self) -> &'static AddressPos {
-        // UNIFIED_ADDRESS_TO_ADDRESS_POS_178[self as usize]
-        // 配列アクセスは遅い気がするので、match構文で書こうぜ☆（＾～＾）
-        use crate::cosmic::toy_box::UnifiedAddress::*;
-        match self {
-            Sq11_1 => &UNIFIED_ADDRESS_0_TO_ADDRESS_POS,
-            Sq12_1 => &UNIFIED_ADDRESS_1_TO_ADDRESS_POS,
-            Sq13_1 => &UNIFIED_ADDRESS_2_TO_ADDRESS_POS,
-            Sq14_1 => &UNIFIED_ADDRESS_3_TO_ADDRESS_POS,
-            Sq15_1 => &UNIFIED_ADDRESS_4_TO_ADDRESS_POS,
-            Sq16_1 => &UNIFIED_ADDRESS_5_TO_ADDRESS_POS,
-            Sq17_1 => &UNIFIED_ADDRESS_6_TO_ADDRESS_POS,
-            Sq18_1 => &UNIFIED_ADDRESS_7_TO_ADDRESS_POS,
-            Sq19_1 => &UNIFIED_ADDRESS_8_TO_ADDRESS_POS,
-            Sq21_1 => &UNIFIED_ADDRESS_9_TO_ADDRESS_POS,
-            Sq22_1 => &UNIFIED_ADDRESS_10_TO_ADDRESS_POS,
-            Sq23_1 => &UNIFIED_ADDRESS_11_TO_ADDRESS_POS,
-            Sq24_1 => &UNIFIED_ADDRESS_12_TO_ADDRESS_POS,
-            Sq25_1 => &UNIFIED_ADDRESS_13_TO_ADDRESS_POS,
-            Sq26_1 => &UNIFIED_ADDRESS_14_TO_ADDRESS_POS,
-            Sq27_1 => &UNIFIED_ADDRESS_15_TO_ADDRESS_POS,
-            Sq28_1 => &UNIFIED_ADDRESS_16_TO_ADDRESS_POS,
-            Sq29_1 => &UNIFIED_ADDRESS_17_TO_ADDRESS_POS,
-            Sq31_1 => &UNIFIED_ADDRESS_18_TO_ADDRESS_POS,
-            Sq32_1 => &UNIFIED_ADDRESS_19_TO_ADDRESS_POS,
-            Sq33_1 => &UNIFIED_ADDRESS_20_TO_ADDRESS_POS,
-            Sq34_1 => &UNIFIED_ADDRESS_21_TO_ADDRESS_POS,
-            Sq35_1 => &UNIFIED_ADDRESS_22_TO_ADDRESS_POS,
-            Sq36_1 => &UNIFIED_ADDRESS_23_TO_ADDRESS_POS,
-            Sq37_1 => &UNIFIED_ADDRESS_24_TO_ADDRESS_POS,
-            Sq38_1 => &UNIFIED_ADDRESS_25_TO_ADDRESS_POS,
-            Sq39_1 => &UNIFIED_ADDRESS_26_TO_ADDRESS_POS,
-            Sq41_1 => &UNIFIED_ADDRESS_27_TO_ADDRESS_POS,
-            Sq42_1 => &UNIFIED_ADDRESS_28_TO_ADDRESS_POS,
-            Sq43_1 => &UNIFIED_ADDRESS_29_TO_ADDRESS_POS,
-            Sq44_1 => &UNIFIED_ADDRESS_30_TO_ADDRESS_POS,
-            Sq45_1 => &UNIFIED_ADDRESS_31_TO_ADDRESS_POS,
-            Sq46_1 => &UNIFIED_ADDRESS_32_TO_ADDRESS_POS,
-            Sq47_1 => &UNIFIED_ADDRESS_33_TO_ADDRESS_POS,
-            Sq48_1 => &UNIFIED_ADDRESS_34_TO_ADDRESS_POS,
-            Sq49_1 => &UNIFIED_ADDRESS_35_TO_ADDRESS_POS,
-            Sq51_1 => &UNIFIED_ADDRESS_36_TO_ADDRESS_POS,
-            Sq52_1 => &UNIFIED_ADDRESS_37_TO_ADDRESS_POS,
-            Sq53_1 => &UNIFIED_ADDRESS_38_TO_ADDRESS_POS,
-            Sq54_1 => &UNIFIED_ADDRESS_39_TO_ADDRESS_POS,
-            Sq55_1 => &UNIFIED_ADDRESS_40_TO_ADDRESS_POS,
-            Sq56_1 => &UNIFIED_ADDRESS_41_TO_ADDRESS_POS,
-            Sq57_1 => &UNIFIED_ADDRESS_42_TO_ADDRESS_POS,
-            Sq58_1 => &UNIFIED_ADDRESS_43_TO_ADDRESS_POS,
-            Sq59_1 => &UNIFIED_ADDRESS_44_TO_ADDRESS_POS,
-            Sq61_1 => &UNIFIED_ADDRESS_45_TO_ADDRESS_POS,
-            Sq62_1 => &UNIFIED_ADDRESS_46_TO_ADDRESS_POS,
-            Sq63_1 => &UNIFIED_ADDRESS_47_TO_ADDRESS_POS,
-            Sq64_1 => &UNIFIED_ADDRESS_48_TO_ADDRESS_POS,
-            Sq65_1 => &UNIFIED_ADDRESS_49_TO_ADDRESS_POS,
-            Sq66_1 => &UNIFIED_ADDRESS_50_TO_ADDRESS_POS,
-            Sq67_1 => &UNIFIED_ADDRESS_51_TO_ADDRESS_POS,
-            Sq68_1 => &UNIFIED_ADDRESS_52_TO_ADDRESS_POS,
-            Sq69_1 => &UNIFIED_ADDRESS_53_TO_ADDRESS_POS,
-            Sq71_1 => &UNIFIED_ADDRESS_54_TO_ADDRESS_POS,
-            Sq72_1 => &UNIFIED_ADDRESS_55_TO_ADDRESS_POS,
-            Sq73_1 => &UNIFIED_ADDRESS_56_TO_ADDRESS_POS,
-            Sq74_1 => &UNIFIED_ADDRESS_57_TO_ADDRESS_POS,
-            Sq75_1 => &UNIFIED_ADDRESS_58_TO_ADDRESS_POS,
-            Sq76_1 => &UNIFIED_ADDRESS_59_TO_ADDRESS_POS,
-            Sq77_1 => &UNIFIED_ADDRESS_60_TO_ADDRESS_POS,
-            Sq78_1 => &UNIFIED_ADDRESS_61_TO_ADDRESS_POS,
-            Sq79_1 => &UNIFIED_ADDRESS_62_TO_ADDRESS_POS,
-            Sq81_1 => &UNIFIED_ADDRESS_63_TO_ADDRESS_POS,
-            Sq82_1 => &UNIFIED_ADDRESS_64_TO_ADDRESS_POS,
-            Sq83_1 => &UNIFIED_ADDRESS_65_TO_ADDRESS_POS,
-            Sq84_1 => &UNIFIED_ADDRESS_66_TO_ADDRESS_POS,
-            Sq85_1 => &UNIFIED_ADDRESS_67_TO_ADDRESS_POS,
-            Sq86_1 => &UNIFIED_ADDRESS_68_TO_ADDRESS_POS,
-            Sq87_1 => &UNIFIED_ADDRESS_69_TO_ADDRESS_POS,
-            Sq88_1 => &UNIFIED_ADDRESS_70_TO_ADDRESS_POS,
-            Sq89_1 => &UNIFIED_ADDRESS_71_TO_ADDRESS_POS,
-            Sq91_1 => &UNIFIED_ADDRESS_72_TO_ADDRESS_POS,
-            Sq92_1 => &UNIFIED_ADDRESS_73_TO_ADDRESS_POS,
-            Sq93_1 => &UNIFIED_ADDRESS_74_TO_ADDRESS_POS,
-            Sq94_1 => &UNIFIED_ADDRESS_75_TO_ADDRESS_POS,
-            Sq95_1 => &UNIFIED_ADDRESS_76_TO_ADDRESS_POS,
-            Sq96_1 => &UNIFIED_ADDRESS_77_TO_ADDRESS_POS,
-            Sq97_1 => &UNIFIED_ADDRESS_78_TO_ADDRESS_POS,
-            Sq98_1 => &UNIFIED_ADDRESS_79_TO_ADDRESS_POS,
-            Sq99_1 => &UNIFIED_ADDRESS_80_TO_ADDRESS_POS,
-            Sq11_2 => &UNIFIED_ADDRESS_81_TO_ADDRESS_POS,
-            Sq12_2 => &UNIFIED_ADDRESS_82_TO_ADDRESS_POS,
-            Sq13_2 => &UNIFIED_ADDRESS_83_TO_ADDRESS_POS,
-            Sq14_2 => &UNIFIED_ADDRESS_84_TO_ADDRESS_POS,
-            Sq15_2 => &UNIFIED_ADDRESS_85_TO_ADDRESS_POS,
-            Sq16_2 => &UNIFIED_ADDRESS_86_TO_ADDRESS_POS,
-            Sq17_2 => &UNIFIED_ADDRESS_87_TO_ADDRESS_POS,
-            Sq18_2 => &UNIFIED_ADDRESS_88_TO_ADDRESS_POS,
-            Sq19_2 => &UNIFIED_ADDRESS_89_TO_ADDRESS_POS,
-            Sq21_2 => &UNIFIED_ADDRESS_90_TO_ADDRESS_POS,
-            Sq22_2 => &UNIFIED_ADDRESS_91_TO_ADDRESS_POS,
-            Sq23_2 => &UNIFIED_ADDRESS_92_TO_ADDRESS_POS,
-            Sq24_2 => &UNIFIED_ADDRESS_93_TO_ADDRESS_POS,
-            Sq25_2 => &UNIFIED_ADDRESS_94_TO_ADDRESS_POS,
-            Sq26_2 => &UNIFIED_ADDRESS_95_TO_ADDRESS_POS,
-            Sq27_2 => &UNIFIED_ADDRESS_96_TO_ADDRESS_POS,
-            Sq28_2 => &UNIFIED_ADDRESS_97_TO_ADDRESS_POS,
-            Sq29_2 => &UNIFIED_ADDRESS_98_TO_ADDRESS_POS,
-            Sq31_2 => &UNIFIED_ADDRESS_99_TO_ADDRESS_POS,
-            Sq32_2 => &UNIFIED_ADDRESS_100_TO_ADDRESS_POS,
-            Sq33_2 => &UNIFIED_ADDRESS_101_TO_ADDRESS_POS,
-            Sq34_2 => &UNIFIED_ADDRESS_102_TO_ADDRESS_POS,
-            Sq35_2 => &UNIFIED_ADDRESS_103_TO_ADDRESS_POS,
-            Sq36_2 => &UNIFIED_ADDRESS_104_TO_ADDRESS_POS,
-            Sq37_2 => &UNIFIED_ADDRESS_105_TO_ADDRESS_POS,
-            Sq38_2 => &UNIFIED_ADDRESS_106_TO_ADDRESS_POS,
-            Sq39_2 => &UNIFIED_ADDRESS_107_TO_ADDRESS_POS,
-            Sq41_2 => &UNIFIED_ADDRESS_108_TO_ADDRESS_POS,
-            Sq42_2 => &UNIFIED_ADDRESS_109_TO_ADDRESS_POS,
-            Sq43_2 => &UNIFIED_ADDRESS_110_TO_ADDRESS_POS,
-            Sq44_2 => &UNIFIED_ADDRESS_111_TO_ADDRESS_POS,
-            Sq45_2 => &UNIFIED_ADDRESS_112_TO_ADDRESS_POS,
-            Sq46_2 => &UNIFIED_ADDRESS_113_TO_ADDRESS_POS,
-            Sq47_2 => &UNIFIED_ADDRESS_114_TO_ADDRESS_POS,
-            Sq48_2 => &UNIFIED_ADDRESS_115_TO_ADDRESS_POS,
-            Sq49_2 => &UNIFIED_ADDRESS_116_TO_ADDRESS_POS,
-            Sq51_2 => &UNIFIED_ADDRESS_117_TO_ADDRESS_POS,
-            Sq52_2 => &UNIFIED_ADDRESS_118_TO_ADDRESS_POS,
-            Sq53_2 => &UNIFIED_ADDRESS_119_TO_ADDRESS_POS,
-            Sq54_2 => &UNIFIED_ADDRESS_120_TO_ADDRESS_POS,
-            Sq55_2 => &UNIFIED_ADDRESS_121_TO_ADDRESS_POS,
-            Sq56_2 => &UNIFIED_ADDRESS_122_TO_ADDRESS_POS,
-            Sq57_2 => &UNIFIED_ADDRESS_123_TO_ADDRESS_POS,
-            Sq58_2 => &UNIFIED_ADDRESS_124_TO_ADDRESS_POS,
-            Sq59_2 => &UNIFIED_ADDRESS_125_TO_ADDRESS_POS,
-            Sq61_2 => &UNIFIED_ADDRESS_126_TO_ADDRESS_POS,
-            Sq62_2 => &UNIFIED_ADDRESS_127_TO_ADDRESS_POS,
-            Sq63_2 => &UNIFIED_ADDRESS_128_TO_ADDRESS_POS,
-            Sq64_2 => &UNIFIED_ADDRESS_129_TO_ADDRESS_POS,
-            Sq65_2 => &UNIFIED_ADDRESS_130_TO_ADDRESS_POS,
-            Sq66_2 => &UNIFIED_ADDRESS_131_TO_ADDRESS_POS,
-            Sq67_2 => &UNIFIED_ADDRESS_132_TO_ADDRESS_POS,
-            Sq68_2 => &UNIFIED_ADDRESS_133_TO_ADDRESS_POS,
-            Sq69_2 => &UNIFIED_ADDRESS_134_TO_ADDRESS_POS,
-            Sq71_2 => &UNIFIED_ADDRESS_135_TO_ADDRESS_POS,
-            Sq72_2 => &UNIFIED_ADDRESS_136_TO_ADDRESS_POS,
-            Sq73_2 => &UNIFIED_ADDRESS_137_TO_ADDRESS_POS,
-            Sq74_2 => &UNIFIED_ADDRESS_138_TO_ADDRESS_POS,
-            Sq75_2 => &UNIFIED_ADDRESS_139_TO_ADDRESS_POS,
-            Sq76_2 => &UNIFIED_ADDRESS_140_TO_ADDRESS_POS,
-            Sq77_2 => &UNIFIED_ADDRESS_141_TO_ADDRESS_POS,
-            Sq78_2 => &UNIFIED_ADDRESS_142_TO_ADDRESS_POS,
-            Sq79_2 => &UNIFIED_ADDRESS_143_TO_ADDRESS_POS,
-            Sq81_2 => &UNIFIED_ADDRESS_144_TO_ADDRESS_POS,
-            Sq82_2 => &UNIFIED_ADDRESS_145_TO_ADDRESS_POS,
-            Sq83_2 => &UNIFIED_ADDRESS_146_TO_ADDRESS_POS,
-            Sq84_2 => &UNIFIED_ADDRESS_147_TO_ADDRESS_POS,
-            Sq85_2 => &UNIFIED_ADDRESS_148_TO_ADDRESS_POS,
-            Sq86_2 => &UNIFIED_ADDRESS_149_TO_ADDRESS_POS,
-            Sq87_2 => &UNIFIED_ADDRESS_150_TO_ADDRESS_POS,
-            Sq88_2 => &UNIFIED_ADDRESS_151_TO_ADDRESS_POS,
-            Sq89_2 => &UNIFIED_ADDRESS_152_TO_ADDRESS_POS,
-            Sq91_2 => &UNIFIED_ADDRESS_153_TO_ADDRESS_POS,
-            Sq92_2 => &UNIFIED_ADDRESS_154_TO_ADDRESS_POS,
-            Sq93_2 => &UNIFIED_ADDRESS_155_TO_ADDRESS_POS,
-            Sq94_2 => &UNIFIED_ADDRESS_156_TO_ADDRESS_POS,
-            Sq95_2 => &UNIFIED_ADDRESS_157_TO_ADDRESS_POS,
-            Sq96_2 => &UNIFIED_ADDRESS_158_TO_ADDRESS_POS,
-            Sq97_2 => &UNIFIED_ADDRESS_159_TO_ADDRESS_POS,
-            Sq98_2 => &UNIFIED_ADDRESS_160_TO_ADDRESS_POS,
-            Sq99_2 => &UNIFIED_ADDRESS_161_TO_ADDRESS_POS,
-            King1 => &UNIFIED_ADDRESS_162_TO_ADDRESS_POS,
-            Rook1 => &UNIFIED_ADDRESS_163_TO_ADDRESS_POS,
-            Bishop1 => &UNIFIED_ADDRESS_164_TO_ADDRESS_POS,
-            Gold1 => &UNIFIED_ADDRESS_165_TO_ADDRESS_POS,
-            Silver1 => &UNIFIED_ADDRESS_166_TO_ADDRESS_POS,
-            Knight1 => &UNIFIED_ADDRESS_167_TO_ADDRESS_POS,
-            Lance1 => &UNIFIED_ADDRESS_168_TO_ADDRESS_POS,
-            Pawn1 => &UNIFIED_ADDRESS_169_TO_ADDRESS_POS,
-            King2 => &UNIFIED_ADDRESS_170_TO_ADDRESS_POS,
-            Rook2 => &UNIFIED_ADDRESS_171_TO_ADDRESS_POS,
-            Bishop2 => &UNIFIED_ADDRESS_172_TO_ADDRESS_POS,
-            Gold2 => &UNIFIED_ADDRESS_173_TO_ADDRESS_POS,
-            Silver2 => &UNIFIED_ADDRESS_174_TO_ADDRESS_POS,
-            Knight2 => &UNIFIED_ADDRESS_175_TO_ADDRESS_POS,
-            Lance2 => &UNIFIED_ADDRESS_176_TO_ADDRESS_POS,
-            Pawn2 => &UNIFIED_ADDRESS_177_TO_ADDRESS_POS,
-        }
-    }
-
     pub fn to_address_pos1(self) -> AddressPos1 {
         // 配列アクセスは遅い気がするので、match構文で書こうぜ☆（＾～＾）
         use crate::cosmic::toy_box::UnifiedAddress::*;
@@ -3471,9 +3285,9 @@ impl GameTable {
             // 先後ひっくり返す。
             self.turn_phase(collision_piece_num_val);
             self.push_piece(
-                UnifiedAddress::from_address_pos(
+                UnifiedAddress::from_address_pos1(
                     self.get_phase(collision_piece_num_val),
-                    &AddressPos::Hand(self.get_double_faced_piece(collision_piece_num_val)),
+                    AddressPos1::Hand(self.get_double_faced_piece(collision_piece_num_val)),
                 ),
                 Some(collision_piece_num_val),
             );
@@ -3493,8 +3307,8 @@ impl GameTable {
                     // friend.turn(),
                     move2_val.piece_type.double_faced_piece_type(),
                 );
-                let addr_pos1 = AddressPos::Hand(double_faced_piece);
-                let uni_addr = UnifiedAddress::from_address_pos(friend, &addr_pos1);
+                let addr_pos1 = AddressPos1::Hand(double_faced_piece);
+                let uni_addr = UnifiedAddress::from_address_pos1(friend, addr_pos1);
                 // let addr_pos2 = uni_addr.to_address_pos();
                 /*
                 Beam::shoot(&format!(
@@ -3519,25 +3333,23 @@ impl GameTable {
     }
     /// 駒を置く。
     pub fn push_piece(&mut self, addr: UnifiedAddress, piece_num: Option<PieceNum>) {
-        match addr.to_address_pos() {
-            AddressPos::Board(sq) => {
+        match addr.to_address_pos1() {
+            AddressPos1::Board(sq) => {
                 if let Some(piece_num_val) = piece_num {
                     // マスに駒を置きます。
-                    self.board[sq.serial_number() as usize] = piece_num;
+                    self.board[sq.to_serial_number() as usize] = piece_num;
                     // 背番号に番地を紐づけます。
-                    self.address_list[piece_num_val as usize] = UnifiedAddress::from_address_pos(
-                        self.get_phase(piece_num_val),
-                        &AddressPos::Board(*sq),
-                    );
+                    self.address_list[piece_num_val as usize] =
+                        sq.to_unified_address(self.get_phase(piece_num_val));
                 } else {
                     // マスを空にします。
-                    self.board[sq.serial_number() as usize] = None;
+                    self.board[sq.to_serial_number() as usize] = None;
                 }
             }
-            AddressPos::Hand(drop) => {
+            AddressPos1::Hand(drop) => {
                 if let Some(piece_num_val) = piece_num {
                     // 持ち駒を１つ増やします。
-                    self.phase_classification.push(*drop, piece_num_val);
+                    self.phase_classification.push(drop, piece_num_val);
                     // 背番号に番地を紐づけます。
                     self.address_list[piece_num_val as usize] = addr;
                 }
@@ -3546,28 +3358,28 @@ impl GameTable {
     }
     /// 駒を取りのぞく。
     pub fn pop_piece(&mut self, addr: UnifiedAddress) -> Option<PieceNum> {
-        match addr.to_address_pos() {
-            AddressPos::Board(sq) => {
-                let piece_num = self.board[sq.serial_number() as usize];
+        match addr.to_address_pos1() {
+            AddressPos1::Board(sq) => {
+                let piece_num = self.board[sq.to_serial_number() as usize];
                 if let Some(piece_num_val) = piece_num {
                     // マスを空にします。
-                    self.board[sq.serial_number() as usize] = None;
+                    self.board[sq.to_serial_number() as usize] = None;
                     // TODO 背番号の番地を、ゴミ値で塗りつぶすが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
-                    self.address_list[piece_num_val as usize] = UnifiedAddress::from_address_pos(
+                    self.address_list[piece_num_val as usize] = UnifiedAddress::from_address_pos1(
                         self.get_phase(piece_num_val),
-                        &AddressPos::Board(AbsoluteAddress2D::default()),
+                        AddressPos1::default(),
                     );
                 }
                 piece_num
             }
-            AddressPos::Hand(drop) => {
+            AddressPos1::Hand(drop) => {
                 // 場所で指定します。
                 // 台から取りのぞきます。
-                let piece_num = self.phase_classification.pop(*drop);
+                let piece_num = self.phase_classification.pop(drop);
                 // TODO 背番号の番地に、ゴミ値を入れて消去するが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
-                self.address_list[piece_num as usize] = UnifiedAddress::from_address_pos(
+                self.address_list[piece_num as usize] = UnifiedAddress::from_address_pos1(
                     self.get_phase(piece_num),
-                    &AddressPos::Board(AbsoluteAddress2D::default()),
+                    AddressPos1::default(),
                 );
                 Some(piece_num)
             }
