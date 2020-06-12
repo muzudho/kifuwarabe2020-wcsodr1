@@ -1522,10 +1522,8 @@ impl GameTable {
         ];
         for drop in &FIRST_SECOND[friend as usize] {
             if let Some(piece_type) = self.last_hand_type(*drop) {
-                piece_get(
-                    UnifiedAddress::from_address_pos(friend, &AddressPos::Hand(*drop)),
-                    piece_type,
-                );
+                // 有無を確認しているぜ☆（＾～＾）
+                piece_get(UnifiedAddress::from_double_faced_piece(*drop), piece_type);
             }
         }
     }
