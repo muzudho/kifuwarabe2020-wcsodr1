@@ -124,39 +124,26 @@ impl Game {
         self.hash_seed
             .update_by_do_move(&mut self.history, &self.table, move_);
 
-        // 動かす駒。Noneなことは無いが、将棋盤にセットするとき結局 Some を付けることになるので、わざわざ省かないぜ☆（＾～＾）
-        let moveing_piece_num: Option<PieceNum> = match move_.source.to_address_pos() {
-            AddressPos::Board(_src_sq) => {
-                // 盤上の移動なら、元の升に駒はあるので、それを消す。
-                let piece_num152: Option<PieceNum> = if move_.promote {
-                    if let Some(piece_num) = self.table.pop_piece(move_.source) {
-                        // 成ったのなら、元のマスの駒を成らすぜ☆（＾～＾）
-                        self.table.promote(piece_num);
-                        Some(piece_num)
-                    } else {
-                        panic!(Beam::trouble(
-                            "(Err.248) 成ったのに、元の升に駒がなかった☆（＾～＾）"
-                        ));
-                    }
-                } else {
-                    // 移動元の駒。
-                    self.table.pop_piece(move_.source)
-                };
+        // 移動元のマスにある駒をポップすることは確定。
+        let src_piece_num = self.table.pop_piece(move_.source);
 
-                piece_num152
+        // 持ち駒は成ることは無いので、成るなら盤上の駒であることが確定。
+        if move_.promote {
+            // 成ったのなら、元のマスの駒を成らすぜ☆（＾～＾）
+            if let Some(piece_num) = src_piece_num {
+                self.table.promote(piece_num);
+            } else {
+                panic!(Beam::trouble(
+                    "(Err.248) 成ったのに、元の升に駒がなかった☆（＾～＾）"
+                ));
             }
-            AddressPos::Hand(_drop) => {
-                // 打なら
-                // 自分の持ち駒を減らす
-                Some(self.table.pop_piece(move_.source).unwrap())
-            }
-        };
+        }
         // 移動先升に駒があるかどうか
         // あれば　盤の相手の駒を先後反転して、自分の駒台に置きます。
         self.table.rotate_piece_board_to_hand(&move_);
 
         // 移動先升に駒を置く
-        self.table.push_piece(move_.destination, moveing_piece_num);
+        self.table.push_piece(move_.destination, src_piece_num);
 
         // // 局面ハッシュを作り直す
         // let ky_hash = self.hash_seed.current_position(&self);
