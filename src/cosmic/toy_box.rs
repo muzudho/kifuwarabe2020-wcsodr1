@@ -519,168 +519,98 @@ const UNIFIED_SQ_79_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
     AbsoluteAddress2D { file: 9, rank: 8 };
 const UNIFIED_SQ_80_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
     AbsoluteAddress2D { file: 9, rank: 9 };
-const UNIFIED_SQ_81_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 1, rank: 1 };
-const UNIFIED_SQ_82_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 1, rank: 2 };
-const UNIFIED_SQ_83_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 1, rank: 3 };
-const UNIFIED_SQ_84_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 1, rank: 4 };
-const UNIFIED_SQ_85_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 1, rank: 5 };
-const UNIFIED_SQ_86_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 1, rank: 6 };
-const UNIFIED_SQ_87_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 1, rank: 7 };
-const UNIFIED_SQ_88_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 1, rank: 8 };
-const UNIFIED_SQ_89_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 1, rank: 9 };
-const UNIFIED_SQ_90_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 2, rank: 1 };
-const UNIFIED_SQ_91_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 2, rank: 2 };
-const UNIFIED_SQ_92_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 2, rank: 3 };
-const UNIFIED_SQ_93_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 2, rank: 4 };
-const UNIFIED_SQ_94_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 2, rank: 5 };
-const UNIFIED_SQ_95_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 2, rank: 6 };
-const UNIFIED_SQ_96_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 2, rank: 7 };
-const UNIFIED_SQ_97_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 2, rank: 8 };
-const UNIFIED_SQ_98_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 2, rank: 9 };
-const UNIFIED_SQ_99_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 3, rank: 1 };
-const UNIFIED_SQ_100_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 3, rank: 2 };
-const UNIFIED_SQ_101_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 3, rank: 3 };
-const UNIFIED_SQ_102_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 3, rank: 4 };
-const UNIFIED_SQ_103_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 3, rank: 5 };
-const UNIFIED_SQ_104_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 3, rank: 6 };
-const UNIFIED_SQ_105_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 3, rank: 7 };
-const UNIFIED_SQ_106_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 3, rank: 8 };
-const UNIFIED_SQ_107_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 3, rank: 9 };
-const UNIFIED_SQ_108_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 4, rank: 1 };
-const UNIFIED_SQ_109_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 4, rank: 2 };
-const UNIFIED_SQ_110_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 4, rank: 3 };
-const UNIFIED_SQ_111_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 4, rank: 4 };
-const UNIFIED_SQ_112_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 4, rank: 5 };
-const UNIFIED_SQ_113_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 4, rank: 6 };
-const UNIFIED_SQ_114_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 4, rank: 7 };
-const UNIFIED_SQ_115_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 4, rank: 8 };
-const UNIFIED_SQ_116_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 4, rank: 9 };
-const UNIFIED_SQ_117_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 5, rank: 1 };
-const UNIFIED_SQ_118_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 5, rank: 2 };
-const UNIFIED_SQ_119_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 5, rank: 3 };
-const UNIFIED_SQ_120_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 5, rank: 4 };
-const UNIFIED_SQ_121_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 5, rank: 5 };
-const UNIFIED_SQ_122_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 5, rank: 6 };
-const UNIFIED_SQ_123_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 5, rank: 7 };
-const UNIFIED_SQ_124_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 5, rank: 8 };
-const UNIFIED_SQ_125_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 5, rank: 9 };
-const UNIFIED_SQ_126_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 6, rank: 1 };
-const UNIFIED_SQ_127_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 6, rank: 2 };
-const UNIFIED_SQ_128_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 6, rank: 3 };
-const UNIFIED_SQ_129_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 6, rank: 4 };
-const UNIFIED_SQ_130_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 6, rank: 5 };
-const UNIFIED_SQ_131_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 6, rank: 6 };
-const UNIFIED_SQ_132_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 6, rank: 7 };
-const UNIFIED_SQ_133_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 6, rank: 8 };
-const UNIFIED_SQ_134_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 6, rank: 9 };
-const UNIFIED_SQ_135_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 7, rank: 1 };
-const UNIFIED_SQ_136_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 7, rank: 2 };
-const UNIFIED_SQ_137_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 7, rank: 3 };
-const UNIFIED_SQ_138_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 7, rank: 4 };
-const UNIFIED_SQ_139_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 7, rank: 5 };
-const UNIFIED_SQ_140_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 7, rank: 6 };
-const UNIFIED_SQ_141_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 7, rank: 7 };
-const UNIFIED_SQ_142_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 7, rank: 8 };
-const UNIFIED_SQ_143_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 7, rank: 9 };
-const UNIFIED_SQ_144_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 8, rank: 1 };
-const UNIFIED_SQ_145_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 8, rank: 2 };
-const UNIFIED_SQ_146_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 8, rank: 3 };
-const UNIFIED_SQ_147_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 8, rank: 4 };
-const UNIFIED_SQ_148_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 8, rank: 5 };
-const UNIFIED_SQ_149_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 8, rank: 6 };
-const UNIFIED_SQ_150_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 8, rank: 7 };
-const UNIFIED_SQ_151_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 8, rank: 8 };
-const UNIFIED_SQ_152_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 8, rank: 9 };
-const UNIFIED_SQ_153_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 9, rank: 1 };
-const UNIFIED_SQ_154_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 9, rank: 2 };
-const UNIFIED_SQ_155_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 9, rank: 3 };
-const UNIFIED_SQ_156_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 9, rank: 4 };
-const UNIFIED_SQ_157_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 9, rank: 5 };
-const UNIFIED_SQ_158_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 9, rank: 6 };
-const UNIFIED_SQ_159_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 9, rank: 7 };
-const UNIFIED_SQ_160_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 9, rank: 8 };
-const UNIFIED_SQ_161_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
-    AbsoluteAddress2D { file: 9, rank: 9 };
+
+/// 統一盤上アドレス。
+#[derive(Copy, Clone, Debug, FromPrimitive)]
+pub enum UnifiedSq {
+    Sq11,
+    Sq12,
+    Sq13,
+    Sq14,
+    Sq15,
+    Sq16,
+    Sq17,
+    Sq18,
+    Sq19,
+    Sq21,
+    Sq22,
+    Sq23,
+    Sq24,
+    Sq25,
+    Sq26,
+    Sq27,
+    Sq28,
+    Sq29,
+    Sq31,
+    Sq32,
+    Sq33,
+    Sq34,
+    Sq35,
+    Sq36,
+    Sq37,
+    Sq38,
+    Sq39,
+    Sq41,
+    Sq42,
+    Sq43,
+    Sq44,
+    Sq45,
+    Sq46,
+    Sq47,
+    Sq48,
+    Sq49,
+    Sq51,
+    Sq52,
+    Sq53,
+    Sq54,
+    Sq55,
+    Sq56,
+    Sq57,
+    Sq58,
+    Sq59,
+    Sq61,
+    Sq62,
+    Sq63,
+    Sq64,
+    Sq65,
+    Sq66,
+    Sq67,
+    Sq68,
+    Sq69,
+    Sq71,
+    Sq72,
+    Sq73,
+    Sq74,
+    Sq75,
+    Sq76,
+    Sq77,
+    Sq78,
+    Sq79,
+    Sq81,
+    Sq82,
+    Sq83,
+    Sq84,
+    Sq85,
+    Sq86,
+    Sq87,
+    Sq88,
+    Sq89,
+    Sq91,
+    Sq92,
+    Sq93,
+    Sq94,
+    Sq95,
+    Sq96,
+    Sq97,
+    Sq98,
+    Sq99,
+}
+impl Default for UnifiedSq {
+    /// ゴミ値だぜ☆（＾～＾）
+    fn default() -> Self {
+        UnifiedSq::Sq11
+    }
+}
 
 /// 統一アドレス。
 #[derive(Copy, Clone, Debug, FromPrimitive)]
@@ -924,6 +854,71 @@ impl UnifiedAddress {
             }
         } else if 90 < num && num < 100 {
             if let Some(val) = UnifiedAddress::from_usize(second + num - 91 + 8 * 9) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.173) 番地を変換できね☆（＾～＾）"))
+            }
+        } else {
+            panic!(Beam::trouble("(Err.176) 番地を変換できね☆（＾～＾）"))
+        }
+    }
+
+    pub fn from_absolute_address_2d_to_unified_sq(
+        friend: Phase,
+        addr: &AbsoluteAddress2D,
+    ) -> UnifiedSq {
+        let second = if friend == Phase::Second { 81 } else { 0 };
+        let num = addr.serial_number();
+        if 10 < num && num < 20 {
+            if let Some(val) = UnifiedSq::from_usize(second + num - 11) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.124) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 20 < num && num < 30 {
+            if let Some(val) = UnifiedSq::from_usize(second + num - 21 + 9) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.131) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 30 < num && num < 40 {
+            if let Some(val) = UnifiedSq::from_usize(second + num - 31 + 2 * 9) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.137) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 40 < num && num < 50 {
+            if let Some(val) = UnifiedSq::from_usize(second + num - 41 + 3 * 9) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.143) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 50 < num && num < 60 {
+            if let Some(val) = UnifiedSq::from_usize(second + num - 51 + 4 * 9) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.149) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 60 < num && num < 70 {
+            if let Some(val) = UnifiedSq::from_usize(second + num - 61 + 5 * 9) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.155) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 70 < num && num < 80 {
+            if let Some(val) = UnifiedSq::from_usize(second + num - 71 + 6 * 9) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.161) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 80 < num && num < 90 {
+            if let Some(val) = UnifiedSq::from_usize(second + num - 81 + 7 * 9) {
+                val
+            } else {
+                panic!(Beam::trouble("(Err.167) 番地を変換できね☆（＾～＾）"))
+            }
+        } else if 90 < num && num < 100 {
+            if let Some(val) = UnifiedSq::from_usize(second + num - 91 + 8 * 9) {
                 val
             } else {
                 panic!(Beam::trouble("(Err.173) 番地を変換できね☆（＾～＾）"))
@@ -1541,172 +1536,91 @@ impl UnifiedAddress {
         }
     }
 
-    pub fn to_absolute_address_2d(self) -> &'static AbsoluteAddress2D {
+    pub fn unified_sq_to_absolute_address_2d(sq: UnifiedSq) -> AbsoluteAddress2D {
         // 配列アクセスは遅い気がするので、match構文で書こうぜ☆（＾～＾）
-        use crate::cosmic::toy_box::UnifiedAddress::*;
-        match self {
-            Sq11_1 => &UNIFIED_SQ_0_TO_ABSOLUTE_ADDRESS_2D,
-            Sq12_1 => &UNIFIED_SQ_1_TO_ABSOLUTE_ADDRESS_2D,
-            Sq13_1 => &UNIFIED_SQ_2_TO_ABSOLUTE_ADDRESS_2D,
-            Sq14_1 => &UNIFIED_SQ_3_TO_ABSOLUTE_ADDRESS_2D,
-            Sq15_1 => &UNIFIED_SQ_4_TO_ABSOLUTE_ADDRESS_2D,
-            Sq16_1 => &UNIFIED_SQ_5_TO_ABSOLUTE_ADDRESS_2D,
-            Sq17_1 => &UNIFIED_SQ_6_TO_ABSOLUTE_ADDRESS_2D,
-            Sq18_1 => &UNIFIED_SQ_7_TO_ABSOLUTE_ADDRESS_2D,
-            Sq19_1 => &UNIFIED_SQ_8_TO_ABSOLUTE_ADDRESS_2D,
-            Sq21_1 => &UNIFIED_SQ_9_TO_ABSOLUTE_ADDRESS_2D,
-            Sq22_1 => &UNIFIED_SQ_10_TO_ABSOLUTE_ADDRESS_2D,
-            Sq23_1 => &UNIFIED_SQ_11_TO_ABSOLUTE_ADDRESS_2D,
-            Sq24_1 => &UNIFIED_SQ_12_TO_ABSOLUTE_ADDRESS_2D,
-            Sq25_1 => &UNIFIED_SQ_13_TO_ABSOLUTE_ADDRESS_2D,
-            Sq26_1 => &UNIFIED_SQ_14_TO_ABSOLUTE_ADDRESS_2D,
-            Sq27_1 => &UNIFIED_SQ_15_TO_ABSOLUTE_ADDRESS_2D,
-            Sq28_1 => &UNIFIED_SQ_16_TO_ABSOLUTE_ADDRESS_2D,
-            Sq29_1 => &UNIFIED_SQ_17_TO_ABSOLUTE_ADDRESS_2D,
-            Sq31_1 => &UNIFIED_SQ_18_TO_ABSOLUTE_ADDRESS_2D,
-            Sq32_1 => &UNIFIED_SQ_19_TO_ABSOLUTE_ADDRESS_2D,
-            Sq33_1 => &UNIFIED_SQ_20_TO_ABSOLUTE_ADDRESS_2D,
-            Sq34_1 => &UNIFIED_SQ_21_TO_ABSOLUTE_ADDRESS_2D,
-            Sq35_1 => &UNIFIED_SQ_22_TO_ABSOLUTE_ADDRESS_2D,
-            Sq36_1 => &UNIFIED_SQ_23_TO_ABSOLUTE_ADDRESS_2D,
-            Sq37_1 => &UNIFIED_SQ_24_TO_ABSOLUTE_ADDRESS_2D,
-            Sq38_1 => &UNIFIED_SQ_25_TO_ABSOLUTE_ADDRESS_2D,
-            Sq39_1 => &UNIFIED_SQ_26_TO_ABSOLUTE_ADDRESS_2D,
-            Sq41_1 => &UNIFIED_SQ_27_TO_ABSOLUTE_ADDRESS_2D,
-            Sq42_1 => &UNIFIED_SQ_28_TO_ABSOLUTE_ADDRESS_2D,
-            Sq43_1 => &UNIFIED_SQ_29_TO_ABSOLUTE_ADDRESS_2D,
-            Sq44_1 => &UNIFIED_SQ_30_TO_ABSOLUTE_ADDRESS_2D,
-            Sq45_1 => &UNIFIED_SQ_31_TO_ABSOLUTE_ADDRESS_2D,
-            Sq46_1 => &UNIFIED_SQ_32_TO_ABSOLUTE_ADDRESS_2D,
-            Sq47_1 => &UNIFIED_SQ_33_TO_ABSOLUTE_ADDRESS_2D,
-            Sq48_1 => &UNIFIED_SQ_34_TO_ABSOLUTE_ADDRESS_2D,
-            Sq49_1 => &UNIFIED_SQ_35_TO_ABSOLUTE_ADDRESS_2D,
-            Sq51_1 => &UNIFIED_SQ_36_TO_ABSOLUTE_ADDRESS_2D,
-            Sq52_1 => &UNIFIED_SQ_37_TO_ABSOLUTE_ADDRESS_2D,
-            Sq53_1 => &UNIFIED_SQ_38_TO_ABSOLUTE_ADDRESS_2D,
-            Sq54_1 => &UNIFIED_SQ_39_TO_ABSOLUTE_ADDRESS_2D,
-            Sq55_1 => &UNIFIED_SQ_40_TO_ABSOLUTE_ADDRESS_2D,
-            Sq56_1 => &UNIFIED_SQ_41_TO_ABSOLUTE_ADDRESS_2D,
-            Sq57_1 => &UNIFIED_SQ_42_TO_ABSOLUTE_ADDRESS_2D,
-            Sq58_1 => &UNIFIED_SQ_43_TO_ABSOLUTE_ADDRESS_2D,
-            Sq59_1 => &UNIFIED_SQ_44_TO_ABSOLUTE_ADDRESS_2D,
-            Sq61_1 => &UNIFIED_SQ_45_TO_ABSOLUTE_ADDRESS_2D,
-            Sq62_1 => &UNIFIED_SQ_46_TO_ABSOLUTE_ADDRESS_2D,
-            Sq63_1 => &UNIFIED_SQ_47_TO_ABSOLUTE_ADDRESS_2D,
-            Sq64_1 => &UNIFIED_SQ_48_TO_ABSOLUTE_ADDRESS_2D,
-            Sq65_1 => &UNIFIED_SQ_49_TO_ABSOLUTE_ADDRESS_2D,
-            Sq66_1 => &UNIFIED_SQ_50_TO_ABSOLUTE_ADDRESS_2D,
-            Sq67_1 => &UNIFIED_SQ_51_TO_ABSOLUTE_ADDRESS_2D,
-            Sq68_1 => &UNIFIED_SQ_52_TO_ABSOLUTE_ADDRESS_2D,
-            Sq69_1 => &UNIFIED_SQ_53_TO_ABSOLUTE_ADDRESS_2D,
-            Sq71_1 => &UNIFIED_SQ_54_TO_ABSOLUTE_ADDRESS_2D,
-            Sq72_1 => &UNIFIED_SQ_55_TO_ABSOLUTE_ADDRESS_2D,
-            Sq73_1 => &UNIFIED_SQ_56_TO_ABSOLUTE_ADDRESS_2D,
-            Sq74_1 => &UNIFIED_SQ_57_TO_ABSOLUTE_ADDRESS_2D,
-            Sq75_1 => &UNIFIED_SQ_58_TO_ABSOLUTE_ADDRESS_2D,
-            Sq76_1 => &UNIFIED_SQ_59_TO_ABSOLUTE_ADDRESS_2D,
-            Sq77_1 => &UNIFIED_SQ_60_TO_ABSOLUTE_ADDRESS_2D,
-            Sq78_1 => &UNIFIED_SQ_61_TO_ABSOLUTE_ADDRESS_2D,
-            Sq79_1 => &UNIFIED_SQ_62_TO_ABSOLUTE_ADDRESS_2D,
-            Sq81_1 => &UNIFIED_SQ_63_TO_ABSOLUTE_ADDRESS_2D,
-            Sq82_1 => &UNIFIED_SQ_64_TO_ABSOLUTE_ADDRESS_2D,
-            Sq83_1 => &UNIFIED_SQ_65_TO_ABSOLUTE_ADDRESS_2D,
-            Sq84_1 => &UNIFIED_SQ_66_TO_ABSOLUTE_ADDRESS_2D,
-            Sq85_1 => &UNIFIED_SQ_67_TO_ABSOLUTE_ADDRESS_2D,
-            Sq86_1 => &UNIFIED_SQ_68_TO_ABSOLUTE_ADDRESS_2D,
-            Sq87_1 => &UNIFIED_SQ_69_TO_ABSOLUTE_ADDRESS_2D,
-            Sq88_1 => &UNIFIED_SQ_70_TO_ABSOLUTE_ADDRESS_2D,
-            Sq89_1 => &UNIFIED_SQ_71_TO_ABSOLUTE_ADDRESS_2D,
-            Sq91_1 => &UNIFIED_SQ_72_TO_ABSOLUTE_ADDRESS_2D,
-            Sq92_1 => &UNIFIED_SQ_73_TO_ABSOLUTE_ADDRESS_2D,
-            Sq93_1 => &UNIFIED_SQ_74_TO_ABSOLUTE_ADDRESS_2D,
-            Sq94_1 => &UNIFIED_SQ_75_TO_ABSOLUTE_ADDRESS_2D,
-            Sq95_1 => &UNIFIED_SQ_76_TO_ABSOLUTE_ADDRESS_2D,
-            Sq96_1 => &UNIFIED_SQ_77_TO_ABSOLUTE_ADDRESS_2D,
-            Sq97_1 => &UNIFIED_SQ_78_TO_ABSOLUTE_ADDRESS_2D,
-            Sq98_1 => &UNIFIED_SQ_79_TO_ABSOLUTE_ADDRESS_2D,
-            Sq99_1 => &UNIFIED_SQ_80_TO_ABSOLUTE_ADDRESS_2D,
-            Sq11_2 => &UNIFIED_SQ_81_TO_ABSOLUTE_ADDRESS_2D,
-            Sq12_2 => &UNIFIED_SQ_82_TO_ABSOLUTE_ADDRESS_2D,
-            Sq13_2 => &UNIFIED_SQ_83_TO_ABSOLUTE_ADDRESS_2D,
-            Sq14_2 => &UNIFIED_SQ_84_TO_ABSOLUTE_ADDRESS_2D,
-            Sq15_2 => &UNIFIED_SQ_85_TO_ABSOLUTE_ADDRESS_2D,
-            Sq16_2 => &UNIFIED_SQ_86_TO_ABSOLUTE_ADDRESS_2D,
-            Sq17_2 => &UNIFIED_SQ_87_TO_ABSOLUTE_ADDRESS_2D,
-            Sq18_2 => &UNIFIED_SQ_88_TO_ABSOLUTE_ADDRESS_2D,
-            Sq19_2 => &UNIFIED_SQ_89_TO_ABSOLUTE_ADDRESS_2D,
-            Sq21_2 => &UNIFIED_SQ_90_TO_ABSOLUTE_ADDRESS_2D,
-            Sq22_2 => &UNIFIED_SQ_91_TO_ABSOLUTE_ADDRESS_2D,
-            Sq23_2 => &UNIFIED_SQ_92_TO_ABSOLUTE_ADDRESS_2D,
-            Sq24_2 => &UNIFIED_SQ_93_TO_ABSOLUTE_ADDRESS_2D,
-            Sq25_2 => &UNIFIED_SQ_94_TO_ABSOLUTE_ADDRESS_2D,
-            Sq26_2 => &UNIFIED_SQ_95_TO_ABSOLUTE_ADDRESS_2D,
-            Sq27_2 => &UNIFIED_SQ_96_TO_ABSOLUTE_ADDRESS_2D,
-            Sq28_2 => &UNIFIED_SQ_97_TO_ABSOLUTE_ADDRESS_2D,
-            Sq29_2 => &UNIFIED_SQ_98_TO_ABSOLUTE_ADDRESS_2D,
-            Sq31_2 => &UNIFIED_SQ_99_TO_ABSOLUTE_ADDRESS_2D,
-            Sq32_2 => &UNIFIED_SQ_100_TO_ABSOLUTE_ADDRESS_2D,
-            Sq33_2 => &UNIFIED_SQ_101_TO_ABSOLUTE_ADDRESS_2D,
-            Sq34_2 => &UNIFIED_SQ_102_TO_ABSOLUTE_ADDRESS_2D,
-            Sq35_2 => &UNIFIED_SQ_103_TO_ABSOLUTE_ADDRESS_2D,
-            Sq36_2 => &UNIFIED_SQ_104_TO_ABSOLUTE_ADDRESS_2D,
-            Sq37_2 => &UNIFIED_SQ_105_TO_ABSOLUTE_ADDRESS_2D,
-            Sq38_2 => &UNIFIED_SQ_106_TO_ABSOLUTE_ADDRESS_2D,
-            Sq39_2 => &UNIFIED_SQ_107_TO_ABSOLUTE_ADDRESS_2D,
-            Sq41_2 => &UNIFIED_SQ_108_TO_ABSOLUTE_ADDRESS_2D,
-            Sq42_2 => &UNIFIED_SQ_109_TO_ABSOLUTE_ADDRESS_2D,
-            Sq43_2 => &UNIFIED_SQ_110_TO_ABSOLUTE_ADDRESS_2D,
-            Sq44_2 => &UNIFIED_SQ_111_TO_ABSOLUTE_ADDRESS_2D,
-            Sq45_2 => &UNIFIED_SQ_112_TO_ABSOLUTE_ADDRESS_2D,
-            Sq46_2 => &UNIFIED_SQ_113_TO_ABSOLUTE_ADDRESS_2D,
-            Sq47_2 => &UNIFIED_SQ_114_TO_ABSOLUTE_ADDRESS_2D,
-            Sq48_2 => &UNIFIED_SQ_115_TO_ABSOLUTE_ADDRESS_2D,
-            Sq49_2 => &UNIFIED_SQ_116_TO_ABSOLUTE_ADDRESS_2D,
-            Sq51_2 => &UNIFIED_SQ_117_TO_ABSOLUTE_ADDRESS_2D,
-            Sq52_2 => &UNIFIED_SQ_118_TO_ABSOLUTE_ADDRESS_2D,
-            Sq53_2 => &UNIFIED_SQ_119_TO_ABSOLUTE_ADDRESS_2D,
-            Sq54_2 => &UNIFIED_SQ_120_TO_ABSOLUTE_ADDRESS_2D,
-            Sq55_2 => &UNIFIED_SQ_121_TO_ABSOLUTE_ADDRESS_2D,
-            Sq56_2 => &UNIFIED_SQ_122_TO_ABSOLUTE_ADDRESS_2D,
-            Sq57_2 => &UNIFIED_SQ_123_TO_ABSOLUTE_ADDRESS_2D,
-            Sq58_2 => &UNIFIED_SQ_124_TO_ABSOLUTE_ADDRESS_2D,
-            Sq59_2 => &UNIFIED_SQ_125_TO_ABSOLUTE_ADDRESS_2D,
-            Sq61_2 => &UNIFIED_SQ_126_TO_ABSOLUTE_ADDRESS_2D,
-            Sq62_2 => &UNIFIED_SQ_127_TO_ABSOLUTE_ADDRESS_2D,
-            Sq63_2 => &UNIFIED_SQ_128_TO_ABSOLUTE_ADDRESS_2D,
-            Sq64_2 => &UNIFIED_SQ_129_TO_ABSOLUTE_ADDRESS_2D,
-            Sq65_2 => &UNIFIED_SQ_130_TO_ABSOLUTE_ADDRESS_2D,
-            Sq66_2 => &UNIFIED_SQ_131_TO_ABSOLUTE_ADDRESS_2D,
-            Sq67_2 => &UNIFIED_SQ_132_TO_ABSOLUTE_ADDRESS_2D,
-            Sq68_2 => &UNIFIED_SQ_133_TO_ABSOLUTE_ADDRESS_2D,
-            Sq69_2 => &UNIFIED_SQ_134_TO_ABSOLUTE_ADDRESS_2D,
-            Sq71_2 => &UNIFIED_SQ_135_TO_ABSOLUTE_ADDRESS_2D,
-            Sq72_2 => &UNIFIED_SQ_136_TO_ABSOLUTE_ADDRESS_2D,
-            Sq73_2 => &UNIFIED_SQ_137_TO_ABSOLUTE_ADDRESS_2D,
-            Sq74_2 => &UNIFIED_SQ_138_TO_ABSOLUTE_ADDRESS_2D,
-            Sq75_2 => &UNIFIED_SQ_139_TO_ABSOLUTE_ADDRESS_2D,
-            Sq76_2 => &UNIFIED_SQ_140_TO_ABSOLUTE_ADDRESS_2D,
-            Sq77_2 => &UNIFIED_SQ_141_TO_ABSOLUTE_ADDRESS_2D,
-            Sq78_2 => &UNIFIED_SQ_142_TO_ABSOLUTE_ADDRESS_2D,
-            Sq79_2 => &UNIFIED_SQ_143_TO_ABSOLUTE_ADDRESS_2D,
-            Sq81_2 => &UNIFIED_SQ_144_TO_ABSOLUTE_ADDRESS_2D,
-            Sq82_2 => &UNIFIED_SQ_145_TO_ABSOLUTE_ADDRESS_2D,
-            Sq83_2 => &UNIFIED_SQ_146_TO_ABSOLUTE_ADDRESS_2D,
-            Sq84_2 => &UNIFIED_SQ_147_TO_ABSOLUTE_ADDRESS_2D,
-            Sq85_2 => &UNIFIED_SQ_148_TO_ABSOLUTE_ADDRESS_2D,
-            Sq86_2 => &UNIFIED_SQ_149_TO_ABSOLUTE_ADDRESS_2D,
-            Sq87_2 => &UNIFIED_SQ_150_TO_ABSOLUTE_ADDRESS_2D,
-            Sq88_2 => &UNIFIED_SQ_151_TO_ABSOLUTE_ADDRESS_2D,
-            Sq89_2 => &UNIFIED_SQ_152_TO_ABSOLUTE_ADDRESS_2D,
-            Sq91_2 => &UNIFIED_SQ_153_TO_ABSOLUTE_ADDRESS_2D,
-            Sq92_2 => &UNIFIED_SQ_154_TO_ABSOLUTE_ADDRESS_2D,
-            Sq93_2 => &UNIFIED_SQ_155_TO_ABSOLUTE_ADDRESS_2D,
-            Sq94_2 => &UNIFIED_SQ_156_TO_ABSOLUTE_ADDRESS_2D,
-            Sq95_2 => &UNIFIED_SQ_157_TO_ABSOLUTE_ADDRESS_2D,
-            Sq96_2 => &UNIFIED_SQ_158_TO_ABSOLUTE_ADDRESS_2D,
-            Sq97_2 => &UNIFIED_SQ_159_TO_ABSOLUTE_ADDRESS_2D,
-            Sq98_2 => &UNIFIED_SQ_160_TO_ABSOLUTE_ADDRESS_2D,
-            Sq99_2 => &UNIFIED_SQ_161_TO_ABSOLUTE_ADDRESS_2D,
+        use crate::cosmic::toy_box::UnifiedSq::*;
+        match sq {
+            Sq11 => UNIFIED_SQ_0_TO_ABSOLUTE_ADDRESS_2D,
+            Sq12 => UNIFIED_SQ_1_TO_ABSOLUTE_ADDRESS_2D,
+            Sq13 => UNIFIED_SQ_2_TO_ABSOLUTE_ADDRESS_2D,
+            Sq14 => UNIFIED_SQ_3_TO_ABSOLUTE_ADDRESS_2D,
+            Sq15 => UNIFIED_SQ_4_TO_ABSOLUTE_ADDRESS_2D,
+            Sq16 => UNIFIED_SQ_5_TO_ABSOLUTE_ADDRESS_2D,
+            Sq17 => UNIFIED_SQ_6_TO_ABSOLUTE_ADDRESS_2D,
+            Sq18 => UNIFIED_SQ_7_TO_ABSOLUTE_ADDRESS_2D,
+            Sq19 => UNIFIED_SQ_8_TO_ABSOLUTE_ADDRESS_2D,
+            Sq21 => UNIFIED_SQ_9_TO_ABSOLUTE_ADDRESS_2D,
+            Sq22 => UNIFIED_SQ_10_TO_ABSOLUTE_ADDRESS_2D,
+            Sq23 => UNIFIED_SQ_11_TO_ABSOLUTE_ADDRESS_2D,
+            Sq24 => UNIFIED_SQ_12_TO_ABSOLUTE_ADDRESS_2D,
+            Sq25 => UNIFIED_SQ_13_TO_ABSOLUTE_ADDRESS_2D,
+            Sq26 => UNIFIED_SQ_14_TO_ABSOLUTE_ADDRESS_2D,
+            Sq27 => UNIFIED_SQ_15_TO_ABSOLUTE_ADDRESS_2D,
+            Sq28 => UNIFIED_SQ_16_TO_ABSOLUTE_ADDRESS_2D,
+            Sq29 => UNIFIED_SQ_17_TO_ABSOLUTE_ADDRESS_2D,
+            Sq31 => UNIFIED_SQ_18_TO_ABSOLUTE_ADDRESS_2D,
+            Sq32 => UNIFIED_SQ_19_TO_ABSOLUTE_ADDRESS_2D,
+            Sq33 => UNIFIED_SQ_20_TO_ABSOLUTE_ADDRESS_2D,
+            Sq34 => UNIFIED_SQ_21_TO_ABSOLUTE_ADDRESS_2D,
+            Sq35 => UNIFIED_SQ_22_TO_ABSOLUTE_ADDRESS_2D,
+            Sq36 => UNIFIED_SQ_23_TO_ABSOLUTE_ADDRESS_2D,
+            Sq37 => UNIFIED_SQ_24_TO_ABSOLUTE_ADDRESS_2D,
+            Sq38 => UNIFIED_SQ_25_TO_ABSOLUTE_ADDRESS_2D,
+            Sq39 => UNIFIED_SQ_26_TO_ABSOLUTE_ADDRESS_2D,
+            Sq41 => UNIFIED_SQ_27_TO_ABSOLUTE_ADDRESS_2D,
+            Sq42 => UNIFIED_SQ_28_TO_ABSOLUTE_ADDRESS_2D,
+            Sq43 => UNIFIED_SQ_29_TO_ABSOLUTE_ADDRESS_2D,
+            Sq44 => UNIFIED_SQ_30_TO_ABSOLUTE_ADDRESS_2D,
+            Sq45 => UNIFIED_SQ_31_TO_ABSOLUTE_ADDRESS_2D,
+            Sq46 => UNIFIED_SQ_32_TO_ABSOLUTE_ADDRESS_2D,
+            Sq47 => UNIFIED_SQ_33_TO_ABSOLUTE_ADDRESS_2D,
+            Sq48 => UNIFIED_SQ_34_TO_ABSOLUTE_ADDRESS_2D,
+            Sq49 => UNIFIED_SQ_35_TO_ABSOLUTE_ADDRESS_2D,
+            Sq51 => UNIFIED_SQ_36_TO_ABSOLUTE_ADDRESS_2D,
+            Sq52 => UNIFIED_SQ_37_TO_ABSOLUTE_ADDRESS_2D,
+            Sq53 => UNIFIED_SQ_38_TO_ABSOLUTE_ADDRESS_2D,
+            Sq54 => UNIFIED_SQ_39_TO_ABSOLUTE_ADDRESS_2D,
+            Sq55 => UNIFIED_SQ_40_TO_ABSOLUTE_ADDRESS_2D,
+            Sq56 => UNIFIED_SQ_41_TO_ABSOLUTE_ADDRESS_2D,
+            Sq57 => UNIFIED_SQ_42_TO_ABSOLUTE_ADDRESS_2D,
+            Sq58 => UNIFIED_SQ_43_TO_ABSOLUTE_ADDRESS_2D,
+            Sq59 => UNIFIED_SQ_44_TO_ABSOLUTE_ADDRESS_2D,
+            Sq61 => UNIFIED_SQ_45_TO_ABSOLUTE_ADDRESS_2D,
+            Sq62 => UNIFIED_SQ_46_TO_ABSOLUTE_ADDRESS_2D,
+            Sq63 => UNIFIED_SQ_47_TO_ABSOLUTE_ADDRESS_2D,
+            Sq64 => UNIFIED_SQ_48_TO_ABSOLUTE_ADDRESS_2D,
+            Sq65 => UNIFIED_SQ_49_TO_ABSOLUTE_ADDRESS_2D,
+            Sq66 => UNIFIED_SQ_50_TO_ABSOLUTE_ADDRESS_2D,
+            Sq67 => UNIFIED_SQ_51_TO_ABSOLUTE_ADDRESS_2D,
+            Sq68 => UNIFIED_SQ_52_TO_ABSOLUTE_ADDRESS_2D,
+            Sq69 => UNIFIED_SQ_53_TO_ABSOLUTE_ADDRESS_2D,
+            Sq71 => UNIFIED_SQ_54_TO_ABSOLUTE_ADDRESS_2D,
+            Sq72 => UNIFIED_SQ_55_TO_ABSOLUTE_ADDRESS_2D,
+            Sq73 => UNIFIED_SQ_56_TO_ABSOLUTE_ADDRESS_2D,
+            Sq74 => UNIFIED_SQ_57_TO_ABSOLUTE_ADDRESS_2D,
+            Sq75 => UNIFIED_SQ_58_TO_ABSOLUTE_ADDRESS_2D,
+            Sq76 => UNIFIED_SQ_59_TO_ABSOLUTE_ADDRESS_2D,
+            Sq77 => UNIFIED_SQ_60_TO_ABSOLUTE_ADDRESS_2D,
+            Sq78 => UNIFIED_SQ_61_TO_ABSOLUTE_ADDRESS_2D,
+            Sq79 => UNIFIED_SQ_62_TO_ABSOLUTE_ADDRESS_2D,
+            Sq81 => UNIFIED_SQ_63_TO_ABSOLUTE_ADDRESS_2D,
+            Sq82 => UNIFIED_SQ_64_TO_ABSOLUTE_ADDRESS_2D,
+            Sq83 => UNIFIED_SQ_65_TO_ABSOLUTE_ADDRESS_2D,
+            Sq84 => UNIFIED_SQ_66_TO_ABSOLUTE_ADDRESS_2D,
+            Sq85 => UNIFIED_SQ_67_TO_ABSOLUTE_ADDRESS_2D,
+            Sq86 => UNIFIED_SQ_68_TO_ABSOLUTE_ADDRESS_2D,
+            Sq87 => UNIFIED_SQ_69_TO_ABSOLUTE_ADDRESS_2D,
+            Sq88 => UNIFIED_SQ_70_TO_ABSOLUTE_ADDRESS_2D,
+            Sq89 => UNIFIED_SQ_71_TO_ABSOLUTE_ADDRESS_2D,
+            Sq91 => UNIFIED_SQ_72_TO_ABSOLUTE_ADDRESS_2D,
+            Sq92 => UNIFIED_SQ_73_TO_ABSOLUTE_ADDRESS_2D,
+            Sq93 => UNIFIED_SQ_74_TO_ABSOLUTE_ADDRESS_2D,
+            Sq94 => UNIFIED_SQ_75_TO_ABSOLUTE_ADDRESS_2D,
+            Sq95 => UNIFIED_SQ_76_TO_ABSOLUTE_ADDRESS_2D,
+            Sq96 => UNIFIED_SQ_77_TO_ABSOLUTE_ADDRESS_2D,
+            Sq97 => UNIFIED_SQ_78_TO_ABSOLUTE_ADDRESS_2D,
+            Sq98 => UNIFIED_SQ_79_TO_ABSOLUTE_ADDRESS_2D,
+            Sq99 => UNIFIED_SQ_80_TO_ABSOLUTE_ADDRESS_2D,
             _ => panic!("（＾～＾）"),
         }
     }
