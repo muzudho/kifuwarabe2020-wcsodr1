@@ -113,16 +113,16 @@ impl fmt::Display for AddressPos1 {
 #[derive(Clone, Copy)]
 pub enum AddressPos3 {
     // 先手の盤上の番地
-    FirstBoard(AbsoluteAddress2D),
+    FirstBoard(SquareType),
     // 後手の盤上の番地
-    SecondBoard(AbsoluteAddress2D),
+    SecondBoard(SquareType),
     // 持ち駒の種類
     Hand(DoubleFacedPiece),
 }
 impl Default for AddressPos3 {
     // ゴミ値だぜ☆（＾～＾）
     fn default() -> Self {
-        AddressPos3::FirstBoard(AbsoluteAddress2D::default())
+        AddressPos3::FirstBoard(SquareType::Sq11)
     }
 }
 impl fmt::Display for AddressPos3 {
@@ -131,8 +131,9 @@ impl fmt::Display for AddressPos3 {
             f,
             "{}",
             match self {
-                AddressPos3::FirstBoard(addr) | AddressPos3::SecondBoard(addr) => {
-                    format!("{}", addr)
+                AddressPos3::FirstBoard(sq) | AddressPos3::SecondBoard(sq) => {
+                    let (file, rank) = sq.to_file_rank();
+                    format!("{}{}", file, num_to_lower_case(rank))
                 }
                 AddressPos3::Hand(drop) => {
                     format!("{}", drop)
@@ -147,8 +148,8 @@ impl fmt::Debug for AddressPos3 {
             f,
             "{}",
             match self {
-                AddressPos3::FirstBoard(addr) | AddressPos3::SecondBoard(addr) => {
-                    addr.serial_number().to_string()
+                AddressPos3::FirstBoard(sq) | AddressPos3::SecondBoard(sq) => {
+                    sq.to_serial_number().to_string()
                 }
                 AddressPos3::Hand(drop) => {
                     format!("{:?}", drop)

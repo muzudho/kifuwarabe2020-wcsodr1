@@ -975,10 +975,10 @@ impl Promoting {
     fn is_farthest_rank_from_friend(destination: UnifiedAddress) -> bool {
         match destination.to_address_pos3() {
             AddressPos3::FirstBoard(dst_sq) => {
-                dst_sq.rank() < RANK_2
+                dst_sq.to_rank() < RANK_2
             }
             AddressPos3::SecondBoard(dst_sq) => {
-                    RANK_8 < dst_sq.rank()
+                    RANK_8 < dst_sq.to_rank()
             }
             _ => panic!(Beam::trouble(&format!(
                 "(Err.905) まだ実装してないぜ☆（＾～＾）！",
@@ -997,10 +997,10 @@ impl Promoting {
     ) -> bool {
         match destination.to_address_pos3() {
             AddressPos3::FirstBoard(dst_sq) => {
-                dst_sq.rank() < RANK_3
+                dst_sq.to_rank() < RANK_3
             }
             AddressPos3::SecondBoard(dst_sq) => {
-                RANK_7 < dst_sq.rank()
+                RANK_7 < dst_sq.to_rank()
             }
             _ => panic!(Beam::trouble(&format!(
                 "(Err.919) まだ実装してないぜ☆（＾～＾）！",
@@ -1019,10 +1019,10 @@ impl Promoting {
     ) -> bool {
         match destination.to_address_pos3() {
             AddressPos3::FirstBoard(dst_sq) => {
-                RANK_1 < dst_sq.rank() && dst_sq.rank() < RANK_4
+                RANK_1 < dst_sq.to_rank() && dst_sq.to_rank() < RANK_4
             }
             AddressPos3::SecondBoard(dst_sq) => {
-                    RANK_6 < dst_sq.rank() && dst_sq.rank() < RANK_9
+                    RANK_6 < dst_sq.to_rank() && dst_sq.to_rank() < RANK_9
             }
             _ => panic!(Beam::trouble(&format!(
                 "(Err.937) まだ実装してないぜ☆（＾～＾）！",
@@ -1039,10 +1039,10 @@ impl Promoting {
     fn is_third_farthest_rank_from_friend(destination: UnifiedAddress) -> bool {
         match destination.to_address_pos3() {
             AddressPos3::FirstBoard(dst_sq) => {
-                dst_sq.rank() == RANK_3
+                dst_sq.to_rank() == RANK_3
             }
             AddressPos3::SecondBoard(dst_sq) => {
-                RANK_7 == dst_sq.rank()
+                RANK_7 == dst_sq.to_rank()
             }
             _ => panic!(Beam::trouble(&format!(
                 "(Err.946) まだ実装してないぜ☆（＾～＾）！",
@@ -1059,10 +1059,10 @@ impl Promoting {
     fn is_opponent_region(destination: UnifiedAddress) -> bool {
         match destination.to_address_pos3() {
             AddressPos3::FirstBoard(dst_sq) => {
-                dst_sq.rank() < RANK_4
+                dst_sq.to_rank() < RANK_4
             }
             AddressPos3::SecondBoard(dst_sq) => {
-                RANK_6 < dst_sq.rank()
+                RANK_6 < dst_sq.to_rank()
             }
             _ => panic!(Beam::trouble(&format!(
                 "(Err.957) まだ実装してないぜ☆（＾～＾）！",
