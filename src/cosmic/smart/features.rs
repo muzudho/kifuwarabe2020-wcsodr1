@@ -80,6 +80,23 @@ pub enum DoubleFacedPieceType {
     Lance,
     Pawn,
 }
+/// USIの Drop に合わせるぜ☆（＾～＾） 先後を区別しないぜ☆（＾～＾）
+impl fmt::Display for DoubleFacedPieceType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        // 文字列リテラルでないとダメみたいなんで、他に似たようなコードがあるのに、また書くことに☆（＾～＾）
+        use self::DoubleFacedPieceType::*;
+        match *self {
+            King => write!(f, "?*"),
+            Rook => write!(f, "R*"),
+            Bishop => write!(f, "B*"),
+            Gold => write!(f, "G*"),
+            Silver => write!(f, "S*"),
+            Knight => write!(f, "N*"),
+            Lance => write!(f, "L*"),
+            Pawn => write!(f, "P*"),
+        }
+    }
+}
 
 // Note: 持ち駒には玉も含むぜ☆（＾～＾）
 pub const PHYSICAL_PIECES_LEN: usize = 16;
@@ -119,31 +136,6 @@ pub enum DoubleFacedPiece {
     Lance2,
     // △ 歩とと
     Pawn2,
-}
-/// USIの Drop に合わせるぜ☆（＾～＾） 先後を区別しないぜ☆（＾～＾）
-impl fmt::Display for DoubleFacedPiece {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        // 文字列リテラルでないとダメみたいなんで、他に似たようなコードがあるのに、また書くことに☆（＾～＾）
-        use self::DoubleFacedPiece::*;
-        match *self {
-            King1 => write!(f, "?*"),
-            Rook1 => write!(f, "R*"),
-            Bishop1 => write!(f, "B*"),
-            Gold1 => write!(f, "G*"),
-            Silver1 => write!(f, "S*"),
-            Knight1 => write!(f, "N*"),
-            Lance1 => write!(f, "L*"),
-            Pawn1 => write!(f, "P*"),
-            King2 => write!(f, "?*"),
-            Rook2 => write!(f, "R*"),
-            Bishop2 => write!(f, "B*"),
-            Gold2 => write!(f, "G*"),
-            Silver2 => write!(f, "S*"),
-            Knight2 => write!(f, "N*"),
-            Lance2 => write!(f, "L*"),
-            Pawn2 => write!(f, "P*"),
-        }
-    }
 }
 
 // 利きボード☆（＾～＾）

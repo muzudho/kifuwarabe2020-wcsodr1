@@ -78,10 +78,7 @@ impl fmt::Display for MoveEnd {
                     format!("{}{}", file, num_to_lower_case(rank as usize))
                 }
                 FireAddress::Hand(drop_type) => {
-                    format!(
-                        "{}",
-                        DoubleFacedPiece::from_phase_and_type(self.friend, drop_type)
-                    )
+                    format!("{}", drop_type)
                 }
             },
         )
@@ -151,7 +148,7 @@ pub struct Movement {
     pub destination: MoveEnd,
     /// 移動後に成るなら真
     pub promote: bool,
-    /// 取ることになる駒
+    /// 取ることになる駒。先後がひっくり返るのは駒を取られた時だけだぜ☆（＾～＾）
     pub captured: Option<CapturedMove>,
 }
 impl Default for Movement {

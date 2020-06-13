@@ -855,7 +855,7 @@ impl GameTable {
             FireAddress::Board(_sq) => {
                 panic!(Beam::trouble(&format!("(Err.3251) 未対応☆（＾～＾）！",)))
             }
-            FireAddress::Hand(drop_type) => {
+            FireAddress::Hand(_drop_type) => {
                 if let Some(piece_num) = self.phase_classification.last(fire) {
                     Some(piece_num)
                 } else {

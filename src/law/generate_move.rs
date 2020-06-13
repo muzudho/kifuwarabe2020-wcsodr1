@@ -15,10 +15,7 @@ use crate::cosmic::smart::square::RANK6U8;
 use crate::cosmic::smart::square::RANK7U8;
 use crate::cosmic::smart::square::RANK8U8;
 use crate::cosmic::smart::square::RANK9U8;
-use crate::cosmic::smart::square::{
-    AbsoluteAddress2D, Angle, RelAdr2D, FILE_1, FILE_10, RANK_1, RANK_10, RANK_2, RANK_3, RANK_4,
-    RANK_6, RANK_7, RANK_8, RANK_9,
-};
+use crate::cosmic::smart::square::{AbsoluteAddress2D, Angle, RelAdr2D};
 use crate::cosmic::toy_box::GameTable;
 use crate::spaceship::equipment::Beam;
 use std::fmt;

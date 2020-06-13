@@ -4,9 +4,9 @@
 use crate::cosmic::playing::Game;
 use crate::cosmic::recording::{CapturedMove, MoveEnd, Movement, Phase};
 use crate::cosmic::smart::features::{DoubleFacedPieceType, PieceType};
+use crate::cosmic::smart::square::AbsoluteAddress2D;
 use crate::cosmic::smart::square::FILE9U8;
 use crate::cosmic::smart::square::RANK1U8;
-use crate::cosmic::smart::square::{AbsoluteAddress2D, FILE_9, RANK_1};
 use crate::spaceship::equipment::Beam;
 use atoi::atoi;
 
