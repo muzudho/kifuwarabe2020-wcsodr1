@@ -436,6 +436,7 @@ impl Area {
     {
         let moving = &mut |destination: &MoveEnd, _agility| {
             Promoting::pawn_lance(
+                friend,
                 destination,
                 moving,
                 Some(MovePermission::from_pawn_or_lance(friend)),
@@ -461,6 +462,7 @@ impl Area {
     {
         let moving = &mut |destination: &MoveEnd, _agility| {
             Promoting::pawn_lance(
+                friend,
                 destination,
                 moving,
                 Some(MovePermission::from_pawn_or_lance(friend)),
@@ -486,6 +488,7 @@ impl Area {
     {
         let moving = &mut |destination: &MoveEnd, _agility| {
             Promoting::knight(
+                friend,
                 destination,
                 moving,
                 Some(MovePermission::from_knight(friend)),
@@ -508,8 +511,9 @@ impl Area {
     where
         F1: FnMut(&MoveEnd, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        let moving =
-            &mut |destination: &MoveEnd, _agility| Promoting::silver(&source, destination, moving);
+        let moving = &mut |destination: &MoveEnd, _agility| {
+            Promoting::silver(friend, &source, destination, moving)
+        };
 
         for mobility in PieceType::Silver.mobility().iter() {
             Area::move_(friend, source, *mobility, moving);
@@ -569,7 +573,7 @@ impl Area {
         F1: FnMut(&MoveEnd, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving = &mut |destination: &MoveEnd, _agility| {
-            Promoting::bishop_rook(source, destination, moving)
+            Promoting::bishop_rook(friend, source, destination, moving)
         };
         for mobility in PieceType::Bishop.mobility().iter() {
             Area::move_(friend, source, *mobility, moving);
@@ -588,7 +592,7 @@ impl Area {
         F1: FnMut(&MoveEnd, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving = &mut |destination: &MoveEnd, _agility| {
-            Promoting::bishop_rook(source, destination, moving)
+            Promoting::bishop_rook(friend, source, destination, moving)
         };
         for mobility in PieceType::Rook.mobility().iter() {
             Area::move_(friend, source, *mobility, moving);
@@ -781,6 +785,7 @@ impl Promoting {
     /// * `callback` -
     /// * `move_permission` - 成らずに一番奥の段に移動することはできません。
     fn pawn_lance<F1>(
+        friend: Phase,
         destination: &MoveEnd,
         callback: &mut F1,
         move_permission: Option<MovePermission>,
@@ -788,7 +793,7 @@ impl Promoting {
     where
         F1: FnMut(&MoveEnd, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        if Promoting::is_farthest_rank_from_friend(destination) {
+        if Promoting::is_farthest_rank_from_friend(friend, destination) {
             // 自陣から見て一番奥の段
             callback(
                 destination,
@@ -796,7 +801,7 @@ impl Promoting {
                 Agility::Hopping,
                 move_permission,
             )
-        } else if Promoting::is_second_third_farthest_rank_from_friend(destination) {
+        } else if Promoting::is_second_third_farthest_rank_from_friend(friend, destination) {
             // 自陣から見て二番、三番目の奥の段
             callback(
                 destination,
@@ -823,6 +828,7 @@ impl Promoting {
     /// * `callback` -
     /// * `move_permission` - 成らずに奥から２番目の段に移動することはできません。
     fn knight<F1>(
+        friend: Phase,
         destination: &MoveEnd,
         callback: &mut F1,
         move_permission: Option<MovePermission>,
@@ -830,14 +836,14 @@ impl Promoting {
     where
         F1: FnMut(&MoveEnd, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        if Promoting::is_first_second_farthest_rank_from_friend(destination) {
+        if Promoting::is_first_second_farthest_rank_from_friend(friend, destination) {
             callback(
                 destination,
                 Promotability::Forced,
                 Agility::Knight,
                 move_permission,
             )
-        } else if Promoting::is_third_farthest_rank_from_friend(destination) {
+        } else if Promoting::is_third_farthest_rank_from_friend(friend, destination) {
             callback(
                 destination,
                 Promotability::Any,
@@ -863,12 +869,12 @@ impl Promoting {
     /// * `source` -
     /// * `destination` -
     /// * `callback` -
-    fn silver<F1>(source: &MoveEnd, destination: &MoveEnd, callback: &mut F1) -> bool
+    fn silver<F1>(friend: Phase, source: &MoveEnd, destination: &MoveEnd, callback: &mut F1) -> bool
     where
         F1: FnMut(&MoveEnd, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        if Promoting::is_third_farthest_rank_from_friend(source)
-            || Promoting::is_opponent_region(destination)
+        if Promoting::is_third_farthest_rank_from_friend(friend, source)
+            || Promoting::is_opponent_region(friend, destination)
         {
             callback(destination, Promotability::Any, Agility::Hopping, None)
         } else {
@@ -886,11 +892,18 @@ impl Promoting {
     /// * `source` -
     /// * `destination` -
     /// * `callback` -
-    fn bishop_rook<F1>(source: &MoveEnd, destination: &MoveEnd, callback: &mut F1) -> bool
+    fn bishop_rook<F1>(
+        friend: Phase,
+        source: &MoveEnd,
+        destination: &MoveEnd,
+        callback: &mut F1,
+    ) -> bool
     where
         F1: FnMut(&MoveEnd, Promotability, Agility, Option<MovePermission>) -> bool,
     {
-        if Promoting::is_opponent_region(source) || Promoting::is_opponent_region(destination) {
+        if Promoting::is_opponent_region(friend, source)
+            || Promoting::is_opponent_region(friend, destination)
+        {
             callback(destination, Promotability::Any, Agility::Sliding, None)
         } else {
             callback(destination, Promotability::Deny, Agility::Sliding, None)
@@ -904,9 +917,9 @@ impl Promoting {
     ///
     /// * `friend` -
     /// * `destination` -
-    fn is_farthest_rank_from_friend(destination: &MoveEnd) -> bool {
+    fn is_farthest_rank_from_friend(friend: Phase, destination: &MoveEnd) -> bool {
         match destination.address {
-            FireAddress::Board(dst_sq) => match destination.friend {
+            FireAddress::Board(dst_sq) => match friend {
                 Phase::First => dst_sq.rank() < RANK2U8,
                 Phase::Second => RANK8U8 < dst_sq.rank(),
             },
@@ -922,9 +935,9 @@ impl Promoting {
     ///
     /// * `friend` -
     /// * `destination` -
-    fn is_first_second_farthest_rank_from_friend(destination: &MoveEnd) -> bool {
+    fn is_first_second_farthest_rank_from_friend(friend: Phase, destination: &MoveEnd) -> bool {
         match destination.address {
-            FireAddress::Board(dst_sq) => match destination.friend {
+            FireAddress::Board(dst_sq) => match friend {
                 Phase::First => dst_sq.rank() < RANK3U8,
                 Phase::Second => RANK7U8 < dst_sq.rank(),
             },
@@ -940,9 +953,9 @@ impl Promoting {
     ///
     /// * `friend` -
     /// * `destination` -
-    fn is_second_third_farthest_rank_from_friend(destination: &MoveEnd) -> bool {
+    fn is_second_third_farthest_rank_from_friend(friend: Phase, destination: &MoveEnd) -> bool {
         match destination.address {
-            FireAddress::Board(dst_sq) => match destination.friend {
+            FireAddress::Board(dst_sq) => match friend {
                 Phase::First => RANK1U8 < dst_sq.rank() && dst_sq.rank() < RANK4U8,
                 Phase::Second => RANK6U8 < dst_sq.rank() && dst_sq.rank() < RANK9U8,
             },
@@ -958,9 +971,9 @@ impl Promoting {
     ///
     /// * `friend` -
     /// * `destination` -
-    fn is_third_farthest_rank_from_friend(destination: &MoveEnd) -> bool {
+    fn is_third_farthest_rank_from_friend(friend: Phase, destination: &MoveEnd) -> bool {
         match destination.address {
-            FireAddress::Board(dst_sq) => match destination.friend {
+            FireAddress::Board(dst_sq) => match friend {
                 Phase::First => dst_sq.rank() == RANK3U8,
                 Phase::Second => RANK7U8 == dst_sq.rank(),
             },
@@ -976,9 +989,9 @@ impl Promoting {
     ///
     /// * `friend` -
     /// * `destination` -
-    fn is_opponent_region(destination: &MoveEnd) -> bool {
+    fn is_opponent_region(friend: Phase, destination: &MoveEnd) -> bool {
         match destination.address {
-            FireAddress::Board(dst_sq) => match destination.friend {
+            FireAddress::Board(dst_sq) => match friend {
                 Phase::First => dst_sq.rank() < RANK4U8,
                 Phase::Second => RANK6U8 < dst_sq.rank(),
             },
