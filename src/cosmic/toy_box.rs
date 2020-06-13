@@ -21,7 +21,6 @@ lazy_static! {
 }
 
 struct ToyBox {
-    piece_type_table: [PieceType; PIECE_LEN],
     /// 駒→成駒　（成れない駒は、そのまま）
     piece_promoted_table: [Piece; PIECE_LEN],
     /// 成駒→駒　（成っていない駒は、そのまま）
@@ -34,39 +33,8 @@ struct ToyBox {
 }
 impl Default for ToyBox {
     fn default() -> Self {
-        use crate::cosmic::smart::features::PieceType::*;
         use crate::cosmic::toy_box::Piece::*;
         ToyBox {
-            piece_type_table: [
-                King,           // King1
-                Rook,           // Rook1
-                Bishop,         // Bishop1
-                Gold,           // Gold1
-                Silver,         // Silver1
-                Knight,         // Knight1
-                Lance,          // Lance1
-                Pawn,           // Pawn1
-                Dragon,         // Dragon1
-                Horse,          // Horse1
-                PromotedSilver, // PromotedSilver1
-                PromotedKnight, // PromotedKnight1
-                PromotedLance,  // PromotedLance1
-                PromotedPawn,   // PromotedPawn1
-                King,           // King2
-                Rook,           // Rook2
-                Bishop,         // Bishop2
-                Gold,           // Gold2
-                Silver,         // Silver2
-                Knight,         // Knight2
-                Lance,          // Lance2
-                Pawn,           // Pawn2
-                Dragon,         // Dragon2
-                Horse,          // Horse2
-                PromotedSilver, // PromotedSilver2
-                PromotedKnight, // PromotedKnight2
-                PromotedLance,  // PromotedLance2
-                PromotedPawn,   // PromotedPawn2
-            ],
             piece_promoted_table: [
                 King1,           // King1
                 Dragon1,         // Rook1
@@ -245,7 +213,36 @@ impl Piece {
     }
 
     pub fn type_(self) -> PieceType {
-        TOY_BOX.piece_type_table[self as usize]
+        match self {
+            Piece::King1 => PieceType::King,
+            Piece::Rook1 => PieceType::Rook,
+            Piece::Bishop1 => PieceType::Bishop,
+            Piece::Gold1 => PieceType::Gold,
+            Piece::Silver1 => PieceType::Silver,
+            Piece::Knight1 => PieceType::Knight,
+            Piece::Lance1 => PieceType::Lance,
+            Piece::Pawn1 => PieceType::Pawn,
+            Piece::Dragon1 => PieceType::Dragon,
+            Piece::Horse1 => PieceType::Horse,
+            Piece::PromotedSilver1 => PieceType::PromotedSilver,
+            Piece::PromotedKnight1 => PieceType::PromotedKnight,
+            Piece::PromotedLance1 => PieceType::PromotedLance,
+            Piece::PromotedPawn1 => PieceType::PromotedPawn,
+            Piece::King2 => PieceType::King,
+            Piece::Rook2 => PieceType::Rook,
+            Piece::Bishop2 => PieceType::Bishop,
+            Piece::Gold2 => PieceType::Gold,
+            Piece::Silver2 => PieceType::Silver,
+            Piece::Knight2 => PieceType::Knight,
+            Piece::Lance2 => PieceType::Lance,
+            Piece::Pawn2 => PieceType::Pawn,
+            Piece::Dragon2 => PieceType::Dragon,
+            Piece::Horse2 => PieceType::Horse,
+            Piece::PromotedSilver2 => PieceType::PromotedSilver,
+            Piece::PromotedKnight2 => PieceType::PromotedKnight,
+            Piece::PromotedLance2 => PieceType::PromotedLance,
+            Piece::PromotedPawn2 => PieceType::PromotedPawn,
+        }
     }
 
     pub fn promoted(self) -> Piece {
