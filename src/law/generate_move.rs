@@ -181,8 +181,8 @@ impl PseudoLegalMoves {
                         // 成ったり、成れなかったりできるとき。
                         if !forbidden {
                             listen_move(Movement::new(
-                                UnifiedAddress::from_fire(&source),
-                                UnifiedAddress::from_fire(&destination),
+                                *source,
+                                *destination,
                                 false,
                                 if let Some(piece_num_val) = pseudo_captured_num {
                                     Some(CapturedMove::new(
@@ -195,8 +195,8 @@ impl PseudoLegalMoves {
                             ));
                         }
                         listen_move(Movement::new(
-                            UnifiedAddress::from_fire(&source),
-                            UnifiedAddress::from_fire(&destination),
+                            *source,
+                            *destination,
                             true,
                             if let Some(piece_num_val) = pseudo_captured_num {
                                 Some(CapturedMove::new(
@@ -212,8 +212,8 @@ impl PseudoLegalMoves {
                         // 成れるか、成れないかのどちらかのとき。
                         if promotion || !forbidden {
                             listen_move(Movement::new(
-                                UnifiedAddress::from_fire(&source),
-                                UnifiedAddress::from_fire(&destination),
+                                *source,
+                                *destination,
                                 promotion,
                                 if let Some(piece_num_val) = pseudo_captured_num {
                                     Some(CapturedMove::new(
@@ -272,10 +272,10 @@ impl PseudoLegalMoves {
                         _ => {}
                     }
                     listen_move(Movement::new(
-                        hand_addr,                               // 打った駒種類
-                        UnifiedAddress::from_fire(&destination), // どの升へ行きたいか
-                        false,                                   // 打に成りは無し
-                        None,                                    // 打で取れる駒無し
+                        hand_addr.to_fire(), // 打った駒種類
+                        *destination,        // どの升へ行きたいか
+                        false,               // 打に成りは無し
+                        None,                // 打で取れる駒無し
                     ));
                 }
             };

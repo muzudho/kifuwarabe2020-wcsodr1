@@ -1,9 +1,10 @@
 //!
 //! USIプロトコル
 //!
+use crate::cosmic::fire::{Fire, FireAddress};
 use crate::cosmic::playing::Game;
 use crate::cosmic::recording::{CapturedMove, Movement, Phase};
-use crate::cosmic::smart::features::DoubleFacedPiece;
+use crate::cosmic::smart::features::{DoubleFacedPiece, DoubleFacedPieceType};
 use crate::cosmic::smart::square::{AbsoluteAddress2D, FILE_9, RANK_1};
 use crate::cosmic::toy_box::{Piece, UnifiedAddress};
 use crate::spaceship::equipment::Beam;
@@ -55,59 +56,31 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
         // 1文字目が駒だったら打。2文字目は必ず「*」なはずなので読み飛ばす。
         "R" => {
             *starts += 2;
-            UnifiedAddress::from_double_faced_piece(if friend == Phase::First {
-                DoubleFacedPiece::Rook1
-            } else {
-                DoubleFacedPiece::Rook2
-            })
+            Fire::new_hand(friend, DoubleFacedPieceType::Rook)
         }
         "B" => {
             *starts += 2;
-            UnifiedAddress::from_double_faced_piece(if friend == Phase::First {
-                DoubleFacedPiece::Bishop1
-            } else {
-                DoubleFacedPiece::Bishop2
-            })
+            Fire::new_hand(friend, DoubleFacedPieceType::Bishop)
         }
         "G" => {
             *starts += 2;
-            UnifiedAddress::from_double_faced_piece(if friend == Phase::First {
-                DoubleFacedPiece::Gold1
-            } else {
-                DoubleFacedPiece::Gold2
-            })
+            Fire::new_hand(friend, DoubleFacedPieceType::Gold)
         }
         "S" => {
             *starts += 2;
-            UnifiedAddress::from_double_faced_piece(if friend == Phase::First {
-                DoubleFacedPiece::Silver1
-            } else {
-                DoubleFacedPiece::Silver2
-            })
+            Fire::new_hand(friend, DoubleFacedPieceType::Silver)
         }
         "N" => {
             *starts += 2;
-            UnifiedAddress::from_double_faced_piece(if friend == Phase::First {
-                DoubleFacedPiece::Knight1
-            } else {
-                DoubleFacedPiece::Knight2
-            })
+            Fire::new_hand(friend, DoubleFacedPieceType::Knight)
         }
         "L" => {
             *starts += 2;
-            UnifiedAddress::from_double_faced_piece(if friend == Phase::First {
-                DoubleFacedPiece::Lance1
-            } else {
-                DoubleFacedPiece::Lance2
-            })
+            Fire::new_hand(friend, DoubleFacedPieceType::Lance)
         }
         "P" => {
             *starts += 2;
-            UnifiedAddress::from_double_faced_piece(if friend == Phase::First {
-                DoubleFacedPiece::Pawn1
-            } else {
-                DoubleFacedPiece::Pawn2
-            })
+            Fire::new_hand(friend, DoubleFacedPieceType::Pawn)
         }
         _ => {
             // 残りは「筋の数字」、「段のアルファベット」のはず。
@@ -125,39 +98,39 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
             match &line[*starts..=*starts] {
                 "a" => {
                     *starts += 1;
-                    UnifiedAddress::from_absolute_address(friend, &AbsoluteAddress2D::new(file, 1))
+                    Fire::new_board(friend, AbsoluteAddress2D::new(file, 1))
                 }
                 "b" => {
                     *starts += 1;
-                    UnifiedAddress::from_absolute_address(friend, &AbsoluteAddress2D::new(file, 2))
+                    Fire::new_board(friend, AbsoluteAddress2D::new(file, 2))
                 }
                 "c" => {
                     *starts += 1;
-                    UnifiedAddress::from_absolute_address(friend, &AbsoluteAddress2D::new(file, 3))
+                    Fire::new_board(friend, AbsoluteAddress2D::new(file, 3))
                 }
                 "d" => {
                     *starts += 1;
-                    UnifiedAddress::from_absolute_address(friend, &AbsoluteAddress2D::new(file, 4))
+                    Fire::new_board(friend, AbsoluteAddress2D::new(file, 4))
                 }
                 "e" => {
                     *starts += 1;
-                    UnifiedAddress::from_absolute_address(friend, &AbsoluteAddress2D::new(file, 5))
+                    Fire::new_board(friend, AbsoluteAddress2D::new(file, 5))
                 }
                 "f" => {
                     *starts += 1;
-                    UnifiedAddress::from_absolute_address(friend, &AbsoluteAddress2D::new(file, 6))
+                    Fire::new_board(friend, AbsoluteAddress2D::new(file, 6))
                 }
                 "g" => {
                     *starts += 1;
-                    UnifiedAddress::from_absolute_address(friend, &AbsoluteAddress2D::new(file, 7))
+                    Fire::new_board(friend, AbsoluteAddress2D::new(file, 7))
                 }
                 "h" => {
                     *starts += 1;
-                    UnifiedAddress::from_absolute_address(friend, &AbsoluteAddress2D::new(file, 8))
+                    Fire::new_board(friend, AbsoluteAddress2D::new(file, 8))
                 }
                 "i" => {
                     *starts += 1;
-                    UnifiedAddress::from_absolute_address(friend, &AbsoluteAddress2D::new(file, 9))
+                    Fire::new_board(friend, AbsoluteAddress2D::new(file, 9))
                 }
                 _ => {
                     panic!(Beam::trouble(&format!(
@@ -202,9 +175,9 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
     *starts += 1;
 
     // 行き先。
-    buffer.destination = UnifiedAddress::from_absolute_address(
+    buffer.destination = Fire::new_board(
         game.history.get_friend(),
-        &AbsoluteAddress2D::new(file, rank),
+        AbsoluteAddress2D::new(file, rank),
     );
 
     // 5文字に「+」があれば成り。
@@ -221,10 +194,12 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
     }
 
     // 取られる駒を事前に調べてセットするぜ☆（＾～＾）！
-    let captured_piece_num = game.table.piece_num_at(buffer.destination);
+    let captured_piece_num = game
+        .table
+        .piece_num_at(UnifiedAddress::from_fire(&buffer.destination));
     buffer.captured = if let Some(captured_piece_num_val) = captured_piece_num {
         Some(CapturedMove::new(
-            buffer.destination.to_fire(),
+            buffer.destination,
             game.table.get_type(captured_piece_num_val),
         ))
     } else {

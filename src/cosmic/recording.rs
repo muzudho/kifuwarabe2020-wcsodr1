@@ -4,7 +4,7 @@
 //! * Phase (先後。手番,相手番)
 //! * Person (先手,後手)
 //!
-use crate::cosmic::fire::Fire;
+use crate::cosmic::fire::{Fire, FireAddress};
 use crate::cosmic::smart::features::DoubleFacedPiece;
 use crate::cosmic::smart::features::PieceType;
 use crate::cosmic::smart::square::AbsoluteAddress2D;
@@ -191,9 +191,9 @@ impl CapturedMove {
 #[derive(Clone, Copy)]
 pub struct Movement {
     /// 移動元マス。
-    pub source: UnifiedAddress,
+    pub source: Fire,
     /// 移動先マス。リバーシブルに作りたいので、駒台にも指せる。
-    pub destination: UnifiedAddress,
+    pub destination: Fire,
     /// 移動後に成るなら真
     pub promote: bool,
     /// 取ることになる駒
@@ -203,8 +203,8 @@ impl Default for Movement {
     /// ゴミの値を作るぜ☆（＾～＾）
     fn default() -> Self {
         Movement {
-            source: UnifiedAddress::default(),
-            destination: UnifiedAddress::default(),
+            source: Fire::default(),
+            destination: Fire::default(),
             promote: false,
             captured: None,
         }
@@ -212,8 +212,8 @@ impl Default for Movement {
 }
 impl Movement {
     pub fn new(
-        source: UnifiedAddress,
-        destination: UnifiedAddress,
+        source: Fire,
+        destination: Fire,
         promote: bool,
         captured: Option<CapturedMove>,
     ) -> Self {
@@ -233,23 +233,23 @@ impl Movement {
 }
 impl fmt::Display for Movement {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self.source.to_address_pos1() {
-            AddressPos1::Board(source_val) => {
-                let (sx, sy) = source_val.to_file_rank();
+        match self.source.address {
+            FireAddress::Board(src_sq) => {
+                let (sx, sy) = src_sq.to_file_rank();
                 write!(
                     f,
                     "{}{}{}{}",
                     sx,
                     num_to_lower_case(sy),
-                    self.destination.to_address_pos1(),
+                    self.destination,
                     if self.promote { "+" } else { "" }
                 )
             }
-            AddressPos1::Hand(drop) => write!(
+            FireAddress::Hand(src_drop_type) => write!(
                 f,
                 "{}{}{}",
-                drop,
-                self.destination.to_address_pos1(),
+                self.source, //src_drop_type,
+                self.destination,
                 if self.promote { "+" } else { "" }
             ),
         }

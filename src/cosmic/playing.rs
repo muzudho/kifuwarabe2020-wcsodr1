@@ -1,3 +1,4 @@
+use crate::cosmic::fire::{Fire, FireAddress};
 use crate::cosmic::pos_hash::pos_hash::*;
 use crate::cosmic::recording::{AddressPos0, History, Movement};
 use crate::cosmic::toy_box::{GameTable, UnifiedAddress};
@@ -124,7 +125,9 @@ impl Game {
             .update_by_do_move(&mut self.history, &self.table, move_);
 
         // 移動元のマスにある駒をポップすることは確定。
-        let src_piece_num = self.table.pop_piece(move_.source);
+        let src_piece_num = self
+            .table
+            .pop_piece(UnifiedAddress::from_fire(&move_.source));
 
         // 持ち駒は成ることは無いので、成るなら盤上の駒であることが確定。
         if move_.promote {
@@ -142,7 +145,8 @@ impl Game {
         self.table.rotate_piece_board_to_hand(&move_);
 
         // 移動先升に駒を置く
-        self.table.push_piece(move_.destination, src_piece_num);
+        self.table
+            .push_piece(UnifiedAddress::from_fire(&move_.destination), src_piece_num);
 
         // // 局面ハッシュを作り直す
         // let ky_hash = self.hash_seed.current_position(&self);
@@ -158,9 +162,11 @@ impl Game {
             self.history.ply -= 1;
             let move_ = &self.history.get_move();
             // 移動先にある駒をポップするのは確定。
-            let moveing_piece_num = self.table.pop_piece(move_.destination);
-            match move_.source.to_address_pos0() {
-                AddressPos0::Board => {
+            let moveing_piece_num = self
+                .table
+                .pop_piece(UnifiedAddress::from_fire(&move_.destination));
+            match move_.source.address {
+                FireAddress::Board(_src_sq) => {
                     // 盤上の移動なら
                     if move_.promote {
                         // 成ったなら、成る前へ
@@ -174,9 +180,10 @@ impl Game {
                     }
 
                     // 打でなければ、移動元升に、動かした駒を置く☆（＾～＾）打なら何もしないぜ☆（＾～＾）
-                    self.table.push_piece(move_.source, moveing_piece_num);
+                    self.table
+                        .push_piece(UnifiedAddress::from_fire(&move_.source), moveing_piece_num);
                 }
-                AddressPos0::Hand => {
+                FireAddress::Hand(_src_drop_type) => {
                     // 打なら
                     // 打った場所に駒があるはずだぜ☆（＾～＾）
                     let piece_num = moveing_piece_num.unwrap();

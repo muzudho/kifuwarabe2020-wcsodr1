@@ -1,14 +1,17 @@
 //! 局面ハッシュ。
 //!
 
+use crate::cosmic::fire::{Fire, FireAddress};
 use crate::cosmic::playing::Game;
 use crate::cosmic::recording::{AddressPos1, History, Movement, Phase, PHASE_LEN, PHASE_SECOND};
+use crate::cosmic::smart::features::{DoubleFacedPiece, DoubleFacedPieceType};
 use crate::cosmic::smart::features::{HAND_MAX, PHYSICAL_PIECES_LEN};
 use crate::cosmic::smart::square::{
     BOARD_MEMORY_AREA, FILE_1, FILE_10, RANK_1, RANK_10, SQUARE_NONE,
 };
-use crate::cosmic::toy_box::{GameTable, SquareType, PIECE_LEN};
+use crate::cosmic::toy_box::{GameTable, SquareType, UnifiedAddress, PIECE_LEN};
 use crate::law::speed_of_light::HandAddresses;
+use crate::spaceship::equipment::Beam;
 use rand::Rng;
 
 /// 現対局ハッシュ種
@@ -71,33 +74,58 @@ impl GameHashSeed {
         };
         // TODO 指し手 で差分を適用
         // 移動する駒。
-        match move_.source.to_address_pos1() {
-            AddressPos1::Board(src_sq) => {
-                let source_piece =
-                    table.piece_at1(move_.source.to_address_pos1()).unwrap() as usize;
+        match move_.source.address {
+            FireAddress::Board(src_sq) => {
+                let source_piece = table
+                    .piece_at1(UnifiedAddress::from_fire(&move_.source).to_address_pos1())
+                    .unwrap() as usize;
                 // 移動前マスに、動かしたい駒があるときのハッシュ。
-                prev_hash ^= self.piece[src_sq.to_serial_number()][source_piece];
+                prev_hash ^= self.piece[src_sq.serial_number()][source_piece];
                 // 移動後マスに、動かしたい駒があるときのハッシュ。
-                prev_hash ^= self.piece[move_.destination.to_square_serial_number()][source_piece];
+                match move_.destination.address {
+                    FireAddress::Board(dst_sq) => {
+                        prev_hash ^= self.piece[dst_sq.serial_number()][source_piece];
+                    }
+                    FireAddress::Hand(_dst_drop_type) => {
+                        panic!(Beam::trouble("(Err.90) 未対応☆（＾～＾）"))
+                    }
+                }
             }
-            AddressPos1::Hand(drop) => {
-                let count = table.count_hand(drop);
+            FireAddress::Hand(src_drop_type) => {
+                let src_drop =
+                    DoubleFacedPiece::from_phase_and_type(move_.source.friend, src_drop_type);
+                let count = table.count_hand(src_drop);
                 // 打つ前の駒の枚数のハッシュ。
-                prev_hash ^= self.hands[drop as usize][count as usize];
+                prev_hash ^= self.hands[src_drop as usize][count as usize];
                 // 移動後マスに、打った駒があるときのハッシュ。
-                prev_hash ^= self.piece[move_.destination.to_square_serial_number()]
-                    [drop.nonpromoted_piece() as usize];
+                match move_.destination.address {
+                    FireAddress::Board(dst_sq) => {
+                        prev_hash ^= self.piece[dst_sq.serial_number()]
+                            [src_drop.nonpromoted_piece() as usize];
+                    }
+                    FireAddress::Hand(_dst_drop_type) => {
+                        panic!(Beam::trouble("(Err.90) 未対応☆（＾～＾）"))
+                    }
+                }
             }
         }
         // 移動先にある駒があれば
-        if let Some(dst_piece_val) = table.piece_at1(move_.destination.to_address_pos1()) {
-            prev_hash ^=
-                self.piece[move_.destination.to_square_serial_number()][dst_piece_val as usize];
-            // 持ち駒になるとき。
-            let double_faced_piece = dst_piece_val.double_faced_piece();
-            let count = table.count_hand(double_faced_piece);
-            // 打つ前の駒の枚数のハッシュ。
-            prev_hash ^= self.hands[double_faced_piece as usize][count as usize + 1];
+        if let Some(dst_piece_val) =
+            table.piece_at1(UnifiedAddress::from_fire(&move_.destination).to_address_pos1())
+        {
+            match move_.destination.address {
+                FireAddress::Board(dst_sq) => {
+                    prev_hash ^= self.piece[dst_sq.serial_number()][dst_piece_val as usize];
+                    // 持ち駒になるとき。
+                    let double_faced_piece = dst_piece_val.double_faced_piece();
+                    let count = table.count_hand(double_faced_piece);
+                    // 打つ前の駒の枚数のハッシュ。
+                    prev_hash ^= self.hands[double_faced_piece as usize][count as usize + 1];
+                }
+                FireAddress::Hand(_dst_drop_type) => {
+                    panic!(Beam::trouble("(Err.90) 未対応☆（＾～＾）"))
+                }
+            }
         }
 
         // TODO ハッシュ更新
