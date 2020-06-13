@@ -3214,10 +3214,10 @@ impl GameTable {
             ))),
         }
     }
-    pub fn promotion_value_at(&self, table: &GameTable, addr: UnifiedAddress) -> isize {
-        match addr.to_address_pos1() {
-            AddressPos1::Board(sq) => {
-                let piece_num = self.board[sq.to_serial_number() as usize];
+    pub fn promotion_value_at(&self, table: &GameTable, fire: &Fire) -> isize {
+        match fire.address {
+            FireAddress::Board(sq) => {
+                let piece_num = self.board[sq.serial_number() as usize];
                 if let Some(piece_num_val) = piece_num {
                     table
                         .get_double_faced_piece(piece_num_val)
@@ -3228,7 +3228,7 @@ impl GameTable {
                     0
                 }
             }
-            AddressPos1::Hand(_drop) => panic!(Beam::trouble(&format!(
+            FireAddress::Hand(_drop_type) => panic!(Beam::trouble(&format!(
                 "(Err.254) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }

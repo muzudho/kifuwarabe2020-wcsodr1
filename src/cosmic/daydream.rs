@@ -201,8 +201,7 @@ impl Tree {
             self.state_nodes += 1;
             // * `promotion_value` - 評価値用。成ったら加点☆（＾～＾）
             let promotion_value = if move_.promote {
-                game.table
-                    .promotion_value_at(&game.table, UnifiedAddress::from_fire(&move_.source))
+                game.table.promotion_value_at(&game.table, &move_.source)
             } else {
                 0
             };
