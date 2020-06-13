@@ -3101,7 +3101,8 @@ impl GameTable {
             AddressPos1::Hand(drop) => {
                 if let Some(piece_num_val) = piece_num {
                     // 持ち駒を１つ増やします。
-                    self.phase_classification.push(drop, piece_num_val);
+                    self.phase_classification
+                        .push(&Fire::new_hand(drop.phase(), drop.type_()), piece_num_val);
                     // 背番号に番地を紐づけます。
                     self.address_list[piece_num_val as usize] = addr.to_fire();
                 }
@@ -3128,12 +3129,7 @@ impl GameTable {
             FireAddress::Hand(drop_type) => {
                 // 場所で指定します。
                 // 台から取りのぞきます。
-                let piece_num =
-                    self.phase_classification
-                        .pop(DoubleFacedPiece::from_phase_and_type(
-                            fire.friend,
-                            drop_type,
-                        ));
+                let piece_num = self.phase_classification.pop(&fire);
                 // TODO 背番号の番地に、ゴミ値を入れて消去するが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
                 self.address_list[piece_num as usize] = UnifiedAddress::from_address_pos1(
                     self.get_phase(piece_num),
@@ -3239,7 +3235,10 @@ impl GameTable {
     }
     /// 指し手生成で使うぜ☆（＾～＾）有無を調べるぜ☆（＾～＾）
     pub fn last_hand_type(&self, drop: DoubleFacedPiece) -> Option<PieceType> {
-        if let Some(piece_num) = self.phase_classification.last(drop) {
+        if let Some(piece_num) = self
+            .phase_classification
+            .last(&Fire::new_hand(drop.phase(), drop.type_()))
+        {
             Some(self.get_type(piece_num))
         } else {
             None
@@ -3247,7 +3246,10 @@ impl GameTable {
     }
     /// 指し手生成で使うぜ☆（＾～＾）
     pub fn last_hand(&self, drop: DoubleFacedPiece) -> Option<(PieceType, UnifiedAddress)> {
-        if let Some(piece_num) = self.phase_classification.last(drop) {
+        if let Some(piece_num) = self
+            .phase_classification
+            .last(&Fire::new_hand(drop.phase(), drop.type_()))
+        {
             let piece = self.get_piece(piece_num);
             Some((
                 piece.type_(),
@@ -3258,7 +3260,8 @@ impl GameTable {
         }
     }
     pub fn count_hand(&self, drop: DoubleFacedPiece) -> usize {
-        self.phase_classification.len(drop)
+        self.phase_classification
+            .len(&Fire::new_hand(drop.phase(), drop.type_()))
     }
 
     /// 表示に使うだけ☆（＾～＾）
@@ -3400,45 +3403,69 @@ impl Default for PhaseClassification {
 }
 impl PhaseClassification {
     /// 駒の先後を ひっくり返してから入れてください。
-    pub fn push(&mut self, drop: DoubleFacedPiece, num: PieceNum) {
-        let area = &self.areas[drop as usize];
-        // 駒台に駒を置くぜ☆（＾～＾）
-        self.items[self.currents[drop as usize] as usize] = num;
-        // 位置を増減するぜ☆（＾～＾）
-        self.currents[drop as usize] += area.direction;
+    pub fn push(&mut self, fire: &Fire, num: PieceNum) {
+        match fire.address {
+            FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3407) 未対応☆（＾～＾）")),
+            FireAddress::Hand(drop_type) => {
+                let drop = DoubleFacedPiece::from_phase_and_type(fire.friend, drop_type);
+                let area = &self.areas[drop as usize];
+                // 駒台に駒を置くぜ☆（＾～＾）
+                self.items[self.currents[drop as usize] as usize] = num;
+                // 位置を増減するぜ☆（＾～＾）
+                self.currents[drop as usize] += area.direction;
+            }
+        }
     }
     /// ゴミ値は消さないぜ☆（＾～＾）
-    pub fn pop(&mut self, drop: DoubleFacedPiece) -> PieceNum {
-        let area = &self.areas[drop as usize];
-        // 位置を増減するぜ☆（＾～＾）
-        self.currents[drop as usize] -= area.direction;
-        // 駒台の駒をはがすぜ☆（＾～＾）
-        self.items[self.currents[drop as usize] as usize]
-    }
-
-    fn last(&self, drop: DoubleFacedPiece) -> Option<PieceNum> {
-        let area = &self.areas[drop as usize];
-        if area.direction == 1 {
-            if area.start < self.currents[drop as usize] {
-                Some(self.items[(self.currents[drop as usize] - 1) as usize])
-            } else {
-                None
-            }
-        } else {
-            if self.currents[drop as usize] < area.start {
-                Some(self.items[(self.currents[drop as usize] + 1) as usize])
-            } else {
-                None
+    pub fn pop(&mut self, fire: &Fire) -> PieceNum {
+        match fire.address {
+            FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3419) 未対応☆（＾～＾）")),
+            FireAddress::Hand(drop_type) => {
+                let drop = DoubleFacedPiece::from_phase_and_type(fire.friend, drop_type);
+                let area = &self.areas[drop as usize];
+                // 位置を増減するぜ☆（＾～＾）
+                self.currents[drop as usize] -= area.direction;
+                // 駒台の駒をはがすぜ☆（＾～＾）
+                self.items[self.currents[drop as usize] as usize]
             }
         }
     }
 
-    fn len(&self, drop: DoubleFacedPiece) -> usize {
-        let area = &self.areas[drop as usize];
-        if area.direction == 1 {
-            (self.currents[drop as usize] - area.start) as usize
-        } else {
-            (area.start - self.currents[drop as usize]) as usize
+    fn last(&self, fire: &Fire) -> Option<PieceNum> {
+        match fire.address {
+            FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3431) 未対応☆（＾～＾）")),
+            FireAddress::Hand(drop_type) => {
+                let drop = DoubleFacedPiece::from_phase_and_type(fire.friend, drop_type);
+                let area = &self.areas[drop as usize];
+                if area.direction == 1 {
+                    if area.start < self.currents[drop as usize] {
+                        Some(self.items[(self.currents[drop as usize] - 1) as usize])
+                    } else {
+                        None
+                    }
+                } else {
+                    if self.currents[drop as usize] < area.start {
+                        Some(self.items[(self.currents[drop as usize] + 1) as usize])
+                    } else {
+                        None
+                    }
+                }
+            }
+        }
+    }
+
+    fn len(&self, fire: &Fire) -> usize {
+        match fire.address {
+            FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3431) 未対応☆（＾～＾）")),
+            FireAddress::Hand(drop_type) => {
+                let drop = DoubleFacedPiece::from_phase_and_type(fire.friend, drop_type);
+                let area = &self.areas[drop as usize];
+                if area.direction == 1 {
+                    (self.currents[drop as usize] - area.start) as usize
+                } else {
+                    (area.start - self.currents[drop as usize]) as usize
+                }
+            }
         }
     }
 
