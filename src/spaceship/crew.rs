@@ -50,7 +50,7 @@ impl Kifuwarabe {
         (line, len, starts)
     }
     /// bestmoveコマンドを送るぜ☆（＾～＾） 思考するのもこの中だぜ☆（＾～＾）
-    pub fn go(universe: &mut Universe, line: &String) {
+    pub fn go(universe: &mut Universe, line: &str) {
         // go btime 40000 wtime 50000 binc 10000 winc 10000
         let go1 = engine::Go::parse(line);
         Beam::shoot(&format!("info string test {}", go1));
@@ -115,11 +115,11 @@ impl Kifuwarabe {
     pub fn isready() {
         Beam::shoot("readyok");
     }
-    pub fn position(universe: &mut Universe, line: &String) {
+    pub fn position(universe: &mut Universe, line: &str) {
         // positionコマンドの読取を丸投げ
         set_position(&line, &mut universe.game);
     }
-    pub fn setoption_name(universe: &mut Universe, line: &String) {
+    pub fn setoption_name(universe: &mut Universe, line: &str) {
         // Example: setoption name USI_Ponder value true
         let label1_width = "setoption name ".len(); // 15
         if let Some(name_width) = line[label1_width..].find(' ') {

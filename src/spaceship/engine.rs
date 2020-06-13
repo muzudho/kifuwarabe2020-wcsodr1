@@ -20,7 +20,7 @@ impl Go {
     /// Example
     /// -------
     /// go btime 40000 wtime 50000 binc 10000 winc 10000
-    pub fn parse(line: &String) -> Go {
+    pub fn parse(line: &str) -> Go {
         let re = Regex::new(r"^go btime (\d+) wtime (\d+) binc (\d+) winc (\d+)$").unwrap();
         if let Some(cap) = re.captures(line) {
             Go {

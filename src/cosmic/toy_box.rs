@@ -397,9 +397,9 @@ pub struct PieceInfo {
     pub num: String,
 }
 impl PieceInfo {
-    pub fn new(piece_display: String, num: PieceNum) -> Self {
+    pub fn new(piece_display: &str, num: PieceNum) -> Self {
         PieceInfo {
-            piece: piece_display,
+            piece: piece_display.to_string(),
             num: format!("{:?}", num),
         }
     }
@@ -805,7 +805,7 @@ impl GameTable {
                 let piece_num = self.board[sq.serial_number() as usize];
                 if let Some(piece_num_val) = piece_num {
                     Some(PieceInfo::new(
-                        format!("{}", self.piece_list[piece_num_val as usize]),
+                        &format!("{}", self.piece_list[piece_num_val as usize]),
                         piece_num_val,
                     ))
                 } else {
