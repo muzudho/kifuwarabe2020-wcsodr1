@@ -101,9 +101,7 @@ impl PseudoLegalMoves {
         table.for_some_pieces_on_list40(
             friend,
             // 移動元と、その駒の種類。
-            &mut |src_fire: &Fire, src_piece_type| {
-                PseudoLegalMoves::start(src_fire, table, listen_move)
-            },
+            &mut |src_fire: &Fire| PseudoLegalMoves::start(src_fire, table, listen_move),
         );
     }
 
@@ -127,7 +125,7 @@ impl PseudoLegalMoves {
         F1: FnMut(Movement),
     {
         match source.address {
-            FireAddress::Board(src_sq) => {
+            FireAddress::Board(_src_sq) => {
                 let piece_type = table.get_type(table.piece_num_at(&source.address).unwrap());
 
                 let friend = source.friend;

@@ -1,10 +1,10 @@
 //!
 //! USIプロトコル
 //!
-use crate::cosmic::fire::{Fire, FireAddress};
+use crate::cosmic::fire::Fire;
 use crate::cosmic::playing::Game;
-use crate::cosmic::recording::{CapturedMove, Movement, Phase};
-use crate::cosmic::smart::features::{DoubleFacedPiece, DoubleFacedPieceType};
+use crate::cosmic::recording::{CapturedMove, Movement};
+use crate::cosmic::smart::features::DoubleFacedPieceType;
 use crate::cosmic::smart::square::{AbsoluteAddress2D, FILE_9, RANK_1};
 use crate::cosmic::toy_box::Piece;
 use crate::spaceship::equipment::Beam;

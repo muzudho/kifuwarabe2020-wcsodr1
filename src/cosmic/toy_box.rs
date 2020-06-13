@@ -438,7 +438,7 @@ impl GameTable {
                 }
                 piece_num
             }
-            FireAddress::Hand(drop_type) => {
+            FireAddress::Hand(_drop_type) => {
                 // 場所で指定します。
                 // 台から取りのぞきます。
                 let piece_num = self.phase_classification.pop(&fire);
@@ -608,7 +608,7 @@ impl GameTable {
     /// TODO できれば、「自分の盤上の駒」「自分の持ち駒」「相手の盤上の駒」「相手の持ち駒」の４チャンネルで分けておけないか☆（＾～＾）？
     pub fn for_some_pieces_on_list40<F>(&self, friend: Phase, piece_get: &mut F)
     where
-        F: FnMut(&Fire, PieceType),
+        F: FnMut(&Fire),
     {
         for piece_num in Nine299792458::piece_numbers().iter() {
             // 盤上の駒だけを調べようぜ☆（＾～＾）
@@ -616,7 +616,7 @@ impl GameTable {
             match fire.address {
                 FireAddress::Board(_sq) => {
                     if self.get_phase(*piece_num) == friend {
-                        piece_get(&fire, self.get_type(*piece_num));
+                        piece_get(&fire);
                     }
                 }
                 FireAddress::Hand(_drop) => {
@@ -648,9 +648,9 @@ impl GameTable {
             ],
         ];
         for drop in &FIRST_SECOND[friend as usize] {
-            if let Some(piece_type) = self.last_hand_type(&Fire::new_hand(friend, drop.type_())) {
+            if let Some(_piece_type) = self.last_hand_type(&Fire::new_hand(friend, drop.type_())) {
                 // 有無を確認しているぜ☆（＾～＾）
-                piece_get(&Fire::new_hand(drop.phase(), drop.type_()), piece_type);
+                piece_get(&Fire::new_hand(drop.phase(), drop.type_()));
             }
         }
     }

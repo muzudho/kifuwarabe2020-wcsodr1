@@ -7,7 +7,7 @@
 //! 駒早見表 (PieceChart),
 //! 駒種類早見表 (PieceTypeChart).
 //!
-use crate::cosmic::fire::{Fire, FireAddress};
+use crate::cosmic::fire::Fire;
 use crate::cosmic::recording::Phase;
 use crate::cosmic::recording::PHASE_LEN;
 use crate::cosmic::smart::features::PHYSICAL_PIECES_LEN;
@@ -62,7 +62,6 @@ struct SpeedOfLight {
     piece_type_to_double_faced_piece_type: [DoubleFacedPieceType; PIECE_TYPE_LEN],
     /// 持ち駒☆（＾～＾）
     /// 玉２枚引く☆（＾～＾）
-    double_faced_pieces_legal_all: [DoubleFacedPiece; PHYSICAL_PIECES_LEN - 2],
     double_faced_pieces: [[DoubleFacedPiece; PHYSICAL_PIECE_TYPE_LEN]; PHASE_LEN],
     double_faced_piece_to_phase_table: [Phase; PHYSICAL_PIECES_LEN],
     double_faced_piece_to_type_table: [DoubleFacedPieceType; PHYSICAL_PIECES_LEN],
@@ -447,23 +446,6 @@ impl Default for SpeedOfLight {
                 DoubleFacedPieceType::Knight, // PromotedKnight
                 DoubleFacedPieceType::Lance,  // PromotedLance
                 DoubleFacedPieceType::Pawn,   // PromotedPawn
-            ],
-            // 持ち駒☆（＾～＾）
-            double_faced_pieces_legal_all: [
-                DoubleFacedPiece::Rook1,
-                DoubleFacedPiece::Bishop1,
-                DoubleFacedPiece::Gold1,
-                DoubleFacedPiece::Silver1,
-                DoubleFacedPiece::Knight1,
-                DoubleFacedPiece::Lance1,
-                DoubleFacedPiece::Pawn1,
-                DoubleFacedPiece::Rook2,
-                DoubleFacedPiece::Bishop2,
-                DoubleFacedPiece::Gold2,
-                DoubleFacedPiece::Silver2,
-                DoubleFacedPiece::Knight2,
-                DoubleFacedPiece::Lance2,
-                DoubleFacedPiece::Pawn2,
             ],
             double_faced_pieces: [
                 [

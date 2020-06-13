@@ -144,7 +144,7 @@ impl fmt::Display for Movement {
                     if self.promote { "+" } else { "" }
                 )
             }
-            FireAddress::Hand(src_drop_type) => write!(
+            FireAddress::Hand(_src_drop_type) => write!(
                 f,
                 "{}{}{}",
                 self.source, //src_drop_type,
