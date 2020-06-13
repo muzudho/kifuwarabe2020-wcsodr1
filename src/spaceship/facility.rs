@@ -239,7 +239,7 @@ P x{87:2}   |{63}|{64}|{65}|{66}|{67}|{68}|{69}|{70}|{71}| h8   p x{94:2}
 pub struct Kitchen {}
 impl Kitchen {
     /// 現在の局面での、指し手の一覧を表示するぜ☆（＾～＾）
-    pub fn print_ways(table: &GameTable, ways: &Vec<Movement>) {
+    pub fn print_ways(friend: Phase, table: &GameTable, ways: &Vec<Movement>) {
         Beam::shoot(&format!("Moves count={}", ways.len()));
         // 辞書順ソート
         let mut move_names = Vec::new();
@@ -248,12 +248,8 @@ impl Kitchen {
                 "{}{}",
                 format!("{}", move_),
                 if let Some(captured_move) = move_.captured {
-                    // let piece_type = captured_move.piece_type;
-                    let piece_type = table.get_type(
-                        table
-                            .piece_num_at(captured_move.source.friend, &captured_move.source)
-                            .unwrap(),
-                    );
+                    let piece_type =
+                        table.get_type(table.piece_num_at(friend, &captured_move.source).unwrap());
                     format!(" ({})", piece_type)
                 } else {
                     "".to_string()
