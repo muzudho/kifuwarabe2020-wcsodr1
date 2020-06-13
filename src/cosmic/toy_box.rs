@@ -3234,11 +3234,8 @@ impl GameTable {
         }
     }
     /// 指し手生成で使うぜ☆（＾～＾）有無を調べるぜ☆（＾～＾）
-    pub fn last_hand_type(&self, drop: DoubleFacedPiece) -> Option<PieceType> {
-        if let Some(piece_num) = self
-            .phase_classification
-            .last(&Fire::new_hand(drop.phase(), drop.type_()))
-        {
+    pub fn last_hand_type(&self, fire: &Fire) -> Option<PieceType> {
+        if let Some(piece_num) = self.phase_classification.last(&fire) {
             Some(self.get_type(piece_num))
         } else {
             None
@@ -3343,7 +3340,7 @@ impl GameTable {
             ],
         ];
         for drop in &FIRST_SECOND[friend as usize] {
-            if let Some(piece_type) = self.last_hand_type(*drop) {
+            if let Some(piece_type) = self.last_hand_type(&Fire::new_hand(friend, drop.type_())) {
                 // 有無を確認しているぜ☆（＾～＾）
                 piece_get(
                     &UnifiedAddress::from_double_faced_piece(*drop).to_fire(),
