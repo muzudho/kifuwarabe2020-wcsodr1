@@ -298,7 +298,7 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Game) {
                 // 駒に背番号を付けるぜ☆（＾～＾）
                 let piece_num = table.numbering_piece(friend, piece_type);
                 // 盤に置くぜ☆（＾～＾）
-                table.push_piece(&fire, Some(piece_num));
+                table.push_piece(fire.friend, &fire, Some(piece_num));
 
                 file -= 1;
             }

@@ -142,7 +142,8 @@ impl Game {
         self.table.rotate_piece_board_to_hand(&move_);
 
         // 移動先升に駒を置く
-        self.table.push_piece(&move_.destination, src_piece_num);
+        self.table
+            .push_piece(move_.destination.friend, &move_.destination, src_piece_num);
 
         // // 局面ハッシュを作り直す
         // let ky_hash = self.hash_seed.current_position(&self);
@@ -174,16 +175,19 @@ impl Game {
                     }
 
                     // 打でなければ、移動元升に、動かした駒を置く☆（＾～＾）打なら何もしないぜ☆（＾～＾）
-                    self.table.push_piece(&move_.source, moveing_piece_num);
+                    self.table
+                        .push_piece(move_.source.friend, &move_.source, moveing_piece_num);
                 }
                 FireAddress::Hand(_src_drop_type) => {
                     // 打なら
                     // 打った場所に駒があるはずだぜ☆（＾～＾）
                     let piece_num = moveing_piece_num.unwrap();
                     // 自分の持ち駒を増やそうぜ☆（＾～＾）！
+                    let friend = self.table.get_phase(piece_num);
                     self.table.push_piece(
+                        friend,
                         &MoveEnd::new_hand(
-                            self.table.get_phase(piece_num),
+                            friend,
                             self.table.get_double_faced_piece_type(piece_num),
                         ),
                         moveing_piece_num,

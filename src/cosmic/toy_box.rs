@@ -620,9 +620,11 @@ impl GameTable {
             // 移動先升の駒を盤上から消し、自分の持ち駒に増やす
             // 先後ひっくり返す。
             self.turn_phase(collision_piece_num_val);
+            let friend = self.get_phase(collision_piece_num_val);
             self.push_piece(
+                friend,
                 &MoveEnd::new_hand(
-                    self.get_phase(collision_piece_num_val),
+                    friend,
                     self.get_double_faced_piece_type(collision_piece_num_val),
                 ),
                 Some(collision_piece_num_val),
@@ -658,11 +660,15 @@ impl GameTable {
                 self.demote(piece_num);
             }
             // 取られた方に、駒を返すぜ☆（＾～＾）置くのは指し手の移動先☆（＾～＾）
-            self.push_piece(&move_.destination, Some(piece_num));
+            self.push_piece(
+                move_.destination.friend,
+                &move_.destination,
+                Some(piece_num),
+            );
         }
     }
     /// 駒を置く。
-    pub fn push_piece(&mut self, fire: &MoveEnd, piece_num: Option<PieceNum>) {
+    pub fn push_piece(&mut self, friend: Phase, fire: &MoveEnd, piece_num: Option<PieceNum>) {
         match fire.address {
             FireAddress::Board(sq) => {
                 if let Some(piece_num_val) = piece_num {
@@ -670,7 +676,7 @@ impl GameTable {
                     self.board[sq.serial_number() as usize] = piece_num;
                     // データベース
                     self.phase_classification
-                        .push(&MoveEnd::new_board(fire.friend, sq), piece_num_val);
+                        .push(&MoveEnd::new_board(friend, sq), piece_num_val);
                     // 背番号に番地を紐づけます。
                     self.address_list[piece_num_val as usize] =
                         MoveEnd::new_board(self.get_phase(piece_num_val), sq);
@@ -683,7 +689,7 @@ impl GameTable {
                 if let Some(piece_num_val) = piece_num {
                     // 持ち駒を１つ増やします。
                     self.phase_classification
-                        .push(&MoveEnd::new_hand(fire.friend, drop_type), piece_num_val);
+                        .push(&MoveEnd::new_hand(friend, drop_type), piece_num_val);
                     // 背番号に番地を紐づけます。
                     self.address_list[piece_num_val as usize] = *fire;
                 }
@@ -725,7 +731,7 @@ impl GameTable {
             self.get_phase(piece_num),
             self.get_double_faced_piece_type(piece_num),
         );
-        self.push_piece(&drop, Some(piece_num));
+        self.push_piece(drop.friend, &drop, Some(piece_num));
     }
 
     /// 駒の新しい背番号を生成します。
