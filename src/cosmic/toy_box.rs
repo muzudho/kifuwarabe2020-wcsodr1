@@ -674,8 +674,11 @@ impl GameTable {
                     // マスに駒を置きます。
                     self.board[sq.serial_number() as usize] = piece_num;
                     // データベース
-                    self.phase_classification
-                        .push(&MoveEnd::new_board(friend, sq), piece_num_val);
+                    self.phase_classification.push(
+                        friend,
+                        &MoveEnd::new_board(friend, sq),
+                        piece_num_val,
+                    );
                     // 背番号に番地を紐づけます。
                     self.address_list[piece_num_val as usize] =
                         MoveEnd::new_board(self.get_phase(piece_num_val), sq);
@@ -687,8 +690,11 @@ impl GameTable {
             FireAddress::Hand(drop_type) => {
                 if let Some(piece_num_val) = piece_num {
                     // 持ち駒を１つ増やします。
-                    self.phase_classification
-                        .push(&MoveEnd::new_hand(friend, drop_type), piece_num_val);
+                    self.phase_classification.push(
+                        friend,
+                        &MoveEnd::new_hand(friend, drop_type),
+                        piece_num_val,
+                    );
                     // 背番号に番地を紐づけます。
                     self.address_list[piece_num_val as usize] = *fire;
                 }
@@ -1032,13 +1038,13 @@ impl Default for PhaseClassification {
 }
 impl PhaseClassification {
     /// 駒の先後を ひっくり返してから入れてください。
-    pub fn push(&mut self, fire: &MoveEnd, num: PieceNum) {
+    pub fn push(&mut self, friend: Phase, fire: &MoveEnd, num: PieceNum) {
         match fire.address {
             FireAddress::Board(_sq) => {
                 // TODO 現在未実装だが、あとで使う☆（＾～＾）
             }
             FireAddress::Hand(drop_type) => {
-                let drop = DoubleFacedPiece::from_phase_and_type(fire.friend, drop_type);
+                let drop = DoubleFacedPiece::from_phase_and_type(friend, drop_type);
                 // 駒台に駒を置くぜ☆（＾～＾）
                 self.items[self.hand_cur(drop) as usize] = num;
                 // 位置を増減するぜ☆（＾～＾）

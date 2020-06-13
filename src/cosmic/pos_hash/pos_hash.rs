@@ -2,6 +2,7 @@
 //!
 
 use crate::cosmic::playing::Game;
+use crate::cosmic::recording::Phase;
 use crate::cosmic::recording::{FireAddress, History, MoveEnd, Movement, PHASE_LEN, PHASE_SECOND};
 use crate::cosmic::smart::features::DoubleFacedPiece;
 use crate::cosmic::smart::features::{HAND_MAX, PHYSICAL_PIECES_LEN};
@@ -184,23 +185,25 @@ impl GameHashSeed {
         }
 
         // 持ち駒ハッシュ
-        HandAddresses::for_all(&mut |fire_hand: &MoveEnd| match fire_hand.address {
-            FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.175) 未対応☆（＾～＾）")),
-            FireAddress::Hand(drop_type) => {
-                let drop = DoubleFacedPiece::from_phase_and_type(fire_hand.friend, drop_type);
-                let count = table.count_hand(fire_hand.friend, fire_hand);
-                /*
-                debug_assert!(
-                    count <= HAND_MAX,
-                    "持ち駒 {:?} の枚数 {} <= {}",
-                    drop,
-                    count,
-                    HAND_MAX
-                );
-                */
-                hash ^= self.hands[drop as usize][count as usize];
-            }
-        });
+        HandAddresses::for_all(
+            &mut |friend: &Phase, fire_hand: &MoveEnd| match fire_hand.address {
+                FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.175) 未対応☆（＾～＾）")),
+                FireAddress::Hand(drop_type) => {
+                    let drop = DoubleFacedPiece::from_phase_and_type(*friend, drop_type);
+                    let count = table.count_hand(*friend, fire_hand);
+                    /*
+                    debug_assert!(
+                        count <= HAND_MAX,
+                        "持ち駒 {:?} の枚数 {} <= {}",
+                        drop,
+                        count,
+                        HAND_MAX
+                    );
+                    */
+                    hash ^= self.hands[drop as usize][count as usize];
+                }
+            },
+        );
 
         // 手番ハッシュ はここでは算出しないぜ☆（＾～＾）
 

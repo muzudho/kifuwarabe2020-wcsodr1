@@ -67,7 +67,7 @@ struct SpeedOfLight {
 
     west: RelAdr2D,
 
-    hand_legal_all: [MoveEnd; PHYSICAL_PIECES_LEN - 2],
+    hand_legal_all: [(Phase, MoveEnd); PHYSICAL_PIECES_LEN - 2],
 }
 impl Default for SpeedOfLight {
     fn default() -> Self {
@@ -376,20 +376,62 @@ impl Default for SpeedOfLight {
 
             // 持ち駒☆（＾～＾）
             hand_legal_all: [
-                MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Rook),
-                MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Bishop),
-                MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Gold),
-                MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Silver),
-                MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Knight),
-                MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Lance),
-                MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Pawn),
-                MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Rook),
-                MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Bishop),
-                MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Gold),
-                MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Silver),
-                MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Knight),
-                MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Lance),
-                MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Pawn),
+                (
+                    Phase::First,
+                    MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Rook),
+                ),
+                (
+                    Phase::First,
+                    MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Bishop),
+                ),
+                (
+                    Phase::First,
+                    MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Gold),
+                ),
+                (
+                    Phase::First,
+                    MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Silver),
+                ),
+                (
+                    Phase::First,
+                    MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Knight),
+                ),
+                (
+                    Phase::First,
+                    MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Lance),
+                ),
+                (
+                    Phase::First,
+                    MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Pawn),
+                ),
+                (
+                    Phase::Second,
+                    MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Rook),
+                ),
+                (
+                    Phase::Second,
+                    MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Bishop),
+                ),
+                (
+                    Phase::Second,
+                    MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Gold),
+                ),
+                (
+                    Phase::Second,
+                    MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Silver),
+                ),
+                (
+                    Phase::Second,
+                    MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Knight),
+                ),
+                (
+                    Phase::Second,
+                    MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Lance),
+                ),
+                (
+                    Phase::Second,
+                    MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Pawn),
+                ),
             ],
         }
     }
@@ -423,10 +465,10 @@ pub struct HandAddresses {}
 impl HandAddresses {
     pub fn for_all<F1>(callback: &mut F1)
     where
-        F1: FnMut(&MoveEnd),
+        F1: FnMut(&Phase, &MoveEnd),
     {
-        for fire in &NINE_299792458.hand_legal_all {
-            callback(fire);
+        for (friend, fire) in &NINE_299792458.hand_legal_all {
+            callback(friend, fire);
         }
     }
 }
