@@ -66,6 +66,7 @@ impl History {
 /// 局面(Position)全体を範囲にして振られた番地(Address)。
 #[derive(Clone, Copy, Debug)]
 pub enum AddressPos1 {
+    /* TODO これを消すのは大変☆（＾～＾） */
     // 盤上の番地 TODO これを先手盤上、後手盤上の２つに分けれる☆（＾～＾）
     Board(SquareType),
     // 持ち駒の種類
@@ -90,56 +91,6 @@ impl fmt::Display for AddressPos1 {
                 }
                 AddressPos1::Hand(drop) => {
                     format!("{}", drop)
-                }
-            },
-        )
-    }
-}
-
-/// 局面(Position)全体を範囲にして振られた番地(Address)。
-#[derive(Clone, Copy)]
-pub enum AddressPos3 {
-    // 先手の盤上の番地
-    FirstBoard(SquareType),
-    // 後手の盤上の番地
-    SecondBoard(SquareType),
-    // 持ち駒の種類
-    Hand(DoubleFacedPiece),
-}
-impl Default for AddressPos3 {
-    // ゴミ値だぜ☆（＾～＾）
-    fn default() -> Self {
-        AddressPos3::FirstBoard(SquareType::Sq11)
-    }
-}
-impl fmt::Display for AddressPos3 {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            match self {
-                AddressPos3::FirstBoard(sq) | AddressPos3::SecondBoard(sq) => {
-                    let (file, rank) = sq.to_file_rank();
-                    format!("{}{}", file, num_to_lower_case(rank))
-                }
-                AddressPos3::Hand(drop) => {
-                    format!("{}", drop)
-                }
-            },
-        )
-    }
-}
-impl fmt::Debug for AddressPos3 {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            match self {
-                AddressPos3::FirstBoard(sq) | AddressPos3::SecondBoard(sq) => {
-                    sq.to_serial_number().to_string()
-                }
-                AddressPos3::Hand(drop) => {
-                    format!("{:?}", drop)
                 }
             },
         )
