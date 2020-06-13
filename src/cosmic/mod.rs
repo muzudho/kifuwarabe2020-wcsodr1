@@ -1,5 +1,4 @@
 pub mod daydream;
-pub mod fire;
 pub mod playing;
 pub mod pos_hash;
 pub mod recording;

@@ -7,9 +7,7 @@
 //! 駒早見表 (PieceChart),
 //! 駒種類早見表 (PieceTypeChart).
 //!
-use crate::cosmic::fire::Fire;
-use crate::cosmic::recording::Phase;
-use crate::cosmic::recording::PHASE_LEN;
+use crate::cosmic::recording::{MoveEnd, Phase, PHASE_LEN};
 use crate::cosmic::smart::features::PHYSICAL_PIECES_LEN;
 use crate::cosmic::smart::features::PHYSICAL_PIECE_TYPE_LEN;
 use crate::cosmic::smart::features::PIECE_TYPE_LEN;
@@ -69,7 +67,7 @@ struct SpeedOfLight {
 
     west: RelAdr2D,
 
-    hand_legal_all: [Fire; PHYSICAL_PIECES_LEN - 2],
+    hand_legal_all: [MoveEnd; PHYSICAL_PIECES_LEN - 2],
 }
 impl Default for SpeedOfLight {
     fn default() -> Self {
@@ -378,20 +376,20 @@ impl Default for SpeedOfLight {
 
             // 持ち駒☆（＾～＾）
             hand_legal_all: [
-                Fire::new_hand(Phase::First, DoubleFacedPieceType::Rook),
-                Fire::new_hand(Phase::First, DoubleFacedPieceType::Bishop),
-                Fire::new_hand(Phase::First, DoubleFacedPieceType::Gold),
-                Fire::new_hand(Phase::First, DoubleFacedPieceType::Silver),
-                Fire::new_hand(Phase::First, DoubleFacedPieceType::Knight),
-                Fire::new_hand(Phase::First, DoubleFacedPieceType::Lance),
-                Fire::new_hand(Phase::First, DoubleFacedPieceType::Pawn),
-                Fire::new_hand(Phase::Second, DoubleFacedPieceType::Rook),
-                Fire::new_hand(Phase::Second, DoubleFacedPieceType::Bishop),
-                Fire::new_hand(Phase::Second, DoubleFacedPieceType::Gold),
-                Fire::new_hand(Phase::Second, DoubleFacedPieceType::Silver),
-                Fire::new_hand(Phase::Second, DoubleFacedPieceType::Knight),
-                Fire::new_hand(Phase::Second, DoubleFacedPieceType::Lance),
-                Fire::new_hand(Phase::Second, DoubleFacedPieceType::Pawn),
+                MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Rook),
+                MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Bishop),
+                MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Gold),
+                MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Silver),
+                MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Knight),
+                MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Lance),
+                MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Pawn),
+                MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Rook),
+                MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Bishop),
+                MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Gold),
+                MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Silver),
+                MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Knight),
+                MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Lance),
+                MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Pawn),
             ],
         }
     }
@@ -425,7 +423,7 @@ pub struct HandAddresses {}
 impl HandAddresses {
     pub fn for_all<F1>(callback: &mut F1)
     where
-        F1: FnMut(&Fire),
+        F1: FnMut(&MoveEnd),
     {
         for fire in &NINE_299792458.hand_legal_all {
             callback(fire);

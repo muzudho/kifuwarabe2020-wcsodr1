@@ -1,6 +1,5 @@
-use crate::cosmic::fire::{Fire, FireAddress};
 use crate::cosmic::pos_hash::pos_hash::*;
-use crate::cosmic::recording::{History, Movement};
+use crate::cosmic::recording::{FireAddress, History, MoveEnd, Movement};
 use crate::cosmic::toy_box::GameTable;
 use crate::spaceship::equipment::{Beam, DestinationDisplay};
 
@@ -183,7 +182,7 @@ impl Game {
                     let piece_num = moveing_piece_num.unwrap();
                     // 自分の持ち駒を増やそうぜ☆（＾～＾）！
                     self.table.push_piece(
-                        &Fire::new_hand(
+                        &MoveEnd::new_hand(
                             self.table.get_phase(piece_num),
                             self.table.get_double_faced_piece_type(piece_num),
                         ),

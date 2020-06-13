@@ -4,7 +4,8 @@
 //! * Phase (先後。手番,相手番)
 //! * Person (先手,後手)
 //!
-use crate::cosmic::fire::{Fire, FireAddress};
+use crate::cosmic::smart::features::{DoubleFacedPiece, DoubleFacedPieceType};
+use crate::cosmic::smart::square::AbsoluteAddress2D;
 use crate::law::cryptographic::num_to_lower_case;
 use std::fmt;
 
@@ -57,16 +58,74 @@ impl History {
     */
 }
 
+/// 線の先端。
+/// 駒の背番号も欲しいか☆（＾～＾）？
+#[derive(Copy, Clone, Debug)]
+pub struct MoveEnd {
+    pub friend: Phase,
+    pub address: FireAddress,
+}
+/// USI向け。
+impl fmt::Display for MoveEnd {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self.address {
+                FireAddress::Board(sq) => {
+                    let (file, rank) = sq.to_file_rank();
+                    format!("{}{}", file, num_to_lower_case(rank))
+                }
+                FireAddress::Hand(drop_type) => {
+                    format!(
+                        "{}",
+                        DoubleFacedPiece::from_phase_and_type(self.friend, drop_type)
+                    )
+                }
+            },
+        )
+    }
+}
+impl Default for MoveEnd {
+    /// ゴミ値だぜ☆（＾～＾）
+    fn default() -> Self {
+        MoveEnd {
+            friend: Phase::First,
+            address: FireAddress::Board(AbsoluteAddress2D::default()),
+        }
+    }
+}
+impl MoveEnd {
+    pub fn new_board(friend: Phase, addr: AbsoluteAddress2D) -> Self {
+        MoveEnd {
+            friend: friend,
+            address: FireAddress::Board(addr),
+        }
+    }
+    pub fn new_hand(friend: Phase, drop_type: DoubleFacedPieceType) -> Self {
+        MoveEnd {
+            friend: friend,
+            address: FireAddress::Hand(drop_type),
+        }
+    }
+}
+/// 盤上と、駒台で　共通しないものを並列にします。
+#[derive(Copy, Clone, Debug)]
+pub enum FireAddress {
+    Board(AbsoluteAddress2D),
+    Hand(DoubleFacedPieceType),
+}
+
 /// 取ることになる駒の移動。
 #[derive(Clone, Copy)]
 pub struct CapturedMove {
     /// 元あった所。
-    pub source: Fire,
+    pub source: MoveEnd,
     /// 移動先。
-    pub destination: Fire,
+    pub destination: MoveEnd,
 }
 impl CapturedMove {
-    pub fn new(source: Fire, destination: Fire) -> Self {
+    pub fn new(source: MoveEnd, destination: MoveEnd) -> Self {
         CapturedMove {
             source: source,
             destination: destination,
@@ -83,9 +142,9 @@ impl CapturedMove {
 #[derive(Clone, Copy)]
 pub struct Movement {
     /// 移動元マス。
-    pub source: Fire,
+    pub source: MoveEnd,
     /// 移動先マス。リバーシブルに作りたいので、駒台にも指せる。
-    pub destination: Fire,
+    pub destination: MoveEnd,
     /// 移動後に成るなら真
     pub promote: bool,
     /// 取ることになる駒
@@ -95,8 +154,8 @@ impl Default for Movement {
     /// ゴミの値を作るぜ☆（＾～＾）
     fn default() -> Self {
         Movement {
-            source: Fire::default(),
-            destination: Fire::default(),
+            source: MoveEnd::default(),
+            destination: MoveEnd::default(),
             promote: false,
             captured: None,
         }
@@ -104,8 +163,8 @@ impl Default for Movement {
 }
 impl Movement {
     pub fn new(
-        source: Fire,
-        destination: Fire,
+        source: MoveEnd,
+        destination: MoveEnd,
         promote: bool,
         captured: Option<CapturedMove>,
     ) -> Self {

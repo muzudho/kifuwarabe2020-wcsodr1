@@ -1,9 +1,8 @@
 //! 局面ハッシュ。
 //!
 
-use crate::cosmic::fire::{Fire, FireAddress};
 use crate::cosmic::playing::Game;
-use crate::cosmic::recording::{History, Movement, PHASE_LEN, PHASE_SECOND};
+use crate::cosmic::recording::{FireAddress, History, MoveEnd, Movement, PHASE_LEN, PHASE_SECOND};
 use crate::cosmic::smart::features::DoubleFacedPiece;
 use crate::cosmic::smart::features::{HAND_MAX, PHYSICAL_PIECES_LEN};
 use crate::cosmic::smart::square::{
@@ -120,7 +119,7 @@ impl GameHashSeed {
                         prev_hash ^= self.piece[dst_sq.serial_number()][dst_piece_hash_index];
                         // 自分の持ち駒になるケースの追加
                         let double_faced_piece = table.get_double_faced_piece(dst_piece_num);
-                        let count = table.count_hand(&Fire::new_hand(
+                        let count = table.count_hand(&MoveEnd::new_hand(
                             history.get_friend(),
                             double_faced_piece.type_(),
                         ));
@@ -181,7 +180,7 @@ impl GameHashSeed {
         }
 
         // 持ち駒ハッシュ
-        HandAddresses::for_all(&mut |fire_hand: &Fire| match fire_hand.address {
+        HandAddresses::for_all(&mut |fire_hand: &MoveEnd| match fire_hand.address {
             FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.175) 未対応☆（＾～＾）")),
             FireAddress::Hand(drop_type) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(fire_hand.friend, drop_type);

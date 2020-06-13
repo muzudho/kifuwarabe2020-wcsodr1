@@ -1,9 +1,8 @@
 //!
 //! USIプロトコル
 //!
-use crate::cosmic::fire::Fire;
 use crate::cosmic::playing::Game;
-use crate::cosmic::recording::{CapturedMove, Movement, Phase};
+use crate::cosmic::recording::{CapturedMove, MoveEnd, Movement, Phase};
 use crate::cosmic::smart::features::{DoubleFacedPieceType, PieceType};
 use crate::cosmic::smart::square::{AbsoluteAddress2D, FILE_9, RANK_1};
 use crate::spaceship::equipment::Beam;
@@ -55,31 +54,31 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
         // 1文字目が駒だったら打。2文字目は必ず「*」なはずなので読み飛ばす。
         "R" => {
             *starts += 2;
-            Fire::new_hand(friend, DoubleFacedPieceType::Rook)
+            MoveEnd::new_hand(friend, DoubleFacedPieceType::Rook)
         }
         "B" => {
             *starts += 2;
-            Fire::new_hand(friend, DoubleFacedPieceType::Bishop)
+            MoveEnd::new_hand(friend, DoubleFacedPieceType::Bishop)
         }
         "G" => {
             *starts += 2;
-            Fire::new_hand(friend, DoubleFacedPieceType::Gold)
+            MoveEnd::new_hand(friend, DoubleFacedPieceType::Gold)
         }
         "S" => {
             *starts += 2;
-            Fire::new_hand(friend, DoubleFacedPieceType::Silver)
+            MoveEnd::new_hand(friend, DoubleFacedPieceType::Silver)
         }
         "N" => {
             *starts += 2;
-            Fire::new_hand(friend, DoubleFacedPieceType::Knight)
+            MoveEnd::new_hand(friend, DoubleFacedPieceType::Knight)
         }
         "L" => {
             *starts += 2;
-            Fire::new_hand(friend, DoubleFacedPieceType::Lance)
+            MoveEnd::new_hand(friend, DoubleFacedPieceType::Lance)
         }
         "P" => {
             *starts += 2;
-            Fire::new_hand(friend, DoubleFacedPieceType::Pawn)
+            MoveEnd::new_hand(friend, DoubleFacedPieceType::Pawn)
         }
         _ => {
             // 残りは「筋の数字」、「段のアルファベット」のはず。
@@ -97,39 +96,39 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
             match &line[*starts..=*starts] {
                 "a" => {
                     *starts += 1;
-                    Fire::new_board(friend, AbsoluteAddress2D::new(file, 1))
+                    MoveEnd::new_board(friend, AbsoluteAddress2D::new(file, 1))
                 }
                 "b" => {
                     *starts += 1;
-                    Fire::new_board(friend, AbsoluteAddress2D::new(file, 2))
+                    MoveEnd::new_board(friend, AbsoluteAddress2D::new(file, 2))
                 }
                 "c" => {
                     *starts += 1;
-                    Fire::new_board(friend, AbsoluteAddress2D::new(file, 3))
+                    MoveEnd::new_board(friend, AbsoluteAddress2D::new(file, 3))
                 }
                 "d" => {
                     *starts += 1;
-                    Fire::new_board(friend, AbsoluteAddress2D::new(file, 4))
+                    MoveEnd::new_board(friend, AbsoluteAddress2D::new(file, 4))
                 }
                 "e" => {
                     *starts += 1;
-                    Fire::new_board(friend, AbsoluteAddress2D::new(file, 5))
+                    MoveEnd::new_board(friend, AbsoluteAddress2D::new(file, 5))
                 }
                 "f" => {
                     *starts += 1;
-                    Fire::new_board(friend, AbsoluteAddress2D::new(file, 6))
+                    MoveEnd::new_board(friend, AbsoluteAddress2D::new(file, 6))
                 }
                 "g" => {
                     *starts += 1;
-                    Fire::new_board(friend, AbsoluteAddress2D::new(file, 7))
+                    MoveEnd::new_board(friend, AbsoluteAddress2D::new(file, 7))
                 }
                 "h" => {
                     *starts += 1;
-                    Fire::new_board(friend, AbsoluteAddress2D::new(file, 8))
+                    MoveEnd::new_board(friend, AbsoluteAddress2D::new(file, 8))
                 }
                 "i" => {
                     *starts += 1;
-                    Fire::new_board(friend, AbsoluteAddress2D::new(file, 9))
+                    MoveEnd::new_board(friend, AbsoluteAddress2D::new(file, 9))
                 }
                 _ => {
                     panic!(Beam::trouble(&format!(
@@ -174,7 +173,7 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
     *starts += 1;
 
     // 行き先。
-    buffer.destination = Fire::new_board(
+    buffer.destination = MoveEnd::new_board(
         game.history.get_friend(),
         AbsoluteAddress2D::new(file, rank),
     );
@@ -197,7 +196,7 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
     buffer.captured = if let Some(captured_piece_num_val) = captured_piece_num {
         Some(CapturedMove::new(
             buffer.destination,
-            Fire::new_hand(
+            MoveEnd::new_hand(
                 friend,
                 game.table
                     .get_double_faced_piece_type(captured_piece_num_val),
@@ -292,7 +291,7 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Game) {
         match board_part {
             BoardPart::Alphabet((friend, piece_type)) => {
                 *starts += 1;
-                let fire = Fire::new_board(friend, AbsoluteAddress2D::new(file, rank));
+                let fire = MoveEnd::new_board(friend, AbsoluteAddress2D::new(file, rank));
 
                 // 駒に背番号を付けるぜ☆（＾～＾）
                 let piece_num = table.numbering_piece(friend, piece_type);
