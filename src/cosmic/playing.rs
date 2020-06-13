@@ -1,7 +1,7 @@
 use crate::cosmic::fire::{Fire, FireAddress};
 use crate::cosmic::pos_hash::pos_hash::*;
 use crate::cosmic::recording::{History, Movement};
-use crate::cosmic::toy_box::{GameTable, UnifiedAddress};
+use crate::cosmic::toy_box::GameTable;
 use crate::spaceship::equipment::{Beam, DestinationDisplay};
 
 /// 局面

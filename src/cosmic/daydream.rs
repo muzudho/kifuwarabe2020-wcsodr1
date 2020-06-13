@@ -7,7 +7,6 @@ use crate::cosmic::recording::{Movement, PLY_SIZE, SENNTITE_NUM};
 use crate::cosmic::smart::evaluator::{Evaluation, REPITITION_VALUE};
 use crate::cosmic::smart::features::PieceType;
 use crate::cosmic::smart::see::SEE;
-use crate::cosmic::toy_box::UnifiedAddress;
 use crate::cosmic::universe::Universe;
 use crate::law::generate_move::{PseudoLegalMoves, Ways};
 use crate::spaceship::equipment::{Beam, PvString};

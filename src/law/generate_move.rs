@@ -10,7 +10,7 @@ use crate::cosmic::smart::square::{
     AbsoluteAddress2D, Angle, RelAdr2D, FILE_1, FILE_10, RANK_1, RANK_10, RANK_2, RANK_3, RANK_4,
     RANK_6, RANK_7, RANK_8, RANK_9,
 };
-use crate::cosmic::toy_box::{GameTable, UnifiedAddress};
+use crate::cosmic::toy_box::GameTable;
 use crate::spaceship::equipment::Beam;
 use std::fmt;
 
@@ -249,7 +249,7 @@ impl PseudoLegalMoves {
                 "(Err.641) 盤上は未対応☆（＾～＾）！",
             ))),
             FireAddress::Hand(drop_type) => {
-                if let Some((piece_type, hand_addr)) = table.last_hand(fire) {
+                if let Some((piece_type, fire_hand)) = table.last_hand(fire) {
                     // 打つぜ☆（＾～＾）
                     let drop_fn = &mut |destination: &Fire| {
                         if let None = table.piece_num_at(&destination.address) {
@@ -272,7 +272,7 @@ impl PseudoLegalMoves {
                                 _ => {}
                             }
                             listen_move(Movement::new(
-                                hand_addr,    // 打った駒種類
+                                fire_hand,    // 打った駒種類
                                 *destination, // どの升へ行きたいか
                                 false,        // 打に成りは無し
                                 None,         // 打で取れる駒無し
