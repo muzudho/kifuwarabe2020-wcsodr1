@@ -927,9 +927,10 @@ impl GameTable {
             ],
         ];
         for drop in &FIRST_SECOND[friend as usize] {
-            if let Some(_piece_type) = self.last_hand_type(&Fire::new_hand(friend, drop.type_())) {
+            let fire = &Fire::new_hand(friend, drop.type_()); // &Fire::new_hand(drop.phase(), drop.type_())
+            if let Some(_piece_type) = self.last_hand_type(fire) {
                 // 有無を確認しているぜ☆（＾～＾）
-                piece_get(&Fire::new_hand(drop.phase(), drop.type_()));
+                piece_get(fire);
             }
         }
     }
