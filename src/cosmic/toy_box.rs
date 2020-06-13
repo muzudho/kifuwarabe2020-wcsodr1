@@ -3083,7 +3083,11 @@ impl GameTable {
         }
     }
     /// 駒を置く。
-    pub fn push_piece(&mut self, addr: UnifiedAddress, piece_num: Option<PieceNum>) {
+    pub fn push_piece(
+        &mut self,
+        addr: UnifiedAddress, /*TODO これの置き換えはバグりやすい。*/
+        piece_num: Option<PieceNum>,
+    ) {
         match addr.to_address_pos1() {
             AddressPos1::Board(sq) => {
                 if let Some(piece_num_val) = piece_num {
