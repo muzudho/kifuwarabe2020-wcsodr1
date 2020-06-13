@@ -667,13 +667,13 @@ impl GameTable {
             FireAddress::Board(sq) => {
                 if let Some(piece_num_val) = piece_num {
                     // マスに駒を置きます。
-                    self.board[sq.serial_number() as usize] = piece_num;
+                    self.board[sq.serial_number()] = piece_num;
                     // 背番号に番地を紐づけます。
                     self.address_list[piece_num_val as usize] =
                         Fire::new_board(self.get_phase(piece_num_val), sq);
                 } else {
                     // マスを空にします。
-                    self.board[sq.serial_number() as usize] = None;
+                    self.board[sq.serial_number()] = None;
                 }
             }
             FireAddress::Hand(drop_type) => {
@@ -828,6 +828,10 @@ impl GameTable {
             None
         }
     }
+    /// 指し手生成で使うぜ☆（＾～＾）有無を調べるぜ☆（＾～＾）
+    pub fn is_empty_hand(&self, fire: &Fire) -> bool {
+        self.phase_classification.is_empty_hand(&fire)
+    }
     /// 指し手生成で使うぜ☆（＾～＾）
     pub fn last_hand(&self, fire: &Fire) -> Option<(PieceType, Fire)> {
         match fire.address {
@@ -927,10 +931,9 @@ impl GameTable {
             ],
         ];
         for drop in &FIRST_SECOND[friend as usize] {
-            let fire = &Fire::new_hand(friend, drop.type_()); // &Fire::new_hand(drop.phase(), drop.type_())
-            if let Some(_piece_type) = self.last_hand_type(fire) {
-                // 有無を確認しているぜ☆（＾～＾）
-                piece_get(fire);
+            let fire = &Fire::new_hand(friend, drop.type_());
+            if !self.is_empty_hand(fire) {
+                piece_get(&Fire::new_hand(drop.phase(), drop.type_())); // TODO この fire は使い回せないのかだぜ☆（＾～＾）？
             }
         }
     }
@@ -1061,6 +1064,28 @@ impl PhaseClassification {
                         Some(self.items[(self.currents[drop as usize] + 1) as usize])
                     } else {
                         None
+                    }
+                }
+            }
+        }
+    }
+
+    fn is_empty_hand(&self, fire: &Fire) -> bool {
+        match fire.address {
+            FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3431) 未対応☆（＾～＾）")),
+            FireAddress::Hand(drop_type) => {
+                let drop = DoubleFacedPiece::from_phase_and_type(fire.friend, drop_type);
+                if self.direction(drop) == 1 {
+                    if self.start(drop) < self.currents[drop as usize] {
+                        false
+                    } else {
+                        true
+                    }
+                } else {
+                    if self.currents[drop as usize] < self.start(drop) {
+                        false
+                    } else {
+                        true
                     }
                 }
             }
