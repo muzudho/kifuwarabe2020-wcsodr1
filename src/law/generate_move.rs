@@ -249,7 +249,9 @@ impl PseudoLegalMoves {
         F1: FnMut(Movement),
     {
         let friend = drop.phase();
-        if let Some((piece_type, hand_addr)) = table.last_hand(drop) {
+        if let Some((piece_type, hand_addr)) =
+            table.last_hand(&Fire::new_hand(drop.phase(), drop.type_()))
+        {
             // 打つぜ☆（＾～＾）
             let drop_fn = &mut |destination: &Fire| {
                 if let None = table.piece_num_at(&destination.address) {

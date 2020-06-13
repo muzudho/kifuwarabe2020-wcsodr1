@@ -3245,23 +3245,36 @@ impl GameTable {
         }
     }
     /// 指し手生成で使うぜ☆（＾～＾）
-    pub fn last_hand(&self, drop: DoubleFacedPiece) -> Option<(PieceType, UnifiedAddress)> {
-        if let Some(piece_num) = self
-            .phase_classification
-            .last(&Fire::new_hand(drop.phase(), drop.type_()))
-        {
-            let piece = self.get_piece(piece_num);
-            Some((
-                piece.type_(),
-                UnifiedAddress::from_double_faced_piece(piece.double_faced_piece()),
-            ))
-        } else {
-            None
+    pub fn last_hand(&self, fire: &Fire) -> Option<(PieceType, UnifiedAddress)> {
+        match fire.address {
+            FireAddress::Board(_sq) => {
+                panic!(Beam::trouble(&format!("(Err.3251) 未対応☆（＾～＾）！",)))
+            }
+            FireAddress::Hand(drop_type) => {
+                if let Some(piece_num) = self
+                    .phase_classification
+                    .last(&Fire::new_hand(fire.friend, drop_type))
+                {
+                    let piece = self.get_piece(piece_num);
+                    Some((
+                        piece.type_(),
+                        UnifiedAddress::from_double_faced_piece(piece.double_faced_piece()),
+                    ))
+                } else {
+                    None
+                }
+            }
         }
     }
-    pub fn count_hand(&self, drop: DoubleFacedPiece) -> usize {
-        self.phase_classification
-            .len(&Fire::new_hand(drop.phase(), drop.type_()))
+    pub fn count_hand(&self, fire: &Fire) -> usize {
+        match fire.address {
+            FireAddress::Board(_sq) => {
+                panic!(Beam::trouble(&format!("(Err.3266) 未対応☆（＾～＾）！",)))
+            }
+            FireAddress::Hand(drop_type) => self
+                .phase_classification
+                .len(&Fire::new_hand(fire.friend, drop_type)),
+        }
     }
 
     /// 表示に使うだけ☆（＾～＾）

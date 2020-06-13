@@ -92,7 +92,7 @@ impl GameHashSeed {
             FireAddress::Hand(src_drop_type) => {
                 let src_drop =
                     DoubleFacedPiece::from_phase_and_type(move_.source.friend, src_drop_type);
-                let count = table.count_hand(src_drop);
+                let count = table.count_hand(&move_.source);
                 // 打つ前の駒の枚数のハッシュ。
                 prev_hash ^= self.hands[src_drop as usize][count as usize];
                 // 移動後マスに、打った駒があるときのハッシュ。
@@ -107,14 +107,18 @@ impl GameHashSeed {
                 }
             }
         }
-        // 移動先にある駒があれば
+        // 移動先に駒があれば、自分の持ち駒になります。
         if let Some(dst_piece_val) = table.piece_at1(&move_.destination.address) {
             match move_.destination.address {
                 FireAddress::Board(dst_sq) => {
+                    // 移動先に駒があるケースの消去
                     prev_hash ^= self.piece[dst_sq.serial_number()][dst_piece_val as usize];
-                    // 持ち駒になるとき。
+                    // 自分の持ち駒になるケースの追加
                     let double_faced_piece = dst_piece_val.double_faced_piece();
-                    let count = table.count_hand(double_faced_piece);
+                    let count = table.count_hand(&Fire::new_hand(
+                        history.get_friend(),
+                        double_faced_piece.type_(),
+                    ));
                     // 打つ前の駒の枚数のハッシュ。
                     prev_hash ^= self.hands[double_faced_piece as usize][count as usize + 1];
                 }
@@ -169,16 +173,20 @@ impl GameHashSeed {
         }
 
         // 持ち駒ハッシュ
-        HandAddresses::for_all(&mut |adr| {
-            let count = table.count_hand(adr);
-            debug_assert!(
-                count <= HAND_MAX,
-                "持ち駒 {:?} の枚数 {} <= {}",
-                adr,
-                count,
-                HAND_MAX
-            );
-            hash ^= self.hands[adr as usize][count as usize];
+        HandAddresses::for_all(&mut |fire_hand: &Fire| match fire_hand.address {
+            FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.175) 未対応☆（＾～＾）")),
+            FireAddress::Hand(drop_type) => {
+                let drop = DoubleFacedPiece::from_phase_and_type(fire_hand.friend, drop_type);
+                let count = table.count_hand(fire_hand);
+                debug_assert!(
+                    count <= HAND_MAX,
+                    "持ち駒 {:?} の枚数 {} <= {}",
+                    drop,
+                    count,
+                    HAND_MAX
+                );
+                hash ^= self.hands[drop as usize][count as usize];
+            }
         });
 
         // 手番ハッシュ はここでは算出しないぜ☆（＾～＾）

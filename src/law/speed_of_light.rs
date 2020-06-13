@@ -7,6 +7,7 @@
 //! 駒早見表 (PieceChart),
 //! 駒種類早見表 (PieceTypeChart).
 //!
+use crate::cosmic::fire::{Fire, FireAddress};
 use crate::cosmic::recording::AddressPos3;
 use crate::cosmic::recording::Phase;
 use crate::cosmic::recording::PHASE_LEN;
@@ -85,6 +86,7 @@ struct SpeedOfLight {
     west: RelAdr2D,
 
     unified_address_to_address_pos3: [AddressPos3; 178],
+    hand_legal_all: [Fire; PHYSICAL_PIECES_LEN - 2],
 }
 impl Default for SpeedOfLight {
     fn default() -> Self {
@@ -792,6 +794,23 @@ impl Default for SpeedOfLight {
                 AddressPos3::Hand(DoubleFacedPiece::Lance2),
                 AddressPos3::Hand(DoubleFacedPiece::Pawn2),
             ],
+            // 持ち駒☆（＾～＾）
+            hand_legal_all: [
+                Fire::new_hand(Phase::First, DoubleFacedPieceType::Rook),
+                Fire::new_hand(Phase::First, DoubleFacedPieceType::Bishop),
+                Fire::new_hand(Phase::First, DoubleFacedPieceType::Gold),
+                Fire::new_hand(Phase::First, DoubleFacedPieceType::Silver),
+                Fire::new_hand(Phase::First, DoubleFacedPieceType::Knight),
+                Fire::new_hand(Phase::First, DoubleFacedPieceType::Lance),
+                Fire::new_hand(Phase::First, DoubleFacedPieceType::Pawn),
+                Fire::new_hand(Phase::Second, DoubleFacedPieceType::Rook),
+                Fire::new_hand(Phase::Second, DoubleFacedPieceType::Bishop),
+                Fire::new_hand(Phase::Second, DoubleFacedPieceType::Gold),
+                Fire::new_hand(Phase::Second, DoubleFacedPieceType::Silver),
+                Fire::new_hand(Phase::Second, DoubleFacedPieceType::Knight),
+                Fire::new_hand(Phase::Second, DoubleFacedPieceType::Lance),
+                Fire::new_hand(Phase::Second, DoubleFacedPieceType::Pawn),
+            ],
         }
     }
 }
@@ -851,10 +870,10 @@ pub struct HandAddresses {}
 impl HandAddresses {
     pub fn for_all<F1>(callback: &mut F1)
     where
-        F1: FnMut(DoubleFacedPiece),
+        F1: FnMut(&Fire),
     {
-        for adr in &NINE_299792458.double_faced_pieces_legal_all {
-            callback(*adr);
+        for fire in &NINE_299792458.hand_legal_all {
+            callback(fire);
         }
     }
 }
