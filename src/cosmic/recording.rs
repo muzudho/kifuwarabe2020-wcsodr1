@@ -6,6 +6,7 @@
 //!
 use crate::cosmic::smart::features::{DoubleFacedPiece, DoubleFacedPieceType};
 use crate::cosmic::smart::square::AbsoluteAddress2D;
+use crate::cosmic::toy_box::PieceNum;
 use crate::law::cryptographic::num_to_lower_case;
 use std::fmt;
 
@@ -142,6 +143,8 @@ impl CapturedMove {
 /// Copy: 配列の要素の初期化時に使う☆（＾～＾）
 #[derive(Clone, Copy)]
 pub struct Movement {
+    /// 動かす駒の背番号
+    pub piece_num: PieceNum,
     /// 移動元マス。
     pub source: MoveEnd,
     /// 移動先マス。リバーシブルに作りたいので、駒台にも指せる。
@@ -155,6 +158,7 @@ impl Default for Movement {
     /// ゴミの値を作るぜ☆（＾～＾）
     fn default() -> Self {
         Movement {
+            piece_num: PieceNum::King1,
             source: MoveEnd::default(),
             destination: MoveEnd::default(),
             promote: false,
@@ -164,12 +168,14 @@ impl Default for Movement {
 }
 impl Movement {
     pub fn new(
+        piece_num: PieceNum,
         source: MoveEnd,
         destination: MoveEnd,
         promote: bool,
         captured: Option<CapturedMove>,
     ) -> Self {
         Movement {
+            piece_num: piece_num,
             source: source,
             destination: destination,
             promote: promote,
@@ -178,9 +184,11 @@ impl Movement {
     }
 
     pub fn set(&mut self, b: &Movement) {
+        self.piece_num = b.piece_num;
         self.source = b.source;
         self.destination = b.destination;
         self.promote = b.promote;
+        self.captured = b.captured;
     }
 }
 impl fmt::Display for Movement {

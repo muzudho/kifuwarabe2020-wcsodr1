@@ -168,7 +168,7 @@ impl Tree {
             for i in 0..cap {
                 let piece_type = game.table.get_type(
                     game.table
-                        .piece_num_at(&ways.get(i).captured.unwrap().source.address)
+                        .piece_num_at(&ways.get(i).captured.unwrap().source)
                         .unwrap(),
                 );
                 // let piece_type = ways.get(i).captured.unwrap().piece_type;
@@ -215,7 +215,7 @@ impl Tree {
             let captured_piece_type = if let Some(captured) = move_.captured {
                 Some(
                     game.table
-                        .get_type(game.table.piece_num_at(&captured.source.address).unwrap()),
+                        .get_type(game.table.piece_num_at(&captured.source).unwrap()),
                 )
             // Some(captured.piece_type)
             } else {

@@ -9,9 +9,7 @@ use crate::cosmic::smart::square::FILE10U8;
 use crate::cosmic::smart::square::FILE1U8;
 use crate::cosmic::smart::square::RANK10U8;
 use crate::cosmic::smart::square::RANK1U8;
-use crate::cosmic::smart::square::{
-    AbsoluteAddress2D, BOARD_MEMORY_AREA, FILE_1, FILE_10, RANK_1, RANK_10, SQUARE_NONE,
-};
+use crate::cosmic::smart::square::{AbsoluteAddress2D, BOARD_MEMORY_AREA, SQUARE_NONE};
 use crate::cosmic::toy_box::{GameTable, PIECE_LEN};
 use crate::law::speed_of_light::HandAddresses;
 use crate::spaceship::equipment::Beam;
@@ -114,7 +112,7 @@ impl GameHashSeed {
             }
         }
         // 移動先に駒があれば、自分の持ち駒になります。
-        if let Some(dst_piece_num) = table.piece_num_at(&move_.destination.address) {
+        if let Some(dst_piece_num) = table.piece_num_at(&move_.destination) {
             if let Some(dst_piece_hash_index) =
                 table.get_piece_board_hash_index(&move_.destination.address)
             {

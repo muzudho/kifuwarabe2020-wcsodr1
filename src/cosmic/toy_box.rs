@@ -7,7 +7,7 @@ use crate::cosmic::smart::features::{
 };
 use crate::cosmic::smart::square::RANK10U8;
 use crate::cosmic::smart::square::RANK1U8;
-use crate::cosmic::smart::square::{AbsoluteAddress2D, BOARD_MEMORY_AREA, RANK_1, RANK_10};
+use crate::cosmic::smart::square::{AbsoluteAddress2D, BOARD_MEMORY_AREA};
 use crate::law::generate_move::Area;
 use crate::law::speed_of_light::Nine299792458;
 use crate::spaceship::equipment::Beam;
@@ -751,7 +751,7 @@ impl GameTable {
     pub fn exists_pawn_on_file(&self, friend: Phase, file: u8) -> bool {
         for rank in RANK1U8..RANK10U8 {
             if let Some(piece_num) =
-                self.piece_num_at(&FireAddress::Board(AbsoluteAddress2D::new(file, rank)))
+                self.piece_num_board_at(&FireAddress::Board(AbsoluteAddress2D::new(file, rank)))
             {
                 if self.get_phase(piece_num) == friend
                     && self.get_type(piece_num) == PieceType::Pawn
@@ -780,7 +780,20 @@ impl GameTable {
     /// TODO Piece をカプセル化したい。外に出したくないぜ☆（＾～＾）
     /// 升で指定して駒を取得。
     /// 駒台には対応してない。 -> 何に使っている？
-    pub fn piece_num_at(&self, addr: &FireAddress) -> Option<PieceNum> {
+    pub fn piece_num_at(&self, fire: &MoveEnd) -> Option<PieceNum> {
+        match fire.address {
+            FireAddress::Board(sq) => self.board[sq.serial_number() as usize],
+            _ => {
+                self.last_hand_num(fire)
+                /*
+                    panic!(Beam::trouble(&format!(
+                    "(Err.254) まだ駒台は実装してないぜ☆（＾～＾）！",
+                )))
+                */
+            }
+        }
+    }
+    pub fn piece_num_board_at(&self, addr: &FireAddress) -> Option<PieceNum> {
         match addr {
             FireAddress::Board(sq) => self.board[sq.serial_number() as usize],
             _ => panic!(Beam::trouble(&format!(
@@ -836,6 +849,20 @@ impl GameTable {
     /// 指し手生成で使うぜ☆（＾～＾）有無を調べるぜ☆（＾～＾）
     pub fn is_empty_hand(&self, fire: &MoveEnd) -> bool {
         self.phase_classification.is_empty_hand(&fire)
+    }
+    pub fn last_hand_num(&self, fire: &MoveEnd) -> Option<PieceNum> {
+        match fire.address {
+            FireAddress::Board(_sq) => {
+                panic!(Beam::trouble(&format!("(Err.3251) 未対応☆（＾～＾）！",)))
+            }
+            FireAddress::Hand(drop_type) => {
+                if let Some(piece_num) = self.phase_classification.last(fire) {
+                    Some(piece_num)
+                } else {
+                    None
+                }
+            }
+        }
     }
     /// 指し手生成で使うぜ☆（＾～＾）
     pub fn last_hand(&self, fire: &MoveEnd) -> Option<(PieceType, MoveEnd)> {

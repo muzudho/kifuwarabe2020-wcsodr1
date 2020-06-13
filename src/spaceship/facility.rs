@@ -241,7 +241,7 @@ impl Kitchen {
                 if let Some(captured_move) = move_.captured {
                     // let piece_type = captured_move.piece_type;
                     let piece_type =
-                        table.get_type(table.piece_num_at(&captured_move.source.address).unwrap());
+                        table.get_type(table.piece_num_at(&captured_move.source).unwrap());
                     format!(" ({})", piece_type)
                 } else {
                     "".to_string()
