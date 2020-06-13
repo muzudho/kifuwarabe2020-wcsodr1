@@ -5,7 +5,6 @@
 //! * Person (先手,後手)
 //!
 use crate::cosmic::fire::{Fire, FireAddress};
-use crate::cosmic::smart::features::PieceType;
 use crate::law::cryptographic::num_to_lower_case;
 use std::fmt;
 
@@ -62,8 +61,6 @@ impl History {
 /// 取ることになる駒の移動。
 #[derive(Clone, Copy)]
 pub struct CapturedMove {
-    /// 取ることになる駒
-    pub piece_type: PieceType,
     /// 元あった所。
     pub source: Fire,
     /// 移動先。
@@ -71,11 +68,10 @@ pub struct CapturedMove {
 }
 impl CapturedMove {
     // TODO Piece を持ちまわすのは止めたいが……☆（＾～＾）
-    pub fn new(source: Fire, destination: Fire, piece_type: PieceType) -> Self {
+    pub fn new(source: Fire, destination: Fire) -> Self {
         CapturedMove {
             source: source,
             destination: destination,
-            piece_type: piece_type,
         }
     }
 }

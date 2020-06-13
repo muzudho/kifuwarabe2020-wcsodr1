@@ -661,9 +661,8 @@ impl GameTable {
     /// あれば、指し手で取った駒の先後をひっくり返せば、自分の駒台にある駒を取り出せるので取り出して、盤の上に指し手の取った駒のまま駒を置きます。
     pub fn rotate_piece_hand_to_board(&mut self, friend: Phase, move_: &Movement) {
         if let Some(move2_val) = move_.captured {
-            // TODO アンドゥだから盤にまだない。
+            // アンドゥだから盤にまだない。
             let piece_type = self.last_hand_type(&move2_val.destination).unwrap();
-            // let piece_type = move2_val.piece_type;
 
             // 取った方の駒台の先後に合わせるぜ☆（＾～＾）
             // 取った方の持ち駒を減らす

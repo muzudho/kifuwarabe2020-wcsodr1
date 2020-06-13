@@ -184,7 +184,6 @@ impl PseudoLegalMoves {
                                                             piece_num_val,
                                                         ),
                                                     ),
-                                                    table.get_type(piece_num_val),
                                                 ))
                                             } else {
                                                 None
@@ -203,7 +202,6 @@ impl PseudoLegalMoves {
                                                     table
                                                         .get_double_faced_piece_type(piece_num_val),
                                                 ),
-                                                table.get_type(piece_num_val),
                                             ))
                                         } else {
                                             None
@@ -226,7 +224,6 @@ impl PseudoLegalMoves {
                                                             piece_num_val,
                                                         ),
                                                     ),
-                                                    table.get_type(piece_num_val),
                                                 ))
                                             } else {
                                                 None
