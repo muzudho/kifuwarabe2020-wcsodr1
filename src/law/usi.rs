@@ -4,8 +4,8 @@
 use crate::cosmic::playing::Game;
 use crate::cosmic::recording::{CapturedMove, MoveEnd, Movement, Phase};
 use crate::cosmic::smart::features::{DoubleFacedPieceType, PieceType};
-use crate::cosmic::smart::square::FILE9u8;
-use crate::cosmic::smart::square::RANK1u8;
+use crate::cosmic::smart::square::FILE9U8;
+use crate::cosmic::smart::square::RANK1U8;
 use crate::cosmic::smart::square::{AbsoluteAddress2D, FILE_9, RANK_1};
 use crate::spaceship::equipment::Beam;
 use atoi::atoi;
@@ -220,8 +220,8 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
 pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Game) {
     // 初期盤面
     let table = game.mut_starting();
-    let mut file = FILE9u8; //９筋から右方向へ読取
-    let mut rank = RANK1u8;
+    let mut file = FILE9U8; //９筋から右方向へ読取
+    let mut rank = RANK1U8;
 
     // `/` か、`+`か、1桁の数か、1文字のアルファベットのいずれかだぜ☆（＾～＾）それ以外なら盤パート終了☆（＾～＾）
     enum BoardPart {
@@ -309,7 +309,7 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Game) {
             }
             BoardPart::NewLine => {
                 *starts += 1;
-                file = FILE9u8;
+                file = FILE9U8;
                 rank += 1;
             }
         }

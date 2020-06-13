@@ -304,38 +304,38 @@ pub const BOARD_MEMORY_AREA: usize = 111;
 /// 筋、段は 1 から始まる、という明示。
 /// usize が速い☆（＾～＾）
 pub const FILE_0: usize = 0;
-pub const FILE0u8: u8 = 0;
+pub const FILE0U8: u8 = 0;
 pub const FILE_1: usize = 1;
-pub const FILE1u8: u8 = 1;
+pub const FILE1U8: u8 = 1;
 pub const FILE_9: usize = 9;
-pub const FILE9u8: u8 = 9;
+pub const FILE9U8: u8 = 9;
 pub const FILE_10: usize = 10;
-pub const FILE10u8: u8 = 10;
+pub const FILE10U8: u8 = 10;
 pub const FILE_11: usize = 11;
-pub const FILE11u8: u8 = 11;
+pub const FILE11U8: u8 = 11;
 pub const RANK_0: usize = 0;
-pub const RANK0u8: u8 = 0;
+pub const RANK0U8: u8 = 0;
 pub const RANK_1: usize = 1;
-pub const RANK1u8: u8 = 1;
+pub const RANK1U8: u8 = 1;
 pub const RANK_2: usize = 2;
-pub const RANK2u8: u8 = 2;
+pub const RANK2U8: u8 = 2;
 pub const RANK_3: usize = 3;
-pub const RANK3u8: u8 = 3;
+pub const RANK3U8: u8 = 3;
 pub const RANK_4: usize = 4;
-pub const RANK4u8: u8 = 4;
+pub const RANK4U8: u8 = 4;
 // pub const RANK_5: usize = 5;
 pub const RANK_6: usize = 6;
-pub const RANK6u8: u8 = 6;
+pub const RANK6U8: u8 = 6;
 pub const RANK_7: usize = 7;
-pub const RANK7u8: u8 = 7;
+pub const RANK7U8: u8 = 7;
 pub const RANK_8: usize = 8; //うさぎの打てる段の上限
-pub const RANK8u8: u8 = 8;
+pub const RANK8U8: u8 = 8;
 pub const RANK_9: usize = 9;
-pub const RANK9u8: u8 = 9;
+pub const RANK9U8: u8 = 9;
 pub const RANK_10: usize = 10;
-pub const RANK10u8: u8 = 10;
+pub const RANK10U8: u8 = 10;
 pub const RANK_11: usize = 11;
-pub const RANK11u8: u8 = 11;
+pub const RANK11U8: u8 = 11;
 
 /// 升の検索等で、該当なしの場合
 pub const SQUARE_NONE: usize = 0;
@@ -633,8 +633,8 @@ impl AbsoluteAddress2D {
         if serial == 0 {
             None
         } else {
-            debug_assert!(FILE0u8 < file && file < FILE10u8, format!("file={}", file));
-            debug_assert!(RANK0u8 < rank && rank < RANK10u8, format!("rank={}", rank));
+            debug_assert!(FILE0U8 < file && file < FILE10U8, format!("file={}", file));
+            debug_assert!(RANK0U8 < rank && rank < RANK10U8, format!("rank={}", rank));
             Some(AbsoluteAddress2D::new(file, rank))
         }
     }
@@ -654,10 +654,10 @@ impl AbsoluteAddress2D {
     }
 
     pub fn rotate_180(&self) -> Self {
-        let file = FILE10u8 - self.file();
-        let rank = RANK10u8 - self.rank();
-        debug_assert!(FILE0u8 < file && file < FILE10u8, format!("file={}", file));
-        debug_assert!(RANK0u8 < rank && rank < RANK10u8, format!("rank={}", rank));
+        let file = FILE10U8 - self.file();
+        let rank = RANK10U8 - self.rank();
+        debug_assert!(FILE0U8 < file && file < FILE10U8, format!("file={}", file));
+        debug_assert!(RANK0U8 < rank && rank < RANK10U8, format!("rank={}", rank));
         AbsoluteAddress2D::new(file, rank)
     }
 

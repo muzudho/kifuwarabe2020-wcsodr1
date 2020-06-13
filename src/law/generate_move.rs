@@ -4,17 +4,17 @@
 
 use crate::cosmic::recording::{CapturedMove, FireAddress, MoveEnd, Movement, Phase, PHASE_LEN};
 use crate::cosmic::smart::features::PieceType;
-use crate::cosmic::smart::square::FILE10u8;
-use crate::cosmic::smart::square::FILE1u8;
-use crate::cosmic::smart::square::RANK10u8;
-use crate::cosmic::smart::square::RANK1u8;
-use crate::cosmic::smart::square::RANK2u8;
-use crate::cosmic::smart::square::RANK3u8;
-use crate::cosmic::smart::square::RANK4u8;
-use crate::cosmic::smart::square::RANK6u8;
-use crate::cosmic::smart::square::RANK7u8;
-use crate::cosmic::smart::square::RANK8u8;
-use crate::cosmic::smart::square::RANK9u8;
+use crate::cosmic::smart::square::FILE10U8;
+use crate::cosmic::smart::square::FILE1U8;
+use crate::cosmic::smart::square::RANK10U8;
+use crate::cosmic::smart::square::RANK1U8;
+use crate::cosmic::smart::square::RANK2U8;
+use crate::cosmic::smart::square::RANK3U8;
+use crate::cosmic::smart::square::RANK4U8;
+use crate::cosmic::smart::square::RANK6U8;
+use crate::cosmic::smart::square::RANK7U8;
+use crate::cosmic::smart::square::RANK8U8;
+use crate::cosmic::smart::square::RANK9U8;
 use crate::cosmic::smart::square::{
     AbsoluteAddress2D, Angle, RelAdr2D, FILE_1, FILE_10, RANK_1, RANK_10, RANK_2, RANK_3, RANK_4,
     RANK_6, RANK_7, RANK_8, RANK_9,
@@ -315,8 +315,8 @@ impl Default for Area {
         fn all_first_sq_fn() -> [MoveEnd; 81] {
             let mut v = [MoveEnd::default(); 81];
             let mut i = 0;
-            for file in FILE1u8..FILE10u8 {
-                for rank in RANK1u8..RANK10u8 {
+            for file in FILE1U8..FILE10U8 {
+                for rank in RANK1U8..RANK10U8 {
                     v[i] = MoveEnd::new_board(Phase::First, AbsoluteAddress2D::new(file, rank));
                     i += 1;
                 }
@@ -326,8 +326,8 @@ impl Default for Area {
         fn all_second_sq_fn() -> [MoveEnd; 81] {
             let mut v = [MoveEnd::default(); 81];
             let mut i = 0;
-            for file in FILE1u8..FILE10u8 {
-                for rank in RANK1u8..RANK10u8 {
+            for file in FILE1U8..FILE10U8 {
+                for rank in RANK1U8..RANK10U8 {
                     v[i] = MoveEnd::new_board(Phase::Second, AbsoluteAddress2D::new(file, rank));
                     i += 1;
                 }
@@ -337,8 +337,8 @@ impl Default for Area {
         fn first_drop_pawn_fn() -> [MoveEnd; 72] {
             let mut v = [MoveEnd::default(); 72];
             let mut i = 0;
-            for rank in RANK2u8..RANK10u8 {
-                for file in (FILE1u8..FILE10u8).rev() {
+            for rank in RANK2U8..RANK10U8 {
+                for file in (FILE1U8..FILE10U8).rev() {
                     v[i] = MoveEnd::new_board(Phase::First, AbsoluteAddress2D::new(file, rank));
                     i += 1;
                 }
@@ -348,8 +348,8 @@ impl Default for Area {
         fn second_drop_pawn_fn() -> [MoveEnd; 72] {
             let mut v = [MoveEnd::default(); 72];
             let mut i = 0;
-            for rank in RANK1u8..RANK9u8 {
-                for file in (FILE1u8..FILE10u8).rev() {
+            for rank in RANK1U8..RANK9U8 {
+                for file in (FILE1U8..FILE10U8).rev() {
                     v[i] = MoveEnd::new_board(Phase::Second, AbsoluteAddress2D::new(file, rank));
                     i += 1;
                 }
@@ -359,8 +359,8 @@ impl Default for Area {
         fn first_drop_knight_fn() -> [MoveEnd; 63] {
             let mut v = [MoveEnd::default(); 63];
             let mut i = 0;
-            for rank in RANK3u8..RANK10u8 {
-                for file in (FILE1u8..FILE10u8).rev() {
+            for rank in RANK3U8..RANK10U8 {
+                for file in (FILE1U8..FILE10U8).rev() {
                     v[i] = MoveEnd::new_board(Phase::First, AbsoluteAddress2D::new(file, rank));
                     i += 1;
                 }
@@ -370,8 +370,8 @@ impl Default for Area {
         fn second_drop_knight_fn() -> [MoveEnd; 63] {
             let mut v = [MoveEnd::default(); 63];
             let mut i = 0;
-            for rank in RANK3u8..RANK10u8 {
-                for file in (FILE1u8..FILE10u8).rev() {
+            for rank in RANK3U8..RANK10U8 {
+                for file in (FILE1U8..FILE10U8).rev() {
                     v[i] = MoveEnd::new_board(
                         Phase::Second,
                         AbsoluteAddress2D::new(file, rank).rotate_180(),
@@ -910,8 +910,8 @@ impl Promoting {
     fn is_farthest_rank_from_friend(destination: &MoveEnd) -> bool {
         match destination.address {
             FireAddress::Board(dst_sq) => match destination.friend {
-                Phase::First => dst_sq.rank() < RANK2u8,
-                Phase::Second => RANK8u8 < dst_sq.rank(),
+                Phase::First => dst_sq.rank() < RANK2U8,
+                Phase::Second => RANK8U8 < dst_sq.rank(),
             },
             _ => panic!(Beam::trouble(&format!(
                 "(Err.905) まだ実装してないぜ☆（＾～＾）！",
@@ -928,8 +928,8 @@ impl Promoting {
     fn is_first_second_farthest_rank_from_friend(destination: &MoveEnd) -> bool {
         match destination.address {
             FireAddress::Board(dst_sq) => match destination.friend {
-                Phase::First => dst_sq.rank() < RANK3u8,
-                Phase::Second => RANK7u8 < dst_sq.rank(),
+                Phase::First => dst_sq.rank() < RANK3U8,
+                Phase::Second => RANK7U8 < dst_sq.rank(),
             },
             _ => panic!(Beam::trouble(&format!(
                 "(Err.919) まだ実装してないぜ☆（＾～＾）！",
@@ -946,8 +946,8 @@ impl Promoting {
     fn is_second_third_farthest_rank_from_friend(destination: &MoveEnd) -> bool {
         match destination.address {
             FireAddress::Board(dst_sq) => match destination.friend {
-                Phase::First => RANK1u8 < dst_sq.rank() && dst_sq.rank() < RANK4u8,
-                Phase::Second => RANK6u8 < dst_sq.rank() && dst_sq.rank() < RANK9u8,
+                Phase::First => RANK1U8 < dst_sq.rank() && dst_sq.rank() < RANK4U8,
+                Phase::Second => RANK6U8 < dst_sq.rank() && dst_sq.rank() < RANK9U8,
             },
             _ => panic!(Beam::trouble(&format!(
                 "(Err.937) まだ実装してないぜ☆（＾～＾）！",
@@ -964,8 +964,8 @@ impl Promoting {
     fn is_third_farthest_rank_from_friend(destination: &MoveEnd) -> bool {
         match destination.address {
             FireAddress::Board(dst_sq) => match destination.friend {
-                Phase::First => dst_sq.rank() == RANK3u8,
-                Phase::Second => RANK7u8 == dst_sq.rank(),
+                Phase::First => dst_sq.rank() == RANK3U8,
+                Phase::Second => RANK7U8 == dst_sq.rank(),
             },
             _ => panic!(Beam::trouble(&format!(
                 "(Err.946) まだ実装してないぜ☆（＾～＾）！",
@@ -982,8 +982,8 @@ impl Promoting {
     fn is_opponent_region(destination: &MoveEnd) -> bool {
         match destination.address {
             FireAddress::Board(dst_sq) => match destination.friend {
-                Phase::First => dst_sq.rank() < RANK4u8,
-                Phase::Second => RANK6u8 < dst_sq.rank(),
+                Phase::First => dst_sq.rank() < RANK4U8,
+                Phase::Second => RANK6U8 < dst_sq.rank(),
             },
             _ => panic!(Beam::trouble(&format!(
                 "(Err.957) まだ実装してないぜ☆（＾～＾）！",

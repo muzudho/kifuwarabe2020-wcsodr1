@@ -5,10 +5,10 @@ use crate::cosmic::playing::Game;
 use crate::cosmic::recording::{FireAddress, History, MoveEnd, Movement, PHASE_LEN, PHASE_SECOND};
 use crate::cosmic::smart::features::DoubleFacedPiece;
 use crate::cosmic::smart::features::{HAND_MAX, PHYSICAL_PIECES_LEN};
-use crate::cosmic::smart::square::FILE10u8;
-use crate::cosmic::smart::square::FILE1u8;
-use crate::cosmic::smart::square::RANK10u8;
-use crate::cosmic::smart::square::RANK1u8;
+use crate::cosmic::smart::square::FILE10U8;
+use crate::cosmic::smart::square::FILE1U8;
+use crate::cosmic::smart::square::RANK10U8;
+use crate::cosmic::smart::square::RANK1U8;
 use crate::cosmic::smart::square::{
     AbsoluteAddress2D, BOARD_MEMORY_AREA, FILE_1, FILE_10, RANK_1, RANK_10, SQUARE_NONE,
 };
@@ -174,8 +174,8 @@ impl GameHashSeed {
         let mut hash: u64 = 0;
 
         // 盤上の駒
-        for rank in RANK1u8..RANK10u8 {
-            for file in (FILE1u8..FILE10u8).rev() {
+        for rank in RANK1U8..RANK10U8 {
+            for file in (FILE1U8..FILE10U8).rev() {
                 let sq = AbsoluteAddress2D::new(file, rank);
                 if let Some(piece_hash_index) =
                     table.get_piece_board_hash_index(&FireAddress::Board(sq))
