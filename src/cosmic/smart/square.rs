@@ -564,6 +564,10 @@ impl fmt::Debug for RelAdr2D {
     }
 }
 
+/// このオブジェクトは大量に生成されるから、容量を小さく抑えた方がいいんだろうか☆（＾～＾）？
+/// 1～9 は 4 byte.
+/// 11～99 は 8 byte.
+///
 /// 絶対番地☆（＾～＾）相対番地と同じだが、回転の操作は座標 55 が中心になるぜ☆（＾～＾）
 /// きふわらべでは 辞書象限 を採用している☆（＾～＾）
 /// これは、file, rank は別々に持ち、しかも軸毎にプラス・マイナスを持つぜ☆（＾～＾）
@@ -584,13 +588,12 @@ pub struct AbsoluteAddress2D {
     ///   98 88 78 68 58 48 38 28 18
     ///   99 89 79 69 59 49 39 29 19
     ///           Source
-    pub file: usize,
-    pub rank: usize,
+    serial: u8,
 }
 impl Default for AbsoluteAddress2D {
     /// ゴミの値を作るぜ☆（＾～＾）
     fn default() -> Self {
-        AbsoluteAddress2D { file: 1, rank: 1 }
+        AbsoluteAddress2D { serial: 11 }
     }
 }
 impl AbsoluteAddress2D {
@@ -604,15 +607,14 @@ impl AbsoluteAddress2D {
             format!("rank={}", rank)
         );
         AbsoluteAddress2D {
-            file: file,
-            rank: rank,
+            serial: 10 * file as u8 + rank as u8,
         }
     }
 
-    pub fn from_absolute_address(address: usize) -> Option<AbsoluteAddress2D> {
-        let file = (address / 10) % 10;
-        let rank = address % 10;
-        if address == 0 {
+    pub fn from_absolute_address(serial: usize) -> Option<AbsoluteAddress2D> {
+        let file = (serial / 10) % 10;
+        let rank = serial % 10;
+        if serial == 0 {
             None
         } else {
             debug_assert!(FILE_0 < file && file < FILE_10, format!("file={}", file));
@@ -623,12 +625,12 @@ impl AbsoluteAddress2D {
 
     /// 列番号。いわゆる筋。右から 1, 2, 3 ...
     pub fn file(&self) -> usize {
-        self.file
+        ((self.serial / 10) % 10) as usize
     }
 
     /// 行番号。いわゆる段。上から 1, 2, 3 ...
     pub fn rank(&self) -> usize {
-        self.rank
+        (self.serial % 10) as usize
     }
 
     pub fn to_file_rank(&self) -> (usize, usize) {
@@ -636,8 +638,8 @@ impl AbsoluteAddress2D {
     }
 
     pub fn rotate_180(&self) -> Self {
-        let file = FILE_10 - self.file;
-        let rank = RANK_10 - self.rank;
+        let file = FILE_10 - self.file();
+        let rank = RANK_10 - self.rank();
         debug_assert!(FILE_0 < file && file < FILE_10, format!("file={}", file));
         debug_assert!(RANK_0 < rank && rank < RANK_10, format!("rank={}", rank));
         AbsoluteAddress2D::new(file, rank)
@@ -645,33 +647,18 @@ impl AbsoluteAddress2D {
 
     /// 壁の中にいる☆（＾～＾）
     pub fn wall(&self) -> bool {
-        self.file % 10 == 0 || self.rank % 10 == 0
+        self.file() % 10 == 0 || self.rank() % 10 == 0
     }
 
     /// 連番
     pub fn serial_number(&self) -> usize {
-        self.file * 10 + self.rank
+        self.serial as usize
     }
 
     pub fn offset(&mut self, r: &RelAdr2D) -> &mut Self {
         // TODO rankの符号はどうだったか……☆（＾～＾） 絶対番地の使い方をしてれば問題ないだろ☆（＾～＾）
         // TODO sum は負数になることもあり、そのときは明らかにイリーガルだぜ☆（＾～＾）
-        let sum = (self.serial_number() as isize + r.get_address()) as usize;
-
-        // Initialize.
-        self.rank = sum % 10;
-        self.file = 0;
-        // Carry.
-        if 9 < self.rank {
-            self.rank = self.rank % 10;
-            self.file += 1;
-        }
-        self.file += sum / 10 % 10;
-        // Carry over flow.
-        if 9 < self.file {
-            self.file = self.file % 10;
-        }
-
+        self.serial = (self.serial_number() as isize + r.get_address()) as u8;
         self
     }
 }
