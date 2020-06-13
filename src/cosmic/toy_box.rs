@@ -3200,10 +3200,10 @@ impl GameTable {
         }
     }
     /// 駒台には対応してない。 -> 何に使っている？
-    pub fn piece_info_at1(&self, addr: AddressPos1) -> Option<PieceInfo> {
+    pub fn piece_info_at1(&self, addr: &FireAddress) -> Option<PieceInfo> {
         match addr {
-            AddressPos1::Board(sq) => {
-                let piece_num = self.board[sq.to_serial_number() as usize];
+            FireAddress::Board(sq) => {
+                let piece_num = self.board[sq.serial_number() as usize];
                 if let Some(piece_num_val) = piece_num {
                     Some(PieceInfo::new(self.get_piece(piece_num_val), piece_num_val))
                 } else {
@@ -3268,9 +3268,7 @@ impl GameTable {
             match fire.address {
                 FireAddress::Board(sq) => {
                     // 盤上の駒☆（＾～＾）
-                    let piece_info = self
-                        .piece_info_at1(UnifiedAddress::from_fire(&fire).to_address_pos1())
-                        .unwrap();
+                    let piece_info = self.piece_info_at1(&fire.address).unwrap();
                     piece_get(i, Some(&sq), Some(piece_info));
                 }
                 FireAddress::Hand(_drop) => {
