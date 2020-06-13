@@ -297,7 +297,7 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Game) {
                 // 駒に背番号を付けるぜ☆（＾～＾）
                 let piece_num = table.numbering_piece(piece);
                 // 盤に置くぜ☆（＾～＾）
-                table.push_piece(addr, Some(piece_num));
+                table.push_piece(&addr.to_fire(), Some(piece_num));
 
                 file -= 1;
             }
@@ -448,7 +448,8 @@ pub fn set_position(line: &str, game: &mut Game) {
                         let drop = UnifiedAddress::from_double_faced_piece(
                             game.table.get_double_faced_piece(piece_num),
                         );
-                        game.mut_starting().push_piece(drop, Some(piece_num));
+                        game.mut_starting()
+                            .push_piece(&drop.to_fire(), Some(piece_num));
                     }
                 } //if
             } //loop

@@ -2285,13 +2285,14 @@ impl GameTable {
             // 先後ひっくり返す。
             self.turn_phase(collision_piece_num_val);
             self.push_piece(
-                UnifiedAddress::from_address_pos1(
+                &UnifiedAddress::from_address_pos1(
                     self.get_phase(collision_piece_num_val),
                     AddressPos1::Hand((
                         self.get_phase(collision_piece_num_val),
                         self.get_double_faced_piece_type(collision_piece_num_val),
                     )),
-                ),
+                )
+                .to_fire(),
                 Some(collision_piece_num_val),
             );
         }
@@ -2331,19 +2332,11 @@ impl GameTable {
                 self.demote(piece_num);
             }
             // 取られた方に、駒を返すぜ☆（＾～＾）置くのは指し手の移動先☆（＾～＾）
-            self.push_piece(
-                UnifiedAddress::from_fire(&move_.destination),
-                Some(piece_num),
-            );
+            self.push_piece(&move_.destination, Some(piece_num));
         }
     }
     /// 駒を置く。
-    pub fn push_piece(
-        &mut self,
-        addr: UnifiedAddress, /*TODO これの置き換えはバグりやすい。*/
-        piece_num: Option<PieceNum>,
-    ) {
-        let fire = addr.to_fire();
+    pub fn push_piece(&mut self, fire: &Fire, piece_num: Option<PieceNum>) {
         match fire.address {
             FireAddress::Board(sq) => {
                 if let Some(piece_num_val) = piece_num {
@@ -2364,7 +2357,7 @@ impl GameTable {
                     self.phase_classification
                         .push(&Fire::new_hand(fire.friend, drop_type), piece_num_val);
                     // 背番号に番地を紐づけます。
-                    self.address_list[piece_num_val as usize] = addr.to_fire();
+                    self.address_list[piece_num_val as usize] = *fire;
                 }
             }
         }
