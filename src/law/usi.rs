@@ -198,7 +198,7 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
         Some(CapturedMove::new(
             buffer.destination,
             Fire::new_hand(
-                friend.turn(),
+                friend,
                 game.table
                     .get_double_faced_piece_type(captured_piece_num_val),
             ),

@@ -179,7 +179,7 @@ impl PseudoLegalMoves {
                                                 Some(CapturedMove::new(
                                                     *destination,
                                                     Fire::new_hand(
-                                                        friend.turn(),
+                                                        friend,
                                                         table.get_double_faced_piece_type(
                                                             piece_num_val,
                                                         ),
@@ -199,7 +199,7 @@ impl PseudoLegalMoves {
                                             Some(CapturedMove::new(
                                                 *destination,
                                                 Fire::new_hand(
-                                                    friend.turn(),
+                                                    friend,
                                                     table
                                                         .get_double_faced_piece_type(piece_num_val),
                                                 ),
@@ -221,7 +221,7 @@ impl PseudoLegalMoves {
                                                 Some(CapturedMove::new(
                                                     *destination,
                                                     Fire::new_hand(
-                                                        friend.turn(),
+                                                        friend,
                                                         table.get_double_faced_piece_type(
                                                             piece_num_val,
                                                         ),
