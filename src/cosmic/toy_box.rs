@@ -5,6 +5,8 @@ use crate::cosmic::recording::{FireAddress, MoveEnd, Movement, Phase};
 use crate::cosmic::smart::features::{
     DoubleFacedPiece, DoubleFacedPieceType, PieceType, PHYSICAL_PIECE_TYPE_LEN,
 };
+use crate::cosmic::smart::square::RANK10u8;
+use crate::cosmic::smart::square::RANK1u8;
 use crate::cosmic::smart::square::{AbsoluteAddress2D, BOARD_MEMORY_AREA, RANK_1, RANK_10};
 use crate::law::generate_move::Area;
 use crate::law::speed_of_light::Nine299792458;
@@ -665,7 +667,7 @@ impl GameTable {
             FireAddress::Board(sq) => {
                 if let Some(piece_num_val) = piece_num {
                     // マスに駒を置きます。
-                    self.board[sq.serial_number()] = piece_num;
+                    self.board[sq.serial_number() as usize] = piece_num;
                     // データベース
                     self.phase_classification
                         .push(&MoveEnd::new_board(fire.friend, sq), piece_num_val);
@@ -674,7 +676,7 @@ impl GameTable {
                         MoveEnd::new_board(self.get_phase(piece_num_val), sq);
                 } else {
                     // マスを空にします。
-                    self.board[sq.serial_number()] = None;
+                    self.board[sq.serial_number() as usize] = None;
                 }
             }
             FireAddress::Hand(drop_type) => {
@@ -746,8 +748,8 @@ impl GameTable {
     }
 
     /// 歩が置いてあるか確認
-    pub fn exists_pawn_on_file(&self, friend: Phase, file: usize) -> bool {
-        for rank in RANK_1..RANK_10 {
+    pub fn exists_pawn_on_file(&self, friend: Phase, file: u8) -> bool {
+        for rank in RANK1u8..RANK10u8 {
             if let Some(piece_num) =
                 self.piece_num_at(&FireAddress::Board(AbsoluteAddress2D::new(file, rank)))
             {

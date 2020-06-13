@@ -74,7 +74,7 @@ impl fmt::Display for MoveEnd {
             match self.address {
                 FireAddress::Board(sq) => {
                     let (file, rank) = sq.to_file_rank();
-                    format!("{}{}", file, num_to_lower_case(rank))
+                    format!("{}{}", file, num_to_lower_case(rank as usize))
                 }
                 FireAddress::Hand(drop_type) => {
                     format!(
@@ -192,7 +192,7 @@ impl fmt::Display for Movement {
                     f,
                     "{}{}{}{}",
                     sx,
-                    num_to_lower_case(sy),
+                    num_to_lower_case(sy as usize),
                     self.destination,
                     if self.promote { "+" } else { "" }
                 )

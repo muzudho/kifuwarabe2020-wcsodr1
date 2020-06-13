@@ -4,6 +4,8 @@
 use crate::cosmic::playing::Game;
 use crate::cosmic::recording::{CapturedMove, MoveEnd, Movement, Phase};
 use crate::cosmic::smart::features::{DoubleFacedPieceType, PieceType};
+use crate::cosmic::smart::square::FILE9u8;
+use crate::cosmic::smart::square::RANK1u8;
 use crate::cosmic::smart::square::{AbsoluteAddress2D, FILE_9, RANK_1};
 use crate::spaceship::equipment::Beam;
 use atoi::atoi;
@@ -83,7 +85,7 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
         _ => {
             // 残りは「筋の数字」、「段のアルファベット」のはず。
             // 数字じゃないものが入ったら強制終了するんじゃないか☆（＾～＾）
-            let file = if let Some(num) = atoi::<usize>(line[*starts..=*starts].as_bytes()) {
+            let file = if let Some(num) = atoi::<u8>(line[*starts..=*starts].as_bytes()) {
                 num
             } else {
                 panic!(Beam::trouble(&format!(
@@ -143,7 +145,7 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
     // 残りは「筋の数字」、「段のアルファベット」のはず。
 
     // 3文字目
-    let file = if let Some(num) = atoi::<usize>(line[*starts..=*starts].as_bytes()) {
+    let file = if let Some(num) = atoi::<u8>(line[*starts..=*starts].as_bytes()) {
         num
     } else {
         panic!(Beam::trouble(&format!(
@@ -218,15 +220,15 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
 pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Game) {
     // 初期盤面
     let table = game.mut_starting();
-    let mut file = FILE_9; //９筋から右方向へ読取
-    let mut rank = RANK_1;
+    let mut file = FILE9u8; //９筋から右方向へ読取
+    let mut rank = RANK1u8;
 
     // `/` か、`+`か、1桁の数か、1文字のアルファベットのいずれかだぜ☆（＾～＾）それ以外なら盤パート終了☆（＾～＾）
     enum BoardPart {
         /// 改行のようなものだぜ☆（＾～＾）
         NewLine,
         /// スペース数☆（＾～＾）
-        Number(usize),
+        Number(u8),
         /// 駒☆（＾～＾）+で始まるものもこっちだぜ☆（＾～＾）
         Alphabet((Phase, PieceType)),
     }
@@ -307,7 +309,7 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Game) {
             }
             BoardPart::NewLine => {
                 *starts += 1;
-                file = FILE_9;
+                file = FILE9u8;
                 rank += 1;
             }
         }

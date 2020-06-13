@@ -47,7 +47,7 @@ impl CommandRoom {
 /// ゲームルームはこちらだぜ☆（＾～＾）！
 pub struct GameRoom {}
 impl GameRoom {
-    fn to_string3(table: &GameTable, file: usize, rank: usize) -> String {
+    fn to_string3(table: &GameTable, file: u8, rank: u8) -> String {
         if let Some(piece_info_val) =
             table.piece_info_at1(&FireAddress::Board(AbsoluteAddress2D::new(file, rank)))
         {
