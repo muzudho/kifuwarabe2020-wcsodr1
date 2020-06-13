@@ -208,7 +208,9 @@ impl Chiyuri {
             // 入っている指し手の通り指すぜ☆（＾～＾）
             let ply = universe.game.history.ply;
             let move_ = universe.game.history.movements[ply as usize];
-            universe.game.read_move(&move_);
+            universe
+                .game
+                .read_move(universe.game.history.get_friend(), &move_);
         }
     }
     pub fn genmove(game: &Game) {

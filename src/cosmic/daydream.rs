@@ -226,7 +226,7 @@ impl Tree {
 
             // 棋譜に入れる☆
             game.set_move(&move_);
-            game.read_move(&move_);
+            game.read_move(game.history.get_friend(), &move_);
 
             self.pv.push(&move_);
             let (captured_piece_centi_pawn, delta_promotion_bonus) = self

@@ -1,4 +1,5 @@
 use crate::cosmic::pos_hash::pos_hash::*;
+use crate::cosmic::recording::Phase;
 use crate::cosmic::recording::{FireAddress, History, MoveEnd, Movement};
 use crate::cosmic::toy_box::GameTable;
 use crate::spaceship::equipment::{Beam, DestinationDisplay};
@@ -118,13 +119,13 @@ impl Game {
     }
 
     /// 入れた指し手の通り指すぜ☆（＾～＾）
-    pub fn read_move(&mut self, move_: &Movement) {
+    pub fn read_move(&mut self, friend: Phase, move_: &Movement) {
         // 局面ハッシュを作り直す
         self.hash_seed
             .update_by_do_move(&mut self.history, &self.table, move_);
 
         // 移動元のマスにある駒をポップすることは確定。
-        let src_piece_num = self.table.pop_piece(move_.source.friend, &move_.source);
+        let src_piece_num = self.table.pop_piece(friend, &move_.source);
 
         // 持ち駒は成ることは無いので、成るなら盤上の駒であることが確定。
         if move_.promote {
@@ -139,11 +140,11 @@ impl Game {
         }
         // 移動先升に駒があるかどうか
         // あれば　盤の相手の駒を先後反転して、自分の駒台に置きます。
-        self.table.rotate_piece_board_to_hand(&move_);
+        self.table.rotate_piece_board_to_hand(friend, &move_);
 
         // 移動先升に駒を置く
         self.table
-            .push_piece(move_.destination.friend, &move_.destination, src_piece_num);
+            .push_piece(friend, &move_.destination, src_piece_num);
 
         // // 局面ハッシュを作り直す
         // let ky_hash = self.hash_seed.current_position(&self);

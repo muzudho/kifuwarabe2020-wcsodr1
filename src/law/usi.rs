@@ -476,6 +476,6 @@ pub fn set_position(line: &str, game: &mut Game) {
         let ply = game.history.ply;
 
         let move_ = game.history.movements[ply as usize];
-        game.read_move(&move_);
+        game.read_move(game.history.get_friend(), &move_);
     }
 }

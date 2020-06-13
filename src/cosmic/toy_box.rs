@@ -615,14 +615,11 @@ impl GameTable {
     /// ドゥ時の動き。
     /// 駒の先後を反転させるぜ☆（＾～＾）
     // あれば　盤の相手の駒を先後反転して、自分の駒台に置きます。
-    pub fn rotate_piece_board_to_hand(&mut self, move_: &Movement) {
-        if let Some(collision_piece_num_val) =
-            self.pop_piece(move_.destination.friend, &move_.destination)
-        {
+    pub fn rotate_piece_board_to_hand(&mut self, friend: Phase, move_: &Movement) {
+        if let Some(collision_piece_num_val) = self.pop_piece(friend, &move_.destination) {
             // 移動先升の駒を盤上から消し、自分の持ち駒に増やす
             // 先後ひっくり返す。
             self.turn_phase(collision_piece_num_val);
-            let friend = self.get_phase(collision_piece_num_val);
             self.push_piece(
                 friend,
                 &MoveEnd::new_hand(
