@@ -209,7 +209,11 @@ impl Tree {
             game.set_move(&move_);
             game.read_move(&move_);
             let captured_piece_type = if let Some(captured) = move_.captured {
-                Some(captured.piece_type)
+                Some(
+                    game.table
+                        .get_type(game.table.piece_num_at(&captured.source.address).unwrap()),
+                )
+            // Some(captured.piece_type)
             } else {
                 None
             };
