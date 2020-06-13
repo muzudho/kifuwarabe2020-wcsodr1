@@ -289,15 +289,12 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Game) {
         match board_part {
             BoardPart::Alphabet(piece) => {
                 *starts += 1;
-                let addr = UnifiedAddress::from_absolute_address(
-                    piece.phase(),
-                    &AbsoluteAddress2D::new(file, rank),
-                );
+                let fire = Fire::new_board(piece.phase(), AbsoluteAddress2D::new(file, rank));
 
                 // 駒に背番号を付けるぜ☆（＾～＾）
                 let piece_num = table.numbering_piece(piece);
                 // 盤に置くぜ☆（＾～＾）
-                table.push_piece(&addr.to_fire(), Some(piece_num));
+                table.push_piece(&fire, Some(piece_num));
 
                 file -= 1;
             }
@@ -445,11 +442,11 @@ pub fn set_position(line: &str, game: &mut Game) {
                         // 駒に背番号を付けるぜ☆（＾～＾）
                         let piece_num = game.mut_starting().numbering_piece(hand);
                         // 駒台に置くぜ☆（＾～＾）
-                        let drop = UnifiedAddress::from_double_faced_piece(
-                            game.table.get_double_faced_piece(piece_num),
+                        let drop = Fire::new_hand(
+                            game.table.get_phase(piece_num),
+                            game.table.get_double_faced_piece_type(piece_num),
                         );
-                        game.mut_starting()
-                            .push_piece(&drop.to_fire(), Some(piece_num));
+                        game.mut_starting().push_piece(&drop, Some(piece_num));
                     }
                 } //if
             } //loop
