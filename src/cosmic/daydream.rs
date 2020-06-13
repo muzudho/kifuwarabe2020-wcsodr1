@@ -217,7 +217,7 @@ impl Tree {
                 Some(
                     game.table.get_type(
                         game.table
-                            .piece_num_at(captured.source.friend, &captured.source)
+                            .piece_num_at(game.history.get_friend(), &captured.source)
                             .unwrap(),
                     ),
                 )
