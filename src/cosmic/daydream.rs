@@ -166,6 +166,13 @@ impl Tree {
             // 次は駒を取ったグループの中で、玉を取った手をグループの先頭に集めるぜ☆（＾～＾）
             let mut king = 0;
             for i in 0..cap {
+                /*
+                let piece_type = game.table.get_type(
+                    game.table
+                        .piece_num_at(&ways.get(i).captured.unwrap().source.address)
+                        .unwrap(),
+                );
+                */
                 match ways.get(i).captured.unwrap().piece_type {
                     PieceType::King => {
                         // 玉を取った手は、リストの先頭に集めるぜ☆（＾～＾）
@@ -205,9 +212,7 @@ impl Tree {
                 0
             };
 
-            // 棋譜に入れる☆
-            game.set_move(&move_);
-            game.read_move(&move_);
+            // 1手進める前に、これから取ることになる駒を盤上から読み取っておきます。
             let captured_piece_type = if let Some(captured) = move_.captured {
                 Some(
                     game.table
@@ -217,6 +222,10 @@ impl Tree {
             } else {
                 None
             };
+
+            // 棋譜に入れる☆
+            game.set_move(&move_);
+            game.read_move(&move_);
 
             self.pv.push(&move_);
             let (captured_piece_centi_pawn, delta_promotion_bonus) = self
