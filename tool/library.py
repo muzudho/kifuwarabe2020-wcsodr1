@@ -79,3 +79,20 @@ captured_pieces = [
     'Lance1',
     'Pawn1',
 ]
+
+double_faced_piece_types = [
+    'King',
+    'Rook',
+    'Bishop',
+    'Gold',
+    'Silver',
+    'Knight',
+    'Lance',
+    'Pawn',
+    'Rook',
+    'Bishop',
+    'Silver',
+    'Knight',
+    'Lance',
+    'Pawn',
+]

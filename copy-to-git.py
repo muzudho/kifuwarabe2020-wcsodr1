@@ -23,7 +23,7 @@ def go():
     print('Trace   | Copy.')
     copy_dir('/src', ignore=shutil.ignore_patterns('*.pdb'))
     copy_dir('/kifu')
-    copy_dir('/tool')
+    copy_dir('/tool', ignore=shutil.ignore_patterns('__pycache__'))
     copy_file('/.gitignore')
     copy_file('/Cargo.toml')
     copy_file('/copy-to-git.py')

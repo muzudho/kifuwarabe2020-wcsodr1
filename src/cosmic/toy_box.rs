@@ -21,42 +21,11 @@ lazy_static! {
 }
 
 struct ToyBox {
-    piece_double_faced_table: [DoubleFacedPiece; PIECE_LEN],
     double_faced_piece_to_nonpromoted_piece: [Piece; PHYSICAL_PIECES_LEN],
 }
 impl Default for ToyBox {
     fn default() -> Self {
         ToyBox {
-            piece_double_faced_table: [
-                DoubleFacedPiece::King1,   // King1
-                DoubleFacedPiece::Rook1,   // Rook1
-                DoubleFacedPiece::Bishop1, // Bishop1
-                DoubleFacedPiece::Gold1,   // Gold1
-                DoubleFacedPiece::Silver1, // Silver1
-                DoubleFacedPiece::Knight1, // Knight1
-                DoubleFacedPiece::Lance1,  // Lance1
-                DoubleFacedPiece::Pawn1,   // Pawn1
-                DoubleFacedPiece::Rook1,   // Dragon1
-                DoubleFacedPiece::Bishop1, // Horse1
-                DoubleFacedPiece::Silver1, // PromotedSilver1
-                DoubleFacedPiece::Knight1, // PromotedKnight1
-                DoubleFacedPiece::Lance1,  // PromotedLance1
-                DoubleFacedPiece::Pawn1,   // PromotedPawn1
-                DoubleFacedPiece::King2,   // King2
-                DoubleFacedPiece::Rook2,   // Rook2
-                DoubleFacedPiece::Bishop2, // Bishop2
-                DoubleFacedPiece::Gold2,   // Gold2
-                DoubleFacedPiece::Silver2, // Silver2
-                DoubleFacedPiece::Knight2, // Knight2
-                DoubleFacedPiece::Lance2,  // Lance2
-                DoubleFacedPiece::Pawn2,   // Pawn2
-                DoubleFacedPiece::Rook2,   // Dragon2
-                DoubleFacedPiece::Bishop2, // Horse2
-                DoubleFacedPiece::Silver2, // PromotedSilver2
-                DoubleFacedPiece::Knight2, // PromotedKnight2
-                DoubleFacedPiece::Lance2,  // PromotedLance2
-                DoubleFacedPiece::Pawn2,   // PromotedPawn2
-            ],
             double_faced_piece_to_nonpromoted_piece: [
                 Piece::King1,
                 Piece::Rook1,
@@ -251,7 +220,36 @@ impl Piece {
     }
 
     pub fn double_faced_piece(self) -> DoubleFacedPiece {
-        TOY_BOX.piece_double_faced_table[self as usize]
+        match self {
+            Piece::King1 => DoubleFacedPiece::King1,
+            Piece::Rook1 => DoubleFacedPiece::Rook1,
+            Piece::Bishop1 => DoubleFacedPiece::Bishop1,
+            Piece::Gold1 => DoubleFacedPiece::Gold1,
+            Piece::Silver1 => DoubleFacedPiece::Silver1,
+            Piece::Knight1 => DoubleFacedPiece::Knight1,
+            Piece::Lance1 => DoubleFacedPiece::Lance1,
+            Piece::Pawn1 => DoubleFacedPiece::Pawn1,
+            Piece::Dragon1 => DoubleFacedPiece::Rook1,
+            Piece::Horse1 => DoubleFacedPiece::Bishop1,
+            Piece::PromotedSilver1 => DoubleFacedPiece::Silver1,
+            Piece::PromotedKnight1 => DoubleFacedPiece::Knight1,
+            Piece::PromotedLance1 => DoubleFacedPiece::Lance1,
+            Piece::PromotedPawn1 => DoubleFacedPiece::Pawn1,
+            Piece::King2 => DoubleFacedPiece::King2,
+            Piece::Rook2 => DoubleFacedPiece::Rook2,
+            Piece::Bishop2 => DoubleFacedPiece::Bishop2,
+            Piece::Gold2 => DoubleFacedPiece::Gold2,
+            Piece::Silver2 => DoubleFacedPiece::Silver2,
+            Piece::Knight2 => DoubleFacedPiece::Knight2,
+            Piece::Lance2 => DoubleFacedPiece::Lance2,
+            Piece::Pawn2 => DoubleFacedPiece::Pawn2,
+            Piece::Dragon2 => DoubleFacedPiece::Rook2,
+            Piece::Horse2 => DoubleFacedPiece::Bishop2,
+            Piece::PromotedSilver2 => DoubleFacedPiece::Silver2,
+            Piece::PromotedKnight2 => DoubleFacedPiece::Knight2,
+            Piece::PromotedLance2 => DoubleFacedPiece::Lance2,
+            Piece::PromotedPawn2 => DoubleFacedPiece::Pawn2,
+        }
     }
 }
 
