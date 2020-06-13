@@ -659,11 +659,7 @@ impl GameTable {
                 self.demote(piece_num);
             }
             // 取られた方に、駒を返すぜ☆（＾～＾）置くのは指し手の移動先☆（＾～＾）
-            self.push_piece(
-                move_.destination.friend,
-                &move_.destination,
-                Some(piece_num),
-            );
+            self.push_piece(friend, &move_.destination, Some(piece_num));
         }
     }
     /// 駒を置く。
@@ -736,7 +732,7 @@ impl GameTable {
             self.get_phase(piece_num),
             self.get_double_faced_piece_type(piece_num),
         );
-        self.push_piece(drop.friend, &drop, Some(piece_num));
+        self.push_piece(friend, &drop, Some(piece_num));
     }
 
     /// 駒の新しい背番号を生成します。
