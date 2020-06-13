@@ -4,6 +4,7 @@
 //! * Phase (先後。手番,相手番)
 //! * Person (先手,後手)
 //!
+use crate::cosmic::fire::Fire;
 use crate::cosmic::smart::features::DoubleFacedPiece;
 use crate::cosmic::smart::features::PieceType;
 use crate::cosmic::smart::square::AbsoluteAddress2D;
@@ -165,7 +166,7 @@ pub struct CapturedMove {
     /// 取ることになる駒
     pub piece_type: PieceType,
     /// 元あった所。
-    pub source: UnifiedAddress,
+    pub source: Fire,
     /*
     /// TODO 移動先。
     pub destination: UnifiedAddress,
@@ -173,7 +174,7 @@ pub struct CapturedMove {
 }
 impl CapturedMove {
     // TODO Piece を持ちまわすのは止めたいが……☆（＾～＾）
-    pub fn new(source: UnifiedAddress, piece_type: PieceType) -> Self {
+    pub fn new(source: Fire, piece_type: PieceType) -> Self {
         CapturedMove {
             source: source,
             piece_type: piece_type,

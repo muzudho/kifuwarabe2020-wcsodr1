@@ -186,7 +186,7 @@ impl PseudoLegalMoves {
                                 false,
                                 if let Some(piece_num_val) = pseudo_captured_num {
                                     Some(CapturedMove::new(
-                                        UnifiedAddress::from_fire(&destination),
+                                        *destination,
                                         table.get_type(piece_num_val),
                                     ))
                                 } else {
@@ -200,7 +200,7 @@ impl PseudoLegalMoves {
                             true,
                             if let Some(piece_num_val) = pseudo_captured_num {
                                 Some(CapturedMove::new(
-                                    UnifiedAddress::from_fire(&destination),
+                                    *destination,
                                     table.get_type(piece_num_val),
                                 ))
                             } else {
@@ -217,7 +217,7 @@ impl PseudoLegalMoves {
                                 promotion,
                                 if let Some(piece_num_val) = pseudo_captured_num {
                                     Some(CapturedMove::new(
-                                        UnifiedAddress::from_fire(&destination),
+                                        *destination,
                                         table.get_type(piece_num_val),
                                     ))
                                 } else {

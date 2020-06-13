@@ -224,7 +224,7 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
     let captured_piece_num = game.table.piece_num_at(buffer.destination);
     buffer.captured = if let Some(captured_piece_num_val) = captured_piece_num {
         Some(CapturedMove::new(
-            buffer.destination,
+            buffer.destination.to_fire(),
             game.table.get_type(captured_piece_num_val),
         ))
     } else {
