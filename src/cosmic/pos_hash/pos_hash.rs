@@ -3,7 +3,7 @@
 
 use crate::cosmic::playing::Game;
 use crate::cosmic::recording::Phase;
-use crate::cosmic::recording::{FireAddress, History, MoveEnd, Movement, PHASE_LEN, PHASE_SECOND};
+use crate::cosmic::recording::{FireAddress, History, Movement, PHASE_LEN, PHASE_SECOND};
 use crate::cosmic::smart::features::DoubleFacedPiece;
 use crate::cosmic::smart::features::{HAND_MAX, PHYSICAL_PIECES_LEN};
 use crate::cosmic::smart::square::FILE10U8;
@@ -76,15 +76,13 @@ impl GameHashSeed {
         };
         // TODO 指し手 で差分を適用
         // 移動する駒。
-        match move_.source.address {
+        match move_.source {
             FireAddress::Board(src_sq) => {
-                let src_piece_hash_index = table
-                    .get_piece_board_hash_index(&move_.source.address)
-                    .unwrap();
+                let src_piece_hash_index = table.get_piece_board_hash_index(&move_.source).unwrap();
                 // 移動前マスに、動かしたい駒があるときのハッシュ。
                 prev_hash ^= self.piece[src_sq.serial_number() as usize][src_piece_hash_index];
                 // 移動後マスに、動かしたい駒があるときのハッシュ。
-                match move_.destination.address {
+                match move_.destination {
                     FireAddress::Board(dst_sq) => {
                         prev_hash ^=
                             self.piece[dst_sq.serial_number() as usize][src_piece_hash_index];
@@ -101,7 +99,7 @@ impl GameHashSeed {
                 // 打つ前の駒の枚数のハッシュ。
                 prev_hash ^= self.hands[src_drop as usize][count as usize];
                 // 移動後マスに、打った駒があるときのハッシュ。
-                match move_.destination.address {
+                match move_.destination {
                     FireAddress::Board(dst_sq) => {
                         prev_hash ^= self.piece[dst_sq.serial_number() as usize]
                             [src_drop.nonpromoted_piece_hash_index()];
@@ -114,10 +112,9 @@ impl GameHashSeed {
         }
         // 移動先に駒があれば、自分の持ち駒になります。
         if let Some(dst_piece_num) = table.piece_num_at(history.get_friend(), &move_.destination) {
-            if let Some(dst_piece_hash_index) =
-                table.get_piece_board_hash_index(&move_.destination.address)
+            if let Some(dst_piece_hash_index) = table.get_piece_board_hash_index(&move_.destination)
             {
-                match move_.destination.address {
+                match move_.destination {
                     FireAddress::Board(dst_sq) => {
                         // 移動先に駒があるケースの消去
                         prev_hash ^=
@@ -126,7 +123,7 @@ impl GameHashSeed {
                         let double_faced_piece = table.get_double_faced_piece(dst_piece_num);
                         let count = table.count_hand(
                             history.get_friend(),
-                            &MoveEnd::new_hand(double_faced_piece.type_()),
+                            &FireAddress::Hand(double_faced_piece.type_()),
                         );
                         // 打つ前の駒の枚数のハッシュ。
                         prev_hash ^= self.hands[double_faced_piece as usize][count as usize + 1];
@@ -186,10 +183,10 @@ impl GameHashSeed {
 
         // 持ち駒ハッシュ
         HandAddresses::for_all(
-            &mut |friend: &Phase, fire_hand: &MoveEnd| match fire_hand.address {
+            &mut |friend: &Phase, fire_hand: &FireAddress| match fire_hand {
                 FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.175) 未対応☆（＾～＾）")),
                 FireAddress::Hand(drop_type) => {
-                    let drop = DoubleFacedPiece::from_phase_and_type(*friend, drop_type);
+                    let drop = DoubleFacedPiece::from_phase_and_type(*friend, *drop_type);
                     let count = table.count_hand(*friend, fire_hand);
                     /*
                     debug_assert!(

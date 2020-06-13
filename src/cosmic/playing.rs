@@ -1,6 +1,6 @@
 use crate::cosmic::pos_hash::pos_hash::*;
 use crate::cosmic::recording::Phase;
-use crate::cosmic::recording::{FireAddress, History, MoveEnd, Movement};
+use crate::cosmic::recording::{FireAddress, History, Movement};
 use crate::cosmic::toy_box::GameTable;
 use crate::spaceship::equipment::{Beam, DestinationDisplay};
 
@@ -163,7 +163,7 @@ impl Game {
             let moveing_piece_num = self
                 .table
                 .pop_piece(self.history.get_friend(), &move_.destination);
-            match move_.source.address {
+            match move_.source {
                 FireAddress::Board(_src_sq) => {
                     // 盤上の移動なら
                     if move_.promote {
@@ -192,7 +192,7 @@ impl Game {
                     let friend = self.table.get_phase(piece_num);
                     self.table.push_piece(
                         friend,
-                        &MoveEnd::new_hand(self.table.get_double_faced_piece_type(piece_num)),
+                        &FireAddress::Hand(self.table.get_double_faced_piece_type(piece_num)),
                         moveing_piece_num,
                     );
                 }

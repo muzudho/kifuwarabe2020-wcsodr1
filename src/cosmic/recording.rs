@@ -59,19 +59,19 @@ impl History {
     */
 }
 
-/// 線の先端。
-/// このオブジェクトは大量に生成されるから容量を押さえたいぜ☆（＾～＾）
+/// 盤上と、駒台で　共通しないものを並列にします。
 #[derive(Copy, Clone, Debug)]
-pub struct MoveEnd {
-    pub address: FireAddress,
+pub enum FireAddress {
+    Board(AbsoluteAddress2D),
+    Hand(DoubleFacedPieceType),
 }
 /// USI向け。
-impl fmt::Display for MoveEnd {
+impl fmt::Display for FireAddress {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
             "{}",
-            match self.address {
+            match self {
                 FireAddress::Board(sq) => {
                     let (file, rank) = sq.to_file_rank();
                     format!("{}{}", file, num_to_lower_case(rank as usize))
@@ -83,43 +83,23 @@ impl fmt::Display for MoveEnd {
         )
     }
 }
-impl Default for MoveEnd {
+impl Default for FireAddress {
     /// ゴミ値だぜ☆（＾～＾）
     fn default() -> Self {
-        MoveEnd {
-            address: FireAddress::Board(AbsoluteAddress2D::default()),
-        }
+        FireAddress::Board(AbsoluteAddress2D::default())
     }
-}
-impl MoveEnd {
-    pub fn new_board(addr: AbsoluteAddress2D) -> Self {
-        MoveEnd {
-            address: FireAddress::Board(addr),
-        }
-    }
-    pub fn new_hand(drop_type: DoubleFacedPieceType) -> Self {
-        MoveEnd {
-            address: FireAddress::Hand(drop_type),
-        }
-    }
-}
-/// 盤上と、駒台で　共通しないものを並列にします。
-#[derive(Copy, Clone, Debug)]
-pub enum FireAddress {
-    Board(AbsoluteAddress2D),
-    Hand(DoubleFacedPieceType),
 }
 
 /// 取ることになる駒の移動。
 #[derive(Clone, Copy)]
 pub struct CapturedMove {
     /// 元あった所。
-    pub source: MoveEnd,
+    pub source: FireAddress,
     /// 移動先。
-    pub destination: MoveEnd,
+    pub destination: FireAddress,
 }
 impl CapturedMove {
-    pub fn new(source: MoveEnd, destination: MoveEnd) -> Self {
+    pub fn new(source: FireAddress, destination: FireAddress) -> Self {
         CapturedMove {
             source: source,
             destination: destination,
@@ -139,9 +119,9 @@ pub struct Movement {
     /// 動かす駒の背番号
     pub piece_num: PieceNum,
     /// 移動元マス。
-    pub source: MoveEnd,
+    pub source: FireAddress,
     /// 移動先マス。リバーシブルに作りたいので、駒台にも指せる。
-    pub destination: MoveEnd,
+    pub destination: FireAddress,
     /// 移動後に成るなら真
     pub promote: bool,
     /// 取ることになる駒。先後がひっくり返るのは駒を取られた時だけだぜ☆（＾～＾）
@@ -152,8 +132,8 @@ impl Default for Movement {
     fn default() -> Self {
         Movement {
             piece_num: PieceNum::King1,
-            source: MoveEnd::default(),
-            destination: MoveEnd::default(),
+            source: FireAddress::default(),
+            destination: FireAddress::default(),
             promote: false,
             captured: None,
         }
@@ -162,8 +142,8 @@ impl Default for Movement {
 impl Movement {
     pub fn new(
         piece_num: PieceNum,
-        source: MoveEnd,
-        destination: MoveEnd,
+        source: FireAddress,
+        destination: FireAddress,
         promote: bool,
         captured: Option<CapturedMove>,
     ) -> Self {
@@ -186,7 +166,7 @@ impl Movement {
 }
 impl fmt::Display for Movement {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self.source.address {
+        match self.source {
             FireAddress::Board(src_sq) => {
                 let (sx, sy) = src_sq.to_file_rank();
                 write!(
