@@ -5,8 +5,8 @@
 //! * Person (先手,後手)
 //!
 use crate::cosmic::fire::{Fire, FireAddress};
-use crate::cosmic::smart::features::DoubleFacedPiece;
 use crate::cosmic::smart::features::PieceType;
+use crate::cosmic::smart::features::{DoubleFacedPiece, DoubleFacedPieceType};
 use crate::cosmic::smart::square::AbsoluteAddress2D;
 use crate::law::cryptographic::num_to_lower_case;
 use std::fmt;
@@ -68,7 +68,7 @@ pub enum AddressPos1 {
     // 盤上の番地 TODO これを先手盤上、後手盤上の２つに分けれる☆（＾～＾）
     Board(AbsoluteAddress2D),
     // 持ち駒の種類
-    Hand(DoubleFacedPiece),
+    Hand((Phase, DoubleFacedPieceType)),
 }
 impl Default for AddressPos1 {
     // ゴミ値だぜ☆（＾～＾）
@@ -87,8 +87,11 @@ impl fmt::Display for AddressPos1 {
                     let (file, rank) = sq.to_file_rank();
                     format!("{}{}", file, num_to_lower_case(rank))
                 }
-                AddressPos1::Hand(drop) => {
-                    format!("{}", drop)
+                AddressPos1::Hand((friend, drop_type)) => {
+                    format!(
+                        "{}",
+                        DoubleFacedPiece::from_phase_and_type(*friend, *drop_type)
+                    )
                 }
             },
         )

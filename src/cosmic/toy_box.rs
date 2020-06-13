@@ -506,31 +506,38 @@ const UNIFIED_ADDRESS_160_TO_ADDRESS_POS1: AddressPos1 =
     AddressPos1::Board(AbsoluteAddress2D { file: 9, rank: 8 });
 const UNIFIED_ADDRESS_161_TO_ADDRESS_POS1: AddressPos1 =
     AddressPos1::Board(AbsoluteAddress2D { file: 9, rank: 9 });
-const UNIFIED_ADDRESS_162_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Hand(DoubleFacedPiece::King1);
-const UNIFIED_ADDRESS_163_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Hand(DoubleFacedPiece::Rook1);
+const UNIFIED_ADDRESS_162_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Hand((Phase::First, DoubleFacedPieceType::King));
+const UNIFIED_ADDRESS_163_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Hand((Phase::First, DoubleFacedPieceType::Rook));
 const UNIFIED_ADDRESS_164_TO_ADDRESS_POS1: AddressPos1 =
-    AddressPos1::Hand(DoubleFacedPiece::Bishop1);
-const UNIFIED_ADDRESS_165_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Hand(DoubleFacedPiece::Gold1);
+    AddressPos1::Hand((Phase::First, DoubleFacedPieceType::Bishop));
+const UNIFIED_ADDRESS_165_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Hand((Phase::First, DoubleFacedPieceType::Gold));
 const UNIFIED_ADDRESS_166_TO_ADDRESS_POS1: AddressPos1 =
-    AddressPos1::Hand(DoubleFacedPiece::Silver1);
+    AddressPos1::Hand((Phase::First, DoubleFacedPieceType::Silver));
 const UNIFIED_ADDRESS_167_TO_ADDRESS_POS1: AddressPos1 =
-    AddressPos1::Hand(DoubleFacedPiece::Knight1);
+    AddressPos1::Hand((Phase::First, DoubleFacedPieceType::Knight));
 const UNIFIED_ADDRESS_168_TO_ADDRESS_POS1: AddressPos1 =
-    AddressPos1::Hand(DoubleFacedPiece::Lance1);
-const UNIFIED_ADDRESS_169_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Hand(DoubleFacedPiece::Pawn1);
-const UNIFIED_ADDRESS_170_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Hand(DoubleFacedPiece::King2);
-const UNIFIED_ADDRESS_171_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Hand(DoubleFacedPiece::Rook2);
+    AddressPos1::Hand((Phase::First, DoubleFacedPieceType::Lance));
+const UNIFIED_ADDRESS_169_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Hand((Phase::First, DoubleFacedPieceType::Pawn));
+const UNIFIED_ADDRESS_170_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Hand((Phase::Second, DoubleFacedPieceType::King));
+const UNIFIED_ADDRESS_171_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Hand((Phase::Second, DoubleFacedPieceType::Rook));
 const UNIFIED_ADDRESS_172_TO_ADDRESS_POS1: AddressPos1 =
-    AddressPos1::Hand(DoubleFacedPiece::Bishop2);
-const UNIFIED_ADDRESS_173_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Hand(DoubleFacedPiece::Gold2);
+    AddressPos1::Hand((Phase::Second, DoubleFacedPieceType::Bishop));
+const UNIFIED_ADDRESS_173_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Hand((Phase::Second, DoubleFacedPieceType::Gold));
 const UNIFIED_ADDRESS_174_TO_ADDRESS_POS1: AddressPos1 =
-    AddressPos1::Hand(DoubleFacedPiece::Silver2);
+    AddressPos1::Hand((Phase::Second, DoubleFacedPieceType::Silver));
 const UNIFIED_ADDRESS_175_TO_ADDRESS_POS1: AddressPos1 =
-    AddressPos1::Hand(DoubleFacedPiece::Knight2);
+    AddressPos1::Hand((Phase::Second, DoubleFacedPieceType::Knight));
 const UNIFIED_ADDRESS_176_TO_ADDRESS_POS1: AddressPos1 =
-    AddressPos1::Hand(DoubleFacedPiece::Lance2);
-const UNIFIED_ADDRESS_177_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Hand(DoubleFacedPiece::Pawn2);
-
+    AddressPos1::Hand((Phase::Second, DoubleFacedPieceType::Lance));
+const UNIFIED_ADDRESS_177_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Hand((Phase::Second, DoubleFacedPieceType::Pawn));
 /// 統一アドレス。
 #[derive(Copy, Clone, Debug, FromPrimitive)]
 pub enum UnifiedAddress {
@@ -1048,7 +1055,9 @@ impl UnifiedAddress {
     pub fn from_address_pos1(friend: Phase, addr: AddressPos1) -> Self {
         match addr {
             AddressPos1::Board(sq) => UnifiedAddress::from_absolute_address(friend, &sq),
-            AddressPos1::Hand(drop) => UnifiedAddress::from_double_faced_piece(drop),
+            AddressPos1::Hand((friend, drop_type)) => UnifiedAddress::from_double_faced_piece(
+                DoubleFacedPiece::from_phase_and_type(friend, drop_type),
+            ),
         }
     }
 
@@ -2248,6 +2257,9 @@ impl GameTable {
     pub fn get_double_faced_piece(&self, num: PieceNum) -> DoubleFacedPiece {
         self.piece_list[num as usize].double_faced_piece()
     }
+    pub fn get_double_faced_piece_type(&self, num: PieceNum) -> DoubleFacedPieceType {
+        self.piece_list[num as usize].double_faced_piece().type_()
+    }
     fn new_piece_num(&mut self, piece: Piece, num: PieceNum) -> PieceNum {
         self.piece_list[num as usize] = piece;
         num
@@ -2275,7 +2287,10 @@ impl GameTable {
             self.push_piece(
                 UnifiedAddress::from_address_pos1(
                     self.get_phase(collision_piece_num_val),
-                    AddressPos1::Hand(self.get_double_faced_piece(collision_piece_num_val)),
+                    AddressPos1::Hand((
+                        self.get_phase(collision_piece_num_val),
+                        self.get_double_faced_piece_type(collision_piece_num_val),
+                    )),
                 ),
                 Some(collision_piece_num_val),
             );
@@ -2342,11 +2357,11 @@ impl GameTable {
                     self.board[sq.serial_number() as usize] = None;
                 }
             }
-            AddressPos1::Hand(drop) => {
+            AddressPos1::Hand((friend, drop_type)) => {
                 if let Some(piece_num_val) = piece_num {
                     // 持ち駒を１つ増やします。
                     self.phase_classification
-                        .push(&Fire::new_hand(drop.phase(), drop.type_()), piece_num_val);
+                        .push(&Fire::new_hand(friend, drop_type), piece_num_val);
                     // 背番号に番地を紐づけます。
                     self.address_list[piece_num_val as usize] = addr.to_fire();
                 }
