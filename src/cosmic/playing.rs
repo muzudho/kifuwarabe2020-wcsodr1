@@ -162,7 +162,7 @@ impl Game {
             // 移動先にある駒をポップするのは確定。
             let moveing_piece_num = self
                 .table
-                .pop_piece(move_.destination.friend, &move_.destination);
+                .pop_piece(self.history.get_friend(), &move_.destination);
             match move_.source.address {
                 FireAddress::Board(_src_sq) => {
                     // 盤上の移動なら
@@ -178,8 +178,11 @@ impl Game {
                     }
 
                     // 打でなければ、移動元升に、動かした駒を置く☆（＾～＾）打なら何もしないぜ☆（＾～＾）
-                    self.table
-                        .push_piece(move_.source.friend, &move_.source, moveing_piece_num);
+                    self.table.push_piece(
+                        self.history.get_friend(),
+                        &move_.source,
+                        moveing_piece_num,
+                    );
                 }
                 FireAddress::Hand(_src_drop_type) => {
                     // 打なら

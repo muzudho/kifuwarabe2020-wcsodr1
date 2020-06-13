@@ -167,9 +167,11 @@ impl Tree {
             let mut king = 0;
             for i in 0..cap {
                 let fire = ways.get(i).captured.unwrap().source;
-                let piece_type = game
-                    .table
-                    .get_type(game.table.piece_num_at(fire.friend, &fire).unwrap());
+                let piece_type = game.table.get_type(
+                    game.table
+                        .piece_num_at(game.history.get_friend(), &fire)
+                        .unwrap(),
+                );
                 // let piece_type = ways.get(i).captured.unwrap().piece_type;
                 match piece_type {
                     PieceType::King => {
