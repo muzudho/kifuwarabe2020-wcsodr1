@@ -4,7 +4,6 @@
 use crate::cosmic::fire::{Fire, FireAddress};
 use crate::cosmic::recording::Movement;
 use crate::cosmic::recording::Phase;
-use crate::cosmic::smart::features::PHYSICAL_PIECES_LEN;
 use crate::cosmic::smart::features::{
     DoubleFacedPiece, DoubleFacedPieceType, PieceType, PHYSICAL_PIECE_TYPE_LEN,
 };
@@ -15,38 +14,6 @@ use crate::spaceship::equipment::Beam;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 use std::*;
-
-lazy_static! {
-    static ref TOY_BOX: ToyBox = ToyBox::default();
-}
-
-struct ToyBox {
-    double_faced_piece_to_nonpromoted_piece: [Piece; PHYSICAL_PIECES_LEN],
-}
-impl Default for ToyBox {
-    fn default() -> Self {
-        ToyBox {
-            double_faced_piece_to_nonpromoted_piece: [
-                Piece::King1,
-                Piece::Rook1,
-                Piece::Bishop1,
-                Piece::Gold1,
-                Piece::Silver1,
-                Piece::Knight1,
-                Piece::Lance1,
-                Piece::Pawn1,
-                Piece::King2,
-                Piece::Rook2,
-                Piece::Bishop2,
-                Piece::Gold2,
-                Piece::Silver2,
-                Piece::Knight2,
-                Piece::Lance2,
-                Piece::Pawn2,
-            ],
-        }
-    }
-}
 
 /// コーディングを短くするためのものだぜ☆（＾～＾）
 impl Piece {
@@ -256,7 +223,24 @@ impl Piece {
 /// コーディングを短くするためのものだぜ☆（＾～＾）
 impl DoubleFacedPiece {
     pub fn nonpromoted_piece_hash_index(self) -> usize {
-        TOY_BOX.double_faced_piece_to_nonpromoted_piece[self as usize] as usize
+        (match self {
+            DoubleFacedPiece::King1 => Piece::King1,
+            DoubleFacedPiece::Rook1 => Piece::Rook1,
+            DoubleFacedPiece::Bishop1 => Piece::Bishop1,
+            DoubleFacedPiece::Gold1 => Piece::Gold1,
+            DoubleFacedPiece::Silver1 => Piece::Silver1,
+            DoubleFacedPiece::Knight1 => Piece::Knight1,
+            DoubleFacedPiece::Lance1 => Piece::Lance1,
+            DoubleFacedPiece::Pawn1 => Piece::Pawn1,
+            DoubleFacedPiece::King2 => Piece::King2,
+            DoubleFacedPiece::Rook2 => Piece::Rook2,
+            DoubleFacedPiece::Bishop2 => Piece::Bishop2,
+            DoubleFacedPiece::Gold2 => Piece::Gold2,
+            DoubleFacedPiece::Silver2 => Piece::Silver2,
+            DoubleFacedPiece::Knight2 => Piece::Knight2,
+            DoubleFacedPiece::Lance2 => Piece::Lance2,
+            DoubleFacedPiece::Pawn2 => Piece::Pawn2,
+        }) as usize
     }
 }
 

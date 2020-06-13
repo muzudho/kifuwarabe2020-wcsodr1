@@ -80,7 +80,7 @@ captured_pieces = [
     'Pawn1',
 ]
 
-double_faced_piece_types = [
+pieces_to_double_faced_pieces = [
     'King',
     'Rook',
     'Bishop',
@@ -91,6 +91,17 @@ double_faced_piece_types = [
     'Pawn',
     'Rook',
     'Bishop',
+    'Silver',
+    'Knight',
+    'Lance',
+    'Pawn',
+]
+
+double_faced_piece_types = [
+    'King',
+    'Rook',
+    'Bishop',
+    'Gold',
     'Silver',
     'Knight',
     'Lance',
