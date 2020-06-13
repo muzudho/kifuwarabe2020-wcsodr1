@@ -775,8 +775,11 @@ impl GameTable {
             if let Some(piece_num) =
                 self.piece_num_at(&FireAddress::Board(AbsoluteAddress2D::new(file, rank)))
             {
-                return self.get_phase(piece_num) == friend
-                    && self.get_type(piece_num) == PieceType::Pawn;
+                if self.get_phase(piece_num) == friend
+                    && self.get_type(piece_num) == PieceType::Pawn
+                {
+                    return true;
+                }
             }
         }
         false
