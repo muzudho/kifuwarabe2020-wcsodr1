@@ -183,10 +183,10 @@ impl Game {
                     let piece_num = moveing_piece_num.unwrap();
                     // 自分の持ち駒を増やそうぜ☆（＾～＾）！
                     self.table.push_piece(
-                        &UnifiedAddress::from_double_faced_piece(
-                            self.table.get_double_faced_piece(piece_num),
-                        )
-                        .to_fire(),
+                        &Fire::new_hand(
+                            self.table.get_phase(piece_num),
+                            self.table.get_double_faced_piece_type(piece_num),
+                        ),
                         moveing_piece_num,
                     );
                 }
