@@ -2340,8 +2340,7 @@ impl GameTable {
                     self.board[sq.serial_number() as usize] = piece_num;
                     // 背番号に番地を紐づけます。
                     self.address_list[piece_num_val as usize] =
-                        UnifiedAddress::from_absolute_address(self.get_phase(piece_num_val), &sq)
-                            .to_fire();
+                        Fire::new_board(self.get_phase(piece_num_val), sq);
                 } else {
                     // マスを空にします。
                     self.board[sq.serial_number() as usize] = None;
@@ -2367,11 +2366,7 @@ impl GameTable {
                     // マスを空にします。
                     self.board[sq.serial_number() as usize] = None;
                     // TODO 背番号の番地を、ゴミ値で塗りつぶすが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
-                    self.address_list[piece_num_val as usize] = UnifiedAddress::from_address_pos1(
-                        self.get_phase(piece_num_val),
-                        AddressPos1::default(),
-                    )
-                    .to_fire();
+                    self.address_list[piece_num_val as usize] = Fire::default();
                 }
                 piece_num
             }
@@ -2380,11 +2375,7 @@ impl GameTable {
                 // 台から取りのぞきます。
                 let piece_num = self.phase_classification.pop(&fire);
                 // TODO 背番号の番地に、ゴミ値を入れて消去するが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
-                self.address_list[piece_num as usize] = UnifiedAddress::from_address_pos1(
-                    self.get_phase(piece_num),
-                    AddressPos1::default(),
-                )
-                .to_fire();
+                self.address_list[piece_num as usize] = Fire::default();
                 Some(piece_num)
             }
         }
