@@ -2285,14 +2285,10 @@ impl GameTable {
             // 先後ひっくり返す。
             self.turn_phase(collision_piece_num_val);
             self.push_piece(
-                &UnifiedAddress::from_address_pos1(
+                &Fire::new_hand(
                     self.get_phase(collision_piece_num_val),
-                    AddressPos1::Hand((
-                        self.get_phase(collision_piece_num_val),
-                        self.get_double_faced_piece_type(collision_piece_num_val),
-                    )),
-                )
-                .to_fire(),
+                    self.get_double_faced_piece_type(collision_piece_num_val),
+                ),
                 Some(collision_piece_num_val),
             );
         }
@@ -2595,10 +2591,7 @@ impl GameTable {
         for drop in &FIRST_SECOND[friend as usize] {
             if let Some(piece_type) = self.last_hand_type(&Fire::new_hand(friend, drop.type_())) {
                 // 有無を確認しているぜ☆（＾～＾）
-                piece_get(
-                    &UnifiedAddress::from_double_faced_piece(*drop).to_fire(),
-                    piece_type,
-                );
+                piece_get(&Fire::new_hand(drop.phase(), drop.type_()), piece_type);
             }
         }
     }
