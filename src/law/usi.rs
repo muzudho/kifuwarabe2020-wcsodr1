@@ -3,8 +3,8 @@
 //!
 use crate::cosmic::fire::Fire;
 use crate::cosmic::playing::Game;
-use crate::cosmic::recording::{CapturedMove, Movement};
-use crate::cosmic::smart::features::DoubleFacedPieceType;
+use crate::cosmic::recording::{CapturedMove, Movement, Phase};
+use crate::cosmic::smart::features::{DoubleFacedPieceType, PieceType};
 use crate::cosmic::smart::square::{AbsoluteAddress2D, FILE_9, RANK_1};
 use crate::cosmic::toy_box::Piece;
 use crate::spaceship::equipment::Beam;
@@ -416,22 +416,21 @@ pub fn set_position(line: &str, game: &mut Game) {
                         }
                     };
 
-                    use crate::cosmic::toy_box::Piece::*;
-                    let hand = match &line[starts..=starts] {
-                        "R" => Rook1,
-                        "B" => Bishop1,
-                        "G" => Gold1,
-                        "S" => Silver1,
-                        "N" => Knight1,
-                        "L" => Lance1,
-                        "P" => Pawn1,
-                        "r" => Rook2,
-                        "b" => Bishop2,
-                        "g" => Gold2,
-                        "s" => Silver2,
-                        "n" => Knight2,
-                        "l" => Lance2,
-                        "p" => Pawn2,
+                    let (friend, piece_type) = match &line[starts..=starts] {
+                        "R" => (Phase::First, PieceType::Rook),
+                        "B" => (Phase::First, PieceType::Bishop),
+                        "G" => (Phase::First, PieceType::Gold),
+                        "S" => (Phase::First, PieceType::Silver),
+                        "N" => (Phase::First, PieceType::Knight),
+                        "L" => (Phase::First, PieceType::Lance),
+                        "P" => (Phase::First, PieceType::Pawn),
+                        "r" => (Phase::Second, PieceType::Rook),
+                        "b" => (Phase::Second, PieceType::Bishop),
+                        "g" => (Phase::Second, PieceType::Gold),
+                        "s" => (Phase::Second, PieceType::Silver),
+                        "n" => (Phase::Second, PieceType::Knight),
+                        "l" => (Phase::Second, PieceType::Lance),
+                        "p" => (Phase::Second, PieceType::Pawn),
                         _ => {
                             break 'mg;
                         } // 持駒部 正常終了
@@ -440,7 +439,7 @@ pub fn set_position(line: &str, game: &mut Game) {
 
                     for _i in 0..hand_num {
                         // 散らばっている駒に、背番号を付けて、駒台に置くぜ☆（＾～＾）
-                        game.mut_starting().init_hand(hand);
+                        game.mut_starting().init_hand(friend, piece_type);
                     }
                 } //if
             } //loop

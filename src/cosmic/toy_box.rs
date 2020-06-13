@@ -119,6 +119,44 @@ impl fmt::Display for Piece {
         }
     }
 }
+impl Piece {
+    pub fn from_phase_and_piece_type(friend: Phase, piece_type: PieceType) -> Self {
+        match friend {
+            Phase::First => match piece_type {
+                PieceType::King => Piece::King1,
+                PieceType::Rook => Piece::Rook1,
+                PieceType::Bishop => Piece::Bishop1,
+                PieceType::Gold => Piece::Gold1,
+                PieceType::Silver => Piece::Silver1,
+                PieceType::Knight => Piece::Knight1,
+                PieceType::Lance => Piece::Lance1,
+                PieceType::Pawn => Piece::Pawn1,
+                PieceType::Dragon => Piece::Dragon1,
+                PieceType::Horse => Piece::Horse1,
+                PieceType::PromotedSilver => Piece::PromotedSilver1,
+                PieceType::PromotedKnight => Piece::PromotedKnight1,
+                PieceType::PromotedLance => Piece::PromotedLance1,
+                PieceType::PromotedPawn => Piece::PromotedPawn1,
+            },
+            Phase::Second => match piece_type {
+                PieceType::King => Piece::King2,
+                PieceType::Rook => Piece::Rook2,
+                PieceType::Bishop => Piece::Bishop2,
+                PieceType::Gold => Piece::Gold2,
+                PieceType::Silver => Piece::Silver2,
+                PieceType::Knight => Piece::Knight2,
+                PieceType::Lance => Piece::Lance2,
+                PieceType::Pawn => Piece::Pawn2,
+                PieceType::Dragon => Piece::Dragon2,
+                PieceType::Horse => Piece::Horse2,
+                PieceType::PromotedSilver => Piece::PromotedSilver2,
+                PieceType::PromotedKnight => Piece::PromotedKnight2,
+                PieceType::PromotedLance => Piece::PromotedLance2,
+                PieceType::PromotedPawn => Piece::PromotedPawn2,
+            },
+        }
+    }
+}
 
 /// ちゆり「駒そのものではなく、駒の情報が欲しいだけなら、これだぜ☆」
 pub struct PieceInfo {
@@ -451,9 +489,9 @@ impl GameTable {
     }
 
     /// 散らばっている駒に、背番号を付けて、駒台に置くぜ☆（＾～＾）
-    pub fn init_hand(&mut self, hand: Piece) {
+    pub fn init_hand(&mut self, friend: Phase, piece_type: PieceType) {
         // 駒に背番号を付けるぜ☆（＾～＾）
-        let piece_num = self.numbering_piece(hand);
+        let piece_num = self.numbering_piece(Piece::from_phase_and_piece_type(friend, piece_type));
         // 駒台に置くぜ☆（＾～＾）
         let drop = Fire::new_hand(
             self.get_phase(piece_num),
