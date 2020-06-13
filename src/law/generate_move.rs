@@ -4,7 +4,7 @@
 
 use crate::cosmic::fire::{Fire, FireAddress};
 use crate::cosmic::recording::PHASE_LEN;
-use crate::cosmic::recording::{AddressPos1, CapturedMove, Movement, Phase};
+use crate::cosmic::recording::{CapturedMove, Movement, Phase};
 use crate::cosmic::smart::features::{DoubleFacedPiece, PieceType};
 use crate::cosmic::smart::square::{
     AbsoluteAddress2D, Angle, RelAdr2D, FILE_1, FILE_10, RANK_1, RANK_10, RANK_2, RANK_3, RANK_4,
