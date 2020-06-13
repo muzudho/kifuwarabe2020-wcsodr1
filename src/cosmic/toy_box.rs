@@ -2482,7 +2482,7 @@ impl GameTable {
         }
     }
     /// 指し手生成で使うぜ☆（＾～＾）
-    pub fn last_hand(&self, fire: &Fire) -> Option<(PieceType, UnifiedAddress)> {
+    pub fn last_hand(&self, fire: &Fire) -> Option<(PieceType, Fire)> {
         match fire.address {
             FireAddress::Board(_sq) => {
                 panic!(Beam::trouble(&format!("(Err.3251) 未対応☆（＾～＾）！",)))
@@ -2495,7 +2495,7 @@ impl GameTable {
                     let piece = self.get_piece(piece_num);
                     Some((
                         piece.type_(),
-                        UnifiedAddress::from_double_faced_piece(piece.double_faced_piece()),
+                        Fire::new_hand(fire.friend, piece.double_faced_piece().type_()),
                     ))
                 } else {
                     None

@@ -272,10 +272,10 @@ impl PseudoLegalMoves {
                                 _ => {}
                             }
                             listen_move(Movement::new(
-                                hand_addr.to_fire(), // 打った駒種類
-                                *destination,        // どの升へ行きたいか
-                                false,               // 打に成りは無し
-                                None,                // 打で取れる駒無し
+                                hand_addr,    // 打った駒種類
+                                *destination, // どの升へ行きたいか
+                                false,        // 打に成りは無し
+                                None,         // 打で取れる駒無し
                             ));
                         }
                     };
