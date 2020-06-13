@@ -2343,8 +2343,9 @@ impl GameTable {
         addr: UnifiedAddress, /*TODO これの置き換えはバグりやすい。*/
         piece_num: Option<PieceNum>,
     ) {
-        match addr.to_address_pos1() {
-            AddressPos1::Board(sq) => {
+        let fire = addr.to_fire();
+        match fire.address {
+            FireAddress::Board(sq) => {
                 if let Some(piece_num_val) = piece_num {
                     // マスに駒を置きます。
                     self.board[sq.serial_number() as usize] = piece_num;
@@ -2357,11 +2358,11 @@ impl GameTable {
                     self.board[sq.serial_number() as usize] = None;
                 }
             }
-            AddressPos1::Hand((friend, drop_type)) => {
+            FireAddress::Hand(drop_type) => {
                 if let Some(piece_num_val) = piece_num {
                     // 持ち駒を１つ増やします。
                     self.phase_classification
-                        .push(&Fire::new_hand(friend, drop_type), piece_num_val);
+                        .push(&Fire::new_hand(fire.friend, drop_type), piece_num_val);
                     // 背番号に番地を紐づけます。
                     self.address_list[piece_num_val as usize] = addr.to_fire();
                 }
