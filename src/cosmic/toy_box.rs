@@ -491,7 +491,7 @@ impl GameTable {
     /// 散らばっている駒に、背番号を付けて、駒台に置くぜ☆（＾～＾）
     pub fn init_hand(&mut self, friend: Phase, piece_type: PieceType) {
         // 駒に背番号を付けるぜ☆（＾～＾）
-        let piece_num = self.numbering_piece(Piece::from_phase_and_piece_type(friend, piece_type));
+        let piece_num = self.numbering_piece(friend, piece_type);
         // 駒台に置くぜ☆（＾～＾）
         let drop = Fire::new_hand(
             self.get_phase(piece_num),
@@ -501,7 +501,8 @@ impl GameTable {
     }
 
     /// 駒の新しい背番号を生成します。
-    pub fn numbering_piece(&mut self, piece: Piece) -> PieceNum {
+    pub fn numbering_piece(&mut self, friend: Phase, piece_type: PieceType) -> PieceNum {
+        let piece = Piece::from_phase_and_piece_type(friend, piece_type);
         match piece {
             // 玉だけ、先後は決まってるから従えだぜ☆（＾～＾）
             Piece::King1 => self.new_piece_num(piece, PieceNum::King1),

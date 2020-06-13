@@ -6,7 +6,6 @@ use crate::cosmic::playing::Game;
 use crate::cosmic::recording::{CapturedMove, Movement, Phase};
 use crate::cosmic::smart::features::{DoubleFacedPieceType, PieceType};
 use crate::cosmic::smart::square::{AbsoluteAddress2D, FILE_9, RANK_1};
-use crate::cosmic::toy_box::Piece;
 use crate::spaceship::equipment::Beam;
 use atoi::atoi;
 
@@ -226,7 +225,7 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Game) {
         /// スペース数☆（＾～＾）
         Number(usize),
         /// 駒☆（＾～＾）+で始まるものもこっちだぜ☆（＾～＾）
-        Alphabet(Piece),
+        Alphabet((Phase, PieceType)),
     }
 
     'ban: while 0 < (len - *starts) {
@@ -241,38 +240,38 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Game) {
             "7" => BoardPart::Number(7),
             "8" => BoardPart::Number(8),
             "9" => BoardPart::Number(9),
-            "K" => BoardPart::Alphabet(Piece::King1),
-            "R" => BoardPart::Alphabet(Piece::Rook1),
-            "B" => BoardPart::Alphabet(Piece::Bishop1),
-            "G" => BoardPart::Alphabet(Piece::Gold1),
-            "S" => BoardPart::Alphabet(Piece::Silver1),
-            "N" => BoardPart::Alphabet(Piece::Knight1),
-            "L" => BoardPart::Alphabet(Piece::Lance1),
-            "P" => BoardPart::Alphabet(Piece::Pawn1),
-            "k" => BoardPart::Alphabet(Piece::King2),
-            "r" => BoardPart::Alphabet(Piece::Rook2),
-            "b" => BoardPart::Alphabet(Piece::Bishop2),
-            "g" => BoardPart::Alphabet(Piece::Gold2),
-            "s" => BoardPart::Alphabet(Piece::Silver2),
-            "n" => BoardPart::Alphabet(Piece::Knight2),
-            "l" => BoardPart::Alphabet(Piece::Lance2),
-            "p" => BoardPart::Alphabet(Piece::Pawn2),
+            "K" => BoardPart::Alphabet((Phase::First, PieceType::King)),
+            "R" => BoardPart::Alphabet((Phase::First, PieceType::Rook)),
+            "B" => BoardPart::Alphabet((Phase::First, PieceType::Bishop)),
+            "G" => BoardPart::Alphabet((Phase::First, PieceType::Gold)),
+            "S" => BoardPart::Alphabet((Phase::First, PieceType::Silver)),
+            "N" => BoardPart::Alphabet((Phase::First, PieceType::Knight)),
+            "L" => BoardPart::Alphabet((Phase::First, PieceType::Lance)),
+            "P" => BoardPart::Alphabet((Phase::First, PieceType::Pawn)),
+            "k" => BoardPart::Alphabet((Phase::Second, PieceType::King)),
+            "r" => BoardPart::Alphabet((Phase::Second, PieceType::Rook)),
+            "b" => BoardPart::Alphabet((Phase::Second, PieceType::Bishop)),
+            "g" => BoardPart::Alphabet((Phase::Second, PieceType::Gold)),
+            "s" => BoardPart::Alphabet((Phase::Second, PieceType::Silver)),
+            "n" => BoardPart::Alphabet((Phase::Second, PieceType::Knight)),
+            "l" => BoardPart::Alphabet((Phase::Second, PieceType::Lance)),
+            "p" => BoardPart::Alphabet((Phase::Second, PieceType::Pawn)),
             "+" => {
                 *starts += 1;
                 // 次に必ず１文字が来るぜ☆（＾～＾）
                 match &line[*starts..=*starts] {
-                    "R" => BoardPart::Alphabet(Piece::Dragon1),
-                    "B" => BoardPart::Alphabet(Piece::Horse1),
-                    "S" => BoardPart::Alphabet(Piece::PromotedSilver1),
-                    "N" => BoardPart::Alphabet(Piece::PromotedKnight1),
-                    "L" => BoardPart::Alphabet(Piece::PromotedLance1),
-                    "P" => BoardPart::Alphabet(Piece::PromotedPawn1),
-                    "r" => BoardPart::Alphabet(Piece::Dragon2),
-                    "b" => BoardPart::Alphabet(Piece::Horse2),
-                    "s" => BoardPart::Alphabet(Piece::PromotedSilver2),
-                    "n" => BoardPart::Alphabet(Piece::PromotedKnight2),
-                    "l" => BoardPart::Alphabet(Piece::PromotedLance2),
-                    "p" => BoardPart::Alphabet(Piece::PromotedPawn2),
+                    "R" => BoardPart::Alphabet((Phase::First, PieceType::Dragon)),
+                    "B" => BoardPart::Alphabet((Phase::First, PieceType::Horse)),
+                    "S" => BoardPart::Alphabet((Phase::First, PieceType::PromotedSilver)),
+                    "N" => BoardPart::Alphabet((Phase::First, PieceType::PromotedKnight)),
+                    "L" => BoardPart::Alphabet((Phase::First, PieceType::PromotedLance)),
+                    "P" => BoardPart::Alphabet((Phase::First, PieceType::PromotedPawn)),
+                    "r" => BoardPart::Alphabet((Phase::Second, PieceType::Dragon)),
+                    "b" => BoardPart::Alphabet((Phase::Second, PieceType::Horse)),
+                    "s" => BoardPart::Alphabet((Phase::Second, PieceType::PromotedSilver)),
+                    "n" => BoardPart::Alphabet((Phase::Second, PieceType::PromotedKnight)),
+                    "l" => BoardPart::Alphabet((Phase::Second, PieceType::PromotedLance)),
+                    "p" => BoardPart::Alphabet((Phase::Second, PieceType::PromotedPawn)),
                     _ => {
                         panic!(Beam::trouble(&format!(
                             "(Err.235)  盤部(0) '{}' だった。",
@@ -287,12 +286,12 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Game) {
         };
 
         match board_part {
-            BoardPart::Alphabet(piece) => {
+            BoardPart::Alphabet((friend, piece_type)) => {
                 *starts += 1;
-                let fire = Fire::new_board(piece.phase(), AbsoluteAddress2D::new(file, rank));
+                let fire = Fire::new_board(friend, AbsoluteAddress2D::new(file, rank));
 
                 // 駒に背番号を付けるぜ☆（＾～＾）
-                let piece_num = table.numbering_piece(piece);
+                let piece_num = table.numbering_piece(friend, piece_type);
                 // 盤に置くぜ☆（＾～＾）
                 table.push_piece(&fire, Some(piece_num));
 
