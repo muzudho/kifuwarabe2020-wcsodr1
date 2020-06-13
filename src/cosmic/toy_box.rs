@@ -3163,11 +3163,9 @@ impl GameTable {
     /// 歩が置いてあるか確認
     pub fn exists_pawn_on_file(&self, friend: Phase, file: usize) -> bool {
         for rank in RANK_1..RANK_10 {
-            let addr = UnifiedAddress::from_address_pos1(
-                friend,
-                AddressPos1::Board(SquareType::from_file_rank(file, rank)),
-            );
-            if let Some(piece_val) = self.piece_at1(addr.to_address_pos1()) {
+            if let Some(piece_val) =
+                self.piece_at1(&FireAddress::Board(AbsoluteAddress2D::new(file, rank)))
+            {
                 if piece_val.phase() == friend && piece_val.type_() == PieceType::Pawn {
                     return true;
                 }
@@ -3176,16 +3174,16 @@ impl GameTable {
         false
     }
     /// ハッシュを作るときにも利用。盤上専用。
-    pub fn piece_at1(&self, addr: AddressPos1) -> Option<Piece> {
+    pub fn piece_at1(&self, addr: &FireAddress) -> Option<Piece> {
         match addr {
-            AddressPos1::Board(sq) => {
-                if let Some(piece_num) = self.board[sq.to_serial_number() as usize] {
+            FireAddress::Board(sq) => {
+                if let Some(piece_num) = self.board[sq.serial_number() as usize] {
                     Some(self.get_piece(piece_num))
                 } else {
                     None
                 }
             }
-            AddressPos1::Hand(_drop) => panic!(Beam::trouble(&format!(
+            FireAddress::Hand(_drop_type) => panic!(Beam::trouble(&format!(
                 "(Err.345) 駒台は非対応☆（＾～＾）！",
             ))),
         }

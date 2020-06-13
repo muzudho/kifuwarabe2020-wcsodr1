@@ -7,7 +7,7 @@ use crate::cosmic::recording::{AddressPos1, History, Movement, Phase, PHASE_LEN,
 use crate::cosmic::smart::features::{DoubleFacedPiece, DoubleFacedPieceType};
 use crate::cosmic::smart::features::{HAND_MAX, PHYSICAL_PIECES_LEN};
 use crate::cosmic::smart::square::{
-    BOARD_MEMORY_AREA, FILE_1, FILE_10, RANK_1, RANK_10, SQUARE_NONE,
+    AbsoluteAddress2D, BOARD_MEMORY_AREA, FILE_1, FILE_10, RANK_1, RANK_10, SQUARE_NONE,
 };
 use crate::cosmic::toy_box::{GameTable, SquareType, UnifiedAddress, PIECE_LEN};
 use crate::law::speed_of_light::HandAddresses;
@@ -76,9 +76,7 @@ impl GameHashSeed {
         // 移動する駒。
         match move_.source.address {
             FireAddress::Board(src_sq) => {
-                let source_piece = table
-                    .piece_at1(UnifiedAddress::from_fire(&move_.source).to_address_pos1())
-                    .unwrap() as usize;
+                let source_piece = table.piece_at1(&move_.source.address).unwrap() as usize;
                 // 移動前マスに、動かしたい駒があるときのハッシュ。
                 prev_hash ^= self.piece[src_sq.serial_number()][source_piece];
                 // 移動後マスに、動かしたい駒があるときのハッシュ。
@@ -110,9 +108,7 @@ impl GameHashSeed {
             }
         }
         // 移動先にある駒があれば
-        if let Some(dst_piece_val) =
-            table.piece_at1(UnifiedAddress::from_fire(&move_.destination).to_address_pos1())
-        {
+        if let Some(dst_piece_val) = table.piece_at1(&move_.destination.address) {
             match move_.destination.address {
                 FireAddress::Board(dst_sq) => {
                     prev_hash ^= self.piece[dst_sq.serial_number()][dst_piece_val as usize];
@@ -165,9 +161,9 @@ impl GameHashSeed {
         // 盤上の駒
         for rank in RANK_1..RANK_10 {
             for file in (FILE_1..FILE_10).rev() {
-                let sq = SquareType::from_file_rank(file, rank);
-                if let Some(piece_val) = table.piece_at1(AddressPos1::Board(sq)) {
-                    hash ^= self.piece[sq.to_serial_number()][piece_val as usize];
+                let sq = AbsoluteAddress2D::new(file, rank);
+                if let Some(piece_val) = table.piece_at1(&FireAddress::Board(sq)) {
+                    hash ^= self.piece[sq.serial_number()][piece_val as usize];
                 }
             }
         }
