@@ -21,8 +21,6 @@ lazy_static! {
 }
 
 struct ToyBox {
-    /// 駒→成駒　（成れない駒は、そのまま）
-    piece_promoted_table: [Piece; PIECE_LEN],
     /// 成駒→駒　（成っていない駒は、そのまま）
     piece_demoted_table: [Piece; PIECE_LEN],
     /// この駒を取ったら、先後が反転して、相手の駒になる、というリンクだぜ☆（＾～＾）
@@ -35,36 +33,6 @@ impl Default for ToyBox {
     fn default() -> Self {
         use crate::cosmic::toy_box::Piece::*;
         ToyBox {
-            piece_promoted_table: [
-                King1,           // King1
-                Dragon1,         // Rook1
-                Horse1,          // Bishop1
-                Gold1,           // Gold1
-                PromotedSilver1, // Silver1
-                PromotedKnight1, // Knight1
-                PromotedLance1,  // Lance1
-                PromotedPawn1,   // Pawn1
-                Dragon1,         // Dragon1
-                Horse1,          // Horse1
-                PromotedSilver1, // PromotedSilver1
-                PromotedKnight1, // PromotedKnight1
-                PromotedLance1,  // PromotedLance1
-                PromotedPawn1,   // PromotedPawn1
-                King2,           // King2
-                Dragon2,         // Rook2
-                Horse2,          // Bishop2
-                Gold2,           // Gold2
-                PromotedSilver2, // Silver2
-                PromotedKnight2, // Knight2
-                PromotedLance2,  // Lance2
-                PromotedPawn2,   // Pawn2
-                Dragon2,         // Dragon2
-                Horse2,          // Horse2
-                PromotedSilver2, // PromotedSilver2
-                PromotedKnight2, // PromotedKnight2
-                PromotedLance2,  // PromotedLance2
-                PromotedPawn2,   // PromotedPawn2
-            ],
             piece_demoted_table: [
                 King1,   // King1
                 Rook1,   // Rook1
@@ -245,15 +213,45 @@ impl Piece {
         }
     }
 
-    pub fn promoted(self) -> Piece {
-        TOY_BOX.piece_promoted_table[self as usize]
+    /// 駒→成駒　（成れない駒は、そのまま）
+    pub fn promoted(self) -> Self {
+        match self {
+            Piece::King1 => Piece::King1,
+            Piece::Rook1 => Piece::Dragon1,
+            Piece::Bishop1 => Piece::Horse1,
+            Piece::Gold1 => Piece::Gold1,
+            Piece::Silver1 => Piece::PromotedSilver1,
+            Piece::Knight1 => Piece::PromotedKnight1,
+            Piece::Lance1 => Piece::PromotedLance1,
+            Piece::Pawn1 => Piece::PromotedPawn1,
+            Piece::Dragon1 => Piece::Dragon1,
+            Piece::Horse1 => Piece::Horse1,
+            Piece::PromotedSilver1 => Piece::PromotedSilver1,
+            Piece::PromotedKnight1 => Piece::PromotedKnight1,
+            Piece::PromotedLance1 => Piece::PromotedLance1,
+            Piece::PromotedPawn1 => Piece::PromotedPawn1,
+            Piece::King2 => Piece::King2,
+            Piece::Rook2 => Piece::Dragon2,
+            Piece::Bishop2 => Piece::Horse2,
+            Piece::Gold2 => Piece::Gold2,
+            Piece::Silver2 => Piece::PromotedSilver2,
+            Piece::Knight2 => Piece::PromotedKnight2,
+            Piece::Lance2 => Piece::PromotedLance2,
+            Piece::Pawn2 => Piece::PromotedPawn2,
+            Piece::Dragon2 => Piece::Dragon2,
+            Piece::Horse2 => Piece::Horse2,
+            Piece::PromotedSilver2 => Piece::PromotedSilver2,
+            Piece::PromotedKnight2 => Piece::PromotedKnight2,
+            Piece::PromotedLance2 => Piece::PromotedLance2,
+            Piece::PromotedPawn2 => Piece::PromotedPawn2,
+        }
     }
 
-    pub fn demoted(self) -> Piece {
+    pub fn demoted(self) -> Self {
         TOY_BOX.piece_demoted_table[self as usize]
     }
 
-    pub fn captured(self) -> Piece {
+    pub fn captured(self) -> Self {
         TOY_BOX.piece_captured_table[self as usize]
     }
 

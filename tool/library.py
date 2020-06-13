@@ -14,3 +14,20 @@ piece_types = [
     'PromotedLance',
     'PromotedPawn',
 ]
+
+promoted_piece_types = [
+    'King',
+    'Dragon',
+    'Horse',
+    'Gold',
+    'PromotedSilver',
+    'PromotedKnight',
+    'PromotedLance',
+    'PromotedPawn',
+    'Dragon',
+    'Horse',
+    'PromotedSilver',
+    'PromotedKnight',
+    'PromotedLance',
+    'PromotedPawn',
+]
