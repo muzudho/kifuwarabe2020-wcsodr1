@@ -21,8 +21,6 @@ lazy_static! {
 }
 
 struct ToyBox {
-    /// 成駒→駒　（成っていない駒は、そのまま）
-    piece_demoted_table: [Piece; PIECE_LEN],
     /// この駒を取ったら、先後が反転して、相手の駒になる、というリンクだぜ☆（＾～＾）
     /// 探索部では、玉のような取れない駒も　らいおんきゃっち　しているので、玉も取れるように作っておけだぜ☆（＾～＾）
     piece_captured_table: [Piece; PIECE_LEN],
@@ -33,36 +31,6 @@ impl Default for ToyBox {
     fn default() -> Self {
         use crate::cosmic::toy_box::Piece::*;
         ToyBox {
-            piece_demoted_table: [
-                King1,   // King1
-                Rook1,   // Rook1
-                Bishop1, // Bishop1
-                Gold1,   // Gold1
-                Silver1, // Silver1
-                Knight1, // Knight1
-                Lance1,  // Lance1
-                Pawn1,   // Pawn1
-                Rook1,   // Dragon1
-                Bishop1, // Horse1
-                Silver1, // PromotedSilver1
-                Knight1, // PromotedKnight1
-                Lance1,  // PromotedLance1
-                Pawn1,   // PromotedPawn1
-                King2,   // King2
-                Rook2,   // Rook2
-                Bishop2, // Bishop2
-                Gold2,   // Gold2
-                Silver2, // Silver2
-                Knight2, // Knight2
-                Lance2,  // Lance2
-                Pawn2,   // Pawn2
-                Rook2,   // Dragon2
-                Bishop2, // Horse2
-                Silver2, // PromotedSilver2
-                Knight2, // PromotedKnight2
-                Lance2,  // PromotedLance2
-                Pawn2,   // PromotedPawn2
-            ],
             piece_captured_table: [
                 King2,   // King1
                 Rook2,   // Rook1
@@ -247,8 +215,38 @@ impl Piece {
         }
     }
 
+    /// 成駒→駒　（成っていない駒は、そのまま）
     pub fn demoted(self) -> Self {
-        TOY_BOX.piece_demoted_table[self as usize]
+        match self {
+            Piece::King1 => Piece::King1,
+            Piece::Rook1 => Piece::Rook1,
+            Piece::Bishop1 => Piece::Bishop1,
+            Piece::Gold1 => Piece::Gold1,
+            Piece::Silver1 => Piece::Silver1,
+            Piece::Knight1 => Piece::Knight1,
+            Piece::Lance1 => Piece::Lance1,
+            Piece::Pawn1 => Piece::Pawn1,
+            Piece::Dragon1 => Piece::Rook1,
+            Piece::Horse1 => Piece::Bishop1,
+            Piece::PromotedSilver1 => Piece::Silver1,
+            Piece::PromotedKnight1 => Piece::Knight1,
+            Piece::PromotedLance1 => Piece::Lance1,
+            Piece::PromotedPawn1 => Piece::Pawn1,
+            Piece::King2 => Piece::King2,
+            Piece::Rook2 => Piece::Rook2,
+            Piece::Bishop2 => Piece::Bishop2,
+            Piece::Gold2 => Piece::Gold2,
+            Piece::Silver2 => Piece::Silver2,
+            Piece::Knight2 => Piece::Knight2,
+            Piece::Lance2 => Piece::Lance2,
+            Piece::Pawn2 => Piece::Pawn2,
+            Piece::Dragon2 => Piece::Rook2,
+            Piece::Horse2 => Piece::Bishop2,
+            Piece::PromotedSilver2 => Piece::Silver2,
+            Piece::PromotedKnight2 => Piece::Knight2,
+            Piece::PromotedLance2 => Piece::Lance2,
+            Piece::PromotedPawn2 => Piece::Pawn2,
+        }
     }
 
     pub fn captured(self) -> Self {

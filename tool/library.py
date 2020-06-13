@@ -31,3 +31,20 @@ promoted_piece_types = [
     'PromotedLance',
     'PromotedPawn',
 ]
+
+demoted_piece_types = [
+    'King',
+    'Rook',
+    'Bishop',
+    'Gold',
+    'Silver',
+    'Knight',
+    'Lance',
+    'Pawn',
+    'Rook',
+    'Bishop',
+    'Silver',
+    'Knight',
+    'Lance',
+    'Pawn',
+]
