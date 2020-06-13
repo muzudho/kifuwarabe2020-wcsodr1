@@ -5,9 +5,8 @@
 ## 直近のTODO
 
 * [ ] できれば、「自分の盤上の駒」「自分の持ち駒」「相手の盤上の駒」「相手の持ち駒」の４チャンネルでミーシーに分けておけないか☆（＾～＾）？
-  * [ ] MoveEnd型を準備☆（＾～＾）
-    * [ ] MoveEnd型に入っている Phase型を外したいぜ☆（＾～＾）
-  * [ ] Movement型に 駒の背番号を入れたいぜ☆（＾～＾）
+  * [ ] FireAddress型を準備☆（＾～＾）
+  * [ ] Movement型に 駒の背番号を入れる準備中☆（＾～＾）
 * [x] 最大手数 320 か 512 か☆（＾～＾）
 * [x] 指し手の AbsoluteAddress と PhisicalPieceType を共有する型 AddressTypeOfPosition を作る。
 * [x] タイムマン(^_^)
