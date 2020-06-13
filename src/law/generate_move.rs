@@ -105,12 +105,8 @@ impl PseudoLegalMoves {
                 FireAddress::Board(_src_sq) => {
                     PseudoLegalMoves::start_on_board(src_fire, src_piece_type, table, listen_move)
                 }
-                FireAddress::Hand(drop_type) => {
-                    PseudoLegalMoves::make_drop(
-                        DoubleFacedPiece::from_phase_and_type(src_fire.friend, drop_type),
-                        table,
-                        listen_move,
-                    );
+                FireAddress::Hand(_drop_type) => {
+                    PseudoLegalMoves::make_drop(src_fire, table, listen_move);
                 }
             },
         );
@@ -244,67 +240,69 @@ impl PseudoLegalMoves {
     /// * `table` - 現局面の盤上だぜ☆（＾～＾）
     /// * `listen_move` - 指し手を受け取れだぜ☆（＾～＾）
     /// * `listen_control` - 利きを受け取れだぜ☆（＾～＾）
-    fn make_drop<F1>(drop: DoubleFacedPiece, table: &GameTable, listen_move: &mut F1)
+    fn make_drop<F1>(fire: &Fire, table: &GameTable, listen_move: &mut F1)
     where
         F1: FnMut(Movement),
     {
-        let friend = drop.phase();
-        if let Some((piece_type, hand_addr)) =
-            table.last_hand(&Fire::new_hand(drop.phase(), drop.type_()))
-        {
-            // 打つぜ☆（＾～＾）
-            let drop_fn = &mut |destination: &Fire| {
-                if let None = table.piece_num_at(&destination.address) {
-                    // 駒が無いところに打つ
-                    use crate::cosmic::smart::features::PieceType::*;
-                    match piece_type {
-                        Pawn => {
-                            match destination.address {
-                                FireAddress::Board(sq) => {
-                                    // ひよこ　は２歩できない☆（＾～＾
-                                    if table.exists_pawn_on_file(friend, sq.file) {
-                                        return;
+        match fire.address {
+            FireAddress::Board(_sq) => panic!(Beam::trouble(&format!(
+                "(Err.641) 盤上は未対応☆（＾～＾）！",
+            ))),
+            FireAddress::Hand(drop_type) => {
+                if let Some((piece_type, hand_addr)) = table.last_hand(fire) {
+                    // 打つぜ☆（＾～＾）
+                    let drop_fn = &mut |destination: &Fire| {
+                        if let None = table.piece_num_at(&destination.address) {
+                            // 駒が無いところに打つ
+                            use crate::cosmic::smart::features::PieceType::*;
+                            match piece_type {
+                                Pawn => {
+                                    match destination.address {
+                                        FireAddress::Board(sq) => {
+                                            // ひよこ　は２歩できない☆（＾～＾
+                                            if table.exists_pawn_on_file(fire.friend, sq.file) {
+                                                return;
+                                            }
+                                        }
+                                        _ => panic!(Beam::trouble(&format!(
+                                            "(Err.641) 盤上じゃなかったぜ☆（＾～＾）！",
+                                        ))),
                                     }
                                 }
-                                _ => panic!(Beam::trouble(&format!(
-                                    "(Err.641) 盤上じゃなかったぜ☆（＾～＾）！",
-                                ))),
+                                _ => {}
+                            }
+                            listen_move(Movement::new(
+                                hand_addr.to_fire(), // 打った駒種類
+                                *destination,        // どの升へ行きたいか
+                                false,               // 打に成りは無し
+                                None,                // 打で取れる駒無し
+                            ));
+                        }
+                    };
+                    // 駒を持っていれば
+                    use crate::cosmic::smart::features::DoubleFacedPieceType::*;
+                    match drop_type {
+                        // 歩、香
+                        Pawn | Lance => {
+                            // 先手から見た歩、香車の打てる面積だぜ☆（＾～＾）
+                            for sq in table.area.drop_pawn_lance[fire.friend as usize].iter() {
+                                drop_fn(sq);
                             }
                         }
-                        _ => {}
-                    }
-                    listen_move(Movement::new(
-                        hand_addr.to_fire(), // 打った駒種類
-                        *destination,        // どの升へ行きたいか
-                        false,               // 打に成りは無し
-                        None,                // 打で取れる駒無し
-                    ));
-                }
-            };
-
-            // 駒を持っていれば
-            let ty = drop.type_();
-            use crate::cosmic::smart::features::DoubleFacedPieceType::*;
-            match ty {
-                // 歩、香
-                Pawn | Lance => {
-                    // 先手から見た歩、香車の打てる面積だぜ☆（＾～＾）
-                    for sq in table.area.drop_pawn_lance[friend as usize].iter() {
-                        drop_fn(sq);
-                    }
-                }
-                // 桂
-                Knight => {
-                    // 先手から見た桂馬の打てる面積だぜ☆（＾～＾）
-                    for sq in table.area.drop_knight[friend as usize].iter() {
-                        drop_fn(sq);
-                    }
-                }
-                // それ以外の駒が打てる範囲は盤面全体。
-                _ => {
-                    // 全升の面積だぜ☆（＾～＾）駒を打つときに使うぜ☆（＾～＾）
-                    for sq in table.area.all_squares[friend as usize].iter() {
-                        drop_fn(sq);
+                        // 桂
+                        Knight => {
+                            // 先手から見た桂馬の打てる面積だぜ☆（＾～＾）
+                            for sq in table.area.drop_knight[fire.friend as usize].iter() {
+                                drop_fn(sq);
+                            }
+                        }
+                        // それ以外の駒が打てる範囲は盤面全体。
+                        _ => {
+                            // 全升の面積だぜ☆（＾～＾）駒を打つときに使うぜ☆（＾～＾）
+                            for sq in table.area.all_squares[fire.friend as usize].iter() {
+                                drop_fn(sq);
+                            }
+                        }
                     }
                 }
             }
