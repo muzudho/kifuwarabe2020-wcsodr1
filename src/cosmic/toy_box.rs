@@ -21,7 +21,6 @@ lazy_static! {
 }
 
 struct ToyBox {
-    piece_to_phase_table: [Phase; PIECE_LEN],
     piece_type_table: [PieceType; PIECE_LEN],
     /// 駒→成駒　（成れない駒は、そのまま）
     piece_promoted_table: [Piece; PIECE_LEN],
@@ -35,40 +34,9 @@ struct ToyBox {
 }
 impl Default for ToyBox {
     fn default() -> Self {
-        use crate::cosmic::recording::Phase::*;
         use crate::cosmic::smart::features::PieceType::*;
         use crate::cosmic::toy_box::Piece::*;
         ToyBox {
-            piece_to_phase_table: [
-                First,  // King1
-                First,  // Rook1
-                First,  // Bishop1
-                First,  // Gold1
-                First,  // Silver1
-                First,  // Knight1
-                First,  // Lance1
-                First,  // Pawn1
-                First,  // Dragon1
-                First,  // Horse1
-                First,  // PromotedSilver1
-                First,  // PromotedKnight1
-                First,  // PromotedLance1
-                First,  // PromotedPawn1
-                Second, // King2
-                Second, // Rook2
-                Second, // Bishop2
-                Second, // Gold2
-                Second, // Silver2
-                Second, // Knight2
-                Second, // Lance2
-                Second, // Pawn2
-                Second, // Dragon2
-                Second, // Horse2
-                Second, // PromotedSilver2
-                Second, // PromotedKnight2
-                Second, // PromotedLance2
-                Second, // PromotedPawn2
-            ],
             piece_type_table: [
                 King,           // King1
                 Rook,           // Rook1
@@ -244,7 +212,36 @@ impl Default for ToyBox {
 /// コーディングを短くするためのものだぜ☆（＾～＾）
 impl Piece {
     pub fn phase(self) -> Phase {
-        TOY_BOX.piece_to_phase_table[self as usize]
+        match self {
+            Piece::King1 => Phase::First,
+            Piece::Rook1 => Phase::First,
+            Piece::Bishop1 => Phase::First,
+            Piece::Gold1 => Phase::First,
+            Piece::Silver1 => Phase::First,
+            Piece::Knight1 => Phase::First,
+            Piece::Lance1 => Phase::First,
+            Piece::Pawn1 => Phase::First,
+            Piece::Dragon1 => Phase::First,
+            Piece::Horse1 => Phase::First,
+            Piece::PromotedSilver1 => Phase::First,
+            Piece::PromotedKnight1 => Phase::First,
+            Piece::PromotedLance1 => Phase::First,
+            Piece::PromotedPawn1 => Phase::First,
+            Piece::King2 => Phase::Second,
+            Piece::Rook2 => Phase::Second,
+            Piece::Bishop2 => Phase::Second,
+            Piece::Gold2 => Phase::Second,
+            Piece::Silver2 => Phase::Second,
+            Piece::Knight2 => Phase::Second,
+            Piece::Lance2 => Phase::Second,
+            Piece::Pawn2 => Phase::Second,
+            Piece::Dragon2 => Phase::Second,
+            Piece::Horse2 => Phase::Second,
+            Piece::PromotedSilver2 => Phase::Second,
+            Piece::PromotedKnight2 => Phase::Second,
+            Piece::PromotedLance2 => Phase::Second,
+            Piece::PromotedPawn2 => Phase::Second,
+        }
     }
 
     pub fn type_(self) -> PieceType {
@@ -835,8 +832,7 @@ impl GameTable {
                 let piece_num = self.board[sq.serial_number() as usize];
                 if let Some(piece_num_val) = piece_num {
                     table
-                        .get_double_faced_piece(piece_num_val)
-                        .type_()
+                        .get_double_faced_piece_type(piece_num_val)
                         .promotion_value()
                 } else {
                     // 打なら成りは無いぜ☆（＾～＾）

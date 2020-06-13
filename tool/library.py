@@ -1,0 +1,16 @@
+piece_types = [
+    'King',
+    'Rook',
+    'Bishop',
+    'Gold',
+    'Silver',
+    'Knight',
+    'Lance',
+    'Pawn',
+    'Dragon',
+    'Horse',
+    'PromotedSilver',
+    'PromotedKnight',
+    'PromotedLance',
+    'PromotedPawn',
+]
