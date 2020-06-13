@@ -76,13 +76,15 @@ impl GameHashSeed {
         // 移動する駒。
         match move_.source.address {
             FireAddress::Board(src_sq) => {
-                let source_piece = table.piece_at1(&move_.source.address).unwrap() as usize;
+                let src_piece_hash_index = table
+                    .get_piece_board_hash_index(&move_.source.address)
+                    .unwrap();
                 // 移動前マスに、動かしたい駒があるときのハッシュ。
-                prev_hash ^= self.piece[src_sq.serial_number()][source_piece];
+                prev_hash ^= self.piece[src_sq.serial_number()][src_piece_hash_index];
                 // 移動後マスに、動かしたい駒があるときのハッシュ。
                 match move_.destination.address {
                     FireAddress::Board(dst_sq) => {
-                        prev_hash ^= self.piece[dst_sq.serial_number()][source_piece];
+                        prev_hash ^= self.piece[dst_sq.serial_number()][src_piece_hash_index];
                     }
                     FireAddress::Hand(_dst_drop_type) => {
                         panic!(Beam::trouble("(Err.90) 未対応☆（＾～＾）"))
@@ -166,8 +168,10 @@ impl GameHashSeed {
         for rank in RANK_1..RANK_10 {
             for file in (FILE_1..FILE_10).rev() {
                 let sq = AbsoluteAddress2D::new(file, rank);
-                if let Some(piece_val) = table.piece_at1(&FireAddress::Board(sq)) {
-                    hash ^= self.piece[sq.serial_number()][piece_val as usize];
+                if let Some(piece_hash_index) =
+                    table.get_piece_board_hash_index(&FireAddress::Board(sq))
+                {
+                    hash ^= self.piece[sq.serial_number()][piece_hash_index];
                 }
             }
         }

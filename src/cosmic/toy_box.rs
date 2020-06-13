@@ -495,6 +495,21 @@ impl GameTable {
             ))),
         }
     }
+    /// ハッシュを作るときに利用。盤上専用。
+    pub fn get_piece_board_hash_index(&self, addr: &FireAddress) -> Option<usize> {
+        match addr {
+            FireAddress::Board(sq) => {
+                if let Some(piece_num) = self.board[sq.serial_number() as usize] {
+                    Some(self.piece_list[piece_num as usize] as usize)
+                } else {
+                    None
+                }
+            }
+            FireAddress::Hand(_drop_type) => panic!(Beam::trouble(&format!(
+                "(Err.345) 駒台は非対応☆（＾～＾）！",
+            ))),
+        }
+    }
     /// TODO Piece をカプセル化したい。外に出したくないぜ☆（＾～＾）
     /// 升で指定して駒を取得。
     /// 駒台には対応してない。 -> 何に使っている？
