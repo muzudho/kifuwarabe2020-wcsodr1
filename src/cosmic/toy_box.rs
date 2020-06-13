@@ -17,6 +17,7 @@ use std::*;
 
 pub const PIECE_LEN: usize = 28;
 
+/// TODO toy_boxの中にカプセル化したい。
 /// 先後付きの駒と空白。
 /// 接尾辞の 1 は先手、 2 は後手。
 ///
@@ -470,30 +471,14 @@ impl GameTable {
     /// 歩が置いてあるか確認
     pub fn exists_pawn_on_file(&self, friend: Phase, file: usize) -> bool {
         for rank in RANK_1..RANK_10 {
-            if let Some(piece_val) =
-                self.piece_at1(&FireAddress::Board(AbsoluteAddress2D::new(file, rank)))
+            if let Some(piece_num) =
+                self.piece_num_at(&FireAddress::Board(AbsoluteAddress2D::new(file, rank)))
             {
-                if piece_val.phase() == friend && piece_val.type_() == PieceType::Pawn {
-                    return true;
-                }
+                return self.get_phase(piece_num) == friend
+                    && self.get_type(piece_num) == PieceType::Pawn;
             }
         }
         false
-    }
-    /// ハッシュを作るときにも利用。盤上専用。
-    pub fn piece_at1(&self, addr: &FireAddress) -> Option<Piece> {
-        match addr {
-            FireAddress::Board(sq) => {
-                if let Some(piece_num) = self.board[sq.serial_number() as usize] {
-                    Some(self.get_piece(piece_num))
-                } else {
-                    None
-                }
-            }
-            FireAddress::Hand(_drop_type) => panic!(Beam::trouble(&format!(
-                "(Err.345) 駒台は非対応☆（＾～＾）！",
-            ))),
-        }
     }
     /// ハッシュを作るときに利用。盤上専用。
     pub fn get_piece_board_hash_index(&self, addr: &FireAddress) -> Option<usize> {

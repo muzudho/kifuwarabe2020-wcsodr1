@@ -110,22 +110,26 @@ impl GameHashSeed {
             }
         }
         // 移動先に駒があれば、自分の持ち駒になります。
-        if let Some(dst_piece_val) = table.piece_at1(&move_.destination.address) {
-            match move_.destination.address {
-                FireAddress::Board(dst_sq) => {
-                    // 移動先に駒があるケースの消去
-                    prev_hash ^= self.piece[dst_sq.serial_number()][dst_piece_val as usize];
-                    // 自分の持ち駒になるケースの追加
-                    let double_faced_piece = dst_piece_val.double_faced_piece();
-                    let count = table.count_hand(&Fire::new_hand(
-                        history.get_friend(),
-                        double_faced_piece.type_(),
-                    ));
-                    // 打つ前の駒の枚数のハッシュ。
-                    prev_hash ^= self.hands[double_faced_piece as usize][count as usize + 1];
-                }
-                FireAddress::Hand(_dst_drop_type) => {
-                    panic!(Beam::trouble("(Err.90) 未対応☆（＾～＾）"))
+        if let Some(dst_piece_num) = table.piece_num_at(&move_.destination.address) {
+            if let Some(dst_piece_hash_index) =
+                table.get_piece_board_hash_index(&move_.destination.address)
+            {
+                match move_.destination.address {
+                    FireAddress::Board(dst_sq) => {
+                        // 移動先に駒があるケースの消去
+                        prev_hash ^= self.piece[dst_sq.serial_number()][dst_piece_hash_index];
+                        // 自分の持ち駒になるケースの追加
+                        let double_faced_piece = table.get_double_faced_piece(dst_piece_num);
+                        let count = table.count_hand(&Fire::new_hand(
+                            history.get_friend(),
+                            double_faced_piece.type_(),
+                        ));
+                        // 打つ前の駒の枚数のハッシュ。
+                        prev_hash ^= self.hands[double_faced_piece as usize][count as usize + 1];
+                    }
+                    FireAddress::Hand(_dst_drop_type) => {
+                        panic!(Beam::trouble("(Err.90) 未対応☆（＾～＾）"))
+                    }
                 }
             }
         }
