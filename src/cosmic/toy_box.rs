@@ -15,6 +15,239 @@ use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 use std::*;
 
+lazy_static! {
+    static ref TOY_BOX: ToyBox = ToyBox::default();
+}
+
+struct ToyBox {
+    piece_to_phase_table: [Phase; PIECE_LEN],
+    piece_type_table: [PieceType; PIECE_LEN],
+    /// 駒→成駒　（成れない駒は、そのまま）
+    piece_promoted_table: [Piece; PIECE_LEN],
+    /// 成駒→駒　（成っていない駒は、そのまま）
+    piece_demoted_table: [Piece; PIECE_LEN],
+    /// この駒を取ったら、先後が反転して、相手の駒になる、というリンクだぜ☆（＾～＾）
+    /// 探索部では、玉のような取れない駒も　らいおんきゃっち　しているので、玉も取れるように作っておけだぜ☆（＾～＾）
+    piece_captured_table: [Piece; PIECE_LEN],
+    piece_double_faced_table: [DoubleFacedPiece; PIECE_LEN],
+}
+impl Default for ToyBox {
+    fn default() -> Self {
+        use crate::cosmic::recording::Phase::*;
+        use crate::cosmic::smart::features::PieceType::*;
+        use crate::cosmic::toy_box::Piece::*;
+        ToyBox {
+            piece_to_phase_table: [
+                First,  // King1
+                First,  // Rook1
+                First,  // Bishop1
+                First,  // Gold1
+                First,  // Silver1
+                First,  // Knight1
+                First,  // Lance1
+                First,  // Pawn1
+                First,  // Dragon1
+                First,  // Horse1
+                First,  // PromotedSilver1
+                First,  // PromotedKnight1
+                First,  // PromotedLance1
+                First,  // PromotedPawn1
+                Second, // King2
+                Second, // Rook2
+                Second, // Bishop2
+                Second, // Gold2
+                Second, // Silver2
+                Second, // Knight2
+                Second, // Lance2
+                Second, // Pawn2
+                Second, // Dragon2
+                Second, // Horse2
+                Second, // PromotedSilver2
+                Second, // PromotedKnight2
+                Second, // PromotedLance2
+                Second, // PromotedPawn2
+            ],
+            piece_type_table: [
+                King,           // King1
+                Rook,           // Rook1
+                Bishop,         // Bishop1
+                Gold,           // Gold1
+                Silver,         // Silver1
+                Knight,         // Knight1
+                Lance,          // Lance1
+                Pawn,           // Pawn1
+                Dragon,         // Dragon1
+                Horse,          // Horse1
+                PromotedSilver, // PromotedSilver1
+                PromotedKnight, // PromotedKnight1
+                PromotedLance,  // PromotedLance1
+                PromotedPawn,   // PromotedPawn1
+                King,           // King2
+                Rook,           // Rook2
+                Bishop,         // Bishop2
+                Gold,           // Gold2
+                Silver,         // Silver2
+                Knight,         // Knight2
+                Lance,          // Lance2
+                Pawn,           // Pawn2
+                Dragon,         // Dragon2
+                Horse,          // Horse2
+                PromotedSilver, // PromotedSilver2
+                PromotedKnight, // PromotedKnight2
+                PromotedLance,  // PromotedLance2
+                PromotedPawn,   // PromotedPawn2
+            ],
+            piece_promoted_table: [
+                King1,           // King1
+                Dragon1,         // Rook1
+                Horse1,          // Bishop1
+                Gold1,           // Gold1
+                PromotedSilver1, // Silver1
+                PromotedKnight1, // Knight1
+                PromotedLance1,  // Lance1
+                PromotedPawn1,   // Pawn1
+                Dragon1,         // Dragon1
+                Horse1,          // Horse1
+                PromotedSilver1, // PromotedSilver1
+                PromotedKnight1, // PromotedKnight1
+                PromotedLance1,  // PromotedLance1
+                PromotedPawn1,   // PromotedPawn1
+                King2,           // King2
+                Dragon2,         // Rook2
+                Horse2,          // Bishop2
+                Gold2,           // Gold2
+                PromotedSilver2, // Silver2
+                PromotedKnight2, // Knight2
+                PromotedLance2,  // Lance2
+                PromotedPawn2,   // Pawn2
+                Dragon2,         // Dragon2
+                Horse2,          // Horse2
+                PromotedSilver2, // PromotedSilver2
+                PromotedKnight2, // PromotedKnight2
+                PromotedLance2,  // PromotedLance2
+                PromotedPawn2,   // PromotedPawn2
+            ],
+            piece_demoted_table: [
+                King1,   // King1
+                Rook1,   // Rook1
+                Bishop1, // Bishop1
+                Gold1,   // Gold1
+                Silver1, // Silver1
+                Knight1, // Knight1
+                Lance1,  // Lance1
+                Pawn1,   // Pawn1
+                Rook1,   // Dragon1
+                Bishop1, // Horse1
+                Silver1, // PromotedSilver1
+                Knight1, // PromotedKnight1
+                Lance1,  // PromotedLance1
+                Pawn1,   // PromotedPawn1
+                King2,   // King2
+                Rook2,   // Rook2
+                Bishop2, // Bishop2
+                Gold2,   // Gold2
+                Silver2, // Silver2
+                Knight2, // Knight2
+                Lance2,  // Lance2
+                Pawn2,   // Pawn2
+                Rook2,   // Dragon2
+                Bishop2, // Horse2
+                Silver2, // PromotedSilver2
+                Knight2, // PromotedKnight2
+                Lance2,  // PromotedLance2
+                Pawn2,   // PromotedPawn2
+            ],
+            piece_captured_table: [
+                King2,   // King1
+                Rook2,   // Rook1
+                Bishop2, // Bishop1
+                Gold2,   // Gold1
+                Silver2, // Silver1
+                Knight2, // Knight1
+                Lance2,  // Lance1
+                Pawn2,   // Pawn1
+                Rook2,   // Dragon1
+                Bishop2, // Horse1
+                Silver2, // PromotedSilver1
+                Knight2, // PromotedKnight1
+                Lance2,  // PromotedLance1
+                Pawn2,   // PromotedPawn1
+                King1,   // King2
+                Rook1,   // Rook2
+                Bishop1, // Bishop2
+                Gold1,   // Gold2
+                Silver1, // Silver2
+                Knight1, // Knight2
+                Lance1,  // Lance2
+                Pawn1,   // Pawn2
+                Rook1,   // Dragon2
+                Bishop1, // Horse2
+                Silver1, // PromotedSilver2
+                Knight1, // PromotedKnight2
+                Lance1,  // PromotedLance2
+                Pawn1,   // PromotedPawn2
+            ],
+            piece_double_faced_table: [
+                DoubleFacedPiece::King1,   // King1
+                DoubleFacedPiece::Rook1,   // Rook1
+                DoubleFacedPiece::Bishop1, // Bishop1
+                DoubleFacedPiece::Gold1,   // Gold1
+                DoubleFacedPiece::Silver1, // Silver1
+                DoubleFacedPiece::Knight1, // Knight1
+                DoubleFacedPiece::Lance1,  // Lance1
+                DoubleFacedPiece::Pawn1,   // Pawn1
+                DoubleFacedPiece::Rook1,   // Dragon1
+                DoubleFacedPiece::Bishop1, // Horse1
+                DoubleFacedPiece::Silver1, // PromotedSilver1
+                DoubleFacedPiece::Knight1, // PromotedKnight1
+                DoubleFacedPiece::Lance1,  // PromotedLance1
+                DoubleFacedPiece::Pawn1,   // PromotedPawn1
+                DoubleFacedPiece::King2,   // King2
+                DoubleFacedPiece::Rook2,   // Rook2
+                DoubleFacedPiece::Bishop2, // Bishop2
+                DoubleFacedPiece::Gold2,   // Gold2
+                DoubleFacedPiece::Silver2, // Silver2
+                DoubleFacedPiece::Knight2, // Knight2
+                DoubleFacedPiece::Lance2,  // Lance2
+                DoubleFacedPiece::Pawn2,   // Pawn2
+                DoubleFacedPiece::Rook2,   // Dragon2
+                DoubleFacedPiece::Bishop2, // Horse2
+                DoubleFacedPiece::Silver2, // PromotedSilver2
+                DoubleFacedPiece::Knight2, // PromotedKnight2
+                DoubleFacedPiece::Lance2,  // PromotedLance2
+                DoubleFacedPiece::Pawn2,   // PromotedPawn2
+            ],
+        }
+    }
+}
+
+/// コーディングを短くするためのものだぜ☆（＾～＾）
+impl Piece {
+    pub fn phase(self) -> Phase {
+        TOY_BOX.piece_to_phase_table[self as usize]
+    }
+
+    pub fn type_(self) -> PieceType {
+        TOY_BOX.piece_type_table[self as usize]
+    }
+
+    pub fn promoted(self) -> Piece {
+        TOY_BOX.piece_promoted_table[self as usize]
+    }
+
+    pub fn demoted(self) -> Piece {
+        TOY_BOX.piece_demoted_table[self as usize]
+    }
+
+    pub fn captured(self) -> Piece {
+        TOY_BOX.piece_captured_table[self as usize]
+    }
+
+    pub fn double_faced_piece(self) -> DoubleFacedPiece {
+        TOY_BOX.piece_double_faced_table[self as usize]
+    }
+}
+
 pub const PIECE_LEN: usize = 28;
 
 /// TODO toy_boxの中にカプセル化したい。
