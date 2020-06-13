@@ -622,10 +622,7 @@ impl GameTable {
             self.turn_phase(collision_piece_num_val);
             self.push_piece(
                 friend,
-                &MoveEnd::new_hand(
-                    friend,
-                    self.get_double_faced_piece_type(collision_piece_num_val),
-                ),
+                &MoveEnd::new_hand(self.get_double_faced_piece_type(collision_piece_num_val)),
                 Some(collision_piece_num_val),
             );
         }
@@ -646,7 +643,7 @@ impl GameTable {
                     friend,
                     piece_type.double_faced_piece_type(),
                 );
-                let fire1 = MoveEnd::new_hand(friend, double_faced_piece.type_());
+                let fire1 = MoveEnd::new_hand(double_faced_piece.type_());
                 self.pop_piece(friend, &fire1).unwrap()
             };
             // 先後をひっくり返す。
@@ -670,14 +667,10 @@ impl GameTable {
                     // マスに駒を置きます。
                     self.board[sq.serial_number() as usize] = piece_num;
                     // データベース
-                    self.phase_classification.push(
-                        friend,
-                        &MoveEnd::new_board(friend, sq),
-                        piece_num_val,
-                    );
+                    self.phase_classification
+                        .push(friend, &MoveEnd::new_board(sq), piece_num_val);
                     // 背番号に番地を紐づけます。
-                    self.address_list[piece_num_val as usize] =
-                        MoveEnd::new_board(self.get_phase(piece_num_val), sq);
+                    self.address_list[piece_num_val as usize] = MoveEnd::new_board(sq);
                 } else {
                     // マスを空にします。
                     self.board[sq.serial_number() as usize] = None;
@@ -688,7 +681,7 @@ impl GameTable {
                     // 持ち駒を１つ増やします。
                     self.phase_classification.push(
                         friend,
-                        &MoveEnd::new_hand(friend, drop_type),
+                        &MoveEnd::new_hand(drop_type),
                         piece_num_val,
                     );
                     // 背番号に番地を紐づけます。
@@ -728,10 +721,7 @@ impl GameTable {
         // 駒に背番号を付けるぜ☆（＾～＾）
         let piece_num = self.numbering_piece(friend, piece_type);
         // 駒台に置くぜ☆（＾～＾）
-        let drop = MoveEnd::new_hand(
-            self.get_phase(piece_num),
-            self.get_double_faced_piece_type(piece_num),
-        );
+        let drop = MoveEnd::new_hand(self.get_double_faced_piece_type(piece_num));
         self.push_piece(friend, &drop, Some(piece_num));
     }
 
@@ -880,12 +870,12 @@ impl GameTable {
             FireAddress::Hand(drop_type) => {
                 if let Some(piece_num) = self
                     .phase_classification
-                    .last(friend, &MoveEnd::new_hand(friend, drop_type))
+                    .last(friend, &MoveEnd::new_hand(drop_type))
                 {
                     let piece = self.piece_list[piece_num as usize];
                     Some((
                         piece.type_(),
-                        MoveEnd::new_hand(friend, piece.double_faced_piece().type_()),
+                        MoveEnd::new_hand(piece.double_faced_piece().type_()),
                     ))
                 } else {
                     None
@@ -900,7 +890,7 @@ impl GameTable {
             }
             FireAddress::Hand(drop_type) => self
                 .phase_classification
-                .len(friend, &MoveEnd::new_hand(friend, drop_type)),
+                .len(friend, &MoveEnd::new_hand(drop_type)),
         }
     }
 
@@ -970,9 +960,9 @@ impl GameTable {
             ],
         ];
         for drop in &FIRST_SECOND[friend as usize] {
-            let fire = &MoveEnd::new_hand(friend, drop.type_());
+            let fire = &MoveEnd::new_hand(drop.type_());
             if !self.is_empty_hand(friend, fire) {
-                piece_get(&MoveEnd::new_hand(drop.phase(), drop.type_())); // TODO この fire は使い回せないのかだぜ☆（＾～＾）？
+                piece_get(&MoveEnd::new_hand(drop.type_())); // TODO この fire は使い回せないのかだぜ☆（＾～＾）？
             }
         }
     }

@@ -184,7 +184,6 @@ impl PseudoLegalMoves {
                                             Some(CapturedMove::new(
                                                 *destination,
                                                 MoveEnd::new_hand(
-                                                    friend,
                                                     table
                                                         .get_double_faced_piece_type(piece_num_val),
                                                 ),
@@ -203,7 +202,6 @@ impl PseudoLegalMoves {
                                         Some(CapturedMove::new(
                                             *destination,
                                             MoveEnd::new_hand(
-                                                friend,
                                                 table.get_double_faced_piece_type(piece_num_val),
                                             ),
                                         ))
@@ -224,7 +222,6 @@ impl PseudoLegalMoves {
                                             Some(CapturedMove::new(
                                                 *destination,
                                                 MoveEnd::new_hand(
-                                                    friend,
                                                     table
                                                         .get_double_faced_piece_type(piece_num_val),
                                                 ),
@@ -318,7 +315,7 @@ impl Default for Area {
             let mut i = 0;
             for file in FILE1U8..FILE10U8 {
                 for rank in RANK1U8..RANK10U8 {
-                    v[i] = MoveEnd::new_board(Phase::First, AbsoluteAddress2D::new(file, rank));
+                    v[i] = MoveEnd::new_board(AbsoluteAddress2D::new(file, rank));
                     i += 1;
                 }
             }
@@ -329,7 +326,7 @@ impl Default for Area {
             let mut i = 0;
             for file in FILE1U8..FILE10U8 {
                 for rank in RANK1U8..RANK10U8 {
-                    v[i] = MoveEnd::new_board(Phase::Second, AbsoluteAddress2D::new(file, rank));
+                    v[i] = MoveEnd::new_board(AbsoluteAddress2D::new(file, rank));
                     i += 1;
                 }
             }
@@ -340,7 +337,7 @@ impl Default for Area {
             let mut i = 0;
             for rank in RANK2U8..RANK10U8 {
                 for file in (FILE1U8..FILE10U8).rev() {
-                    v[i] = MoveEnd::new_board(Phase::First, AbsoluteAddress2D::new(file, rank));
+                    v[i] = MoveEnd::new_board(AbsoluteAddress2D::new(file, rank));
                     i += 1;
                 }
             }
@@ -351,7 +348,7 @@ impl Default for Area {
             let mut i = 0;
             for rank in RANK1U8..RANK9U8 {
                 for file in (FILE1U8..FILE10U8).rev() {
-                    v[i] = MoveEnd::new_board(Phase::Second, AbsoluteAddress2D::new(file, rank));
+                    v[i] = MoveEnd::new_board(AbsoluteAddress2D::new(file, rank));
                     i += 1;
                 }
             }
@@ -362,7 +359,7 @@ impl Default for Area {
             let mut i = 0;
             for rank in RANK3U8..RANK10U8 {
                 for file in (FILE1U8..FILE10U8).rev() {
-                    v[i] = MoveEnd::new_board(Phase::First, AbsoluteAddress2D::new(file, rank));
+                    v[i] = MoveEnd::new_board(AbsoluteAddress2D::new(file, rank));
                     i += 1;
                 }
             }
@@ -373,10 +370,7 @@ impl Default for Area {
             let mut i = 0;
             for rank in RANK3U8..RANK10U8 {
                 for file in (FILE1U8..FILE10U8).rev() {
-                    v[i] = MoveEnd::new_board(
-                        Phase::Second,
-                        AbsoluteAddress2D::new(file, rank).rotate_180(),
-                    );
+                    v[i] = MoveEnd::new_board(AbsoluteAddress2D::new(file, rank).rotate_180());
                     i += 1;
                 }
             }
@@ -671,7 +665,7 @@ impl Area {
                             if cur.offset(&r).wall() {
                                 break;
                             }
-                            if moving(&MoveEnd::new_board(friend, cur), mobility.agility) {
+                            if moving(&MoveEnd::new_board(cur), mobility.agility) {
                                 break;
                             }
                         }
@@ -681,14 +675,14 @@ impl Area {
                         let mut cur = start_sq.clone();
                         // 西隣から反時計回りだぜ☆（＾～＾）
                         if !cur.offset(&angle.west_ccw_double_rank()).wall() {
-                            moving(&MoveEnd::new_board(friend, cur), mobility.agility);
+                            moving(&MoveEnd::new_board(cur), mobility.agility);
                         }
                     }
                     Agility::Hopping => {
                         let mut cur = start_sq.clone();
                         // 西隣から反時計回りだぜ☆（＾～＾）
                         if !cur.offset(&angle.west_ccw()).wall() {
-                            moving(&MoveEnd::new_board(friend, cur), mobility.agility);
+                            moving(&MoveEnd::new_board(cur), mobility.agility);
                         }
                     }
                 }

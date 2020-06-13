@@ -126,7 +126,7 @@ impl GameHashSeed {
                         let double_faced_piece = table.get_double_faced_piece(dst_piece_num);
                         let count = table.count_hand(
                             history.get_friend(),
-                            &MoveEnd::new_hand(history.get_friend(), double_faced_piece.type_()),
+                            &MoveEnd::new_hand(double_faced_piece.type_()),
                         );
                         // 打つ前の駒の枚数のハッシュ。
                         prev_hash ^= self.hands[double_faced_piece as usize][count as usize + 1];

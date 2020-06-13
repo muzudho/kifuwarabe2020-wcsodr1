@@ -63,8 +63,6 @@ impl History {
 /// このオブジェクトは大量に生成されるから容量を押さえたいぜ☆（＾～＾）
 #[derive(Copy, Clone, Debug)]
 pub struct MoveEnd {
-    /// TODO friend は 消したいぜ☆（＾～＾）
-    pub friend: Phase,
     pub address: FireAddress,
 }
 /// USI向け。
@@ -89,21 +87,18 @@ impl Default for MoveEnd {
     /// ゴミ値だぜ☆（＾～＾）
     fn default() -> Self {
         MoveEnd {
-            friend: Phase::First,
             address: FireAddress::Board(AbsoluteAddress2D::default()),
         }
     }
 }
 impl MoveEnd {
-    pub fn new_board(friend: Phase, addr: AbsoluteAddress2D) -> Self {
+    pub fn new_board(addr: AbsoluteAddress2D) -> Self {
         MoveEnd {
-            friend: friend,
             address: FireAddress::Board(addr),
         }
     }
-    pub fn new_hand(friend: Phase, drop_type: DoubleFacedPieceType) -> Self {
+    pub fn new_hand(drop_type: DoubleFacedPieceType) -> Self {
         MoveEnd {
-            friend: friend,
             address: FireAddress::Hand(drop_type),
         }
     }

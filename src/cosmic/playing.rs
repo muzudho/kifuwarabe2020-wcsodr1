@@ -192,10 +192,7 @@ impl Game {
                     let friend = self.table.get_phase(piece_num);
                     self.table.push_piece(
                         friend,
-                        &MoveEnd::new_hand(
-                            friend,
-                            self.table.get_double_faced_piece_type(piece_num),
-                        ),
+                        &MoveEnd::new_hand(self.table.get_double_faced_piece_type(piece_num)),
                         moveing_piece_num,
                     );
                 }

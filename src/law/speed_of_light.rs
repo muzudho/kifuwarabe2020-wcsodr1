@@ -376,62 +376,41 @@ impl Default for SpeedOfLight {
 
             // 持ち駒☆（＾～＾）
             hand_legal_all: [
+                (Phase::First, MoveEnd::new_hand(DoubleFacedPieceType::Rook)),
                 (
                     Phase::First,
-                    MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Rook),
+                    MoveEnd::new_hand(DoubleFacedPieceType::Bishop),
                 ),
+                (Phase::First, MoveEnd::new_hand(DoubleFacedPieceType::Gold)),
                 (
                     Phase::First,
-                    MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Bishop),
-                ),
-                (
-                    Phase::First,
-                    MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Gold),
+                    MoveEnd::new_hand(DoubleFacedPieceType::Silver),
                 ),
                 (
                     Phase::First,
-                    MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Silver),
+                    MoveEnd::new_hand(DoubleFacedPieceType::Knight),
                 ),
+                (Phase::First, MoveEnd::new_hand(DoubleFacedPieceType::Lance)),
+                (Phase::First, MoveEnd::new_hand(DoubleFacedPieceType::Pawn)),
+                (Phase::Second, MoveEnd::new_hand(DoubleFacedPieceType::Rook)),
                 (
-                    Phase::First,
-                    MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Knight),
+                    Phase::Second,
+                    MoveEnd::new_hand(DoubleFacedPieceType::Bishop),
                 ),
+                (Phase::Second, MoveEnd::new_hand(DoubleFacedPieceType::Gold)),
                 (
-                    Phase::First,
-                    MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Lance),
-                ),
-                (
-                    Phase::First,
-                    MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Pawn),
+                    Phase::Second,
+                    MoveEnd::new_hand(DoubleFacedPieceType::Silver),
                 ),
                 (
                     Phase::Second,
-                    MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Rook),
+                    MoveEnd::new_hand(DoubleFacedPieceType::Knight),
                 ),
                 (
                     Phase::Second,
-                    MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Bishop),
+                    MoveEnd::new_hand(DoubleFacedPieceType::Lance),
                 ),
-                (
-                    Phase::Second,
-                    MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Gold),
-                ),
-                (
-                    Phase::Second,
-                    MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Silver),
-                ),
-                (
-                    Phase::Second,
-                    MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Knight),
-                ),
-                (
-                    Phase::Second,
-                    MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Lance),
-                ),
-                (
-                    Phase::Second,
-                    MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Pawn),
-                ),
+                (Phase::Second, MoveEnd::new_hand(DoubleFacedPieceType::Pawn)),
             ],
         }
     }

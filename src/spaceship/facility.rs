@@ -171,62 +171,53 @@ P x{87:2}   |{63}|{64}|{65}|{66}|{67}|{68}|{69}|{70}|{71}| h8   p x{94:2}
             GameRoom::to_string3(table, 2, 9),
             GameRoom::to_string3(table, 1, 9),
             //                   ▲き,　                   ▲ぞ,                     ▲い,                     ▲ね,                     ▲う,                     ▲し,                     ▲ひ,
+            table.count_hand(Phase::First, &MoveEnd::new_hand(DoubleFacedPieceType::Rook)),
             table.count_hand(
                 Phase::First,
-                &MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Rook)
+                &MoveEnd::new_hand(DoubleFacedPieceType::Bishop)
+            ),
+            table.count_hand(Phase::First, &MoveEnd::new_hand(DoubleFacedPieceType::Gold)),
+            table.count_hand(
+                Phase::First,
+                &MoveEnd::new_hand(DoubleFacedPieceType::Silver)
             ),
             table.count_hand(
                 Phase::First,
-                &MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Bishop)
+                &MoveEnd::new_hand(DoubleFacedPieceType::Knight)
             ),
             table.count_hand(
                 Phase::First,
-                &MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Gold)
+                &MoveEnd::new_hand(DoubleFacedPieceType::Lance)
             ),
-            table.count_hand(
-                Phase::First,
-                &MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Silver)
-            ),
-            table.count_hand(
-                Phase::First,
-                &MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Knight)
-            ),
-            table.count_hand(
-                Phase::First,
-                &MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Lance)
-            ),
-            table.count_hand(
-                Phase::First,
-                &MoveEnd::new_hand(Phase::First, DoubleFacedPieceType::Pawn)
-            ),
+            table.count_hand(Phase::First, &MoveEnd::new_hand(DoubleFacedPieceType::Pawn)),
             //                   ▽キ,                     ▽ゾ,                     ▽イ,                     ▽ネ,                     ▽ウ,                     ▽シ,                     ▽ヒ,
             table.count_hand(
                 Phase::Second,
-                &MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Rook)
+                &MoveEnd::new_hand(DoubleFacedPieceType::Rook)
             ),
             table.count_hand(
                 Phase::Second,
-                &MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Bishop)
+                &MoveEnd::new_hand(DoubleFacedPieceType::Bishop)
             ),
             table.count_hand(
                 Phase::Second,
-                &MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Gold)
+                &MoveEnd::new_hand(DoubleFacedPieceType::Gold)
             ),
             table.count_hand(
                 Phase::Second,
-                &MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Silver)
+                &MoveEnd::new_hand(DoubleFacedPieceType::Silver)
             ),
             table.count_hand(
                 Phase::Second,
-                &MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Knight)
+                &MoveEnd::new_hand(DoubleFacedPieceType::Knight)
             ),
             table.count_hand(
                 Phase::Second,
-                &MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Lance)
+                &MoveEnd::new_hand(DoubleFacedPieceType::Lance)
             ),
             table.count_hand(
                 Phase::Second,
-                &MoveEnd::new_hand(Phase::Second, DoubleFacedPieceType::Pawn)
+                &MoveEnd::new_hand(DoubleFacedPieceType::Pawn)
             ),
             ply,
             phase,
