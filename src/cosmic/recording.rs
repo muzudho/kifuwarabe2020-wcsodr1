@@ -39,7 +39,6 @@ impl Default for History {
 impl History {
     /// 手番
     pub fn get_friend(&self) -> Phase {
-        // 手番
         if self.ply % 2 == 0 {
             Phase::First
         } else {
@@ -67,7 +66,6 @@ pub struct CapturedMove {
     pub destination: Fire,
 }
 impl CapturedMove {
-    // TODO Piece を持ちまわすのは止めたいが……☆（＾～＾）
     pub fn new(source: Fire, destination: Fire) -> Self {
         CapturedMove {
             source: source,

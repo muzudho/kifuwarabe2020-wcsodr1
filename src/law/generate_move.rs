@@ -128,7 +128,6 @@ impl PseudoLegalMoves {
             FireAddress::Board(_src_sq) => {
                 let piece_type = table.get_type(table.piece_num_at(&source.address).unwrap());
 
-                let friend = source.friend;
                 let moving =
                     &mut |destination: &Fire,
                           promotability,
@@ -136,69 +135,49 @@ impl PseudoLegalMoves {
                           move_permission: Option<MovePermission>| {
                         let pseudo_captured_num = table.piece_num_at(&destination.address);
 
-                        let (ok, space) = if let Some(pseudo_captured_num_val) = pseudo_captured_num
-                        {
-                            if table.get_phase(pseudo_captured_num_val) == friend {
+                        let space = if let Some(pseudo_captured_num_val) = pseudo_captured_num {
+                            if table.get_phase(pseudo_captured_num_val) == source.friend {
                                 // 味方の駒を取った☆（＾～＾）なしだぜ☆（＾～＾）！
-                                (false, false)
-                            } else {
-                                (true, false)
-                            }
-                        } else {
-                            (true, true)
-                        };
-
-                        if ok {
-                            // 成れるかどうかの判定☆（＾ｑ＾）
-                            use crate::law::generate_move::Promotability::*;
-                            let promotion = match &promotability {
-                                Forced => true,
-                                _ => false,
-                            };
-
-                            // 成りじゃない場合は、行き先のない動きを制限されるぜ☆（＾～＾）
-                            let forbidden = if let Some(move_permission_val) = move_permission {
-                                if move_permission_val.check(destination) {
-                                    false
-                                } else {
-                                    true
-                                }
+                                // 真を返して処理を中断だぜ☆（＾～＾）！
+                                return true;
                             } else {
                                 false
-                            };
+                            }
+                        } else {
+                            true
+                        };
 
-                            match &promotability {
-                                Any => {
-                                    // 成ったり、成れなかったりできるとき。
-                                    if !forbidden {
-                                        listen_move(Movement::new(
-                                            *source,
-                                            *destination,
-                                            false,
-                                            if let Some(piece_num_val) = pseudo_captured_num {
-                                                Some(CapturedMove::new(
-                                                    *destination,
-                                                    Fire::new_hand(
-                                                        friend,
-                                                        table.get_double_faced_piece_type(
-                                                            piece_num_val,
-                                                        ),
-                                                    ),
-                                                ))
-                                            } else {
-                                                None
-                                            },
-                                        ));
-                                    }
+                        // 成れるかどうかの判定☆（＾ｑ＾）
+                        use crate::law::generate_move::Promotability::*;
+                        let promotion = match &promotability {
+                            Forced => true,
+                            _ => false,
+                        };
+
+                        // 成りじゃない場合は、行き先のない動きを制限されるぜ☆（＾～＾）
+                        let forbidden = if let Some(move_permission_val) = move_permission {
+                            if move_permission_val.check(destination) {
+                                false
+                            } else {
+                                true
+                            }
+                        } else {
+                            false
+                        };
+
+                        match &promotability {
+                            Any => {
+                                // 成ったり、成れなかったりできるとき。
+                                if !forbidden {
                                     listen_move(Movement::new(
                                         *source,
                                         *destination,
-                                        true,
+                                        false,
                                         if let Some(piece_num_val) = pseudo_captured_num {
                                             Some(CapturedMove::new(
                                                 *destination,
                                                 Fire::new_hand(
-                                                    friend,
+                                                    source.friend,
                                                     table
                                                         .get_double_faced_piece_type(piece_num_val),
                                                 ),
@@ -208,31 +187,46 @@ impl PseudoLegalMoves {
                                         },
                                     ));
                                 }
-                                _ => {
-                                    // 成れるか、成れないかのどちらかのとき。
-                                    if promotion || !forbidden {
-                                        listen_move(Movement::new(
-                                            *source,
+                                listen_move(Movement::new(
+                                    *source,
+                                    *destination,
+                                    true,
+                                    if let Some(piece_num_val) = pseudo_captured_num {
+                                        Some(CapturedMove::new(
                                             *destination,
-                                            promotion,
-                                            if let Some(piece_num_val) = pseudo_captured_num {
-                                                Some(CapturedMove::new(
-                                                    *destination,
-                                                    Fire::new_hand(
-                                                        friend,
-                                                        table.get_double_faced_piece_type(
-                                                            piece_num_val,
-                                                        ),
-                                                    ),
-                                                ))
-                                            } else {
-                                                None
-                                            },
-                                        ));
-                                    }
+                                            Fire::new_hand(
+                                                source.friend,
+                                                table.get_double_faced_piece_type(piece_num_val),
+                                            ),
+                                        ))
+                                    } else {
+                                        None
+                                    },
+                                ));
+                            }
+                            _ => {
+                                // 成れるか、成れないかのどちらかのとき。
+                                if promotion || !forbidden {
+                                    listen_move(Movement::new(
+                                        *source,
+                                        *destination,
+                                        promotion,
+                                        if let Some(piece_num_val) = pseudo_captured_num {
+                                            Some(CapturedMove::new(
+                                                *destination,
+                                                Fire::new_hand(
+                                                    source.friend,
+                                                    table
+                                                        .get_double_faced_piece_type(piece_num_val),
+                                                ),
+                                            ))
+                                        } else {
+                                            None
+                                        },
+                                    ));
                                 }
-                            };
-                        }
+                            }
+                        };
 
                         !space
                     };
