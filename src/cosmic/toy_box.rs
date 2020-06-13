@@ -944,7 +944,6 @@ impl GameTable {
 #[derive(Clone)]
 pub struct PhaseClassification {
     items: [PieceNum; 80],
-    areas: [HandStackArea; 18],
     currents: [isize; 18],
 }
 impl Default for PhaseClassification {
@@ -952,26 +951,6 @@ impl Default for PhaseClassification {
     fn default() -> Self {
         PhaseClassification {
             items: [PieceNum::King1; 80],
-            areas: [
-                HandStackArea::new(40, 1),  // King1
-                HandStackArea::new(60, 1),  // Rook1
-                HandStackArea::new(58, 1),  // Bishop1
-                HandStackArea::new(42, 1),  // Gold1
-                HandStackArea::new(46, 1),  // Silver1
-                HandStackArea::new(50, 1),  // Knight1
-                HandStackArea::new(54, 1),  // Lance1
-                HandStackArea::new(62, 1),  // Pawn1
-                HandStackArea::new(41, -1), // King2
-                HandStackArea::new(61, -1), // Rook2
-                HandStackArea::new(59, -1), // Bishop2
-                HandStackArea::new(45, -1), // Gold2
-                HandStackArea::new(49, -1), // Silver2
-                HandStackArea::new(53, -1), // Knight2
-                HandStackArea::new(57, -1), // Lance2
-                HandStackArea::new(79, -1), // Pawn2
-                HandStackArea::new(0, 1),   // Board1
-                HandStackArea::new(39, -1), // Board2
-            ],
             currents: [
                 40, // King1
                 60, // Rook1
@@ -996,17 +975,58 @@ impl Default for PhaseClassification {
     }
 }
 impl PhaseClassification {
+    /// 開始地点。
+    pub fn start(&self, double_faced_piece: DoubleFacedPiece) -> isize {
+        match double_faced_piece {
+            DoubleFacedPiece::King1 => 40,
+            DoubleFacedPiece::Rook1 => 60,
+            DoubleFacedPiece::Bishop1 => 58,
+            DoubleFacedPiece::Gold1 => 42,
+            DoubleFacedPiece::Silver1 => 46,
+            DoubleFacedPiece::Knight1 => 50,
+            DoubleFacedPiece::Lance1 => 54,
+            DoubleFacedPiece::Pawn1 => 62,
+            DoubleFacedPiece::King2 => 41,
+            DoubleFacedPiece::Rook2 => 61,
+            DoubleFacedPiece::Bishop2 => 59,
+            DoubleFacedPiece::Gold2 => 45,
+            DoubleFacedPiece::Silver2 => 49,
+            DoubleFacedPiece::Knight2 => 53,
+            DoubleFacedPiece::Lance2 => 57,
+            DoubleFacedPiece::Pawn2 => 79,
+        }
+    }
+    /// 向き。+1, -1。
+    pub fn direction(&self, double_faced_piece: DoubleFacedPiece) -> isize {
+        match double_faced_piece {
+            DoubleFacedPiece::King1 => 1,
+            DoubleFacedPiece::Rook1 => 1,
+            DoubleFacedPiece::Bishop1 => 1,
+            DoubleFacedPiece::Gold1 => 1,
+            DoubleFacedPiece::Silver1 => 1,
+            DoubleFacedPiece::Knight1 => 1,
+            DoubleFacedPiece::Lance1 => 1,
+            DoubleFacedPiece::Pawn1 => 1,
+            DoubleFacedPiece::King2 => -1,
+            DoubleFacedPiece::Rook2 => -1,
+            DoubleFacedPiece::Bishop2 => -1,
+            DoubleFacedPiece::Gold2 => -1,
+            DoubleFacedPiece::Silver2 => -1,
+            DoubleFacedPiece::Knight2 => -1,
+            DoubleFacedPiece::Lance2 => -1,
+            DoubleFacedPiece::Pawn2 => -1,
+        }
+    }
     /// 駒の先後を ひっくり返してから入れてください。
     pub fn push(&mut self, fire: &Fire, num: PieceNum) {
         match fire.address {
             FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3407) 未対応☆（＾～＾）")),
             FireAddress::Hand(drop_type) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(fire.friend, drop_type);
-                let area = &self.areas[drop as usize];
                 // 駒台に駒を置くぜ☆（＾～＾）
                 self.items[self.currents[drop as usize] as usize] = num;
                 // 位置を増減するぜ☆（＾～＾）
-                self.currents[drop as usize] += area.direction;
+                self.currents[drop as usize] += self.direction(drop);
             }
         }
     }
@@ -1016,9 +1036,8 @@ impl PhaseClassification {
             FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3419) 未対応☆（＾～＾）")),
             FireAddress::Hand(drop_type) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(fire.friend, drop_type);
-                let area = &self.areas[drop as usize];
                 // 位置を増減するぜ☆（＾～＾）
-                self.currents[drop as usize] -= area.direction;
+                self.currents[drop as usize] -= self.direction(drop);
                 // 駒台の駒をはがすぜ☆（＾～＾）
                 self.items[self.currents[drop as usize] as usize]
             }
@@ -1030,15 +1049,14 @@ impl PhaseClassification {
             FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3431) 未対応☆（＾～＾）")),
             FireAddress::Hand(drop_type) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(fire.friend, drop_type);
-                let area = &self.areas[drop as usize];
-                if area.direction == 1 {
-                    if area.start < self.currents[drop as usize] {
+                if self.direction(drop) == 1 {
+                    if self.start(drop) < self.currents[drop as usize] {
                         Some(self.items[(self.currents[drop as usize] - 1) as usize])
                     } else {
                         None
                     }
                 } else {
-                    if self.currents[drop as usize] < area.start {
+                    if self.currents[drop as usize] < self.start(drop) {
                         Some(self.items[(self.currents[drop as usize] + 1) as usize])
                     } else {
                         None
@@ -1053,11 +1071,10 @@ impl PhaseClassification {
             FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3431) 未対応☆（＾～＾）")),
             FireAddress::Hand(drop_type) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(fire.friend, drop_type);
-                let area = &self.areas[drop as usize];
-                if area.direction == 1 {
-                    (self.currents[drop as usize] - area.start) as usize
+                if self.direction(drop) == 1 {
+                    (self.currents[drop as usize] - self.start(drop)) as usize
                 } else {
-                    (area.start - self.currents[drop as usize]) as usize
+                    (self.start(drop) - self.currents[drop as usize]) as usize
                 }
             }
         }
@@ -1075,19 +1092,4 @@ impl PhaseClassification {
         buffer.trim_end().to_string()
     }
     */
-}
-#[derive(Clone)]
-pub struct HandStackArea {
-    // 開始地点。
-    start: isize,
-    // 向き。+1, -1。
-    direction: isize,
-}
-impl HandStackArea {
-    pub fn new(start: isize, direction: isize) -> Self {
-        HandStackArea {
-            start: start,
-            direction: direction,
-        }
-    }
 }
