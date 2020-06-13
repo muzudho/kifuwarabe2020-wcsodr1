@@ -3028,9 +3028,7 @@ impl GameTable {
     /// 駒の先後を反転させるぜ☆（＾～＾）
     // あれば　盤の相手の駒を先後反転して、自分の駒台に置きます。
     pub fn rotate_piece_board_to_hand(&mut self, move_: &Movement) {
-        if let Some(collision_piece_num_val) =
-            self.pop_piece(UnifiedAddress::from_fire(&move_.destination))
-        {
+        if let Some(collision_piece_num_val) = self.pop_piece(&move_.destination) {
             // 移動先升の駒を盤上から消し、自分の持ち駒に増やす
             // 先後ひっくり返す。
             self.turn_phase(collision_piece_num_val);
@@ -3057,8 +3055,8 @@ impl GameTable {
                     // friend.turn(),
                     move2_val.piece_type.double_faced_piece_type(),
                 );
-                let addr_pos1 = AddressPos1::Hand(double_faced_piece);
-                let uni_addr = UnifiedAddress::from_address_pos1(friend, addr_pos1);
+                let fire1 = Fire::new_hand(friend, double_faced_piece.type_());
+                // let uni_addr = UnifiedAddress::from_address_pos1(friend, addr_pos1);
                 // let addr_pos2 = uni_addr.to_address_pos();
                 /*
                 Beam::shoot(&format!(
@@ -3066,7 +3064,7 @@ impl GameTable {
                     addr_pos1, uni_addr, addr_pos2
                 ));
                 */
-                self.pop_piece(uni_addr).unwrap()
+                self.pop_piece(&fire1).unwrap()
             };
             // 先後をひっくり返す。
             self.turn_phase(piece_num);
@@ -3111,13 +3109,13 @@ impl GameTable {
         }
     }
     /// 駒を取りのぞく。
-    pub fn pop_piece(&mut self, addr: UnifiedAddress) -> Option<PieceNum> {
-        match addr.to_address_pos1() {
-            AddressPos1::Board(sq) => {
-                let piece_num = self.board[sq.to_serial_number() as usize];
+    pub fn pop_piece(&mut self, fire: &Fire) -> Option<PieceNum> {
+        match fire.address {
+            FireAddress::Board(sq) => {
+                let piece_num = self.board[sq.serial_number() as usize];
                 if let Some(piece_num_val) = piece_num {
                     // マスを空にします。
-                    self.board[sq.to_serial_number() as usize] = None;
+                    self.board[sq.serial_number() as usize] = None;
                     // TODO 背番号の番地を、ゴミ値で塗りつぶすが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
                     self.address_list[piece_num_val as usize] = UnifiedAddress::from_address_pos1(
                         self.get_phase(piece_num_val),
@@ -3127,10 +3125,15 @@ impl GameTable {
                 }
                 piece_num
             }
-            AddressPos1::Hand(drop) => {
+            FireAddress::Hand(drop_type) => {
                 // 場所で指定します。
                 // 台から取りのぞきます。
-                let piece_num = self.phase_classification.pop(drop);
+                let piece_num =
+                    self.phase_classification
+                        .pop(DoubleFacedPiece::from_phase_and_type(
+                            fire.friend,
+                            drop_type,
+                        ));
                 // TODO 背番号の番地に、ゴミ値を入れて消去するが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
                 self.address_list[piece_num as usize] = UnifiedAddress::from_address_pos1(
                     self.get_phase(piece_num),

@@ -125,9 +125,7 @@ impl Game {
             .update_by_do_move(&mut self.history, &self.table, move_);
 
         // 移動元のマスにある駒をポップすることは確定。
-        let src_piece_num = self
-            .table
-            .pop_piece(UnifiedAddress::from_fire(&move_.source));
+        let src_piece_num = self.table.pop_piece(&move_.source);
 
         // 持ち駒は成ることは無いので、成るなら盤上の駒であることが確定。
         if move_.promote {
@@ -162,9 +160,7 @@ impl Game {
             self.history.ply -= 1;
             let move_ = &self.history.get_move();
             // 移動先にある駒をポップするのは確定。
-            let moveing_piece_num = self
-                .table
-                .pop_piece(UnifiedAddress::from_fire(&move_.destination));
+            let moveing_piece_num = self.table.pop_piece(&move_.destination);
             match move_.source.address {
                 FireAddress::Board(_src_sq) => {
                     // 盤上の移動なら
