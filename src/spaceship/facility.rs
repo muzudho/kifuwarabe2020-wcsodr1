@@ -1,9 +1,9 @@
 use crate::cosmic::fire::{Fire, FireAddress};
 use crate::cosmic::playing::{Game, PosNums};
-use crate::cosmic::recording::{AddressPos1, Movement, Phase};
-use crate::cosmic::smart::features::{DoubleFacedPiece, DoubleFacedPieceType};
+use crate::cosmic::recording::{Movement, Phase};
+use crate::cosmic::smart::features::DoubleFacedPieceType;
 use crate::cosmic::smart::square::AbsoluteAddress2D;
-use crate::cosmic::toy_box::{GameTable, SquareType, PIECE_WHITE_SPACE};
+use crate::cosmic::toy_box::{GameTable, PIECE_WHITE_SPACE};
 use crate::spaceship::equipment::Beam;
 
 /// 指令室はこちらだぜ☆（＾～＾）！

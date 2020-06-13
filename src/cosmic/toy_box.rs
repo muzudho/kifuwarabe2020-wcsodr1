@@ -182,168 +182,330 @@ const UNIFIED_SQ_79_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
 const UNIFIED_SQ_80_TO_ABSOLUTE_ADDRESS_2D: AbsoluteAddress2D =
     AbsoluteAddress2D { file: 9, rank: 9 };
 
-const UNIFIED_ADDRESS_0_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq11);
-const UNIFIED_ADDRESS_1_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq12);
-const UNIFIED_ADDRESS_2_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq13);
-const UNIFIED_ADDRESS_3_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq14);
-const UNIFIED_ADDRESS_4_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq15);
-const UNIFIED_ADDRESS_5_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq16);
-const UNIFIED_ADDRESS_6_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq17);
-const UNIFIED_ADDRESS_7_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq18);
-const UNIFIED_ADDRESS_8_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq19);
-const UNIFIED_ADDRESS_9_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq21);
-const UNIFIED_ADDRESS_10_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq22);
-const UNIFIED_ADDRESS_11_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq23);
-const UNIFIED_ADDRESS_12_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq24);
-const UNIFIED_ADDRESS_13_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq25);
-const UNIFIED_ADDRESS_14_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq26);
-const UNIFIED_ADDRESS_15_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq27);
-const UNIFIED_ADDRESS_16_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq28);
-const UNIFIED_ADDRESS_17_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq29);
-const UNIFIED_ADDRESS_18_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq31);
-const UNIFIED_ADDRESS_19_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq32);
-const UNIFIED_ADDRESS_20_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq33);
-const UNIFIED_ADDRESS_21_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq34);
-const UNIFIED_ADDRESS_22_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq35);
-const UNIFIED_ADDRESS_23_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq36);
-const UNIFIED_ADDRESS_24_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq37);
-const UNIFIED_ADDRESS_25_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq38);
-const UNIFIED_ADDRESS_26_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq39);
-const UNIFIED_ADDRESS_27_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq41);
-const UNIFIED_ADDRESS_28_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq42);
-const UNIFIED_ADDRESS_29_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq43);
-const UNIFIED_ADDRESS_30_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq44);
-const UNIFIED_ADDRESS_31_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq45);
-const UNIFIED_ADDRESS_32_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq46);
-const UNIFIED_ADDRESS_33_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq47);
-const UNIFIED_ADDRESS_34_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq48);
-const UNIFIED_ADDRESS_35_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq49);
-const UNIFIED_ADDRESS_36_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq51);
-const UNIFIED_ADDRESS_37_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq52);
-const UNIFIED_ADDRESS_38_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq53);
-const UNIFIED_ADDRESS_39_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq54);
-const UNIFIED_ADDRESS_40_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq55);
-const UNIFIED_ADDRESS_41_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq56);
-const UNIFIED_ADDRESS_42_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq57);
-const UNIFIED_ADDRESS_43_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq58);
-const UNIFIED_ADDRESS_44_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq59);
-const UNIFIED_ADDRESS_45_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq61);
-const UNIFIED_ADDRESS_46_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq62);
-const UNIFIED_ADDRESS_47_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq63);
-const UNIFIED_ADDRESS_48_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq64);
-const UNIFIED_ADDRESS_49_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq65);
-const UNIFIED_ADDRESS_50_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq66);
-const UNIFIED_ADDRESS_51_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq67);
-const UNIFIED_ADDRESS_52_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq68);
-const UNIFIED_ADDRESS_53_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq69);
-const UNIFIED_ADDRESS_54_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq71);
-const UNIFIED_ADDRESS_55_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq72);
-const UNIFIED_ADDRESS_56_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq73);
-const UNIFIED_ADDRESS_57_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq74);
-const UNIFIED_ADDRESS_58_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq75);
-const UNIFIED_ADDRESS_59_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq76);
-const UNIFIED_ADDRESS_60_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq77);
-const UNIFIED_ADDRESS_61_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq78);
-const UNIFIED_ADDRESS_62_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq79);
-const UNIFIED_ADDRESS_63_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq81);
-const UNIFIED_ADDRESS_64_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq82);
-const UNIFIED_ADDRESS_65_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq83);
-const UNIFIED_ADDRESS_66_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq84);
-const UNIFIED_ADDRESS_67_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq85);
-const UNIFIED_ADDRESS_68_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq86);
-const UNIFIED_ADDRESS_69_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq87);
-const UNIFIED_ADDRESS_70_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq88);
-const UNIFIED_ADDRESS_71_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq89);
-const UNIFIED_ADDRESS_72_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq91);
-const UNIFIED_ADDRESS_73_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq92);
-const UNIFIED_ADDRESS_74_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq93);
-const UNIFIED_ADDRESS_75_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq94);
-const UNIFIED_ADDRESS_76_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq95);
-const UNIFIED_ADDRESS_77_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq96);
-const UNIFIED_ADDRESS_78_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq97);
-const UNIFIED_ADDRESS_79_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq98);
-const UNIFIED_ADDRESS_80_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq99);
-const UNIFIED_ADDRESS_81_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq11);
-const UNIFIED_ADDRESS_82_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq12);
-const UNIFIED_ADDRESS_83_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq13);
-const UNIFIED_ADDRESS_84_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq14);
-const UNIFIED_ADDRESS_85_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq15);
-const UNIFIED_ADDRESS_86_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq16);
-const UNIFIED_ADDRESS_87_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq17);
-const UNIFIED_ADDRESS_88_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq18);
-const UNIFIED_ADDRESS_89_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq19);
-const UNIFIED_ADDRESS_90_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq21);
-const UNIFIED_ADDRESS_91_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq22);
-const UNIFIED_ADDRESS_92_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq23);
-const UNIFIED_ADDRESS_93_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq24);
-const UNIFIED_ADDRESS_94_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq25);
-const UNIFIED_ADDRESS_95_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq26);
-const UNIFIED_ADDRESS_96_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq27);
-const UNIFIED_ADDRESS_97_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq28);
-const UNIFIED_ADDRESS_98_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq29);
-const UNIFIED_ADDRESS_99_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq31);
-const UNIFIED_ADDRESS_100_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq32);
-const UNIFIED_ADDRESS_101_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq33);
-const UNIFIED_ADDRESS_102_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq34);
-const UNIFIED_ADDRESS_103_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq35);
-const UNIFIED_ADDRESS_104_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq36);
-const UNIFIED_ADDRESS_105_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq37);
-const UNIFIED_ADDRESS_106_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq38);
-const UNIFIED_ADDRESS_107_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq39);
-const UNIFIED_ADDRESS_108_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq41);
-const UNIFIED_ADDRESS_109_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq42);
-const UNIFIED_ADDRESS_110_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq43);
-const UNIFIED_ADDRESS_111_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq44);
-const UNIFIED_ADDRESS_112_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq45);
-const UNIFIED_ADDRESS_113_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq46);
-const UNIFIED_ADDRESS_114_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq47);
-const UNIFIED_ADDRESS_115_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq48);
-const UNIFIED_ADDRESS_116_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq49);
-const UNIFIED_ADDRESS_117_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq51);
-const UNIFIED_ADDRESS_118_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq52);
-const UNIFIED_ADDRESS_119_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq53);
-const UNIFIED_ADDRESS_120_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq54);
-const UNIFIED_ADDRESS_121_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq55);
-const UNIFIED_ADDRESS_122_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq56);
-const UNIFIED_ADDRESS_123_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq57);
-const UNIFIED_ADDRESS_124_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq58);
-const UNIFIED_ADDRESS_125_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq59);
-const UNIFIED_ADDRESS_126_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq61);
-const UNIFIED_ADDRESS_127_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq62);
-const UNIFIED_ADDRESS_128_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq63);
-const UNIFIED_ADDRESS_129_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq64);
-const UNIFIED_ADDRESS_130_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq65);
-const UNIFIED_ADDRESS_131_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq66);
-const UNIFIED_ADDRESS_132_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq67);
-const UNIFIED_ADDRESS_133_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq68);
-const UNIFIED_ADDRESS_134_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq69);
-const UNIFIED_ADDRESS_135_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq71);
-const UNIFIED_ADDRESS_136_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq72);
-const UNIFIED_ADDRESS_137_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq73);
-const UNIFIED_ADDRESS_138_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq74);
-const UNIFIED_ADDRESS_139_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq75);
-const UNIFIED_ADDRESS_140_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq76);
-const UNIFIED_ADDRESS_141_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq77);
-const UNIFIED_ADDRESS_142_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq78);
-const UNIFIED_ADDRESS_143_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq79);
-const UNIFIED_ADDRESS_144_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq81);
-const UNIFIED_ADDRESS_145_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq82);
-const UNIFIED_ADDRESS_146_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq83);
-const UNIFIED_ADDRESS_147_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq84);
-const UNIFIED_ADDRESS_148_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq85);
-const UNIFIED_ADDRESS_149_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq86);
-const UNIFIED_ADDRESS_150_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq87);
-const UNIFIED_ADDRESS_151_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq88);
-const UNIFIED_ADDRESS_152_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq89);
-const UNIFIED_ADDRESS_153_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq91);
-const UNIFIED_ADDRESS_154_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq92);
-const UNIFIED_ADDRESS_155_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq93);
-const UNIFIED_ADDRESS_156_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq94);
-const UNIFIED_ADDRESS_157_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq95);
-const UNIFIED_ADDRESS_158_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq96);
-const UNIFIED_ADDRESS_159_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq97);
-const UNIFIED_ADDRESS_160_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq98);
-const UNIFIED_ADDRESS_161_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Board(SquareType::Sq99);
+const UNIFIED_ADDRESS_0_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 1, rank: 1 });
+const UNIFIED_ADDRESS_1_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 1, rank: 2 });
+const UNIFIED_ADDRESS_2_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 1, rank: 3 });
+const UNIFIED_ADDRESS_3_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 1, rank: 4 });
+const UNIFIED_ADDRESS_4_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 1, rank: 5 });
+const UNIFIED_ADDRESS_5_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 1, rank: 6 });
+const UNIFIED_ADDRESS_6_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 1, rank: 7 });
+const UNIFIED_ADDRESS_7_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 1, rank: 8 });
+const UNIFIED_ADDRESS_8_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 1, rank: 9 });
+const UNIFIED_ADDRESS_9_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 2, rank: 1 });
+const UNIFIED_ADDRESS_10_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 2, rank: 2 });
+const UNIFIED_ADDRESS_11_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 2, rank: 3 });
+const UNIFIED_ADDRESS_12_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 2, rank: 4 });
+const UNIFIED_ADDRESS_13_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 2, rank: 5 });
+const UNIFIED_ADDRESS_14_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 2, rank: 6 });
+const UNIFIED_ADDRESS_15_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 2, rank: 7 });
+const UNIFIED_ADDRESS_16_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 2, rank: 8 });
+const UNIFIED_ADDRESS_17_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 2, rank: 9 });
+const UNIFIED_ADDRESS_18_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 3, rank: 1 });
+const UNIFIED_ADDRESS_19_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 3, rank: 2 });
+const UNIFIED_ADDRESS_20_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 3, rank: 3 });
+const UNIFIED_ADDRESS_21_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 3, rank: 4 });
+const UNIFIED_ADDRESS_22_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 3, rank: 5 });
+const UNIFIED_ADDRESS_23_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 3, rank: 6 });
+const UNIFIED_ADDRESS_24_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 3, rank: 7 });
+const UNIFIED_ADDRESS_25_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 3, rank: 8 });
+const UNIFIED_ADDRESS_26_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 3, rank: 9 });
+const UNIFIED_ADDRESS_27_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 4, rank: 1 });
+const UNIFIED_ADDRESS_28_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 4, rank: 2 });
+const UNIFIED_ADDRESS_29_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 4, rank: 3 });
+const UNIFIED_ADDRESS_30_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 4, rank: 4 });
+const UNIFIED_ADDRESS_31_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 4, rank: 5 });
+const UNIFIED_ADDRESS_32_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 4, rank: 6 });
+const UNIFIED_ADDRESS_33_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 4, rank: 7 });
+const UNIFIED_ADDRESS_34_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 4, rank: 8 });
+const UNIFIED_ADDRESS_35_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 4, rank: 9 });
+const UNIFIED_ADDRESS_36_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 5, rank: 1 });
+const UNIFIED_ADDRESS_37_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 5, rank: 2 });
+const UNIFIED_ADDRESS_38_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 5, rank: 3 });
+const UNIFIED_ADDRESS_39_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 5, rank: 4 });
+const UNIFIED_ADDRESS_40_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 5, rank: 5 });
+const UNIFIED_ADDRESS_41_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 5, rank: 6 });
+const UNIFIED_ADDRESS_42_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 5, rank: 7 });
+const UNIFIED_ADDRESS_43_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 5, rank: 8 });
+const UNIFIED_ADDRESS_44_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 5, rank: 9 });
+const UNIFIED_ADDRESS_45_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 6, rank: 1 });
+const UNIFIED_ADDRESS_46_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 6, rank: 2 });
+const UNIFIED_ADDRESS_47_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 6, rank: 3 });
+const UNIFIED_ADDRESS_48_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 6, rank: 4 });
+const UNIFIED_ADDRESS_49_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 6, rank: 5 });
+const UNIFIED_ADDRESS_50_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 6, rank: 6 });
+const UNIFIED_ADDRESS_51_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 6, rank: 7 });
+const UNIFIED_ADDRESS_52_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 6, rank: 8 });
+const UNIFIED_ADDRESS_53_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 6, rank: 9 });
+const UNIFIED_ADDRESS_54_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 7, rank: 1 });
+const UNIFIED_ADDRESS_55_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 7, rank: 2 });
+const UNIFIED_ADDRESS_56_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 7, rank: 3 });
+const UNIFIED_ADDRESS_57_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 7, rank: 4 });
+const UNIFIED_ADDRESS_58_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 7, rank: 5 });
+const UNIFIED_ADDRESS_59_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 7, rank: 6 });
+const UNIFIED_ADDRESS_60_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 7, rank: 7 });
+const UNIFIED_ADDRESS_61_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 7, rank: 8 });
+const UNIFIED_ADDRESS_62_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 7, rank: 9 });
+const UNIFIED_ADDRESS_63_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 8, rank: 1 });
+const UNIFIED_ADDRESS_64_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 8, rank: 2 });
+const UNIFIED_ADDRESS_65_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 8, rank: 3 });
+const UNIFIED_ADDRESS_66_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 8, rank: 4 });
+const UNIFIED_ADDRESS_67_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 8, rank: 5 });
+const UNIFIED_ADDRESS_68_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 8, rank: 6 });
+const UNIFIED_ADDRESS_69_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 8, rank: 7 });
+const UNIFIED_ADDRESS_70_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 8, rank: 8 });
+const UNIFIED_ADDRESS_71_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 8, rank: 9 });
+const UNIFIED_ADDRESS_72_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 9, rank: 1 });
+const UNIFIED_ADDRESS_73_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 9, rank: 2 });
+const UNIFIED_ADDRESS_74_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 9, rank: 3 });
+const UNIFIED_ADDRESS_75_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 9, rank: 4 });
+const UNIFIED_ADDRESS_76_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 9, rank: 5 });
+const UNIFIED_ADDRESS_77_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 9, rank: 6 });
+const UNIFIED_ADDRESS_78_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 9, rank: 7 });
+const UNIFIED_ADDRESS_79_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 9, rank: 8 });
+const UNIFIED_ADDRESS_80_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 9, rank: 9 });
+const UNIFIED_ADDRESS_81_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 1, rank: 1 });
+const UNIFIED_ADDRESS_82_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 1, rank: 2 });
+const UNIFIED_ADDRESS_83_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 1, rank: 3 });
+const UNIFIED_ADDRESS_84_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 1, rank: 4 });
+const UNIFIED_ADDRESS_85_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 1, rank: 5 });
+const UNIFIED_ADDRESS_86_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 1, rank: 6 });
+const UNIFIED_ADDRESS_87_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 1, rank: 7 });
+const UNIFIED_ADDRESS_88_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 1, rank: 8 });
+const UNIFIED_ADDRESS_89_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 1, rank: 9 });
+const UNIFIED_ADDRESS_90_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 2, rank: 1 });
+const UNIFIED_ADDRESS_91_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 2, rank: 2 });
+const UNIFIED_ADDRESS_92_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 2, rank: 3 });
+const UNIFIED_ADDRESS_93_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 2, rank: 4 });
+const UNIFIED_ADDRESS_94_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 2, rank: 5 });
+const UNIFIED_ADDRESS_95_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 2, rank: 6 });
+const UNIFIED_ADDRESS_96_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 2, rank: 7 });
+const UNIFIED_ADDRESS_97_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 2, rank: 8 });
+const UNIFIED_ADDRESS_98_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 2, rank: 9 });
+const UNIFIED_ADDRESS_99_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 3, rank: 1 });
+const UNIFIED_ADDRESS_100_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 3, rank: 2 });
+const UNIFIED_ADDRESS_101_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 3, rank: 3 });
+const UNIFIED_ADDRESS_102_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 3, rank: 4 });
+const UNIFIED_ADDRESS_103_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 3, rank: 5 });
+const UNIFIED_ADDRESS_104_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 3, rank: 6 });
+const UNIFIED_ADDRESS_105_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 3, rank: 7 });
+const UNIFIED_ADDRESS_106_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 3, rank: 8 });
+const UNIFIED_ADDRESS_107_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 3, rank: 9 });
+const UNIFIED_ADDRESS_108_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 4, rank: 1 });
+const UNIFIED_ADDRESS_109_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 4, rank: 2 });
+const UNIFIED_ADDRESS_110_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 4, rank: 3 });
+const UNIFIED_ADDRESS_111_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 4, rank: 4 });
+const UNIFIED_ADDRESS_112_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 4, rank: 5 });
+const UNIFIED_ADDRESS_113_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 4, rank: 6 });
+const UNIFIED_ADDRESS_114_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 4, rank: 7 });
+const UNIFIED_ADDRESS_115_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 4, rank: 8 });
+const UNIFIED_ADDRESS_116_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 4, rank: 9 });
+const UNIFIED_ADDRESS_117_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 5, rank: 1 });
+const UNIFIED_ADDRESS_118_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 5, rank: 2 });
+const UNIFIED_ADDRESS_119_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 5, rank: 3 });
+const UNIFIED_ADDRESS_120_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 5, rank: 4 });
+const UNIFIED_ADDRESS_121_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 5, rank: 5 });
+const UNIFIED_ADDRESS_122_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 5, rank: 6 });
+const UNIFIED_ADDRESS_123_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 5, rank: 7 });
+const UNIFIED_ADDRESS_124_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 5, rank: 8 });
+const UNIFIED_ADDRESS_125_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 5, rank: 9 });
+const UNIFIED_ADDRESS_126_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 6, rank: 1 });
+const UNIFIED_ADDRESS_127_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 6, rank: 2 });
+const UNIFIED_ADDRESS_128_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 6, rank: 3 });
+const UNIFIED_ADDRESS_129_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 6, rank: 4 });
+const UNIFIED_ADDRESS_130_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 6, rank: 5 });
+const UNIFIED_ADDRESS_131_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 6, rank: 6 });
+const UNIFIED_ADDRESS_132_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 6, rank: 7 });
+const UNIFIED_ADDRESS_133_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 6, rank: 8 });
+const UNIFIED_ADDRESS_134_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 6, rank: 9 });
+const UNIFIED_ADDRESS_135_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 7, rank: 1 });
+const UNIFIED_ADDRESS_136_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 7, rank: 2 });
+const UNIFIED_ADDRESS_137_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 7, rank: 3 });
+const UNIFIED_ADDRESS_138_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 7, rank: 4 });
+const UNIFIED_ADDRESS_139_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 7, rank: 5 });
+const UNIFIED_ADDRESS_140_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 7, rank: 6 });
+const UNIFIED_ADDRESS_141_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 7, rank: 7 });
+const UNIFIED_ADDRESS_142_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 7, rank: 8 });
+const UNIFIED_ADDRESS_143_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 7, rank: 9 });
+const UNIFIED_ADDRESS_144_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 8, rank: 1 });
+const UNIFIED_ADDRESS_145_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 8, rank: 2 });
+const UNIFIED_ADDRESS_146_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 8, rank: 3 });
+const UNIFIED_ADDRESS_147_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 8, rank: 4 });
+const UNIFIED_ADDRESS_148_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 8, rank: 5 });
+const UNIFIED_ADDRESS_149_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 8, rank: 6 });
+const UNIFIED_ADDRESS_150_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 8, rank: 7 });
+const UNIFIED_ADDRESS_151_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 8, rank: 8 });
+const UNIFIED_ADDRESS_152_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 8, rank: 9 });
+const UNIFIED_ADDRESS_153_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 9, rank: 1 });
+const UNIFIED_ADDRESS_154_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 9, rank: 2 });
+const UNIFIED_ADDRESS_155_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 9, rank: 3 });
+const UNIFIED_ADDRESS_156_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 9, rank: 4 });
+const UNIFIED_ADDRESS_157_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 9, rank: 5 });
+const UNIFIED_ADDRESS_158_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 9, rank: 6 });
+const UNIFIED_ADDRESS_159_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 9, rank: 7 });
+const UNIFIED_ADDRESS_160_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 9, rank: 8 });
+const UNIFIED_ADDRESS_161_TO_ADDRESS_POS1: AddressPos1 =
+    AddressPos1::Board(AbsoluteAddress2D { file: 9, rank: 9 });
 const UNIFIED_ADDRESS_162_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Hand(DoubleFacedPiece::King1);
 const UNIFIED_ADDRESS_163_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Hand(DoubleFacedPiece::Rook1);
 const UNIFIED_ADDRESS_164_TO_ADDRESS_POS1: AddressPos1 =
@@ -1622,7 +1784,7 @@ impl UnifiedAddress {
 
     pub fn from_address_pos1(friend: Phase, addr: AddressPos1) -> Self {
         match addr {
-            AddressPos1::Board(sq) => sq.to_unified_address(friend),
+            AddressPos1::Board(sq) => UnifiedAddress::from_absolute_address(friend, &sq),
             AddressPos1::Hand(drop) => UnifiedAddress::from_double_faced_piece(drop),
         }
     }
@@ -2907,14 +3069,14 @@ impl GameTable {
             AddressPos1::Board(sq) => {
                 if let Some(piece_num_val) = piece_num {
                     // マスに駒を置きます。
-                    self.board[sq.to_serial_number() as usize] = piece_num;
+                    self.board[sq.serial_number() as usize] = piece_num;
                     // 背番号に番地を紐づけます。
-                    self.address_list[piece_num_val as usize] = sq
-                        .to_unified_address(self.get_phase(piece_num_val))
-                        .to_fire();
+                    self.address_list[piece_num_val as usize] =
+                        UnifiedAddress::from_absolute_address(self.get_phase(piece_num_val), &sq)
+                            .to_fire();
                 } else {
                     // マスを空にします。
-                    self.board[sq.to_serial_number() as usize] = None;
+                    self.board[sq.serial_number() as usize] = None;
                 }
             }
             AddressPos1::Hand(drop) => {

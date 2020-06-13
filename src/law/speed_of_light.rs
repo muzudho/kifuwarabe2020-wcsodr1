@@ -15,8 +15,7 @@ use crate::cosmic::smart::features::PHYSICAL_PIECE_TYPE_LEN;
 use crate::cosmic::smart::features::PIECE_TYPE_LEN;
 use crate::cosmic::smart::features::{DoubleFacedPiece, DoubleFacedPieceType, PieceType};
 use crate::cosmic::smart::square::{Angle, RelAdr2D, ANGLE_LEN};
-use crate::cosmic::toy_box::UnifiedAddress;
-use crate::cosmic::toy_box::{Piece, PieceNum, SquareType, PIECE_LEN};
+use crate::cosmic::toy_box::{Piece, PieceNum, PIECE_LEN};
 use crate::law::generate_move::{Agility, Mobility};
 
 // グローバル定数

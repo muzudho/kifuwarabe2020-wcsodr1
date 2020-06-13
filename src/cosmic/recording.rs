@@ -8,8 +8,6 @@ use crate::cosmic::fire::{Fire, FireAddress};
 use crate::cosmic::smart::features::DoubleFacedPiece;
 use crate::cosmic::smart::features::PieceType;
 use crate::cosmic::smart::square::AbsoluteAddress2D;
-use crate::cosmic::toy_box::SquareType;
-use crate::cosmic::toy_box::UnifiedAddress;
 use crate::law::cryptographic::num_to_lower_case;
 use std::fmt;
 
@@ -68,14 +66,14 @@ impl History {
 pub enum AddressPos1 {
     /* TODO これを消すのは大変☆（＾～＾） */
     // 盤上の番地 TODO これを先手盤上、後手盤上の２つに分けれる☆（＾～＾）
-    Board(SquareType),
+    Board(AbsoluteAddress2D),
     // 持ち駒の種類
     Hand(DoubleFacedPiece),
 }
 impl Default for AddressPos1 {
     // ゴミ値だぜ☆（＾～＾）
     fn default() -> Self {
-        AddressPos1::Board(SquareType::Sq11)
+        AddressPos1::Board(AbsoluteAddress2D::default())
     }
 }
 /// USI向け。
