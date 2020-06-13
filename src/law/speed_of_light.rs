@@ -15,7 +15,7 @@ use crate::cosmic::smart::features::PHYSICAL_PIECE_TYPE_LEN;
 use crate::cosmic::smart::features::PIECE_TYPE_LEN;
 use crate::cosmic::smart::features::{DoubleFacedPiece, DoubleFacedPieceType, PieceType};
 use crate::cosmic::smart::square::{Angle, RelAdr2D, ANGLE_LEN};
-use crate::cosmic::toy_box::{Piece, PieceNum};
+use crate::cosmic::toy_box::PieceNum;
 use crate::law::generate_move::{Agility, Mobility};
 
 // グローバル定数
@@ -54,7 +54,6 @@ struct SpeedOfLight {
     double_faced_piece_to_phase_table: [Phase; PHYSICAL_PIECES_LEN],
     double_faced_piece_to_type_table: [DoubleFacedPieceType; PHYSICAL_PIECES_LEN],
     double_faced_piece_to_captured_value: [isize; PHYSICAL_PIECE_TYPE_LEN],
-    double_faced_piece_to_nonpromoted_piece: [Piece; PHYSICAL_PIECES_LEN],
 
     // 相対番地と角度☆（＾～＾）
     west_ccw: [RelAdr2D; ANGLE_LEN],
@@ -311,25 +310,6 @@ impl Default for SpeedOfLight {
                 DoubleFacedPieceType::Pawn,
             ],
 
-            double_faced_piece_to_nonpromoted_piece: [
-                Piece::King1,
-                Piece::Rook1,
-                Piece::Bishop1,
-                Piece::Gold1,
-                Piece::Silver1,
-                Piece::Knight1,
-                Piece::Lance1,
-                Piece::Pawn1,
-                Piece::King2,
-                Piece::Rook2,
-                Piece::Bishop2,
-                Piece::Gold2,
-                Piece::Silver2,
-                Piece::Knight2,
-                Piece::Lance2,
-                Piece::Pawn2,
-            ],
-
             // よく使う、角度の付いた相対番地☆（＾～＾）
             west_ccw: [
                 RelAdr2D::new(1, 0),
@@ -463,9 +443,6 @@ impl DoubleFacedPiece {
     }
     pub fn type_(self) -> DoubleFacedPieceType {
         NINE_299792458.double_faced_piece_to_type_table[self as usize]
-    }
-    pub fn nonpromoted_piece(self) -> Piece {
-        NINE_299792458.double_faced_piece_to_nonpromoted_piece[self as usize]
     }
 }
 

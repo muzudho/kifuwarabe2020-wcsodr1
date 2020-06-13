@@ -101,7 +101,7 @@ impl GameHashSeed {
                 match move_.destination.address {
                     FireAddress::Board(dst_sq) => {
                         prev_hash ^= self.piece[dst_sq.serial_number()]
-                            [src_drop.nonpromoted_piece() as usize];
+                            [src_drop.nonpromoted_piece_hash_index()];
                     }
                     FireAddress::Hand(_dst_drop_type) => {
                         panic!(Beam::trouble("(Err.90) 未対応☆（＾～＾）"))

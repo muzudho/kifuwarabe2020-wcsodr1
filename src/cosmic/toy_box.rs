@@ -4,6 +4,7 @@
 use crate::cosmic::fire::{Fire, FireAddress};
 use crate::cosmic::recording::Movement;
 use crate::cosmic::recording::Phase;
+use crate::cosmic::smart::features::PHYSICAL_PIECES_LEN;
 use crate::cosmic::smart::features::{
     DoubleFacedPiece, DoubleFacedPieceType, PieceType, PHYSICAL_PIECE_TYPE_LEN,
 };
@@ -30,6 +31,7 @@ struct ToyBox {
     /// 探索部では、玉のような取れない駒も　らいおんきゃっち　しているので、玉も取れるように作っておけだぜ☆（＾～＾）
     piece_captured_table: [Piece; PIECE_LEN],
     piece_double_faced_table: [DoubleFacedPiece; PIECE_LEN],
+    double_faced_piece_to_nonpromoted_piece: [Piece; PHYSICAL_PIECES_LEN],
 }
 impl Default for ToyBox {
     fn default() -> Self {
@@ -217,6 +219,24 @@ impl Default for ToyBox {
                 DoubleFacedPiece::Lance2,  // PromotedLance2
                 DoubleFacedPiece::Pawn2,   // PromotedPawn2
             ],
+            double_faced_piece_to_nonpromoted_piece: [
+                Piece::King1,
+                Piece::Rook1,
+                Piece::Bishop1,
+                Piece::Gold1,
+                Piece::Silver1,
+                Piece::Knight1,
+                Piece::Lance1,
+                Piece::Pawn1,
+                Piece::King2,
+                Piece::Rook2,
+                Piece::Bishop2,
+                Piece::Gold2,
+                Piece::Silver2,
+                Piece::Knight2,
+                Piece::Lance2,
+                Piece::Pawn2,
+            ],
         }
     }
 }
@@ -248,15 +268,22 @@ impl Piece {
     }
 }
 
+/// コーディングを短くするためのものだぜ☆（＾～＾）
+impl DoubleFacedPiece {
+    pub fn nonpromoted_piece_hash_index(self) -> usize {
+        TOY_BOX.double_faced_piece_to_nonpromoted_piece[self as usize] as usize
+    }
+}
+
 pub const PIECE_LEN: usize = 28;
 
-/// TODO toy_boxの中にカプセル化したい。
+/// toy_boxの中にカプセル化するぜ☆（＾～＾）
 /// 先後付きの駒と空白。
 /// 接尾辞の 1 は先手、 2 は後手。
 ///
 /// Copy: 配列の要素の初期化のために利用。
 #[derive(Copy, Clone, PartialEq, FromPrimitive)]
-pub enum Piece {
+enum Piece {
     // ▲玉
     King1,
     // ▲きりん
@@ -397,9 +424,9 @@ pub struct PieceInfo {
     pub num: String,
 }
 impl PieceInfo {
-    pub fn new(piece: Piece, num: PieceNum) -> Self {
+    pub fn new(piece_display: String, num: PieceNum) -> Self {
         PieceInfo {
-            piece: format!("{}", piece),
+            piece: piece_display,
             num: format!("{:?}", num),
         }
     }
@@ -584,10 +611,6 @@ impl GameTable {
         self.phase_classification = table.phase_classification.clone();
     }
 
-    /// TODO 駒はカプセル化したいんで、なるべく他のメソッド使えだぜ☆（＾～＾）
-    pub fn get_piece(&self, num: PieceNum) -> Piece {
-        self.piece_list[num as usize]
-    }
     pub fn get_phase(&self, num: PieceNum) -> Phase {
         self.piece_list[num as usize].phase()
     }
@@ -796,7 +819,10 @@ impl GameTable {
             FireAddress::Board(sq) => {
                 let piece_num = self.board[sq.serial_number() as usize];
                 if let Some(piece_num_val) = piece_num {
-                    Some(PieceInfo::new(self.get_piece(piece_num_val), piece_num_val))
+                    Some(PieceInfo::new(
+                        format!("{}", self.piece_list[piece_num_val as usize]),
+                        piece_num_val,
+                    ))
                 } else {
                     None
                 }
@@ -844,7 +870,7 @@ impl GameTable {
                     .phase_classification
                     .last(&Fire::new_hand(fire.friend, drop_type))
                 {
-                    let piece = self.get_piece(piece_num);
+                    let piece = self.piece_list[piece_num as usize];
                     Some((
                         piece.type_(),
                         Fire::new_hand(fire.friend, piece.double_faced_piece().type_()),
