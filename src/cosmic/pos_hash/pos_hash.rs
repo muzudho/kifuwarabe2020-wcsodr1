@@ -178,6 +178,7 @@ impl GameHashSeed {
             FireAddress::Hand(drop_type) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(fire_hand.friend, drop_type);
                 let count = table.count_hand(fire_hand);
+                /*
                 debug_assert!(
                     count <= HAND_MAX,
                     "持ち駒 {:?} の枚数 {} <= {}",
@@ -185,6 +186,7 @@ impl GameHashSeed {
                     count,
                     HAND_MAX
                 );
+                */
                 hash ^= self.hands[drop as usize][count as usize];
             }
         });

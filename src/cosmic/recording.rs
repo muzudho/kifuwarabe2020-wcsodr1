@@ -6,8 +6,6 @@
 //!
 use crate::cosmic::fire::{Fire, FireAddress};
 use crate::cosmic::smart::features::PieceType;
-use crate::cosmic::smart::features::{DoubleFacedPiece, DoubleFacedPieceType};
-use crate::cosmic::smart::square::AbsoluteAddress2D;
 use crate::law::cryptographic::num_to_lower_case;
 use std::fmt;
 
