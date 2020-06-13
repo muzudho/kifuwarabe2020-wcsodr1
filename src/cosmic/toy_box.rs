@@ -21,46 +21,12 @@ lazy_static! {
 }
 
 struct ToyBox {
-    /// この駒を取ったら、先後が反転して、相手の駒になる、というリンクだぜ☆（＾～＾）
-    /// 探索部では、玉のような取れない駒も　らいおんきゃっち　しているので、玉も取れるように作っておけだぜ☆（＾～＾）
-    piece_captured_table: [Piece; PIECE_LEN],
     piece_double_faced_table: [DoubleFacedPiece; PIECE_LEN],
     double_faced_piece_to_nonpromoted_piece: [Piece; PHYSICAL_PIECES_LEN],
 }
 impl Default for ToyBox {
     fn default() -> Self {
-        use crate::cosmic::toy_box::Piece::*;
         ToyBox {
-            piece_captured_table: [
-                King2,   // King1
-                Rook2,   // Rook1
-                Bishop2, // Bishop1
-                Gold2,   // Gold1
-                Silver2, // Silver1
-                Knight2, // Knight1
-                Lance2,  // Lance1
-                Pawn2,   // Pawn1
-                Rook2,   // Dragon1
-                Bishop2, // Horse1
-                Silver2, // PromotedSilver1
-                Knight2, // PromotedKnight1
-                Lance2,  // PromotedLance1
-                Pawn2,   // PromotedPawn1
-                King1,   // King2
-                Rook1,   // Rook2
-                Bishop1, // Bishop2
-                Gold1,   // Gold2
-                Silver1, // Silver2
-                Knight1, // Knight2
-                Lance1,  // Lance2
-                Pawn1,   // Pawn2
-                Rook1,   // Dragon2
-                Bishop1, // Horse2
-                Silver1, // PromotedSilver2
-                Knight1, // PromotedKnight2
-                Lance1,  // PromotedLance2
-                Pawn1,   // PromotedPawn2
-            ],
             piece_double_faced_table: [
                 DoubleFacedPiece::King1,   // King1
                 DoubleFacedPiece::Rook1,   // Rook1
@@ -249,8 +215,39 @@ impl Piece {
         }
     }
 
+    /// この駒を取ったら、先後が反転して、相手の駒になる、というリンクだぜ☆（＾～＾）
+    /// 探索部では、玉のような取れない駒も　らいおんきゃっち　しているので、玉も取れるように作っておけだぜ☆（＾～＾）
     pub fn captured(self) -> Self {
-        TOY_BOX.piece_captured_table[self as usize]
+        match self {
+            Piece::King1 => Piece::King2,
+            Piece::Rook1 => Piece::Rook2,
+            Piece::Bishop1 => Piece::Bishop2,
+            Piece::Gold1 => Piece::Gold2,
+            Piece::Silver1 => Piece::Silver2,
+            Piece::Knight1 => Piece::Knight2,
+            Piece::Lance1 => Piece::Lance2,
+            Piece::Pawn1 => Piece::Pawn2,
+            Piece::Dragon1 => Piece::Rook2,
+            Piece::Horse1 => Piece::Bishop2,
+            Piece::PromotedSilver1 => Piece::Silver2,
+            Piece::PromotedKnight1 => Piece::Knight2,
+            Piece::PromotedLance1 => Piece::Lance2,
+            Piece::PromotedPawn1 => Piece::Pawn2,
+            Piece::King2 => Piece::King1,
+            Piece::Rook2 => Piece::Rook1,
+            Piece::Bishop2 => Piece::Bishop1,
+            Piece::Gold2 => Piece::Gold1,
+            Piece::Silver2 => Piece::Silver1,
+            Piece::Knight2 => Piece::Knight1,
+            Piece::Lance2 => Piece::Lance1,
+            Piece::Pawn2 => Piece::Pawn1,
+            Piece::Dragon2 => Piece::Rook1,
+            Piece::Horse2 => Piece::Bishop1,
+            Piece::PromotedSilver2 => Piece::Silver1,
+            Piece::PromotedKnight2 => Piece::Knight1,
+            Piece::PromotedLance2 => Piece::Lance1,
+            Piece::PromotedPawn2 => Piece::Pawn1,
+        }
     }
 
     pub fn double_faced_piece(self) -> DoubleFacedPiece {
