@@ -63,6 +63,7 @@ impl History {
 /// このオブジェクトは大量に生成されるから容量を押さえたいぜ☆（＾～＾）
 #[derive(Copy, Clone, Debug)]
 pub struct MoveEnd {
+    /// TODO friend は 消したいぜ☆（＾～＾）
     pub friend: Phase,
     pub address: FireAddress,
 }
