@@ -144,7 +144,7 @@ impl PseudoLegalMoves {
                            promotability,
                            _agility,
                            move_permission: Option<MovePermission>| {
-            let pseudo_captured_num = table.piece_num_at(UnifiedAddress::from_fire(&destination));
+            let pseudo_captured_num = table.piece_num_at(&destination.address);
 
             let (ok, space) = if let Some(pseudo_captured_num_val) = pseudo_captured_num {
                 if table.get_phase(pseudo_captured_num_val) == friend {
@@ -252,7 +252,7 @@ impl PseudoLegalMoves {
         if let Some((piece_type, hand_addr)) = table.last_hand(drop) {
             // 打つぜ☆（＾～＾）
             let drop_fn = &mut |destination: &Fire| {
-                if let None = table.piece_num_at(UnifiedAddress::from_fire(&destination)) {
+                if let None = table.piece_num_at(&destination.address) {
                     // 駒が無いところに打つ
                     use crate::cosmic::smart::features::PieceType::*;
                     match piece_type {

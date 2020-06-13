@@ -3193,9 +3193,9 @@ impl GameTable {
     /// TODO Piece をカプセル化したい。外に出したくないぜ☆（＾～＾）
     /// 升で指定して駒を取得。
     /// 駒台には対応してない。 -> 何に使っている？
-    pub fn piece_num_at(&self, addr: UnifiedAddress) -> Option<PieceNum> {
-        match addr.to_address_pos1() {
-            AddressPos1::Board(sq) => self.board[sq.to_serial_number() as usize],
+    pub fn piece_num_at(&self, addr: &FireAddress) -> Option<PieceNum> {
+        match addr {
+            FireAddress::Board(sq) => self.board[sq.serial_number() as usize],
             _ => panic!(Beam::trouble(&format!(
                 "(Err.254) まだ駒台は実装してないぜ☆（＾～＾）！",
             ))),
