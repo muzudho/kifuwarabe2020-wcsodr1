@@ -439,14 +439,8 @@ pub fn set_position(line: &str, game: &mut Game) {
                     starts += 1;
 
                     for _i in 0..hand_num {
-                        // 駒に背番号を付けるぜ☆（＾～＾）
-                        let piece_num = game.mut_starting().numbering_piece(hand);
-                        // 駒台に置くぜ☆（＾～＾）
-                        let drop = Fire::new_hand(
-                            game.table.get_phase(piece_num),
-                            game.table.get_double_faced_piece_type(piece_num),
-                        );
-                        game.mut_starting().push_piece(&drop, Some(piece_num));
+                        // 散らばっている駒に、背番号を付けて、駒台に置くぜ☆（＾～＾）
+                        game.mut_starting().init_hand(hand);
                     }
                 } //if
             } //loop

@@ -450,6 +450,18 @@ impl GameTable {
         }
     }
 
+    /// 散らばっている駒に、背番号を付けて、駒台に置くぜ☆（＾～＾）
+    pub fn init_hand(&mut self, hand: Piece) {
+        // 駒に背番号を付けるぜ☆（＾～＾）
+        let piece_num = self.numbering_piece(hand);
+        // 駒台に置くぜ☆（＾～＾）
+        let drop = Fire::new_hand(
+            self.get_phase(piece_num),
+            self.get_double_faced_piece_type(piece_num),
+        );
+        self.push_piece(&drop, Some(piece_num));
+    }
+
     /// 駒の新しい背番号を生成します。
     pub fn numbering_piece(&mut self, piece: Piece) -> PieceNum {
         match piece {
