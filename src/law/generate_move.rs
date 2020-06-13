@@ -178,6 +178,12 @@ impl PseudoLegalMoves {
                                             if let Some(piece_num_val) = pseudo_captured_num {
                                                 Some(CapturedMove::new(
                                                     *destination,
+                                                    Fire::new_hand(
+                                                        friend.turn(),
+                                                        table.get_double_faced_piece_type(
+                                                            piece_num_val,
+                                                        ),
+                                                    ),
                                                     table.get_type(piece_num_val),
                                                 ))
                                             } else {
@@ -192,6 +198,11 @@ impl PseudoLegalMoves {
                                         if let Some(piece_num_val) = pseudo_captured_num {
                                             Some(CapturedMove::new(
                                                 *destination,
+                                                Fire::new_hand(
+                                                    friend.turn(),
+                                                    table
+                                                        .get_double_faced_piece_type(piece_num_val),
+                                                ),
                                                 table.get_type(piece_num_val),
                                             ))
                                         } else {
@@ -209,6 +220,12 @@ impl PseudoLegalMoves {
                                             if let Some(piece_num_val) = pseudo_captured_num {
                                                 Some(CapturedMove::new(
                                                     *destination,
+                                                    Fire::new_hand(
+                                                        friend.turn(),
+                                                        table.get_double_faced_piece_type(
+                                                            piece_num_val,
+                                                        ),
+                                                    ),
                                                     table.get_type(piece_num_val),
                                                 ))
                                             } else {

@@ -661,29 +661,22 @@ impl GameTable {
     /// あれば、指し手で取った駒の先後をひっくり返せば、自分の駒台にある駒を取り出せるので取り出して、盤の上に指し手の取った駒のまま駒を置きます。
     pub fn rotate_piece_hand_to_board(&mut self, friend: Phase, move_: &Movement) {
         if let Some(move2_val) = move_.captured {
+            // let piece_type = self.get_type(self.piece_num_at(&move2_val.destination.address).unwrap());
+            let piece_type = move2_val.piece_type;
             // 取った方の駒台の先後に合わせるぜ☆（＾～＾）
             // 取った方の持ち駒を減らす
             let piece_num = {
                 // TODO テスト中☆（＾～＾）
                 let double_faced_piece = DoubleFacedPiece::from_phase_and_type(
                     friend,
-                    // friend.turn(),
-                    move2_val.piece_type.double_faced_piece_type(),
+                    piece_type.double_faced_piece_type(),
                 );
                 let fire1 = Fire::new_hand(friend, double_faced_piece.type_());
-                // let uni_addr = UnifiedAddress::from_address_pos1(friend, addr_pos1);
-                // let addr_pos2 = uni_addr.to_address_pos();
-                /*
-                Beam::shoot(&format!(
-                    "addr_pos {} -> {:?} -> {}",
-                    addr_pos1, uni_addr, addr_pos2
-                ));
-                */
                 self.pop_piece(&fire1).unwrap()
             };
             // 先後をひっくり返す。
             self.turn_phase(piece_num);
-            if move2_val.piece_type.promoted() {
+            if piece_type.promoted() {
                 // 成り駒にします。
                 self.promote(piece_num);
             } else {

@@ -197,6 +197,11 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
     buffer.captured = if let Some(captured_piece_num_val) = captured_piece_num {
         Some(CapturedMove::new(
             buffer.destination,
+            Fire::new_hand(
+                friend.turn(),
+                game.table
+                    .get_double_faced_piece_type(captured_piece_num_val),
+            ),
             game.table.get_type(captured_piece_num_val),
         ))
     } else {

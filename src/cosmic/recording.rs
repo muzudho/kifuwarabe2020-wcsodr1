@@ -66,16 +66,15 @@ pub struct CapturedMove {
     pub piece_type: PieceType,
     /// 元あった所。
     pub source: Fire,
-    /*
-    /// TODO 移動先。
-    pub destination: UnifiedAddress,
-    */
+    /// 移動先。
+    pub destination: Fire,
 }
 impl CapturedMove {
     // TODO Piece を持ちまわすのは止めたいが……☆（＾～＾）
-    pub fn new(source: Fire, piece_type: PieceType) -> Self {
+    pub fn new(source: Fire, destination: Fire, piece_type: PieceType) -> Self {
         CapturedMove {
             source: source,
+            destination: destination,
             piece_type: piece_type,
         }
     }
@@ -176,7 +175,6 @@ pub enum Phase {
     First,
     Second,
 }
-/*
 impl Phase {
     pub fn turn(self) -> Phase {
         use self::Phase::*;
@@ -186,7 +184,6 @@ impl Phase {
         }
     }
 }
-*/
 /// 後手（上手）を盤の下側に持ってきて表示するのを基本とするぜ☆（＾～＾）
 impl fmt::Display for Phase {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
