@@ -616,7 +616,9 @@ impl GameTable {
     /// 駒の先後を反転させるぜ☆（＾～＾）
     // あれば　盤の相手の駒を先後反転して、自分の駒台に置きます。
     pub fn rotate_piece_board_to_hand(&mut self, move_: &Movement) {
-        if let Some(collision_piece_num_val) = self.pop_piece(&move_.destination) {
+        if let Some(collision_piece_num_val) =
+            self.pop_piece(move_.destination.friend, &move_.destination)
+        {
             // 移動先升の駒を盤上から消し、自分の持ち駒に増やす
             // 先後ひっくり返す。
             self.turn_phase(collision_piece_num_val);
@@ -637,7 +639,7 @@ impl GameTable {
     pub fn rotate_piece_hand_to_board(&mut self, friend: Phase, move_: &Movement) {
         if let Some(move2_val) = move_.captured {
             // アンドゥだから盤にまだない。
-            let piece_type = self.last_hand_type(&move2_val.destination).unwrap();
+            let piece_type = self.last_hand_type(friend, &move2_val.destination).unwrap();
 
             // 取った方の駒台の先後に合わせるぜ☆（＾～＾）
             // 取った方の持ち駒を減らす
@@ -648,7 +650,7 @@ impl GameTable {
                     piece_type.double_faced_piece_type(),
                 );
                 let fire1 = MoveEnd::new_hand(friend, double_faced_piece.type_());
-                self.pop_piece(&fire1).unwrap()
+                self.pop_piece(friend, &fire1).unwrap()
             };
             // 先後をひっくり返す。
             self.turn_phase(piece_num);
@@ -697,7 +699,7 @@ impl GameTable {
         }
     }
     /// 駒を取りのぞく。
-    pub fn pop_piece(&mut self, fire: &MoveEnd) -> Option<PieceNum> {
+    pub fn pop_piece(&mut self, friend: Phase, fire: &MoveEnd) -> Option<PieceNum> {
         match fire.address {
             FireAddress::Board(sq) => {
                 let piece_num = self.board[sq.serial_number() as usize];
@@ -705,7 +707,7 @@ impl GameTable {
                     // マスを空にします。
                     self.board[sq.serial_number() as usize] = None;
                     // データベース
-                    self.phase_classification.pop(&fire);
+                    self.phase_classification.pop(friend, &fire);
                     // TODO 背番号の番地を、ゴミ値で塗りつぶすが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
                     self.address_list[piece_num_val as usize] = MoveEnd::default();
                 }
@@ -714,7 +716,7 @@ impl GameTable {
             FireAddress::Hand(_drop_type) => {
                 // 場所で指定します。
                 // 台から取りのぞきます。
-                let piece_num = self.phase_classification.pop(&fire);
+                let piece_num = self.phase_classification.pop(friend, &fire);
                 // TODO 背番号の番地に、ゴミ値を入れて消去するが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
                 self.address_list[piece_num as usize] = MoveEnd::default();
                 Some(piece_num)
@@ -786,11 +788,11 @@ impl GameTable {
     /// TODO Piece をカプセル化したい。外に出したくないぜ☆（＾～＾）
     /// 升で指定して駒を取得。
     /// 駒台には対応してない。 -> 何に使っている？
-    pub fn piece_num_at(&self, fire: &MoveEnd) -> Option<PieceNum> {
+    pub fn piece_num_at(&self, friend: Phase, fire: &MoveEnd) -> Option<PieceNum> {
         match fire.address {
             FireAddress::Board(sq) => self.board[sq.serial_number() as usize],
             _ => {
-                self.last_hand_num(fire)
+                self.last_hand_num(friend, fire)
                 /*
                     panic!(Beam::trouble(&format!(
                     "(Err.254) まだ駒台は実装してないぜ☆（＾～＾）！",
@@ -845,24 +847,24 @@ impl GameTable {
         }
     }
     /// 指し手生成で使うぜ☆（＾～＾）有無を調べるぜ☆（＾～＾）
-    pub fn last_hand_type(&self, fire: &MoveEnd) -> Option<PieceType> {
-        if let Some(piece_num) = self.phase_classification.last(&fire) {
+    pub fn last_hand_type(&self, friend: Phase, fire: &MoveEnd) -> Option<PieceType> {
+        if let Some(piece_num) = self.phase_classification.last(friend, &fire) {
             Some(self.get_type(piece_num))
         } else {
             None
         }
     }
     /// 指し手生成で使うぜ☆（＾～＾）有無を調べるぜ☆（＾～＾）
-    pub fn is_empty_hand(&self, fire: &MoveEnd) -> bool {
-        self.phase_classification.is_empty_hand(&fire)
+    pub fn is_empty_hand(&self, friend: Phase, fire: &MoveEnd) -> bool {
+        self.phase_classification.is_empty_hand(friend, &fire)
     }
-    pub fn last_hand_num(&self, fire: &MoveEnd) -> Option<PieceNum> {
+    pub fn last_hand_num(&self, friend: Phase, fire: &MoveEnd) -> Option<PieceNum> {
         match fire.address {
             FireAddress::Board(_sq) => {
                 panic!(Beam::trouble(&format!("(Err.3251) 未対応☆（＾～＾）！",)))
             }
             FireAddress::Hand(_drop_type) => {
-                if let Some(piece_num) = self.phase_classification.last(fire) {
+                if let Some(piece_num) = self.phase_classification.last(friend, fire) {
                     Some(piece_num)
                 } else {
                     None
@@ -871,7 +873,7 @@ impl GameTable {
         }
     }
     /// 指し手生成で使うぜ☆（＾～＾）
-    pub fn last_hand(&self, fire: &MoveEnd) -> Option<(PieceType, MoveEnd)> {
+    pub fn last_hand(&self, friend: Phase, fire: &MoveEnd) -> Option<(PieceType, MoveEnd)> {
         match fire.address {
             FireAddress::Board(_sq) => {
                 panic!(Beam::trouble(&format!("(Err.3251) 未対応☆（＾～＾）！",)))
@@ -879,12 +881,12 @@ impl GameTable {
             FireAddress::Hand(drop_type) => {
                 if let Some(piece_num) = self
                     .phase_classification
-                    .last(&MoveEnd::new_hand(fire.friend, drop_type))
+                    .last(friend, &MoveEnd::new_hand(friend, drop_type))
                 {
                     let piece = self.piece_list[piece_num as usize];
                     Some((
                         piece.type_(),
-                        MoveEnd::new_hand(fire.friend, piece.double_faced_piece().type_()),
+                        MoveEnd::new_hand(friend, piece.double_faced_piece().type_()),
                     ))
                 } else {
                     None
@@ -892,14 +894,14 @@ impl GameTable {
             }
         }
     }
-    pub fn count_hand(&self, fire: &MoveEnd) -> usize {
+    pub fn count_hand(&self, friend: Phase, fire: &MoveEnd) -> usize {
         match fire.address {
             FireAddress::Board(_sq) => {
                 panic!(Beam::trouble(&format!("(Err.3266) 未対応☆（＾～＾）！",)))
             }
             FireAddress::Hand(drop_type) => self
                 .phase_classification
-                .len(&MoveEnd::new_hand(fire.friend, drop_type)),
+                .len(friend, &MoveEnd::new_hand(friend, drop_type)),
         }
     }
 
@@ -970,7 +972,7 @@ impl GameTable {
         ];
         for drop in &FIRST_SECOND[friend as usize] {
             let fire = &MoveEnd::new_hand(friend, drop.type_());
-            if !self.is_empty_hand(fire) {
+            if !self.is_empty_hand(friend, fire) {
                 piece_get(&MoveEnd::new_hand(drop.phase(), drop.type_())); // TODO この fire は使い回せないのかだぜ☆（＾～＾）？
             }
         }
@@ -1048,18 +1050,18 @@ impl PhaseClassification {
         }
     }
     /// ゴミ値は消さないぜ☆（＾～＾）
-    pub fn pop(&mut self, fire: &MoveEnd) -> PieceNum {
+    pub fn pop(&mut self, friend: Phase, fire: &MoveEnd) -> PieceNum {
         match fire.address {
             FireAddress::Board(_sq) => {
                 // TODO 先端の要素をポップ。
-                let peak = self.items[self.board_cur(fire.friend) as usize];
+                let peak = self.items[self.board_cur(friend) as usize];
                 // TODO 中段の要素をポップ。
                 // let middle =
                 // TODO さっき抜いた先端の要素を、中段の要素のところへスワップ。
                 PieceNum::King1 // ゴミ値を返しとくぜ☆（＾～＾）
             }
             FireAddress::Hand(drop_type) => {
-                let drop = DoubleFacedPiece::from_phase_and_type(fire.friend, drop_type);
+                let drop = DoubleFacedPiece::from_phase_and_type(friend, drop_type);
                 // 位置を増減するぜ☆（＾～＾）
                 self.add_hand_cur(drop, -self.direction(drop));
                 // 駒台の駒をはがすぜ☆（＾～＾）
@@ -1068,11 +1070,11 @@ impl PhaseClassification {
         }
     }
 
-    fn last(&self, fire: &MoveEnd) -> Option<PieceNum> {
+    fn last(&self, friend: Phase, fire: &MoveEnd) -> Option<PieceNum> {
         match fire.address {
             FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3431) 未対応☆（＾～＾）")),
             FireAddress::Hand(drop_type) => {
-                let drop = DoubleFacedPiece::from_phase_and_type(fire.friend, drop_type);
+                let drop = DoubleFacedPiece::from_phase_and_type(friend, drop_type);
                 if self.direction(drop) == 1 {
                     if self.start(drop) < self.hand_cur(drop) {
                         Some(self.items[(self.hand_cur(drop) - 1) as usize])
@@ -1090,11 +1092,11 @@ impl PhaseClassification {
         }
     }
 
-    fn is_empty_hand(&self, fire: &MoveEnd) -> bool {
+    fn is_empty_hand(&self, friend: Phase, fire: &MoveEnd) -> bool {
         match fire.address {
             FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3431) 未対応☆（＾～＾）")),
             FireAddress::Hand(drop_type) => {
-                let drop = DoubleFacedPiece::from_phase_and_type(fire.friend, drop_type);
+                let drop = DoubleFacedPiece::from_phase_and_type(friend, drop_type);
                 if self.direction(drop) == 1 {
                     if self.start(drop) < self.hand_cur(drop) as isize {
                         false
@@ -1112,11 +1114,11 @@ impl PhaseClassification {
         }
     }
 
-    fn len(&self, fire: &MoveEnd) -> usize {
+    fn len(&self, friend: Phase, fire: &MoveEnd) -> usize {
         match fire.address {
             FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3431) 未対応☆（＾～＾）")),
             FireAddress::Hand(drop_type) => {
-                let drop = DoubleFacedPiece::from_phase_and_type(fire.friend, drop_type);
+                let drop = DoubleFacedPiece::from_phase_and_type(friend, drop_type);
                 if self.direction(drop) == 1 {
                     (self.hand_cur(drop) as isize - self.start(drop)) as usize
                 } else {

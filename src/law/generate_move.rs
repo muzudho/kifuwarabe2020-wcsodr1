@@ -132,14 +132,14 @@ impl PseudoLegalMoves {
     {
         match source.address {
             FireAddress::Board(_src_sq) => {
-                let piece_type = table.get_type(table.piece_num_at(&source).unwrap());
+                let piece_type = table.get_type(table.piece_num_at(friend, &source).unwrap());
 
                 let moving =
                     &mut |destination: &MoveEnd,
                           promotability,
                           _agility,
                           move_permission: Option<MovePermission>| {
-                        let pseudo_captured_num = table.piece_num_at(&destination);
+                        let pseudo_captured_num = table.piece_num_at(friend, &destination);
 
                         let space = if let Some(pseudo_captured_num_val) = pseudo_captured_num {
                             if table.get_phase(pseudo_captured_num_val) == friend {
@@ -176,7 +176,7 @@ impl PseudoLegalMoves {
                                 // 成ったり、成れなかったりできるとき。
                                 if !forbidden {
                                     listen_move(Movement::new(
-                                        table.piece_num_at(&source).unwrap(),
+                                        table.piece_num_at(friend, &source).unwrap(),
                                         *source,
                                         *destination,
                                         false,
@@ -195,7 +195,7 @@ impl PseudoLegalMoves {
                                     ));
                                 }
                                 listen_move(Movement::new(
-                                    table.piece_num_at(&source).unwrap(),
+                                    table.piece_num_at(friend, &source).unwrap(),
                                     *source,
                                     *destination,
                                     true,
@@ -216,7 +216,7 @@ impl PseudoLegalMoves {
                                 // 成れるか、成れないかのどちらかのとき。
                                 if promotion || !forbidden {
                                     listen_move(Movement::new(
-                                        table.piece_num_at(&source).unwrap(),
+                                        table.piece_num_at(friend, &source).unwrap(),
                                         *source,
                                         *destination,
                                         promotion,
@@ -242,10 +242,10 @@ impl PseudoLegalMoves {
                 Area::piece_of(friend, piece_type, source, moving);
             }
             FireAddress::Hand(src_drop_type) => {
-                if let Some((piece_type, fire_hand)) = table.last_hand(source) {
+                if let Some((piece_type, fire_hand)) = table.last_hand(friend, source) {
                     // 打つぜ☆（＾～＾）
                     let drop_fn = &mut |destination: &MoveEnd| {
-                        if let None = table.piece_num_at(&destination) {
+                        if let None = table.piece_num_at(friend, &destination) {
                             // 駒が無いところに打つ
                             use crate::cosmic::smart::features::PieceType::*;
                             match piece_type {
@@ -265,7 +265,7 @@ impl PseudoLegalMoves {
                                 _ => {}
                             }
                             listen_move(Movement::new(
-                                table.piece_num_at(&fire_hand).unwrap(),
+                                table.piece_num_at(friend, &fire_hand).unwrap(),
                                 fire_hand,    // 打った駒種類
                                 *destination, // どの升へ行きたいか
                                 false,        // 打に成りは無し

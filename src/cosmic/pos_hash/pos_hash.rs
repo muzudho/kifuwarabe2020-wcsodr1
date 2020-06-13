@@ -96,7 +96,7 @@ impl GameHashSeed {
             FireAddress::Hand(src_drop_type) => {
                 let src_drop =
                     DoubleFacedPiece::from_phase_and_type(move_.source.friend, src_drop_type);
-                let count = table.count_hand(&move_.source);
+                let count = table.count_hand(move_.source.friend, &move_.source);
                 // 打つ前の駒の枚数のハッシュ。
                 prev_hash ^= self.hands[src_drop as usize][count as usize];
                 // 移動後マスに、打った駒があるときのハッシュ。
@@ -112,7 +112,9 @@ impl GameHashSeed {
             }
         }
         // 移動先に駒があれば、自分の持ち駒になります。
-        if let Some(dst_piece_num) = table.piece_num_at(&move_.destination) {
+        if let Some(dst_piece_num) =
+            table.piece_num_at(move_.destination.friend, &move_.destination)
+        {
             if let Some(dst_piece_hash_index) =
                 table.get_piece_board_hash_index(&move_.destination.address)
             {
@@ -123,10 +125,10 @@ impl GameHashSeed {
                             self.piece[dst_sq.serial_number() as usize][dst_piece_hash_index];
                         // 自分の持ち駒になるケースの追加
                         let double_faced_piece = table.get_double_faced_piece(dst_piece_num);
-                        let count = table.count_hand(&MoveEnd::new_hand(
+                        let count = table.count_hand(
                             history.get_friend(),
-                            double_faced_piece.type_(),
-                        ));
+                            &MoveEnd::new_hand(history.get_friend(), double_faced_piece.type_()),
+                        );
                         // 打つ前の駒の枚数のハッシュ。
                         prev_hash ^= self.hands[double_faced_piece as usize][count as usize + 1];
                     }
@@ -188,7 +190,7 @@ impl GameHashSeed {
             FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.175) 未対応☆（＾～＾）")),
             FireAddress::Hand(drop_type) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(fire_hand.friend, drop_type);
-                let count = table.count_hand(fire_hand);
+                let count = table.count_hand(fire_hand.friend, fire_hand);
                 /*
                 debug_assert!(
                     count <= HAND_MAX,
