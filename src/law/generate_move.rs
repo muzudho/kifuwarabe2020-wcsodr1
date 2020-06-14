@@ -350,8 +350,7 @@ impl PseudoLegalMoves {
         F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
-            Promoting::pawn_lance(
-                self.friend,
+            self.promote_pawn_lance(
                 destination,
                 moving,
                 Some(MovePermission::from_pawn_or_lance(self.friend)),
@@ -376,8 +375,7 @@ impl PseudoLegalMoves {
         F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
-            Promoting::pawn_lance(
-                self.friend,
+            self.promote_pawn_lance(
                 destination,
                 moving,
                 Some(MovePermission::from_pawn_or_lance(self.friend)),
@@ -402,8 +400,7 @@ impl PseudoLegalMoves {
         F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
-            Promoting::knight(
-                self.friend,
+            self.promote_knight(
                 destination,
                 moving,
                 Some(MovePermission::from_knight(self.friend)),
@@ -427,7 +424,7 @@ impl PseudoLegalMoves {
         F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
-            Promoting::silver(self.friend, &source, destination, moving)
+            self.promote_silver(&source, destination, moving)
         };
 
         for mobility in PieceType::Silver.mobility().iter() {
@@ -488,7 +485,7 @@ impl PseudoLegalMoves {
         F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
-            Promoting::bishop_rook(self.friend, source, destination, moving)
+            self.promote_bishop_rook(source, destination, moving)
         };
         for mobility in PieceType::Bishop.mobility().iter() {
             self.move_(source, *mobility, moving);
@@ -507,7 +504,7 @@ impl PseudoLegalMoves {
         F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
-            Promoting::bishop_rook(self.friend, source, destination, moving)
+            self.promote_bishop_rook(source, destination, moving)
         };
         for mobility in PieceType::Rook.mobility().iter() {
             self.move_(source, *mobility, moving);
@@ -610,6 +607,234 @@ impl PseudoLegalMoves {
             }
             _ => panic!(Beam::trouble(&format!(
                 "(Err.641) まだ実装してないぜ☆（＾～＾）！",
+            ))),
+        }
+    }
+
+    /// 歩と香のための、成れるか成れないか判定だぜ☆（＾～＾）！
+    ///
+    /// Arguments
+    /// ---------
+    ///
+    /// * `destinaion` -
+    /// * `callback` -
+    /// * `move_permission` - 成らずに一番奥の段に移動することはできません。
+    fn promote_pawn_lance<F1>(
+        &self,
+        destination: &FireAddress,
+        callback: &mut F1,
+        move_permission: Option<MovePermission>,
+    ) -> bool
+    where
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+    {
+        if self.is_promote_farthest_rank_from_friend(destination) {
+            // 自陣から見て一番奥の段
+            callback(
+                destination,
+                Promotability::Forced,
+                Agility::Hopping,
+                move_permission,
+            )
+        } else if self.is_promote_second_third_farthest_rank_from_friend(destination) {
+            // 自陣から見て二番、三番目の奥の段
+            callback(
+                destination,
+                Promotability::Any,
+                Agility::Hopping,
+                move_permission,
+            )
+        } else {
+            callback(
+                destination,
+                Promotability::Deny,
+                Agility::Hopping,
+                move_permission,
+            )
+        }
+    }
+
+    /// 桂のための、成れるか成れないか判定だぜ☆（＾～＾）！
+    ///
+    /// Arguments
+    /// ---------
+    ///
+    /// * `destinaion` -
+    /// * `callback` -
+    /// * `move_permission` - 成らずに奥から２番目の段に移動することはできません。
+    fn promote_knight<F1>(
+        &self,
+        destination: &FireAddress,
+        callback: &mut F1,
+        move_permission: Option<MovePermission>,
+    ) -> bool
+    where
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+    {
+        if self.is_promote_first_second_farthest_rank_from_friend(destination) {
+            callback(
+                destination,
+                Promotability::Forced,
+                Agility::Knight,
+                move_permission,
+            )
+        } else if self.is_promote_third_farthest_rank_from_friend(destination) {
+            callback(
+                destination,
+                Promotability::Any,
+                Agility::Knight,
+                move_permission,
+            )
+        } else {
+            callback(
+                destination,
+                Promotability::Deny,
+                Agility::Knight,
+                move_permission,
+            )
+        }
+    }
+
+    /// 銀のための、成れるか成れないか判定だぜ☆（＾～＾）！
+    /// 自陣から見て奥から１～３段目に入るときに成れます。元位置が３段目のときは、動けば成るか選べます。
+    ///
+    /// Arguments
+    /// ---------
+    ///
+    /// * `source` -
+    /// * `destination` -
+    /// * `callback` -
+    fn promote_silver<F1>(
+        &self,
+        source: &FireAddress,
+        destination: &FireAddress,
+        callback: &mut F1,
+    ) -> bool
+    where
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+    {
+        if self.is_promote_third_farthest_rank_from_friend(source)
+            || self.is_promote_opponent_region(destination)
+        {
+            callback(destination, Promotability::Any, Agility::Hopping, None)
+        } else {
+            callback(destination, Promotability::Deny, Agility::Hopping, None)
+        }
+    }
+
+    /// 角と飛のための、成れるか成れないか判定だぜ☆（＾～＾）！
+    /// 非敵陣にいるとき、敵陣で成れます。敵陣にいるとき、どこでも成れます。
+    ///
+    /// Arguments
+    /// ---------
+    ///
+    /// * `friend` -
+    /// * `source` -
+    /// * `destination` -
+    /// * `callback` -
+    fn promote_bishop_rook<F1>(
+        &self,
+        source: &FireAddress,
+        destination: &FireAddress,
+        callback: &mut F1,
+    ) -> bool
+    where
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+    {
+        if self.is_promote_opponent_region(source) || self.is_promote_opponent_region(destination) {
+            callback(destination, Promotability::Any, Agility::Sliding, None)
+        } else {
+            callback(destination, Promotability::Deny, Agility::Sliding, None)
+        }
+    }
+
+    /// 自陣から見て、一番遠いの段
+    ///
+    /// Arguments
+    /// ---------
+    ///
+    /// * `friend` -
+    /// * `destination` -
+    fn is_promote_farthest_rank_from_friend(&self, destination: &FireAddress) -> bool {
+        match destination {
+            FireAddress::Board(dst_sq) => match self.friend {
+                Phase::First => dst_sq.rank() < RANK2U8,
+                Phase::Second => RANK8U8 < dst_sq.rank(),
+            },
+            _ => panic!(Beam::trouble(&format!(
+                "(Err.905) まだ実装してないぜ☆（＾～＾）！",
+            ))),
+        }
+    }
+    /// 自陣から見て、一番目、２番目に遠いの段
+    ///
+    /// Arguments
+    /// ---------
+    ///
+    /// * `friend` -
+    /// * `destination` -
+    fn is_promote_first_second_farthest_rank_from_friend(&self, destination: &FireAddress) -> bool {
+        match destination {
+            FireAddress::Board(dst_sq) => match self.friend {
+                Phase::First => dst_sq.rank() < RANK3U8,
+                Phase::Second => RANK7U8 < dst_sq.rank(),
+            },
+            _ => panic!(Beam::trouble(&format!(
+                "(Err.919) まだ実装してないぜ☆（＾～＾）！",
+            ))),
+        }
+    }
+    /// 自陣から見て、二番目、三番目に遠いの段
+    ///
+    /// Arguments
+    /// ---------
+    ///
+    /// * `friend` -
+    /// * `destination` -
+    fn is_promote_second_third_farthest_rank_from_friend(&self, destination: &FireAddress) -> bool {
+        match destination {
+            FireAddress::Board(dst_sq) => match self.friend {
+                Phase::First => RANK1U8 < dst_sq.rank() && dst_sq.rank() < RANK4U8,
+                Phase::Second => RANK6U8 < dst_sq.rank() && dst_sq.rank() < RANK9U8,
+            },
+            _ => panic!(Beam::trouble(&format!(
+                "(Err.937) まだ実装してないぜ☆（＾～＾）！",
+            ))),
+        }
+    }
+    /// 自陣から見て、三番目に遠いの段
+    ///
+    /// Arguments
+    /// ---------
+    ///
+    /// * `friend` -
+    /// * `destination` -
+    fn is_promote_third_farthest_rank_from_friend(&self, destination: &FireAddress) -> bool {
+        match destination {
+            FireAddress::Board(dst_sq) => match self.friend {
+                Phase::First => dst_sq.rank() == RANK3U8,
+                Phase::Second => RANK7U8 == dst_sq.rank(),
+            },
+            _ => panic!(Beam::trouble(&format!(
+                "(Err.946) まだ実装してないぜ☆（＾～＾）！",
+            ))),
+        }
+    }
+    /// 敵陣
+    ///
+    /// Arguments
+    /// ---------
+    ///
+    /// * `friend` -
+    /// * `destination` -
+    fn is_promote_opponent_region(&self, destination: &FireAddress) -> bool {
+        match destination {
+            FireAddress::Board(dst_sq) => match self.friend {
+                Phase::First => dst_sq.rank() < RANK4U8,
+                Phase::Second => RANK6U8 < dst_sq.rank(),
+            },
+            _ => panic!(Beam::trouble(&format!(
+                "(Err.957) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
     }
@@ -737,239 +962,5 @@ impl MovePermission {
 impl fmt::Debug for MovePermission {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "(rank{}~{})", self.min_rank, self.max_rank)
-    }
-}
-
-/// 成れるか、成れないか☆（＾～＾）
-struct Promoting {}
-impl Promoting {
-    /// 歩と香のための、成れるか成れないか判定だぜ☆（＾～＾）！
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `destinaion` -
-    /// * `callback` -
-    /// * `move_permission` - 成らずに一番奥の段に移動することはできません。
-    fn pawn_lance<F1>(
-        friend: Phase,
-        destination: &FireAddress,
-        callback: &mut F1,
-        move_permission: Option<MovePermission>,
-    ) -> bool
-    where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
-    {
-        if Promoting::is_farthest_rank_from_friend(friend, destination) {
-            // 自陣から見て一番奥の段
-            callback(
-                destination,
-                Promotability::Forced,
-                Agility::Hopping,
-                move_permission,
-            )
-        } else if Promoting::is_second_third_farthest_rank_from_friend(friend, destination) {
-            // 自陣から見て二番、三番目の奥の段
-            callback(
-                destination,
-                Promotability::Any,
-                Agility::Hopping,
-                move_permission,
-            )
-        } else {
-            callback(
-                destination,
-                Promotability::Deny,
-                Agility::Hopping,
-                move_permission,
-            )
-        }
-    }
-
-    /// 桂のための、成れるか成れないか判定だぜ☆（＾～＾）！
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `destinaion` -
-    /// * `callback` -
-    /// * `move_permission` - 成らずに奥から２番目の段に移動することはできません。
-    fn knight<F1>(
-        friend: Phase,
-        destination: &FireAddress,
-        callback: &mut F1,
-        move_permission: Option<MovePermission>,
-    ) -> bool
-    where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
-    {
-        if Promoting::is_first_second_farthest_rank_from_friend(friend, destination) {
-            callback(
-                destination,
-                Promotability::Forced,
-                Agility::Knight,
-                move_permission,
-            )
-        } else if Promoting::is_third_farthest_rank_from_friend(friend, destination) {
-            callback(
-                destination,
-                Promotability::Any,
-                Agility::Knight,
-                move_permission,
-            )
-        } else {
-            callback(
-                destination,
-                Promotability::Deny,
-                Agility::Knight,
-                move_permission,
-            )
-        }
-    }
-
-    /// 銀のための、成れるか成れないか判定だぜ☆（＾～＾）！
-    /// 自陣から見て奥から１～３段目に入るときに成れます。元位置が３段目のときは、動けば成るか選べます。
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `source` -
-    /// * `destination` -
-    /// * `callback` -
-    fn silver<F1>(
-        friend: Phase,
-        source: &FireAddress,
-        destination: &FireAddress,
-        callback: &mut F1,
-    ) -> bool
-    where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
-    {
-        if Promoting::is_third_farthest_rank_from_friend(friend, source)
-            || Promoting::is_opponent_region(friend, destination)
-        {
-            callback(destination, Promotability::Any, Agility::Hopping, None)
-        } else {
-            callback(destination, Promotability::Deny, Agility::Hopping, None)
-        }
-    }
-
-    /// 角と飛のための、成れるか成れないか判定だぜ☆（＾～＾）！
-    /// 非敵陣にいるとき、敵陣で成れます。敵陣にいるとき、どこでも成れます。
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `friend` -
-    /// * `source` -
-    /// * `destination` -
-    /// * `callback` -
-    fn bishop_rook<F1>(
-        friend: Phase,
-        source: &FireAddress,
-        destination: &FireAddress,
-        callback: &mut F1,
-    ) -> bool
-    where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
-    {
-        if Promoting::is_opponent_region(friend, source)
-            || Promoting::is_opponent_region(friend, destination)
-        {
-            callback(destination, Promotability::Any, Agility::Sliding, None)
-        } else {
-            callback(destination, Promotability::Deny, Agility::Sliding, None)
-        }
-    }
-
-    /// 自陣から見て、一番遠いの段
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `friend` -
-    /// * `destination` -
-    fn is_farthest_rank_from_friend(friend: Phase, destination: &FireAddress) -> bool {
-        match destination {
-            FireAddress::Board(dst_sq) => match friend {
-                Phase::First => dst_sq.rank() < RANK2U8,
-                Phase::Second => RANK8U8 < dst_sq.rank(),
-            },
-            _ => panic!(Beam::trouble(&format!(
-                "(Err.905) まだ実装してないぜ☆（＾～＾）！",
-            ))),
-        }
-    }
-    /// 自陣から見て、一番目、２番目に遠いの段
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `friend` -
-    /// * `destination` -
-    fn is_first_second_farthest_rank_from_friend(friend: Phase, destination: &FireAddress) -> bool {
-        match destination {
-            FireAddress::Board(dst_sq) => match friend {
-                Phase::First => dst_sq.rank() < RANK3U8,
-                Phase::Second => RANK7U8 < dst_sq.rank(),
-            },
-            _ => panic!(Beam::trouble(&format!(
-                "(Err.919) まだ実装してないぜ☆（＾～＾）！",
-            ))),
-        }
-    }
-    /// 自陣から見て、二番目、三番目に遠いの段
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `friend` -
-    /// * `destination` -
-    fn is_second_third_farthest_rank_from_friend(friend: Phase, destination: &FireAddress) -> bool {
-        match destination {
-            FireAddress::Board(dst_sq) => match friend {
-                Phase::First => RANK1U8 < dst_sq.rank() && dst_sq.rank() < RANK4U8,
-                Phase::Second => RANK6U8 < dst_sq.rank() && dst_sq.rank() < RANK9U8,
-            },
-            _ => panic!(Beam::trouble(&format!(
-                "(Err.937) まだ実装してないぜ☆（＾～＾）！",
-            ))),
-        }
-    }
-    /// 自陣から見て、三番目に遠いの段
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `friend` -
-    /// * `destination` -
-    fn is_third_farthest_rank_from_friend(friend: Phase, destination: &FireAddress) -> bool {
-        match destination {
-            FireAddress::Board(dst_sq) => match friend {
-                Phase::First => dst_sq.rank() == RANK3U8,
-                Phase::Second => RANK7U8 == dst_sq.rank(),
-            },
-            _ => panic!(Beam::trouble(&format!(
-                "(Err.946) まだ実装してないぜ☆（＾～＾）！",
-            ))),
-        }
-    }
-    /// 敵陣
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `friend` -
-    /// * `destination` -
-    fn is_opponent_region(friend: Phase, destination: &FireAddress) -> bool {
-        match destination {
-            FireAddress::Board(dst_sq) => match friend {
-                Phase::First => dst_sq.rank() < RANK4U8,
-                Phase::Second => RANK6U8 < dst_sq.rank(),
-            },
-            _ => panic!(Beam::trouble(&format!(
-                "(Err.957) まだ実装してないぜ☆（＾～＾）！",
-            ))),
-        }
     }
 }
