@@ -160,7 +160,7 @@ setoption name PromotionWeightPer1000 value 1000
 position startpos
 go btime 300000 wtime 300000 binc 5000 winc 5000
 
-### 2020-06-14(sun) 強制終了するバグを盛ってしまったぜ☆（＾～＾）
+### 2020-06-14(sun) 強制終了するバグを盛ってしまったぜ☆（＾～＾）再現性なし☆（＾～＾）
 usi
 isready
 setoption name USI_Ponder value true

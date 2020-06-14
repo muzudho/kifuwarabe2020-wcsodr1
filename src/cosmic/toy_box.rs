@@ -959,8 +959,8 @@ impl GameTable {
 #[derive(Clone)]
 pub struct PhaseClassification {
     items: [Option<PieceNum>; BOARD_MEMORY_AREA],
-    board1_cur: isize,
-    board2_cur: isize,
+    // board1_cur: isize,
+    // board2_cur: isize,
     king1_cur: isize,
     rook1_cur: isize,
     bishop1_cur: isize,
@@ -983,24 +983,24 @@ impl Default for PhaseClassification {
     fn default() -> Self {
         PhaseClassification {
             items: [None; BOARD_MEMORY_AREA],
-            board1_cur: 0,
-            board2_cur: 39,
-            king1_cur: 40,
-            rook1_cur: 60,
-            bishop1_cur: 58,
-            gold1_cur: 42,
-            silver1_cur: 46,
-            knight1_cur: 50,
-            lance1_cur: 54,
-            pawn1_cur: 62,
-            king2_cur: 41,
-            rook2_cur: 61,
-            bishop2_cur: 59,
-            gold2_cur: 45,
-            silver2_cur: 49,
-            knight2_cur: 53,
-            lance2_cur: 57,
-            pawn2_cur: 79,
+            // board1_cur: 0,
+            // board2_cur: 39,
+            king1_cur: PhaseClassification::start(DoubleFacedPiece::King1),
+            rook1_cur: PhaseClassification::start(DoubleFacedPiece::Rook1),
+            bishop1_cur: PhaseClassification::start(DoubleFacedPiece::Bishop1),
+            gold1_cur: PhaseClassification::start(DoubleFacedPiece::Gold1),
+            silver1_cur: PhaseClassification::start(DoubleFacedPiece::Silver1),
+            knight1_cur: PhaseClassification::start(DoubleFacedPiece::Knight1),
+            lance1_cur: PhaseClassification::start(DoubleFacedPiece::Lance1),
+            pawn1_cur: PhaseClassification::start(DoubleFacedPiece::Pawn1),
+            king2_cur: PhaseClassification::start(DoubleFacedPiece::King2),
+            rook2_cur: PhaseClassification::start(DoubleFacedPiece::Rook2),
+            bishop2_cur: PhaseClassification::start(DoubleFacedPiece::Bishop2),
+            gold2_cur: PhaseClassification::start(DoubleFacedPiece::Gold2),
+            silver2_cur: PhaseClassification::start(DoubleFacedPiece::Silver2),
+            knight2_cur: PhaseClassification::start(DoubleFacedPiece::Knight2),
+            lance2_cur: PhaseClassification::start(DoubleFacedPiece::Lance2),
+            pawn2_cur: PhaseClassification::start(DoubleFacedPiece::Pawn2),
         }
     }
 }
@@ -1016,7 +1016,7 @@ impl PhaseClassification {
                 // 駒台に駒を置くぜ☆（＾～＾）
                 self.items[self.hand_cur(drop) as usize] = Some(num);
                 // 位置を増減するぜ☆（＾～＾）
-                self.add_hand_cur(drop, self.direction(drop));
+                self.add_hand_cur(drop, PhaseClassification::direction(drop));
             }
         }
     }
@@ -1033,7 +1033,7 @@ impl PhaseClassification {
             FireAddress::Hand(drop_type) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(friend, *drop_type);
                 // 位置を増減するぜ☆（＾～＾）
-                self.add_hand_cur(drop, -self.direction(drop));
+                self.add_hand_cur(drop, -PhaseClassification::direction(drop));
                 // 駒台の駒をはがすぜ☆（＾～＾）
                 let num = self.items[self.hand_cur(drop) as usize].unwrap();
                 self.items[self.hand_cur(drop) as usize] = None;
@@ -1047,15 +1047,17 @@ impl PhaseClassification {
             FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3431) 未対応☆（＾～＾）")),
             FireAddress::Hand(drop_type) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(friend, *drop_type);
-                if self.direction(drop) == 1 {
-                    if self.start(drop) < self.hand_cur(drop) {
-                        self.items[(self.hand_cur(drop) - 1) as usize]
+                let direction = PhaseClassification::direction(drop);
+                if direction < 0 {
+                    // 先手
+                    if self.hand_cur(drop) < PhaseClassification::start(drop) {
+                        self.items[(self.hand_cur(drop) - direction) as usize]
                     } else {
                         None
                     }
                 } else {
-                    if self.hand_cur(drop) < self.start(drop) {
-                        self.items[(self.hand_cur(drop) + 1) as usize]
+                    if PhaseClassification::start(drop) < self.hand_cur(drop) {
+                        self.items[(self.hand_cur(drop) - direction) as usize]
                     } else {
                         None
                     }
@@ -1069,14 +1071,15 @@ impl PhaseClassification {
             FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3431) 未対応☆（＾～＾）")),
             FireAddress::Hand(drop_type) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(friend, *drop_type);
-                if self.direction(drop) == 1 {
-                    if self.start(drop) < self.hand_cur(drop) as isize {
+                if PhaseClassification::direction(drop) < 0 {
+                    // 先手
+                    if self.hand_cur(drop) < PhaseClassification::start(drop) {
                         false
                     } else {
                         true
                     }
                 } else {
-                    if self.hand_cur(drop) < self.start(drop) {
+                    if PhaseClassification::start(drop) < self.hand_cur(drop) {
                         false
                     } else {
                         true
@@ -1091,20 +1094,25 @@ impl PhaseClassification {
             FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3431) 未対応☆（＾～＾）")),
             FireAddress::Hand(drop_type) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(friend, *drop_type);
-                if self.direction(drop) == 1 {
-                    (self.hand_cur(drop) as isize - self.start(drop)) as usize
+                if PhaseClassification::direction(drop) < 0 {
+                    // 先手
+                    (PhaseClassification::start(drop) - self.hand_cur(drop)) as usize
                 } else {
-                    (self.start(drop) - self.hand_cur(drop) as isize) as usize
+                    (self.hand_cur(drop) - PhaseClassification::start(drop)) as usize
                 }
             }
         }
     }
 
+    /// TODO
     fn board_cur(&self, friend: Phase) -> isize {
+        0
+        /*
         match friend {
             Phase::First => self.board1_cur,
             Phase::Second => self.board2_cur,
         }
+        */
     }
     fn hand_cur(&self, double_faced_piece: DoubleFacedPiece) -> isize {
         match double_faced_piece {
@@ -1126,11 +1134,14 @@ impl PhaseClassification {
             DoubleFacedPiece::Pawn2 => self.pawn2_cur,
         }
     }
+    /// TODO
     fn add_board_cur(&mut self, friend: Phase, direction: isize) {
+        /*
         match friend {
             Phase::First => self.board1_cur += direction,
             Phase::Second => self.board2_cur += direction,
         }
+        */
     }
     fn add_hand_cur(&mut self, double_faced_piece: DoubleFacedPiece, direction: isize) {
         match double_faced_piece {
@@ -1153,45 +1164,45 @@ impl PhaseClassification {
         }
     }
     /// 開始地点。
-    fn start(&self, double_faced_piece: DoubleFacedPiece) -> isize {
+    fn start(double_faced_piece: DoubleFacedPiece) -> isize {
         match double_faced_piece {
-            DoubleFacedPiece::King1 => 40,
-            DoubleFacedPiece::Rook1 => 60,
-            DoubleFacedPiece::Bishop1 => 58,
-            DoubleFacedPiece::Gold1 => 42,
-            DoubleFacedPiece::Silver1 => 46,
+            DoubleFacedPiece::King1 => 2,
+            DoubleFacedPiece::Rook1 => 103,
+            DoubleFacedPiece::Bishop1 => 101,
+            DoubleFacedPiece::Gold1 => 6,
+            DoubleFacedPiece::Silver1 => 10,
             DoubleFacedPiece::Knight1 => 50,
-            DoubleFacedPiece::Lance1 => 54,
-            DoubleFacedPiece::Pawn1 => 62,
-            DoubleFacedPiece::King2 => 41,
-            DoubleFacedPiece::Rook2 => 61,
-            DoubleFacedPiece::Bishop2 => 59,
-            DoubleFacedPiece::Gold2 => 45,
-            DoubleFacedPiece::Silver2 => 49,
-            DoubleFacedPiece::Knight2 => 53,
-            DoubleFacedPiece::Lance2 => 57,
-            DoubleFacedPiece::Pawn2 => 79,
+            DoubleFacedPiece::Lance1 => 90,
+            DoubleFacedPiece::Pawn1 => 121,
+            DoubleFacedPiece::King2 => 1,
+            DoubleFacedPiece::Rook2 => 102,
+            DoubleFacedPiece::Bishop2 => 100,
+            DoubleFacedPiece::Gold2 => 3,
+            DoubleFacedPiece::Silver2 => 7,
+            DoubleFacedPiece::Knight2 => 20,
+            DoubleFacedPiece::Lance2 => 60,
+            DoubleFacedPiece::Pawn2 => 104,
         }
     }
-    /// 向き。+1, -1。
-    fn direction(&self, double_faced_piece: DoubleFacedPiece) -> isize {
+    /// 向き。
+    fn direction(double_faced_piece: DoubleFacedPiece) -> isize {
         match double_faced_piece {
-            DoubleFacedPiece::King1 => 1,
-            DoubleFacedPiece::Rook1 => 1,
-            DoubleFacedPiece::Bishop1 => 1,
-            DoubleFacedPiece::Gold1 => 1,
-            DoubleFacedPiece::Silver1 => 1,
-            DoubleFacedPiece::Knight1 => 1,
-            DoubleFacedPiece::Lance1 => 1,
-            DoubleFacedPiece::Pawn1 => 1,
-            DoubleFacedPiece::King2 => -1,
-            DoubleFacedPiece::Rook2 => -1,
-            DoubleFacedPiece::Bishop2 => -1,
-            DoubleFacedPiece::Gold2 => -1,
-            DoubleFacedPiece::Silver2 => -1,
-            DoubleFacedPiece::Knight2 => -1,
-            DoubleFacedPiece::Lance2 => -1,
-            DoubleFacedPiece::Pawn2 => -1,
+            DoubleFacedPiece::King1 => -1,
+            DoubleFacedPiece::Rook1 => -1,
+            DoubleFacedPiece::Bishop1 => -1,
+            DoubleFacedPiece::Gold1 => -1,
+            DoubleFacedPiece::Silver1 => -1,
+            DoubleFacedPiece::Knight1 => -10,
+            DoubleFacedPiece::Lance1 => -10,
+            DoubleFacedPiece::Pawn1 => -1,
+            DoubleFacedPiece::King2 => 1,
+            DoubleFacedPiece::Rook2 => 1,
+            DoubleFacedPiece::Bishop2 => 1,
+            DoubleFacedPiece::Gold2 => 1,
+            DoubleFacedPiece::Silver2 => 1,
+            DoubleFacedPiece::Knight2 => 10,
+            DoubleFacedPiece::Lance2 => 10,
+            DoubleFacedPiece::Pawn2 => 1,
         }
     }
 
