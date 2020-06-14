@@ -153,11 +153,8 @@ impl PseudoLegalMoves {
 
                         // 成りじゃない場合は、行き先のない動きを制限されるぜ☆（＾～＾）
                         let forbidden = if let Some(permission_type_val) = permission_type {
-                            if self.check_permission(&destination, permission_type_val) {
-                                false
-                            } else {
-                                true
-                            }
+                            // permission があれば forbidden じゃないぜ☆（＾～＾）
+                            !self.check_permission(&destination, permission_type_val)
                         } else {
                             false
                         };
@@ -263,28 +260,15 @@ impl PseudoLegalMoves {
                     };
                     // 駒を持っていれば
                     use crate::cosmic::smart::features::DoubleFacedPieceType::*;
-                    match src_drop_type {
-                        // 歩、香
-                        Pawn | Lance => {
-                            // 先手から見た歩、香車の打てる面積だぜ☆（＾～＾）
-                            for sq in table.area.drop_pawn_lance.iter() {
-                                drop_fn(sq);
-                            }
-                        }
-                        // 桂
-                        Knight => {
-                            // 先手から見た桂馬の打てる面積だぜ☆（＾～＾）
-                            for sq in table.area.drop_knight.iter() {
-                                drop_fn(sq);
-                            }
-                        }
-                        // それ以外の駒が打てる範囲は盤面全体。
-                        _ => {
-                            // 全升の面積だぜ☆（＾～＾）駒を打つときに使うぜ☆（＾～＾）
-                            for sq in table.area.all_squares.iter() {
-                                drop_fn(sq);
-                            }
-                        }
+                    // 歩、香: 先手から見た歩、香車の打てる面積だぜ☆（＾～＾）
+                    // 桂: 先手から見た桂馬の打てる面積だぜ☆（＾～＾）
+                    // それ以外の駒が打てる範囲は盤面全体。駒を打つときに使うぜ☆（＾～＾）
+                    for sq in match src_drop_type {
+                        Pawn | Lance => table.area.drop_pawn_lance.iter(),
+                        Knight => table.area.drop_knight.iter(),
+                        _ => table.area.all_squares.iter(),
+                    } {
+                        drop_fn(sq);
                     }
                 }
             }
@@ -593,30 +577,18 @@ impl PseudoLegalMoves {
     where
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
-        if self.is_promote_farthest_rank_from_friend(destination) {
-            // 自陣から見て一番奥の段
-            callback(
-                destination,
-                Promotability::Forced,
-                Agility::Hopping,
-                Some(PermissionType::PawnLance),
-            )
-        } else if self.is_promote_second_third_farthest_rank_from_friend(destination) {
-            // 自陣から見て二番、三番目の奥の段
-            callback(
-                destination,
-                Promotability::Any,
-                Agility::Hopping,
-                Some(PermissionType::PawnLance),
-            )
-        } else {
-            callback(
-                destination,
-                Promotability::Deny,
-                Agility::Hopping,
-                Some(PermissionType::PawnLance),
-            )
-        }
+        callback(
+            destination,
+            if self.is_promote_farthest_rank_from_friend(destination) {
+                Promotability::Forced
+            } else if self.is_promote_second_third_farthest_rank_from_friend(destination) {
+                Promotability::Any
+            } else {
+                Promotability::Deny
+            },
+            Agility::Hopping,
+            Some(PermissionType::PawnLance),
+        )
     }
 
     /// 桂のための、成れるか成れないか判定だぜ☆（＾～＾）！
@@ -631,28 +603,18 @@ impl PseudoLegalMoves {
     where
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
-        if self.is_promote_first_second_farthest_rank_from_friend(destination) {
-            callback(
-                destination,
-                Promotability::Forced,
-                Agility::Knight,
-                Some(PermissionType::Knight),
-            )
-        } else if self.is_promote_third_farthest_rank_from_friend(destination) {
-            callback(
-                destination,
-                Promotability::Any,
-                Agility::Knight,
-                Some(PermissionType::Knight),
-            )
-        } else {
-            callback(
-                destination,
-                Promotability::Deny,
-                Agility::Knight,
-                Some(PermissionType::Knight),
-            )
-        }
+        callback(
+            destination,
+            if self.is_promote_first_second_farthest_rank_from_friend(destination) {
+                Promotability::Forced
+            } else if self.is_promote_third_farthest_rank_from_friend(destination) {
+                Promotability::Any
+            } else {
+                Promotability::Deny
+            },
+            Agility::Knight,
+            Some(PermissionType::Knight),
+        )
     }
 
     /// 銀のための、成れるか成れないか判定だぜ☆（＾～＾）！
@@ -673,13 +635,18 @@ impl PseudoLegalMoves {
     where
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
-        if self.is_promote_third_farthest_rank_from_friend(source)
-            || self.is_promote_opponent_region(destination)
-        {
-            callback(destination, Promotability::Any, Agility::Hopping, None)
-        } else {
-            callback(destination, Promotability::Deny, Agility::Hopping, None)
-        }
+        callback(
+            destination,
+            if self.is_promote_third_farthest_rank_from_friend(source)
+                || self.is_promote_opponent_region(destination)
+            {
+                Promotability::Any
+            } else {
+                Promotability::Deny
+            },
+            Agility::Hopping,
+            None,
+        )
     }
 
     /// 角と飛のための、成れるか成れないか判定だぜ☆（＾～＾）！
@@ -701,11 +668,18 @@ impl PseudoLegalMoves {
     where
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
-        if self.is_promote_opponent_region(source) || self.is_promote_opponent_region(destination) {
-            callback(destination, Promotability::Any, Agility::Sliding, None)
-        } else {
-            callback(destination, Promotability::Deny, Agility::Sliding, None)
-        }
+        callback(
+            destination,
+            if self.is_promote_opponent_region(source)
+                || self.is_promote_opponent_region(destination)
+            {
+                Promotability::Any
+            } else {
+                Promotability::Deny
+            },
+            Agility::Sliding,
+            None,
+        )
     }
 
     /// 自陣から見て、一番遠いの段
@@ -881,7 +855,6 @@ impl Default for Area {
         }
     }
 }
-impl Area {}
 
 /// 機敏性。
 #[derive(Clone, Copy, Debug)]
