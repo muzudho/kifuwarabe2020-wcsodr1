@@ -22,8 +22,8 @@ use std::fmt;
 
 /// 先手、後手で処理が変わるやつを吸収するぜ☆（＾～＾）
 trait PhaseOperation {
-    /// 桂馬を打ち込める段か判定するぜ☆（＾～＾）先後で異なるぜ☆（＾～＾）
-    fn rank_can_drop_keima(&self, rank: u8) -> bool;
+    /// 先手から見て、１、２、３段目かどうか☆（＾～＾）
+    fn is_rank123(&self, destination: &FireAddress) -> bool;
 }
 struct FirstOperation {}
 struct SecondOperation {}
@@ -38,13 +38,23 @@ impl Default for SecondOperation {
     }
 }
 impl PhaseOperation for FirstOperation {
-    fn rank_can_drop_keima(&self, rank: u8) -> bool {
-        rank < RANK4U8
+    fn is_rank123(&self, destination: &FireAddress) -> bool {
+        match destination {
+            FireAddress::Board(dst_sq) => dst_sq.rank() < RANK4U8,
+            _ => panic!(Beam::trouble(&format!(
+                "(Err.905) まだ実装してないぜ☆（＾～＾）！",
+            ))),
+        }
     }
 }
 impl PhaseOperation for SecondOperation {
-    fn rank_can_drop_keima(&self, rank: u8) -> bool {
-        RANK6U8 < rank
+    fn is_rank123(&self, destination: &FireAddress) -> bool {
+        match destination {
+            FireAddress::Board(dst_sq) => RANK6U8 < dst_sq.rank(),
+            _ => panic!(Beam::trouble(&format!(
+                "(Err.905) まだ実装してないぜ☆（＾～＾）！",
+            ))),
+        }
     }
 }
 
@@ -67,20 +77,6 @@ pub struct PseudoLegalMoves {
     /// 先手、後手で処理が変わるやつを吸収するぜ☆（＾～＾）
     phase_operation: Box<dyn PhaseOperation>,
 }
-/*
-    fn ff1(&self) -> bool {
-        let fa = |x| 2 < x;
-        let fb = |y| y > 2;
-        self.ff2(3, fa) || self.ff2(3, fb)
-    }
-    fn ff2<F1>(&self, x: u8, fc: F1) -> bool
-    where
-        F1: Fn(u8) -> bool,
-    {
-        fc(x)
-    }
-
-*/
 impl fmt::Debug for PseudoLegalMoves {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
@@ -625,9 +621,9 @@ impl PseudoLegalMoves {
     {
         callback(
             destination,
-            if self.is_promote_farthest_rank_from_friend(destination) {
+            if self.is_promote_second_third_farthest_rank_from_friend(destination) {
                 Promotability::Forced
-            } else if self.is_promote_second_third_farthest_rank_from_friend(destination) {
+            } else if self.phase_operation.is_rank123(destination) {
                 Promotability::Any
             } else {
                 Promotability::Deny
@@ -653,7 +649,7 @@ impl PseudoLegalMoves {
             destination,
             if self.is_promote_first_second_farthest_rank_from_friend(destination) {
                 Promotability::Forced
-            } else if self.is_promote_third_farthest_rank_from_friend(destination) {
+            } else if self.phase_operation.is_rank123(destination) {
                 Promotability::Any
             } else {
                 Promotability::Deny
@@ -683,7 +679,7 @@ impl PseudoLegalMoves {
     {
         callback(
             destination,
-            if self.is_promote_third_farthest_rank_from_friend(source)
+            if self.phase_operation.is_rank123(source)
                 || self.is_promote_opponent_region(destination)
             {
                 Promotability::Any
@@ -728,24 +724,6 @@ impl PseudoLegalMoves {
         )
     }
 
-    /// 自陣から見て、一番遠いの段
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `friend` -
-    /// * `destination` -
-    fn is_promote_farthest_rank_from_friend(&self, destination: &FireAddress) -> bool {
-        match destination {
-            FireAddress::Board(dst_sq) => match self.friend {
-                Phase::First => dst_sq.rank() < RANK2U8,
-                Phase::Second => RANK8U8 < dst_sq.rank(),
-            },
-            _ => panic!(Beam::trouble(&format!(
-                "(Err.905) まだ実装してないぜ☆（＾～＾）！",
-            ))),
-        }
-    }
     /// 自陣から見て、一番目、２番目に遠いの段
     ///
     /// Arguments
@@ -779,21 +757,6 @@ impl PseudoLegalMoves {
             },
             _ => panic!(Beam::trouble(&format!(
                 "(Err.937) まだ実装してないぜ☆（＾～＾）！",
-            ))),
-        }
-    }
-    /// 自陣から見て、三番目に遠いの段
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `friend` -
-    /// * `destination` -
-    fn is_promote_third_farthest_rank_from_friend(&self, destination: &FireAddress) -> bool {
-        match destination {
-            FireAddress::Board(dst_sq) => self.phase_operation.rank_can_drop_keima(dst_sq.rank()),
-            _ => panic!(Beam::trouble(&format!(
-                "(Err.946) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
     }
