@@ -17,13 +17,12 @@ use crate::cosmic::smart::square::RANK9U8;
 use crate::cosmic::smart::square::{AbsoluteAddress2D, Angle, RelAdr2D};
 use crate::cosmic::toy_box::GameTable;
 use crate::spaceship::equipment::Beam;
-use std::fmt;
 
 /// 先手、後手で処理が変わるやつを吸収するぜ☆（＾～＾）
 trait PhaseOperation {
     /// 先手から見て、４、５、６、７、８、９段目かどうか☆（＾～＾）
     fn is_rank456789(&self, destination: &FireAddress) -> bool;
-    /// 先手から見て、１、２、３段目かどうか☆（＾～＾）
+    /// 先手から見て、１、２、３段目かどうか☆（＾～＾）いわゆる敵陣だぜ☆（＾～＾）
     fn is_rank123(&self, destination: &FireAddress) -> bool;
     /// 先手から見て、１、２段目かどうか☆（＾～＾）
     fn is_rank12(&self, destination: &FireAddress) -> bool;
@@ -33,6 +32,8 @@ trait PhaseOperation {
     fn is_rank1(&self, destination: &FireAddress) -> bool;
     /// 先手から見て、３段目かどうか☆（＾～＾）
     fn is_rank3(&self, destination: &FireAddress) -> bool;
+    /// 移動可能かどうか判定するぜ☆（＾～＾）
+    fn check_permission(&self, dst_fire: &FireAddress, permission_type: PermissionType) -> bool;
 }
 struct FirstOperation {}
 struct SecondOperation {}
@@ -95,6 +96,34 @@ impl PhaseOperation for FirstOperation {
             ))),
         }
     }
+    fn check_permission(&self, dst_fire: &FireAddress, permission_type: PermissionType) -> bool {
+        match permission_type {
+            PermissionType::PawnLance => match dst_fire {
+                FireAddress::Board(sq) => {
+                    // １段目には侵入できないぜ☆（＾～＾）
+                    if sq.rank() < 2 {
+                        return false;
+                    }
+                    true
+                }
+                FireAddress::Hand(_drop_type) => panic!(Beam::trouble(&format!(
+                    "(Err.546) 盤上ではなかったぜ☆（＾～＾）！",
+                ))),
+            },
+            PermissionType::Knight => match dst_fire {
+                FireAddress::Board(sq) => {
+                    // １、２段目には侵入できないぜ☆（＾～＾）
+                    if sq.rank() < 3 {
+                        return false;
+                    }
+                    true
+                }
+                FireAddress::Hand(_drop_type) => panic!(Beam::trouble(&format!(
+                    "(Err.546) 盤上ではなかったぜ☆（＾～＾）！",
+                ))),
+            },
+        }
+    }
 }
 impl PhaseOperation for SecondOperation {
     fn is_rank456789(&self, destination: &FireAddress) -> bool {
@@ -145,9 +174,38 @@ impl PhaseOperation for SecondOperation {
             ))),
         }
     }
+    fn check_permission(&self, dst_fire: &FireAddress, permission_type: PermissionType) -> bool {
+        match permission_type {
+            PermissionType::PawnLance => match dst_fire {
+                FireAddress::Board(sq) => {
+                    // ９段目には侵入できないぜ☆（＾～＾）
+                    if 8 < sq.rank() {
+                        return false;
+                    }
+                    true
+                }
+                FireAddress::Hand(_drop_type) => panic!(Beam::trouble(&format!(
+                    "(Err.546) 盤上ではなかったぜ☆（＾～＾）！",
+                ))),
+            },
+            PermissionType::Knight => match dst_fire {
+                FireAddress::Board(sq) => {
+                    // ８、９段目には侵入できないぜ☆（＾～＾）
+                    if 7 < sq.rank() {
+                        return false;
+                    }
+                    true
+                }
+                FireAddress::Hand(_drop_type) => panic!(Beam::trouble(&format!(
+                    "(Err.546) 盤上ではなかったぜ☆（＾～＾）！",
+                ))),
+            },
+        }
+    }
 }
 
 /// Pseudo legal move(疑似合法手)☆（＾～＾）
+/// このオブジェクトは、探索のノード１つごとに作られるぜ☆（＾～＾）
 ///
 /// 先手の連続王手の千日手とか、空き王手とか、駒を見ただけでは調べられないだろ☆（＾～＾）
 /// 棋譜や盤面を見ず、駒だけで調べる合法手が Pseudo legal move だぜ☆（＾～＾）
@@ -157,26 +215,8 @@ impl PhaseOperation for SecondOperation {
 pub struct PseudoLegalMoves {
     /// 指し手生成中に手番が変わることは無いんで☆（＾～＾）
     friend: Phase,
-    /// 行き先があるかないかのチェックに使うぜ☆（＾～＾）
-    /// 成れるときは使わないぜ☆（＾～＾）
-    permission_pawn_lance_min_rank: u8,
-    permission_pawn_lance_max_rank: u8,
-    permission_knight_min_rank: u8,
-    permission_knight_max_rank: u8,
     /// 先手、後手で処理が変わるやつを吸収するぜ☆（＾～＾）
     phase_operation: Box<dyn PhaseOperation>,
-}
-impl fmt::Debug for PseudoLegalMoves {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "(PLrank{}~{})(Krank{}~{})",
-            self.permission_pawn_lance_min_rank,
-            self.permission_pawn_lance_max_rank,
-            self.permission_knight_min_rank,
-            self.permission_knight_max_rank
-        )
-    }
 }
 impl PseudoLegalMoves {
     pub fn new(friend: Phase) -> Self {
@@ -185,18 +225,10 @@ impl PseudoLegalMoves {
         match friend {
             Phase::First => PseudoLegalMoves {
                 friend: friend,
-                permission_pawn_lance_min_rank: 2,
-                permission_pawn_lance_max_rank: 9,
-                permission_knight_min_rank: 3,
-                permission_knight_max_rank: 9,
                 phase_operation: Box::new(FirstOperation::default()),
             },
             Phase::Second => PseudoLegalMoves {
                 friend: friend,
-                permission_pawn_lance_min_rank: 1,
-                permission_pawn_lance_max_rank: 8,
-                permission_knight_min_rank: 1,
-                permission_knight_max_rank: 7,
                 phase_operation: Box::new(SecondOperation::default()),
             },
         }
@@ -285,7 +317,9 @@ impl PseudoLegalMoves {
                         // 成りじゃない場合は、行き先のない動きを制限されるぜ☆（＾～＾）
                         let forbidden = if let Some(permission_type_val) = permission_type {
                             // permission があれば forbidden じゃないぜ☆（＾～＾）
-                            !self.check_permission(&destination, permission_type_val)
+                            !self
+                                .phase_operation
+                                .check_permission(&destination, permission_type_val)
                         } else {
                             false
                         };
@@ -769,8 +803,8 @@ impl PseudoLegalMoves {
         callback(
             destination,
             // 戻って成るのがある☆（＾～＾）
-            if self.phase_operation.is_rank123(source)
-                || self.is_promote_opponent_region(destination)
+            if self.phase_operation.is_rank123(destination)
+                || self.phase_operation.is_rank123(source)
             {
                 Promotability::Any
             } else {
@@ -802,8 +836,9 @@ impl PseudoLegalMoves {
     {
         callback(
             destination,
-            if self.is_promote_opponent_region(source)
-                || self.is_promote_opponent_region(destination)
+            // 戻って成るのがある☆（＾～＾）
+            if self.phase_operation.is_rank123(destination)
+                || self.phase_operation.is_rank123(source)
             {
                 Promotability::Any
             } else {
@@ -812,56 +847,6 @@ impl PseudoLegalMoves {
             Agility::Sliding,
             None,
         )
-    }
-
-    /// 敵陣
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `friend` -
-    /// * `destination` -
-    fn is_promote_opponent_region(&self, destination: &FireAddress) -> bool {
-        match destination {
-            FireAddress::Board(dst_sq) => match self.friend {
-                Phase::First => dst_sq.rank() < RANK4U8,
-                Phase::Second => RANK6U8 < dst_sq.rank(),
-            },
-            _ => panic!(Beam::trouble(&format!(
-                "(Err.957) まだ実装してないぜ☆（＾～＾）！",
-            ))),
-        }
-    }
-
-    fn check_permission(&self, dst_fire: &FireAddress, permission_type: PermissionType) -> bool {
-        match permission_type {
-            PermissionType::PawnLance => match dst_fire {
-                FireAddress::Board(sq) => {
-                    if sq.rank() < self.permission_pawn_lance_min_rank
-                        || self.permission_pawn_lance_max_rank < sq.rank()
-                    {
-                        return false;
-                    }
-                    true
-                }
-                FireAddress::Hand(_drop_type) => panic!(Beam::trouble(&format!(
-                    "(Err.546) 盤上ではなかったぜ☆（＾～＾）！",
-                ))),
-            },
-            PermissionType::Knight => match dst_fire {
-                FireAddress::Board(sq) => {
-                    if sq.rank() < self.permission_knight_min_rank
-                        || self.permission_knight_max_rank < sq.rank()
-                    {
-                        return false;
-                    }
-                    true
-                }
-                FireAddress::Hand(_drop_type) => panic!(Beam::trouble(&format!(
-                    "(Err.546) 盤上ではなかったぜ☆（＾～＾）！",
-                ))),
-            },
-        }
     }
 }
 
