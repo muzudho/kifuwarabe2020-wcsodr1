@@ -77,7 +77,7 @@ fn help_chiyuri(line: &str, len: usize, starts: usize, universe: &mut Universe) 
         Chiyuri::do_(universe, line, len, starts);
     // G
     } else if 6 < len && &line[starts..7] == "genmove" {
-        Chiyuri::genmove(&universe.game);
+        Chiyuri::genmove(&universe);
     // H
     } else if 7 < len && &line[starts..8] == "how-much" {
         Chiyuri::how_much(line);

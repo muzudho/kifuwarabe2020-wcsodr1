@@ -8,7 +8,7 @@ use crate::cosmic::smart::evaluator::{Evaluation, REPITITION_VALUE};
 use crate::cosmic::smart::features::PieceType;
 use crate::cosmic::smart::see::SEE;
 use crate::cosmic::universe::Universe;
-use crate::law::generate_move::{PseudoLegalMoves, Ways};
+use crate::law::generate_move::{MoveGen, Ways};
 use crate::spaceship::equipment::{Beam, PvString};
 use std::fmt;
 use std::time::Instant;
@@ -141,11 +141,11 @@ impl Tree {
             let mut ways = Ways::new();
 
             // 現局面で、各駒が、他に駒がないと考えた場合の最大数の指し手を生成しろだぜ☆（＾～＾）
-            PseudoLegalMoves::make_move(
+            MoveGen::make_move(
                 &game,
                 match game.history.get_friend() {
-                    Phase::First => &game.first_operation,
-                    Phase::Second => &game.second_operation,
+                    Phase::First => &game.movegen_phase.first_movegen,
+                    Phase::Second => &game.movegen_phase.second_movegen,
                 },
                 &mut |way| {
                     ways.push(&way);

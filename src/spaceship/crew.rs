@@ -7,7 +7,7 @@ use crate::cosmic::smart::square::AbsoluteAddress2D;
 use crate::cosmic::smart::square::FILE1U8;
 use crate::cosmic::universe::Universe;
 use crate::law::cryptographic::*;
-use crate::law::generate_move::PseudoLegalMoves;
+use crate::law::generate_move::MoveGen;
 use crate::law::usi::*;
 use crate::spaceship::engine;
 use crate::spaceship::equipment::{Beam, PvString, Telescope};
@@ -213,22 +213,26 @@ impl Chiyuri {
                 .read_move(universe.game.history.get_friend(), &move_);
         }
     }
-    pub fn genmove(game: &Game) {
+    pub fn genmove(universe: &Universe) {
         // Generation move.
         // FIXME 合法手とは限らない
         let mut ways = Vec::<Movement>::new();
-        PseudoLegalMoves::make_move(
-            &game,
-            match game.history.get_friend() {
-                Phase::First => &game.first_operation,
-                Phase::Second => &game.second_operation,
+        MoveGen::make_move(
+            &universe.game,
+            match universe.game.history.get_friend() {
+                Phase::First => &universe.game.movegen_phase.first_movegen,
+                Phase::Second => &universe.game.movegen_phase.second_movegen,
             },
             &mut |way| {
                 ways.push(way);
             },
         );
         Beam::shoot("----指し手生成(合法手とは限らない) ここから----");
-        Kitchen::print_ways(game.history.get_friend(), &game.table, &ways);
+        Kitchen::print_ways(
+            universe.game.history.get_friend(),
+            &universe.game.table,
+            &ways,
+        );
         Beam::shoot("----指し手生成(合法手とは限らない) ここまで----");
     }
     pub fn hash(universe: &Universe) {

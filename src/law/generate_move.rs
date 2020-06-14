@@ -214,8 +214,8 @@ impl PhaseOperation for SecondOperation {
 /// 香を２段目に打たないとか強い将棋を目指すことは　まだやってないぜ☆（＾～＾）
 ///
 /// 指し手生成中に手番が変わることは無いんで friend は game.history.get_friend() で取れだぜ☆（＾～＾）
-pub struct PseudoLegalMoves {}
-impl PseudoLegalMoves {
+pub struct MoveGen {}
+impl MoveGen {
     /// 現局面の、任意の移動先升の、
     /// - 盤上の駒の移動
     /// - 打
@@ -247,7 +247,7 @@ impl PseudoLegalMoves {
             game.history.get_friend(),
             // 移動元と、その駒の種類。
             &mut |src_fire: &FireAddress| {
-                PseudoLegalMoves::start(game, phase_operation, src_fire, listen_move)
+                MoveGen::start(game, phase_operation, src_fire, listen_move)
             },
         );
     }
@@ -393,7 +393,7 @@ impl PseudoLegalMoves {
 
                         !space
                     };
-                PseudoLegalMoves::piece_of(game, phase_operation, piece_type, source, moving);
+                MoveGen::piece_of(game, phase_operation, piece_type, source, moving);
             }
             FireAddress::Hand(src_drop_type) => {
                 if let Some((piece_type, fire_hand)) =
@@ -473,20 +473,20 @@ impl PseudoLegalMoves {
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         match piece_type {
-            PieceType::Pawn => PseudoLegalMoves::pawn(game, phase_operation, source, moving),
-            PieceType::Lance => PseudoLegalMoves::lance(game, phase_operation, source, moving),
-            PieceType::Knight => PseudoLegalMoves::knight(game, phase_operation, source, moving),
-            PieceType::Silver => PseudoLegalMoves::silver(game, phase_operation, source, moving),
-            PieceType::Gold => PseudoLegalMoves::gold(game, source, moving),
-            PieceType::King => PseudoLegalMoves::king(game, source, moving),
-            PieceType::Bishop => PseudoLegalMoves::bishop(game, phase_operation, source, moving),
-            PieceType::Rook => PseudoLegalMoves::rook(game, phase_operation, source, moving),
-            PieceType::PromotedPawn => PseudoLegalMoves::gold(game, source, moving),
-            PieceType::PromotedLance => PseudoLegalMoves::gold(game, source, moving),
-            PieceType::PromotedKnight => PseudoLegalMoves::gold(game, source, moving),
-            PieceType::PromotedSilver => PseudoLegalMoves::gold(game, source, moving),
-            PieceType::Horse => PseudoLegalMoves::horse(game, source, moving),
-            PieceType::Dragon => PseudoLegalMoves::dragon(game, source, moving),
+            PieceType::Pawn => MoveGen::pawn(game, phase_operation, source, moving),
+            PieceType::Lance => MoveGen::lance(game, phase_operation, source, moving),
+            PieceType::Knight => MoveGen::knight(game, phase_operation, source, moving),
+            PieceType::Silver => MoveGen::silver(game, phase_operation, source, moving),
+            PieceType::Gold => MoveGen::gold(game, source, moving),
+            PieceType::King => MoveGen::king(game, source, moving),
+            PieceType::Bishop => MoveGen::bishop(game, phase_operation, source, moving),
+            PieceType::Rook => MoveGen::rook(game, phase_operation, source, moving),
+            PieceType::PromotedPawn => MoveGen::gold(game, source, moving),
+            PieceType::PromotedLance => MoveGen::gold(game, source, moving),
+            PieceType::PromotedKnight => MoveGen::gold(game, source, moving),
+            PieceType::PromotedSilver => MoveGen::gold(game, source, moving),
+            PieceType::Horse => MoveGen::horse(game, source, moving),
+            PieceType::Dragon => MoveGen::dragon(game, source, moving),
         }
     }
 
@@ -507,11 +507,11 @@ impl PseudoLegalMoves {
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
-            PseudoLegalMoves::promote_pawn_lance(phase_operation, destination, moving)
+            MoveGen::promote_pawn_lance(phase_operation, destination, moving)
         };
 
         for mobility in PieceType::Pawn.mobility().iter() {
-            PseudoLegalMoves::move_(game, source, *mobility, moving);
+            MoveGen::move_(game, source, *mobility, moving);
         }
     }
 
@@ -532,11 +532,11 @@ impl PseudoLegalMoves {
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
-            PseudoLegalMoves::promote_pawn_lance(phase_operation, destination, moving)
+            MoveGen::promote_pawn_lance(phase_operation, destination, moving)
         };
 
         for mobility in PieceType::Lance.mobility().iter() {
-            PseudoLegalMoves::move_(game, source, *mobility, moving);
+            MoveGen::move_(game, source, *mobility, moving);
         }
     }
 
@@ -557,11 +557,11 @@ impl PseudoLegalMoves {
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
-            PseudoLegalMoves::promote_knight(phase_operation, destination, moving)
+            MoveGen::promote_knight(phase_operation, destination, moving)
         };
 
         for mobility in PieceType::Knight.mobility().iter() {
-            PseudoLegalMoves::move_(game, source, *mobility, moving);
+            MoveGen::move_(game, source, *mobility, moving);
         }
     }
 
@@ -581,11 +581,11 @@ impl PseudoLegalMoves {
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
-            PseudoLegalMoves::promote_silver(phase_operation, &source, destination, moving)
+            MoveGen::promote_silver(phase_operation, &source, destination, moving)
         };
 
         for mobility in PieceType::Silver.mobility().iter() {
-            PseudoLegalMoves::move_(game, source, *mobility, moving);
+            MoveGen::move_(game, source, *mobility, moving);
         }
     }
 
@@ -606,7 +606,7 @@ impl PseudoLegalMoves {
         };
 
         for mobility in PieceType::Gold.mobility().iter() {
-            PseudoLegalMoves::move_(game, source, *mobility, moving);
+            MoveGen::move_(game, source, *mobility, moving);
         }
     }
 
@@ -626,7 +626,7 @@ impl PseudoLegalMoves {
         };
 
         for mobility in PieceType::King.mobility().iter() {
-            PseudoLegalMoves::move_(game, source, *mobility, moving);
+            MoveGen::move_(game, source, *mobility, moving);
         }
     }
 
@@ -646,10 +646,10 @@ impl PseudoLegalMoves {
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
-            PseudoLegalMoves::promote_bishop_rook(phase_operation, source, destination, moving)
+            MoveGen::promote_bishop_rook(phase_operation, source, destination, moving)
         };
         for mobility in PieceType::Bishop.mobility().iter() {
-            PseudoLegalMoves::move_(game, source, *mobility, moving);
+            MoveGen::move_(game, source, *mobility, moving);
         }
     }
 
@@ -669,10 +669,10 @@ impl PseudoLegalMoves {
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
-            PseudoLegalMoves::promote_bishop_rook(phase_operation, source, destination, moving)
+            MoveGen::promote_bishop_rook(phase_operation, source, destination, moving)
         };
         for mobility in PieceType::Rook.mobility().iter() {
-            PseudoLegalMoves::move_(game, source, *mobility, moving);
+            MoveGen::move_(game, source, *mobility, moving);
         }
     }
 
@@ -692,7 +692,7 @@ impl PseudoLegalMoves {
         };
 
         for mobility in PieceType::Horse.mobility().iter() {
-            PseudoLegalMoves::move_(game, source, *mobility, moving);
+            MoveGen::move_(game, source, *mobility, moving);
         }
     }
 
@@ -712,7 +712,7 @@ impl PseudoLegalMoves {
         };
 
         for mobility in PieceType::Dragon.mobility().iter() {
-            PseudoLegalMoves::move_(game, source, *mobility, moving);
+            MoveGen::move_(game, source, *mobility, moving);
         }
     }
 

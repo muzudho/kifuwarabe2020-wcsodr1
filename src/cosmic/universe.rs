@@ -7,6 +7,7 @@ use crate::cosmic::playing::Game;
 
 /// アプリケーション開始時に決め終えておくものだぜ☆（＾～＾）
 pub struct Universe {
+    /// 対局
     pub game: Game,
     /// 対話モード
     pub dialogue_mode: bool,
