@@ -20,56 +20,6 @@ use crate::cosmic::toy_box::GameTable;
 use crate::spaceship::equipment::Beam;
 use std::fmt;
 
-/// ソートを高速にするためのものだぜ☆（＾～＾）
-pub struct Ways {
-    /// スワップしても割と速いだろ☆（＾～＾）
-    pub indexes: Vec<usize>,
-    /// こいつをスワップすると遅くなるぜ☆（＾～＾）
-    body: Vec<Movement>,
-}
-impl Ways {
-    /// この初期化が遅いかどうかだな☆（＾～＾）
-    pub fn new() -> Self {
-        Ways {
-            indexes: Vec::<usize>::new(),
-            body: Vec::<Movement>::new(),
-        }
-    }
-    pub fn push(&mut self, move_: &Movement) {
-        self.indexes.push(self.indexes.len());
-        self.body.push(*move_);
-    }
-    /// usize型のコピーなら、オブジェクトのコピーより少しは速いだろ☆（＾～＾）
-    pub fn swap(&mut self, a: usize, b: usize) {
-        let temp = self.indexes[a];
-        self.indexes[a] = self.indexes[b];
-        self.indexes[b] = temp;
-    }
-    pub fn get(&self, index: usize) -> Movement {
-        self.body[self.indexes[index]]
-    }
-    pub fn len(&self) -> usize {
-        self.body.len()
-    }
-    pub fn is_empty(&self) -> bool {
-        self.body.is_empty()
-    }
-}
-
-#[derive(Clone, Copy)]
-pub struct Mobility {
-    pub angle: Angle,
-    pub agility: Agility,
-}
-impl Mobility {
-    pub fn new(angle: Angle, agility: Agility) -> Self {
-        Mobility {
-            angle: angle,
-            agility: agility,
-        }
-    }
-}
-
 /// Pseudo legal move(疑似合法手)☆（＾～＾）
 ///
 /// 先手の連続王手の千日手とか、空き王手とか、駒を見ただけでは調べられないだろ☆（＾～＾）
@@ -80,10 +30,45 @@ impl Mobility {
 pub struct PseudoLegalMoves {
     /// 指し手生成中に手番が変わることは無いんで☆（＾～＾）
     friend: Phase,
+    /// 行き先があるかないかのチェックに使うぜ☆（＾～＾）
+    /// 成れるときは使わないぜ☆（＾～＾）
+    permission_pawn_lance_min_rank: u8,
+    permission_pawn_lance_max_rank: u8,
+    permission_knight_min_rank: u8,
+    permission_knight_max_rank: u8,
+}
+impl fmt::Debug for PseudoLegalMoves {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "(PLrank{}~{})(Krank{}~{})",
+            self.permission_pawn_lance_min_rank,
+            self.permission_pawn_lance_max_rank,
+            self.permission_knight_min_rank,
+            self.permission_knight_max_rank
+        )
+    }
 }
 impl PseudoLegalMoves {
     pub fn new(friend: Phase) -> Self {
-        PseudoLegalMoves { friend: friend }
+        // ▲P,▲L　は１段目(▽P,▽L　は９段目)には進めない
+        // ▲N　は１、２段目(▽N　は８、９段目)には進めない
+        match friend {
+            Phase::First => PseudoLegalMoves {
+                friend: friend,
+                permission_pawn_lance_min_rank: 2,
+                permission_pawn_lance_max_rank: 9,
+                permission_knight_min_rank: 3,
+                permission_knight_max_rank: 9,
+            },
+            Phase::Second => PseudoLegalMoves {
+                friend: friend,
+                permission_pawn_lance_min_rank: 1,
+                permission_pawn_lance_max_rank: 8,
+                permission_knight_min_rank: 1,
+                permission_knight_max_rank: 7,
+            },
+        }
     }
     ///
     /// 現局面の、任意の移動先升の、
@@ -144,7 +129,7 @@ impl PseudoLegalMoves {
                     &mut |destination: &FireAddress,
                           promotability,
                           _agility,
-                          move_permission: Option<MovePermission>| {
+                          permission_type: Option<PermissionType>| {
                         let pseudo_captured_num = table.piece_num_at(self.friend, &destination);
 
                         let space = if let Some(pseudo_captured_num_val) = pseudo_captured_num {
@@ -167,8 +152,8 @@ impl PseudoLegalMoves {
                         };
 
                         // 成りじゃない場合は、行き先のない動きを制限されるぜ☆（＾～＾）
-                        let forbidden = if let Some(move_permission_val) = move_permission {
-                            if move_permission_val.check(&destination) {
+                        let forbidden = if let Some(permission_type_val) = permission_type {
+                            if self.check_permission(&destination, permission_type_val) {
                                 false
                             } else {
                                 true
@@ -317,7 +302,7 @@ impl PseudoLegalMoves {
     /// * `sliding` -
     fn piece_of<F1>(&self, piece_type: PieceType, source: &FireAddress, moving: &mut F1)
     where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         match piece_type {
             PieceType::Pawn => self.pawn(source, moving),
@@ -347,15 +332,10 @@ impl PseudoLegalMoves {
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn pawn<F1>(&self, source: &FireAddress, moving: &mut F1)
     where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
-        let moving = &mut |destination: &FireAddress, _agility| {
-            self.promote_pawn_lance(
-                destination,
-                moving,
-                Some(MovePermission::from_pawn_or_lance(self.friend)),
-            )
-        };
+        let moving =
+            &mut |destination: &FireAddress, _agility| self.promote_pawn_lance(destination, moving);
 
         for mobility in PieceType::Pawn.mobility().iter() {
             self.move_(source, *mobility, moving);
@@ -372,15 +352,10 @@ impl PseudoLegalMoves {
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn lance<F1>(&self, source: &FireAddress, moving: &mut F1)
     where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
-        let moving = &mut |destination: &FireAddress, _agility| {
-            self.promote_pawn_lance(
-                destination,
-                moving,
-                Some(MovePermission::from_pawn_or_lance(self.friend)),
-            )
-        };
+        let moving =
+            &mut |destination: &FireAddress, _agility| self.promote_pawn_lance(destination, moving);
 
         for mobility in PieceType::Lance.mobility().iter() {
             self.move_(source, *mobility, moving);
@@ -397,15 +372,10 @@ impl PseudoLegalMoves {
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn knight<F1>(&self, source: &FireAddress, moving: &mut F1)
     where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
-        let moving = &mut |destination: &FireAddress, _agility| {
-            self.promote_knight(
-                destination,
-                moving,
-                Some(MovePermission::from_knight(self.friend)),
-            )
-        };
+        let moving =
+            &mut |destination: &FireAddress, _agility| self.promote_knight(destination, moving);
 
         for mobility in PieceType::Knight.mobility().iter() {
             self.move_(source, *mobility, moving);
@@ -421,7 +391,7 @@ impl PseudoLegalMoves {
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn silver<F1>(&self, source: &FireAddress, moving: &mut F1)
     where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
             self.promote_silver(&source, destination, moving)
@@ -442,7 +412,7 @@ impl PseudoLegalMoves {
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn gold<F1>(&self, source: &FireAddress, moving: &mut F1)
     where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
             moving(destination, Promotability::Deny, Agility::Hopping, None)
@@ -462,7 +432,7 @@ impl PseudoLegalMoves {
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn king<F1>(&self, source: &FireAddress, moving: &mut F1)
     where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
             moving(destination, Promotability::Deny, Agility::Hopping, None)
@@ -482,7 +452,7 @@ impl PseudoLegalMoves {
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn bishop<F1>(&self, source: &FireAddress, moving: &mut F1)
     where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
             self.promote_bishop_rook(source, destination, moving)
@@ -501,7 +471,7 @@ impl PseudoLegalMoves {
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn rook<F1>(&self, source: &FireAddress, moving: &mut F1)
     where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
             self.promote_bishop_rook(source, destination, moving)
@@ -520,7 +490,7 @@ impl PseudoLegalMoves {
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn horse<F1>(&self, source: &FireAddress, moving: &mut F1)
     where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, agility| {
             moving(destination, Promotability::Deny, agility, None)
@@ -540,7 +510,7 @@ impl PseudoLegalMoves {
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn dragon<F1>(&self, source: &FireAddress, moving: &mut F1)
     where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, agility| {
             moving(destination, Promotability::Deny, agility, None)
@@ -619,14 +589,9 @@ impl PseudoLegalMoves {
     /// * `destinaion` -
     /// * `callback` -
     /// * `move_permission` - 成らずに一番奥の段に移動することはできません。
-    fn promote_pawn_lance<F1>(
-        &self,
-        destination: &FireAddress,
-        callback: &mut F1,
-        move_permission: Option<MovePermission>,
-    ) -> bool
+    fn promote_pawn_lance<F1>(&self, destination: &FireAddress, callback: &mut F1) -> bool
     where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         if self.is_promote_farthest_rank_from_friend(destination) {
             // 自陣から見て一番奥の段
@@ -634,7 +599,7 @@ impl PseudoLegalMoves {
                 destination,
                 Promotability::Forced,
                 Agility::Hopping,
-                move_permission,
+                Some(PermissionType::PawnLance),
             )
         } else if self.is_promote_second_third_farthest_rank_from_friend(destination) {
             // 自陣から見て二番、三番目の奥の段
@@ -642,14 +607,14 @@ impl PseudoLegalMoves {
                 destination,
                 Promotability::Any,
                 Agility::Hopping,
-                move_permission,
+                Some(PermissionType::PawnLance),
             )
         } else {
             callback(
                 destination,
                 Promotability::Deny,
                 Agility::Hopping,
-                move_permission,
+                Some(PermissionType::PawnLance),
             )
         }
     }
@@ -662,35 +627,30 @@ impl PseudoLegalMoves {
     /// * `destinaion` -
     /// * `callback` -
     /// * `move_permission` - 成らずに奥から２番目の段に移動することはできません。
-    fn promote_knight<F1>(
-        &self,
-        destination: &FireAddress,
-        callback: &mut F1,
-        move_permission: Option<MovePermission>,
-    ) -> bool
+    fn promote_knight<F1>(&self, destination: &FireAddress, callback: &mut F1) -> bool
     where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         if self.is_promote_first_second_farthest_rank_from_friend(destination) {
             callback(
                 destination,
                 Promotability::Forced,
                 Agility::Knight,
-                move_permission,
+                Some(PermissionType::Knight),
             )
         } else if self.is_promote_third_farthest_rank_from_friend(destination) {
             callback(
                 destination,
                 Promotability::Any,
                 Agility::Knight,
-                move_permission,
+                Some(PermissionType::Knight),
             )
         } else {
             callback(
                 destination,
                 Promotability::Deny,
                 Agility::Knight,
-                move_permission,
+                Some(PermissionType::Knight),
             )
         }
     }
@@ -711,7 +671,7 @@ impl PseudoLegalMoves {
         callback: &mut F1,
     ) -> bool
     where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         if self.is_promote_third_farthest_rank_from_friend(source)
             || self.is_promote_opponent_region(destination)
@@ -739,7 +699,7 @@ impl PseudoLegalMoves {
         callback: &mut F1,
     ) -> bool
     where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         if self.is_promote_opponent_region(source) || self.is_promote_opponent_region(destination) {
             callback(destination, Promotability::Any, Agility::Sliding, None)
@@ -838,6 +798,37 @@ impl PseudoLegalMoves {
             ))),
         }
     }
+
+    fn check_permission(&self, dst_fire: &FireAddress, permission_type: PermissionType) -> bool {
+        match permission_type {
+            PermissionType::PawnLance => match dst_fire {
+                FireAddress::Board(sq) => {
+                    if sq.rank() < self.permission_pawn_lance_min_rank
+                        || self.permission_pawn_lance_max_rank < sq.rank()
+                    {
+                        return false;
+                    }
+                    true
+                }
+                FireAddress::Hand(_drop_type) => panic!(Beam::trouble(&format!(
+                    "(Err.546) 盤上ではなかったぜ☆（＾～＾）！",
+                ))),
+            },
+            PermissionType::Knight => match dst_fire {
+                FireAddress::Board(sq) => {
+                    if sq.rank() < self.permission_knight_min_rank
+                        || self.permission_knight_max_rank < sq.rank()
+                    {
+                        return false;
+                    }
+                    true
+                }
+                FireAddress::Hand(_drop_type) => panic!(Beam::trouble(&format!(
+                    "(Err.546) 盤上ではなかったぜ☆（＾～＾）！",
+                ))),
+            },
+        }
+    }
 }
 
 /// 次の升☆（＾～＾）
@@ -912,55 +903,57 @@ enum Promotability {
     Forced,
 }
 
-/// 行き先があるかないかのチェックに使うぜ☆（＾～＾）
-/// 成れるときは使わないぜ☆（＾～＾）
-struct MovePermission {
-    min_rank: u8,
-    max_rank: u8,
+/// ソートを高速にするためのものだぜ☆（＾～＾）
+pub struct Ways {
+    /// スワップしても割と速いだろ☆（＾～＾）
+    pub indexes: Vec<usize>,
+    /// こいつをスワップすると遅くなるぜ☆（＾～＾）
+    body: Vec<Movement>,
 }
-impl MovePermission {
-    fn from_pawn_or_lance(friend: Phase) -> Self {
-        // ▲P,▲L　は１段目(▽P,▽L　は９段目)には進めない
-        match friend {
-            Phase::First => MovePermission {
-                min_rank: 2,
-                max_rank: 9,
-            },
-            Phase::Second => MovePermission {
-                min_rank: 1,
-                max_rank: 8,
-            },
+impl Ways {
+    /// この初期化が遅いかどうかだな☆（＾～＾）
+    pub fn new() -> Self {
+        Ways {
+            indexes: Vec::<usize>::new(),
+            body: Vec::<Movement>::new(),
         }
     }
-    fn from_knight(friend: Phase) -> Self {
-        // ▲N　は１、２段目(▽N　は８、９段目)には進めない
-        match friend {
-            Phase::First => MovePermission {
-                min_rank: 3,
-                max_rank: 9,
-            },
-            Phase::Second => MovePermission {
-                min_rank: 1,
-                max_rank: 7,
-            },
-        }
+    pub fn push(&mut self, move_: &Movement) {
+        self.indexes.push(self.indexes.len());
+        self.body.push(*move_);
     }
-    fn check(&self, dst_fire: &FireAddress) -> bool {
-        match dst_fire {
-            FireAddress::Board(sq) => {
-                if sq.rank() < self.min_rank || self.max_rank < sq.rank() {
-                    return false;
-                }
-                true
-            }
-            FireAddress::Hand(_drop_type) => panic!(Beam::trouble(&format!(
-                "(Err.546) 盤上ではなかったぜ☆（＾～＾）！",
-            ))),
-        }
+    /// usize型のコピーなら、オブジェクトのコピーより少しは速いだろ☆（＾～＾）
+    pub fn swap(&mut self, a: usize, b: usize) {
+        let temp = self.indexes[a];
+        self.indexes[a] = self.indexes[b];
+        self.indexes[b] = temp;
+    }
+    pub fn get(&self, index: usize) -> Movement {
+        self.body[self.indexes[index]]
+    }
+    pub fn len(&self) -> usize {
+        self.body.len()
+    }
+    pub fn is_empty(&self) -> bool {
+        self.body.is_empty()
     }
 }
-impl fmt::Debug for MovePermission {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "(rank{}~{})", self.min_rank, self.max_rank)
+
+#[derive(Clone, Copy)]
+pub struct Mobility {
+    pub angle: Angle,
+    pub agility: Agility,
+}
+impl Mobility {
+    pub fn new(angle: Angle, agility: Agility) -> Self {
+        Mobility {
+            angle: angle,
+            agility: agility,
+        }
     }
+}
+
+pub enum PermissionType {
+    PawnLance,
+    Knight,
 }
