@@ -500,6 +500,22 @@ pub enum PieceNum {
 pub struct GameTable {
     /// 盤に、駒が紐づくぜ☆（＾～＾）
     board: [Option<PieceNum>; BOARD_MEMORY_AREA as usize],
+    hand_king1_cur: isize,
+    hand_rook1_cur: isize,
+    hand_bishop1_cur: isize,
+    hand_gold1_cur: isize,
+    hand_silver1_cur: isize,
+    hand_knight1_cur: isize,
+    hand_lance1_cur: isize,
+    hand_pawn1_cur: isize,
+    hand_king2_cur: isize,
+    hand_rook2_cur: isize,
+    hand_bishop2_cur: isize,
+    hand_gold2_cur: isize,
+    hand_silver2_cur: isize,
+    hand_knight2_cur: isize,
+    hand_lance2_cur: isize,
+    hand_pawn2_cur: isize,
     /// 背番号付きの駒に、番地が紐づいているぜ☆（＾～＾）
     address_list: [FireAddress; NAMED_PIECES_LEN],
     /// 駒の背番号に、駒が紐づくぜ☆（＾～＾）
@@ -533,6 +549,22 @@ impl Default for GameTable {
             // 持ち駒
             phase_classification: PhaseClassification::default(),
             area: Area::default(),
+            hand_king1_cur: GameTable::hand_start(DoubleFacedPiece::King1),
+            hand_rook1_cur: GameTable::hand_start(DoubleFacedPiece::Rook1),
+            hand_bishop1_cur: GameTable::hand_start(DoubleFacedPiece::Bishop1),
+            hand_gold1_cur: GameTable::hand_start(DoubleFacedPiece::Gold1),
+            hand_silver1_cur: GameTable::hand_start(DoubleFacedPiece::Silver1),
+            hand_knight1_cur: GameTable::hand_start(DoubleFacedPiece::Knight1),
+            hand_lance1_cur: GameTable::hand_start(DoubleFacedPiece::Lance1),
+            hand_pawn1_cur: GameTable::hand_start(DoubleFacedPiece::Pawn1),
+            hand_king2_cur: GameTable::hand_start(DoubleFacedPiece::King2),
+            hand_rook2_cur: GameTable::hand_start(DoubleFacedPiece::Rook2),
+            hand_bishop2_cur: GameTable::hand_start(DoubleFacedPiece::Bishop2),
+            hand_gold2_cur: GameTable::hand_start(DoubleFacedPiece::Gold2),
+            hand_silver2_cur: GameTable::hand_start(DoubleFacedPiece::Silver2),
+            hand_knight2_cur: GameTable::hand_start(DoubleFacedPiece::Knight2),
+            hand_lance2_cur: GameTable::hand_start(DoubleFacedPiece::Lance2),
+            hand_pawn2_cur: GameTable::hand_start(DoubleFacedPiece::Pawn2),
         }
     }
 }
@@ -649,8 +681,7 @@ impl GameTable {
                     // マスに駒を置きます。
                     self.board[sq.serial_number() as usize] = piece_num;
                     // データベース
-                    self.phase_classification
-                        .push(friend, &FireAddress::Board(*sq), piece_num_val);
+                    self.push_hand(friend, &FireAddress::Board(*sq), piece_num_val);
                     // 背番号に番地を紐づけます。
                     self.address_list[piece_num_val as usize] = FireAddress::Board(*sq);
                 } else {
@@ -661,11 +692,7 @@ impl GameTable {
             FireAddress::Hand(drop_type) => {
                 if let Some(piece_num_val) = piece_num {
                     // 持ち駒を１つ増やします。
-                    self.phase_classification.push(
-                        friend,
-                        &FireAddress::Hand(*drop_type),
-                        piece_num_val,
-                    );
+                    self.push_hand(friend, &FireAddress::Hand(*drop_type), piece_num_val);
                     // 背番号に番地を紐づけます。
                     self.address_list[piece_num_val as usize] = *fire;
                 }
@@ -681,7 +708,7 @@ impl GameTable {
                     // マスを空にします。
                     self.board[sq.serial_number() as usize] = None;
                     // データベース
-                    self.phase_classification.pop(friend, &fire);
+                    self.pop_hand(friend, &fire);
                     // TODO 背番号の番地を、ゴミ値で塗りつぶすが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
                     self.address_list[piece_num_val as usize] = FireAddress::default();
                 }
@@ -690,7 +717,7 @@ impl GameTable {
             FireAddress::Hand(_drop_type) => {
                 // 場所で指定します。
                 // 台から取りのぞきます。
-                let piece_num = self.phase_classification.pop(friend, &fire);
+                let piece_num = self.pop_hand(friend, &fire);
                 // TODO 背番号の番地に、ゴミ値を入れて消去するが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
                 self.address_list[piece_num as usize] = FireAddress::default();
                 Some(piece_num)
@@ -819,50 +846,10 @@ impl GameTable {
     }
     /// 指し手生成で使うぜ☆（＾～＾）有無を調べるぜ☆（＾～＾）
     pub fn last_hand_type(&self, friend: Phase, fire: &FireAddress) -> Option<PieceType> {
-        if let Some(piece_num) = self.phase_classification.last(friend, &fire) {
+        if let Some(piece_num) = self.last_hand_num(friend, &fire) {
             Some(self.get_type(piece_num))
         } else {
             None
-        }
-    }
-    /// 指し手生成で使うぜ☆（＾～＾）有無を調べるぜ☆（＾～＾）
-    pub fn is_empty_hand(&self, friend: Phase, fire: &FireAddress) -> bool {
-        self.phase_classification.is_empty_hand(friend, &fire)
-    }
-    pub fn last_hand_num(&self, friend: Phase, fire: &FireAddress) -> Option<PieceNum> {
-        match fire {
-            FireAddress::Board(_sq) => {
-                panic!(Beam::trouble(&format!("(Err.3251) 未対応☆（＾～＾）！",)))
-            }
-            FireAddress::Hand(_drop_type) => {
-                if let Some(piece_num) = self.phase_classification.last(friend, fire) {
-                    Some(piece_num)
-                } else {
-                    None
-                }
-            }
-        }
-    }
-    /// 指し手生成で使うぜ☆（＾～＾）
-    pub fn last_hand(&self, friend: Phase, fire: &FireAddress) -> Option<(PieceType, FireAddress)> {
-        match fire {
-            FireAddress::Board(_sq) => {
-                panic!(Beam::trouble(&format!("(Err.3251) 未対応☆（＾～＾）！",)))
-            }
-            FireAddress::Hand(drop_type) => {
-                if let Some(piece_num) = self
-                    .phase_classification
-                    .last(friend, &FireAddress::Hand(*drop_type))
-                {
-                    let piece = self.piece_list[piece_num as usize];
-                    Some((
-                        piece.type_(),
-                        FireAddress::Hand(piece.double_faced_piece().type_()),
-                    ))
-                } else {
-                    None
-                }
-            }
         }
     }
     pub fn count_hand(&self, friend: Phase, fire: &FireAddress) -> usize {
@@ -870,9 +857,7 @@ impl GameTable {
             FireAddress::Board(_sq) => {
                 panic!(Beam::trouble(&format!("(Err.3266) 未対応☆（＾～＾）！",)))
             }
-            FireAddress::Hand(drop_type) => self
-                .phase_classification
-                .len(friend, &FireAddress::Hand(*drop_type)),
+            FireAddress::Hand(drop_type) => self.len_hand(friend, &FireAddress::Hand(*drop_type)),
         }
     }
 
@@ -948,223 +933,9 @@ impl GameTable {
             }
         }
     }
-}
 
-/// 以下の４つを、漏れなく被りなく　分類するぜ☆（＾～＾）
-/// * 盤上の先手の駒
-/// * 盤上の後手の駒
-/// * 駒台の先手の駒
-/// * 駒台の後手の駒
-/// 駒台だぜ☆（＾～＾）これ１つで２人分あるんで☆（＾～＾）
-#[derive(Clone)]
-pub struct PhaseClassification {
-    items: [Option<PieceNum>; BOARD_MEMORY_AREA],
-    // board1_cur: isize,
-    // board2_cur: isize,
-    king1_cur: isize,
-    rook1_cur: isize,
-    bishop1_cur: isize,
-    gold1_cur: isize,
-    silver1_cur: isize,
-    knight1_cur: isize,
-    lance1_cur: isize,
-    pawn1_cur: isize,
-    king2_cur: isize,
-    rook2_cur: isize,
-    bishop2_cur: isize,
-    gold2_cur: isize,
-    silver2_cur: isize,
-    knight2_cur: isize,
-    lance2_cur: isize,
-    pawn2_cur: isize,
-}
-impl Default for PhaseClassification {
-    // ゴミ値で埋めるぜ☆（＾～＾）
-    fn default() -> Self {
-        PhaseClassification {
-            items: [None; BOARD_MEMORY_AREA],
-            // board1_cur: 0,
-            // board2_cur: 39,
-            king1_cur: PhaseClassification::start(DoubleFacedPiece::King1),
-            rook1_cur: PhaseClassification::start(DoubleFacedPiece::Rook1),
-            bishop1_cur: PhaseClassification::start(DoubleFacedPiece::Bishop1),
-            gold1_cur: PhaseClassification::start(DoubleFacedPiece::Gold1),
-            silver1_cur: PhaseClassification::start(DoubleFacedPiece::Silver1),
-            knight1_cur: PhaseClassification::start(DoubleFacedPiece::Knight1),
-            lance1_cur: PhaseClassification::start(DoubleFacedPiece::Lance1),
-            pawn1_cur: PhaseClassification::start(DoubleFacedPiece::Pawn1),
-            king2_cur: PhaseClassification::start(DoubleFacedPiece::King2),
-            rook2_cur: PhaseClassification::start(DoubleFacedPiece::Rook2),
-            bishop2_cur: PhaseClassification::start(DoubleFacedPiece::Bishop2),
-            gold2_cur: PhaseClassification::start(DoubleFacedPiece::Gold2),
-            silver2_cur: PhaseClassification::start(DoubleFacedPiece::Silver2),
-            knight2_cur: PhaseClassification::start(DoubleFacedPiece::Knight2),
-            lance2_cur: PhaseClassification::start(DoubleFacedPiece::Lance2),
-            pawn2_cur: PhaseClassification::start(DoubleFacedPiece::Pawn2),
-        }
-    }
-}
-impl PhaseClassification {
-    /// 駒の先後を ひっくり返してから入れてください。
-    pub fn push(&mut self, friend: Phase, fire: &FireAddress, num: PieceNum) {
-        match fire {
-            FireAddress::Board(_sq) => {
-                // TODO 現在未実装だが、あとで使う☆（＾～＾）
-            }
-            FireAddress::Hand(drop_type) => {
-                let drop = DoubleFacedPiece::from_phase_and_type(friend, *drop_type);
-                // 駒台に駒を置くぜ☆（＾～＾）
-                self.items[self.hand_cur(drop) as usize] = Some(num);
-                // 位置を増減するぜ☆（＾～＾）
-                self.add_hand_cur(drop, PhaseClassification::direction(drop));
-            }
-        }
-    }
-    pub fn pop(&mut self, friend: Phase, fire: &FireAddress) -> PieceNum {
-        match fire {
-            FireAddress::Board(_sq) => {
-                // TODO 先端の要素をポップ。
-                let peak = self.items[self.board_cur(friend) as usize];
-                // TODO 中段の要素をポップ。
-                // let middle =
-                // TODO さっき抜いた先端の要素を、中段の要素のところへスワップ。
-                PieceNum::King1 // ゴミ値を返しとくぜ☆（＾～＾）
-            }
-            FireAddress::Hand(drop_type) => {
-                let drop = DoubleFacedPiece::from_phase_and_type(friend, *drop_type);
-                // 位置を増減するぜ☆（＾～＾）
-                self.add_hand_cur(drop, -PhaseClassification::direction(drop));
-                // 駒台の駒をはがすぜ☆（＾～＾）
-                let num = self.items[self.hand_cur(drop) as usize].unwrap();
-                self.items[self.hand_cur(drop) as usize] = None;
-                num
-            }
-        }
-    }
-
-    fn last(&self, friend: Phase, fire: &FireAddress) -> Option<PieceNum> {
-        match fire {
-            FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3431) 未対応☆（＾～＾）")),
-            FireAddress::Hand(drop_type) => {
-                let drop = DoubleFacedPiece::from_phase_and_type(friend, *drop_type);
-                let direction = PhaseClassification::direction(drop);
-                if direction < 0 {
-                    // 先手
-                    if self.hand_cur(drop) < PhaseClassification::start(drop) {
-                        self.items[(self.hand_cur(drop) - direction) as usize]
-                    } else {
-                        None
-                    }
-                } else {
-                    if PhaseClassification::start(drop) < self.hand_cur(drop) {
-                        self.items[(self.hand_cur(drop) - direction) as usize]
-                    } else {
-                        None
-                    }
-                }
-            }
-        }
-    }
-
-    fn is_empty_hand(&self, friend: Phase, fire: &FireAddress) -> bool {
-        match fire {
-            FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3431) 未対応☆（＾～＾）")),
-            FireAddress::Hand(drop_type) => {
-                let drop = DoubleFacedPiece::from_phase_and_type(friend, *drop_type);
-                if PhaseClassification::direction(drop) < 0 {
-                    // 先手
-                    if self.hand_cur(drop) < PhaseClassification::start(drop) {
-                        false
-                    } else {
-                        true
-                    }
-                } else {
-                    if PhaseClassification::start(drop) < self.hand_cur(drop) {
-                        false
-                    } else {
-                        true
-                    }
-                }
-            }
-        }
-    }
-
-    fn len(&self, friend: Phase, fire: &FireAddress) -> usize {
-        match fire {
-            FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3431) 未対応☆（＾～＾）")),
-            FireAddress::Hand(drop_type) => {
-                let drop = DoubleFacedPiece::from_phase_and_type(friend, *drop_type);
-                if PhaseClassification::direction(drop) < 0 {
-                    // 先手
-                    (PhaseClassification::start(drop) - self.hand_cur(drop)) as usize
-                } else {
-                    (self.hand_cur(drop) - PhaseClassification::start(drop)) as usize
-                }
-            }
-        }
-    }
-
-    /// TODO
-    fn board_cur(&self, friend: Phase) -> isize {
-        0
-        /*
-        match friend {
-            Phase::First => self.board1_cur,
-            Phase::Second => self.board2_cur,
-        }
-        */
-    }
-    fn hand_cur(&self, double_faced_piece: DoubleFacedPiece) -> isize {
-        match double_faced_piece {
-            DoubleFacedPiece::King1 => self.king1_cur,
-            DoubleFacedPiece::Rook1 => self.rook1_cur,
-            DoubleFacedPiece::Bishop1 => self.bishop1_cur,
-            DoubleFacedPiece::Gold1 => self.gold1_cur,
-            DoubleFacedPiece::Silver1 => self.silver1_cur,
-            DoubleFacedPiece::Knight1 => self.knight1_cur,
-            DoubleFacedPiece::Lance1 => self.lance1_cur,
-            DoubleFacedPiece::Pawn1 => self.pawn1_cur,
-            DoubleFacedPiece::King2 => self.king2_cur,
-            DoubleFacedPiece::Rook2 => self.rook2_cur,
-            DoubleFacedPiece::Bishop2 => self.bishop2_cur,
-            DoubleFacedPiece::Gold2 => self.gold2_cur,
-            DoubleFacedPiece::Silver2 => self.silver2_cur,
-            DoubleFacedPiece::Knight2 => self.knight2_cur,
-            DoubleFacedPiece::Lance2 => self.lance2_cur,
-            DoubleFacedPiece::Pawn2 => self.pawn2_cur,
-        }
-    }
-    /// TODO
-    fn add_board_cur(&mut self, friend: Phase, direction: isize) {
-        /*
-        match friend {
-            Phase::First => self.board1_cur += direction,
-            Phase::Second => self.board2_cur += direction,
-        }
-        */
-    }
-    fn add_hand_cur(&mut self, double_faced_piece: DoubleFacedPiece, direction: isize) {
-        match double_faced_piece {
-            DoubleFacedPiece::King1 => self.king1_cur += direction,
-            DoubleFacedPiece::Rook1 => self.rook1_cur += direction,
-            DoubleFacedPiece::Bishop1 => self.bishop1_cur += direction,
-            DoubleFacedPiece::Gold1 => self.gold1_cur += direction,
-            DoubleFacedPiece::Silver1 => self.silver1_cur += direction,
-            DoubleFacedPiece::Knight1 => self.knight1_cur += direction,
-            DoubleFacedPiece::Lance1 => self.lance1_cur += direction,
-            DoubleFacedPiece::Pawn1 => self.pawn1_cur += direction,
-            DoubleFacedPiece::King2 => self.king2_cur += direction,
-            DoubleFacedPiece::Rook2 => self.rook2_cur += direction,
-            DoubleFacedPiece::Bishop2 => self.bishop2_cur += direction,
-            DoubleFacedPiece::Gold2 => self.gold2_cur += direction,
-            DoubleFacedPiece::Silver2 => self.silver2_cur += direction,
-            DoubleFacedPiece::Knight2 => self.knight2_cur += direction,
-            DoubleFacedPiece::Lance2 => self.lance2_cur += direction,
-            DoubleFacedPiece::Pawn2 => self.pawn2_cur += direction,
-        }
-    }
     /// 開始地点。
-    fn start(double_faced_piece: DoubleFacedPiece) -> isize {
+    fn hand_start(double_faced_piece: DoubleFacedPiece) -> isize {
         match double_faced_piece {
             DoubleFacedPiece::King1 => 2,
             DoubleFacedPiece::Rook1 => 103,
@@ -1185,7 +956,7 @@ impl PhaseClassification {
         }
     }
     /// 向き。
-    fn direction(double_faced_piece: DoubleFacedPiece) -> isize {
+    fn hand_direction(double_faced_piece: DoubleFacedPiece) -> isize {
         match double_faced_piece {
             DoubleFacedPiece::King1 => -1,
             DoubleFacedPiece::Rook1 => -1,
@@ -1206,6 +977,210 @@ impl PhaseClassification {
         }
     }
 
+    /// 駒の先後を ひっくり返してから入れてください。
+    pub fn push_hand(&mut self, friend: Phase, fire: &FireAddress, num: PieceNum) {
+        match fire {
+            FireAddress::Board(_sq) => {
+                // TODO 現在未実装だが、あとで使う☆（＾～＾）
+            }
+            FireAddress::Hand(drop_type) => {
+                let drop = DoubleFacedPiece::from_phase_and_type(friend, *drop_type);
+                // 駒台に駒を置くぜ☆（＾～＾）
+                self.board[self.hand_cur(drop) as usize] = Some(num);
+                // 位置を増減するぜ☆（＾～＾）
+                self.add_hand_cur(drop, GameTable::hand_direction(drop));
+            }
+        }
+    }
+    pub fn pop_hand(&mut self, friend: Phase, fire: &FireAddress) -> PieceNum {
+        match fire {
+            FireAddress::Board(_sq) => {
+                // TODO 先端の要素をポップ。
+                // let peak = self.items[self.board_cur(friend) as usize];
+                // TODO 中段の要素をポップ。
+                // let middle =
+                // TODO さっき抜いた先端の要素を、中段の要素のところへスワップ。
+                PieceNum::King1 // ゴミ値を返しとくぜ☆（＾～＾）
+            }
+            FireAddress::Hand(drop_type) => {
+                let drop = DoubleFacedPiece::from_phase_and_type(friend, *drop_type);
+                // 位置を増減するぜ☆（＾～＾）
+                self.add_hand_cur(drop, -GameTable::hand_direction(drop));
+                // 駒台の駒をはがすぜ☆（＾～＾）
+                let num = self.board[self.hand_cur(drop) as usize].unwrap();
+                self.board[self.hand_cur(drop) as usize] = None;
+                num
+            }
+        }
+    }
+
+    /// 指し手生成で使うぜ☆（＾～＾）
+    pub fn last_hand(&self, friend: Phase, fire: &FireAddress) -> Option<(PieceType, FireAddress)> {
+        match fire {
+            FireAddress::Board(_sq) => {
+                panic!(Beam::trouble(&format!("(Err.3251) 未対応☆（＾～＾）！",)))
+            }
+            FireAddress::Hand(drop_type) => {
+                if let Some(piece_num) = self.last_hand_num(friend, &FireAddress::Hand(*drop_type))
+                {
+                    let piece = self.piece_list[piece_num as usize];
+                    Some((
+                        piece.type_(),
+                        FireAddress::Hand(piece.double_faced_piece().type_()),
+                    ))
+                } else {
+                    None
+                }
+            }
+        }
+    }
+    pub fn last_hand_num(&self, friend: Phase, fire: &FireAddress) -> Option<PieceNum> {
+        match fire {
+            FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3431) 未対応☆（＾～＾）")),
+            FireAddress::Hand(drop_type) => {
+                let drop = DoubleFacedPiece::from_phase_and_type(friend, *drop_type);
+                let direction = GameTable::hand_direction(drop);
+                if direction < 0 {
+                    // 先手
+                    if self.hand_cur(drop) < GameTable::hand_start(drop) {
+                        self.board[(self.hand_cur(drop) - direction) as usize]
+                    } else {
+                        None
+                    }
+                } else {
+                    if GameTable::hand_start(drop) < self.hand_cur(drop) {
+                        self.board[(self.hand_cur(drop) - direction) as usize]
+                    } else {
+                        None
+                    }
+                }
+            }
+        }
+    }
+
+    /// 指し手生成で使うぜ☆（＾～＾）有無を調べるぜ☆（＾～＾）
+    pub fn is_empty_hand(&self, friend: Phase, fire: &FireAddress) -> bool {
+        match fire {
+            FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3431) 未対応☆（＾～＾）")),
+            FireAddress::Hand(drop_type) => {
+                let drop = DoubleFacedPiece::from_phase_and_type(friend, *drop_type);
+                if GameTable::hand_direction(drop) < 0 {
+                    // 先手
+                    if self.hand_cur(drop) < GameTable::hand_start(drop) {
+                        false
+                    } else {
+                        true
+                    }
+                } else {
+                    if GameTable::hand_start(drop) < self.hand_cur(drop) {
+                        false
+                    } else {
+                        true
+                    }
+                }
+            }
+        }
+    }
+
+    fn len_hand(&self, friend: Phase, fire: &FireAddress) -> usize {
+        match fire {
+            FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3431) 未対応☆（＾～＾）")),
+            FireAddress::Hand(drop_type) => {
+                let drop = DoubleFacedPiece::from_phase_and_type(friend, *drop_type);
+                if GameTable::hand_direction(drop) < 0 {
+                    // 先手
+                    (GameTable::hand_start(drop) - self.hand_cur(drop)) as usize
+                } else {
+                    (self.hand_cur(drop) - GameTable::hand_start(drop)) as usize
+                }
+            }
+        }
+    }
+
+    fn hand_cur(&self, double_faced_piece: DoubleFacedPiece) -> isize {
+        match double_faced_piece {
+            DoubleFacedPiece::King1 => self.hand_king1_cur,
+            DoubleFacedPiece::Rook1 => self.hand_rook1_cur,
+            DoubleFacedPiece::Bishop1 => self.hand_bishop1_cur,
+            DoubleFacedPiece::Gold1 => self.hand_gold1_cur,
+            DoubleFacedPiece::Silver1 => self.hand_silver1_cur,
+            DoubleFacedPiece::Knight1 => self.hand_knight1_cur,
+            DoubleFacedPiece::Lance1 => self.hand_lance1_cur,
+            DoubleFacedPiece::Pawn1 => self.hand_pawn1_cur,
+            DoubleFacedPiece::King2 => self.hand_king2_cur,
+            DoubleFacedPiece::Rook2 => self.hand_rook2_cur,
+            DoubleFacedPiece::Bishop2 => self.hand_bishop2_cur,
+            DoubleFacedPiece::Gold2 => self.hand_gold2_cur,
+            DoubleFacedPiece::Silver2 => self.hand_silver2_cur,
+            DoubleFacedPiece::Knight2 => self.hand_knight2_cur,
+            DoubleFacedPiece::Lance2 => self.hand_lance2_cur,
+            DoubleFacedPiece::Pawn2 => self.hand_pawn2_cur,
+        }
+    }
+    fn add_hand_cur(&mut self, double_faced_piece: DoubleFacedPiece, direction: isize) {
+        match double_faced_piece {
+            DoubleFacedPiece::King1 => self.hand_king1_cur += direction,
+            DoubleFacedPiece::Rook1 => self.hand_rook1_cur += direction,
+            DoubleFacedPiece::Bishop1 => self.hand_bishop1_cur += direction,
+            DoubleFacedPiece::Gold1 => self.hand_gold1_cur += direction,
+            DoubleFacedPiece::Silver1 => self.hand_silver1_cur += direction,
+            DoubleFacedPiece::Knight1 => self.hand_knight1_cur += direction,
+            DoubleFacedPiece::Lance1 => self.hand_lance1_cur += direction,
+            DoubleFacedPiece::Pawn1 => self.hand_pawn1_cur += direction,
+            DoubleFacedPiece::King2 => self.hand_king2_cur += direction,
+            DoubleFacedPiece::Rook2 => self.hand_rook2_cur += direction,
+            DoubleFacedPiece::Bishop2 => self.hand_bishop2_cur += direction,
+            DoubleFacedPiece::Gold2 => self.hand_gold2_cur += direction,
+            DoubleFacedPiece::Silver2 => self.hand_silver2_cur += direction,
+            DoubleFacedPiece::Knight2 => self.hand_knight2_cur += direction,
+            DoubleFacedPiece::Lance2 => self.hand_lance2_cur += direction,
+            DoubleFacedPiece::Pawn2 => self.hand_pawn2_cur += direction,
+        }
+    }
+}
+
+/// 以下の４つを、漏れなく被りなく　分類するぜ☆（＾～＾）
+/// * 盤上の先手の駒
+/// * 盤上の後手の駒
+/// * 駒台の先手の駒
+/// * 駒台の後手の駒
+/// 駒台だぜ☆（＾～＾）これ１つで２人分あるんで☆（＾～＾）
+#[derive(Clone)]
+pub struct PhaseClassification {
+    items: [Option<PieceNum>; BOARD_MEMORY_AREA],
+    // board1_cur: isize,
+    // board2_cur: isize,
+}
+impl Default for PhaseClassification {
+    // ゴミ値で埋めるぜ☆（＾～＾）
+    fn default() -> Self {
+        PhaseClassification {
+            items: [None; BOARD_MEMORY_AREA],
+            // board1_cur: 0,
+            // board2_cur: 39,
+        }
+    }
+}
+impl PhaseClassification {
+    /// TODO
+    fn board_cur(&self, friend: Phase) -> isize {
+        0
+        /*
+        match friend {
+            Phase::First => self.board1_cur,
+            Phase::Second => self.board2_cur,
+        }
+        */
+    }
+    /// TODO
+    fn add_board_cur(&mut self, friend: Phase, direction: isize) {
+        /*
+        match friend {
+            Phase::First => self.board1_cur += direction,
+            Phase::Second => self.board2_cur += direction,
+        }
+        */
+    }
     /*
     fn to_debug(&self, table: &GameTable) -> String {
         let mut buffer = String::new();
