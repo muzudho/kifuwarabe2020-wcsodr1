@@ -13,7 +13,6 @@ use crate::cosmic::smart::square::RANK3U8;
 use crate::cosmic::smart::square::RANK4U8;
 use crate::cosmic::smart::square::RANK6U8;
 use crate::cosmic::smart::square::RANK7U8;
-use crate::cosmic::smart::square::RANK8U8;
 use crate::cosmic::smart::square::RANK9U8;
 use crate::cosmic::smart::square::{AbsoluteAddress2D, Angle, RelAdr2D};
 use crate::cosmic::toy_box::GameTable;
@@ -22,8 +21,18 @@ use std::fmt;
 
 /// 先手、後手で処理が変わるやつを吸収するぜ☆（＾～＾）
 trait PhaseOperation {
+    /// 先手から見て、４、５、６、７、８、９段目かどうか☆（＾～＾）
+    fn is_rank456789(&self, destination: &FireAddress) -> bool;
     /// 先手から見て、１、２、３段目かどうか☆（＾～＾）
     fn is_rank123(&self, destination: &FireAddress) -> bool;
+    /// 先手から見て、１、２段目かどうか☆（＾～＾）
+    fn is_rank12(&self, destination: &FireAddress) -> bool;
+    /// 先手から見て、２、３段目かどうか☆（＾～＾）
+    fn is_rank23(&self, destination: &FireAddress) -> bool;
+    /// 先手から見て、１段目かどうか☆（＾～＾）
+    fn is_rank1(&self, destination: &FireAddress) -> bool;
+    /// 先手から見て、３段目かどうか☆（＾～＾）
+    fn is_rank3(&self, destination: &FireAddress) -> bool;
 }
 struct FirstOperation {}
 struct SecondOperation {}
@@ -38,6 +47,14 @@ impl Default for SecondOperation {
     }
 }
 impl PhaseOperation for FirstOperation {
+    fn is_rank456789(&self, destination: &FireAddress) -> bool {
+        match destination {
+            FireAddress::Board(dst_sq) => RANK3U8 < dst_sq.rank(),
+            _ => panic!(Beam::trouble(&format!(
+                "(Err.905) まだ実装してないぜ☆（＾～＾）！",
+            ))),
+        }
+    }
     fn is_rank123(&self, destination: &FireAddress) -> bool {
         match destination {
             FireAddress::Board(dst_sq) => dst_sq.rank() < RANK4U8,
@@ -46,11 +63,83 @@ impl PhaseOperation for FirstOperation {
             ))),
         }
     }
+    fn is_rank12(&self, destination: &FireAddress) -> bool {
+        match destination {
+            FireAddress::Board(dst_sq) => dst_sq.rank() < RANK3U8,
+            _ => panic!(Beam::trouble(&format!(
+                "(Err.905) まだ実装してないぜ☆（＾～＾）！",
+            ))),
+        }
+    }
+    fn is_rank23(&self, destination: &FireAddress) -> bool {
+        match destination {
+            FireAddress::Board(dst_sq) => RANK1U8 < dst_sq.rank() && dst_sq.rank() < RANK4U8,
+            _ => panic!(Beam::trouble(&format!(
+                "(Err.905) まだ実装してないぜ☆（＾～＾）！",
+            ))),
+        }
+    }
+    fn is_rank1(&self, destination: &FireAddress) -> bool {
+        match destination {
+            FireAddress::Board(dst_sq) => dst_sq.rank() == RANK1U8,
+            _ => panic!(Beam::trouble(&format!(
+                "(Err.905) まだ実装してないぜ☆（＾～＾）！",
+            ))),
+        }
+    }
+    fn is_rank3(&self, destination: &FireAddress) -> bool {
+        match destination {
+            FireAddress::Board(dst_sq) => dst_sq.rank() == RANK3U8,
+            _ => panic!(Beam::trouble(&format!(
+                "(Err.905) まだ実装してないぜ☆（＾～＾）！",
+            ))),
+        }
+    }
 }
 impl PhaseOperation for SecondOperation {
+    fn is_rank456789(&self, destination: &FireAddress) -> bool {
+        match destination {
+            FireAddress::Board(dst_sq) => dst_sq.rank() < RANK7U8,
+            _ => panic!(Beam::trouble(&format!(
+                "(Err.905) まだ実装してないぜ☆（＾～＾）！",
+            ))),
+        }
+    }
     fn is_rank123(&self, destination: &FireAddress) -> bool {
         match destination {
             FireAddress::Board(dst_sq) => RANK6U8 < dst_sq.rank(),
+            _ => panic!(Beam::trouble(&format!(
+                "(Err.905) まだ実装してないぜ☆（＾～＾）！",
+            ))),
+        }
+    }
+    fn is_rank12(&self, destination: &FireAddress) -> bool {
+        match destination {
+            FireAddress::Board(dst_sq) => RANK7U8 < dst_sq.rank(),
+            _ => panic!(Beam::trouble(&format!(
+                "(Err.905) まだ実装してないぜ☆（＾～＾）！",
+            ))),
+        }
+    }
+    fn is_rank23(&self, destination: &FireAddress) -> bool {
+        match destination {
+            FireAddress::Board(dst_sq) => RANK6U8 < dst_sq.rank() && dst_sq.rank() < RANK9U8,
+            _ => panic!(Beam::trouble(&format!(
+                "(Err.905) まだ実装してないぜ☆（＾～＾）！",
+            ))),
+        }
+    }
+    fn is_rank1(&self, destination: &FireAddress) -> bool {
+        match destination {
+            FireAddress::Board(dst_sq) => RANK9U8 == dst_sq.rank(),
+            _ => panic!(Beam::trouble(&format!(
+                "(Err.905) まだ実装してないぜ☆（＾～＾）！",
+            ))),
+        }
+    }
+    fn is_rank3(&self, destination: &FireAddress) -> bool {
+        match destination {
+            FireAddress::Board(dst_sq) => RANK7U8 == dst_sq.rank(),
             _ => panic!(Beam::trouble(&format!(
                 "(Err.905) まだ実装してないぜ☆（＾～＾）！",
             ))),
@@ -621,12 +710,12 @@ impl PseudoLegalMoves {
     {
         callback(
             destination,
-            if self.is_promote_second_third_farthest_rank_from_friend(destination) {
-                Promotability::Forced
-            } else if self.phase_operation.is_rank123(destination) {
+            if self.phase_operation.is_rank456789(destination) {
+                Promotability::Deny
+            } else if self.phase_operation.is_rank23(destination) {
                 Promotability::Any
             } else {
-                Promotability::Deny
+                Promotability::Forced
             },
             Agility::Hopping,
             Some(PermissionType::PawnLance),
@@ -647,12 +736,12 @@ impl PseudoLegalMoves {
     {
         callback(
             destination,
-            if self.is_promote_first_second_farthest_rank_from_friend(destination) {
-                Promotability::Forced
-            } else if self.phase_operation.is_rank123(destination) {
+            if self.phase_operation.is_rank456789(destination) {
+                Promotability::Deny
+            } else if self.phase_operation.is_rank3(destination) {
                 Promotability::Any
             } else {
-                Promotability::Deny
+                Promotability::Forced
             },
             Agility::Knight,
             Some(PermissionType::Knight),
@@ -679,6 +768,7 @@ impl PseudoLegalMoves {
     {
         callback(
             destination,
+            // 戻って成るのがある☆（＾～＾）
             if self.phase_operation.is_rank123(source)
                 || self.is_promote_opponent_region(destination)
             {
@@ -724,42 +814,6 @@ impl PseudoLegalMoves {
         )
     }
 
-    /// 自陣から見て、一番目、２番目に遠いの段
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `friend` -
-    /// * `destination` -
-    fn is_promote_first_second_farthest_rank_from_friend(&self, destination: &FireAddress) -> bool {
-        match destination {
-            FireAddress::Board(dst_sq) => match self.friend {
-                Phase::First => dst_sq.rank() < RANK3U8,
-                Phase::Second => RANK7U8 < dst_sq.rank(),
-            },
-            _ => panic!(Beam::trouble(&format!(
-                "(Err.919) まだ実装してないぜ☆（＾～＾）！",
-            ))),
-        }
-    }
-    /// 自陣から見て、二番目、三番目に遠いの段
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `friend` -
-    /// * `destination` -
-    fn is_promote_second_third_farthest_rank_from_friend(&self, destination: &FireAddress) -> bool {
-        match destination {
-            FireAddress::Board(dst_sq) => match self.friend {
-                Phase::First => RANK1U8 < dst_sq.rank() && dst_sq.rank() < RANK4U8,
-                Phase::Second => RANK6U8 < dst_sq.rank() && dst_sq.rank() < RANK9U8,
-            },
-            _ => panic!(Beam::trouble(&format!(
-                "(Err.937) まだ実装してないぜ☆（＾～＾）！",
-            ))),
-        }
-    }
     /// 敵陣
     ///
     /// Arguments
