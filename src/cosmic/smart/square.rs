@@ -298,8 +298,8 @@ pub fn test_rotation() {
 // #[allow(non_camel_case_types)]
 // pub type isquare = isize;
 
-// 枠も使う☆（＾～＾）配列サイズなので 1 大きめだぜ☆（＾～＾）
-pub const BOARD_MEMORY_AREA: usize = 111;
+/// 持ち駒を置くところも付いている盤だぜ☆（＾～＾）添付の図を参照してくれだぜ☆（＾～＾）
+pub const BOARD_MEMORY_AREA: usize = 122;
 
 /// 筋、段は 1 から始まる、という明示。
 /// usize が速い☆（＾～＾）

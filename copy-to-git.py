@@ -11,8 +11,9 @@ destination = 'C:/Users/むずでょ/Documents/GitHub/kifuwarabe2020-wcsodr1'
 
 def go():
     print('Trace   | Remove.')
-    remove_destination_dir('/src')
+    remove_destination_dir('/doc')
     remove_destination_dir('/kifu')
+    remove_destination_dir('/src')
     remove_destination_dir('/tool')
     remove_destination_file('/.gitignore')
     remove_destination_file('/Cargo.toml')
@@ -21,8 +22,9 @@ def go():
     remove_destination_file('/README.md')
 
     print('Trace   | Copy.')
-    copy_dir('/src', ignore=shutil.ignore_patterns('*.pdb'))
+    copy_dir('/doc')
     copy_dir('/kifu')
+    copy_dir('/src', ignore=shutil.ignore_patterns('*.pdb'))
     copy_dir('/tool', ignore=shutil.ignore_patterns('__pycache__'))
     copy_file('/.gitignore')
     copy_file('/Cargo.toml')

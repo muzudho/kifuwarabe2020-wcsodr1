@@ -515,16 +515,7 @@ impl Default for GameTable {
     fn default() -> Self {
         GameTable {
             // 盤上
-            board: [
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None,
-            ],
+            board: [None; BOARD_MEMORY_AREA],
             /// 初期値はゴミ値だぜ☆（＾～＾）上書きして消せだぜ☆（＾～＾）
             address_list: [FireAddress::default(); NAMED_PIECES_LEN],
             /// 初期値はゴミ値だぜ☆（＾～＾）上書きして消せだぜ☆（＾～＾）
@@ -547,16 +538,7 @@ impl Default for GameTable {
 }
 impl GameTable {
     pub fn clear(&mut self) {
-        self.board = [
-            None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-            None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-            None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-            None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-            None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-            None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-            None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-            None, None, None, None, None, None, None, None, None, None, None, None, None,
-        ];
+        self.board = [None; BOARD_MEMORY_AREA];
         // 初期値はゴミ値だぜ☆（＾～＾）上書きして消せだぜ☆（＾～＾）
         self.address_list = [FireAddress::default(); NAMED_PIECES_LEN];
         // 初期値はゴミ値だぜ☆（＾～＾）上書きして消せだぜ☆（＾～＾）
@@ -976,7 +958,7 @@ impl GameTable {
 /// 駒台だぜ☆（＾～＾）これ１つで２人分あるんで☆（＾～＾）
 #[derive(Clone)]
 pub struct PhaseClassification {
-    items: [PieceNum; 80],
+    items: [Option<PieceNum>; BOARD_MEMORY_AREA],
     board1_cur: isize,
     board2_cur: isize,
     king1_cur: isize,
@@ -1000,7 +982,7 @@ impl Default for PhaseClassification {
     // ゴミ値で埋めるぜ☆（＾～＾）
     fn default() -> Self {
         PhaseClassification {
-            items: [PieceNum::King1; 80],
+            items: [None; BOARD_MEMORY_AREA],
             board1_cur: 0,
             board2_cur: 39,
             king1_cur: 40,
@@ -1032,13 +1014,12 @@ impl PhaseClassification {
             FireAddress::Hand(drop_type) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(friend, *drop_type);
                 // 駒台に駒を置くぜ☆（＾～＾）
-                self.items[self.hand_cur(drop) as usize] = num;
+                self.items[self.hand_cur(drop) as usize] = Some(num);
                 // 位置を増減するぜ☆（＾～＾）
                 self.add_hand_cur(drop, self.direction(drop));
             }
         }
     }
-    /// ゴミ値は消さないぜ☆（＾～＾）
     pub fn pop(&mut self, friend: Phase, fire: &FireAddress) -> PieceNum {
         match fire {
             FireAddress::Board(_sq) => {
@@ -1054,7 +1035,9 @@ impl PhaseClassification {
                 // 位置を増減するぜ☆（＾～＾）
                 self.add_hand_cur(drop, -self.direction(drop));
                 // 駒台の駒をはがすぜ☆（＾～＾）
-                self.items[self.hand_cur(drop) as usize]
+                let num = self.items[self.hand_cur(drop) as usize].unwrap();
+                self.items[self.hand_cur(drop) as usize] = None;
+                num
             }
         }
     }
@@ -1066,13 +1049,13 @@ impl PhaseClassification {
                 let drop = DoubleFacedPiece::from_phase_and_type(friend, *drop_type);
                 if self.direction(drop) == 1 {
                     if self.start(drop) < self.hand_cur(drop) {
-                        Some(self.items[(self.hand_cur(drop) - 1) as usize])
+                        self.items[(self.hand_cur(drop) - 1) as usize]
                     } else {
                         None
                     }
                 } else {
                     if self.hand_cur(drop) < self.start(drop) {
-                        Some(self.items[(self.hand_cur(drop) + 1) as usize])
+                        self.items[(self.hand_cur(drop) + 1) as usize]
                     } else {
                         None
                     }
