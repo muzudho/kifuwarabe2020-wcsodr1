@@ -313,6 +313,7 @@ pub const FILE9U8: u8 = 9;
 pub const FILE10U8: u8 = 10;
 pub const FILE_11: usize = 11;
 // pub const FILE11U8: u8 = 11;
+pub const FILE13U8: u8 = 13;
 pub const RANK_0: usize = 0;
 pub const RANK0U8: u8 = 0;
 // pub const RANK_1: usize = 1;
@@ -614,12 +615,9 @@ impl Default for AbsoluteAddress2D {
 }
 impl AbsoluteAddress2D {
     pub fn new(file: u8, rank: u8) -> Self {
+        debug_assert!(FILE0U8 <= file && file < FILE13U8, format!("file={}", file));
         debug_assert!(
-            FILE_0 as u8 <= file && file < FILE_11 as u8,
-            format!("file={}", file)
-        );
-        debug_assert!(
-            RANK_0 as u8 <= rank && rank < RANK_11 as u8,
+            RANK0U8 <= rank && rank < RANK10U8 as u8,
             format!("rank={}", rank)
         );
         AbsoluteAddress2D {
@@ -628,20 +626,20 @@ impl AbsoluteAddress2D {
     }
 
     pub fn from_absolute_address(serial: u8) -> Option<AbsoluteAddress2D> {
-        let file = (serial / 10) % 10;
+        let file = serial / 10; // 12 列まであるぜ☆（＾～＾） // (serial / 10) % 10
         let rank = serial % 10;
         if serial == 0 {
             None
         } else {
-            debug_assert!(FILE0U8 < file && file < FILE10U8, format!("file={}", file));
-            debug_assert!(RANK0U8 < rank && rank < RANK10U8, format!("rank={}", rank));
+            debug_assert!(FILE0U8 <= file && file < FILE13U8, format!("file={}", file));
+            debug_assert!(RANK0U8 <= rank && rank < RANK10U8, format!("rank={}", rank));
             Some(AbsoluteAddress2D::new(file, rank))
         }
     }
 
     /// 列番号。いわゆる筋。右から 1, 2, 3 ...
     pub fn file(&self) -> u8 {
-        (self.serial / 10) % 10
+        self.serial / 10 // 12 列まであるぜ☆（＾～＾） // (self.serial / 10) % 10
     }
 
     /// 行番号。いわゆる段。上から 1, 2, 3 ...

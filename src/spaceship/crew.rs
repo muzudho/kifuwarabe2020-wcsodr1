@@ -11,7 +11,7 @@ use crate::law::generate_move::MoveGen;
 use crate::law::usi::*;
 use crate::spaceship::engine;
 use crate::spaceship::equipment::{Beam, PvString, Telescope};
-use crate::spaceship::facility::{CommandRoom, GameRoom, Kitchen};
+use crate::spaceship::facility::{CommandRoom, GameRoom, Kitchen, TheaterRoom};
 use rand::Rng;
 use std;
 use std::io as std_io;
@@ -292,6 +292,11 @@ impl Chiyuri {
     pub fn pos(universe: &Universe) {
         // 現局面表示
         let s = GameRoom::to_string(&universe.game, PosNums::Current);
+        Beam::shoot(&s);
+    }
+    pub fn pos2(universe: &Universe) {
+        // 現局面表示
+        let s = TheaterRoom::to_string(&universe.game, PosNums::Current);
         Beam::shoot(&s);
     }
     pub fn pos0(universe: &Universe) {

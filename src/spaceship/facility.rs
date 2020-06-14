@@ -226,6 +226,192 @@ P x{87:2}   |{63}|{64}|{65}|{66}|{67}|{68}|{69}|{70}|{71}| h8   p x{94:2}
     }
 }
 
+/// シアター・ルームはこちらだぜ☆（＾～＾）！
+pub struct TheaterRoom {}
+impl TheaterRoom {
+    fn to_string3(table: &GameTable, serial: u8) -> String {
+        if let Some(sq) = AbsoluteAddress2D::from_absolute_address(serial) {
+            if let Some(piece_info_val) = table.piece_info_at1(&FireAddress::Board(sq)) {
+                format!("{}", piece_info_val.piece).to_string()
+            } else {
+                "    ".to_string()
+            }
+        } else {
+            // 0 は None.
+            "    ".to_string()
+        }
+    }
+    /// 表示
+    pub fn to_string(game: &Game, pos_nums: PosNums) -> String {
+        let table = game.get_table(pos_nums);
+        let ply = game.history.ply;
+        let phase = game.history.get_friend();
+        let same_pos_count = game.count_same_position();
+
+        // 局面表示
+        // フォーマットの引数は 98個まで。
+        format!(
+            "{}{}{}",
+            format!(
+                "[{0} ply. {1} phase. {2} repeats.]
+
+",
+                ply, phase, same_pos_count
+            ),
+            format!(
+                "  12   11   10    9    8    7    6    5    4    3    2    1    0
++----+----+----+----+----+----+----+----+----+----+----+----+----+
+|{60}|{55}|{50}|{45}|{40}|{35}|{30}|{25}|{20}|{15}|{10}|{5 }|{0 }| z
++----+----+----+----+----+----+----+----+----+----+----+----+----+
+|{61}|{56}|{51}|{46}|{41}|{36}|{31}|{26}|{21}|{16}|{11}|{6 }|{1 }| a
++----+----+----+----+----+----+----+----+----+----+----+----+----+
+     |{57}|{52}|{47}|{42}|{37}|{32}|{27}|{22}|{17}|{12}|{7 }|{2 }| b
+     +----+----+----+----+----+----+----+----+----+----+----+----+
+     |{58}|{53}|{48}|{43}|{38}|{33}|{28}|{23}|{18}|{13}|{8 }|{3 }| c
+     +----+----+----+----+----+----+----+----+----+----+----+----+
+     |{59}|{54}|{49}|{44}|{39}|{34}|{29}|{24}|{19}|{14}|{9 }|{4 }| d
+",
+                TheaterRoom::to_string3(table, 0),
+                TheaterRoom::to_string3(table, 1),
+                TheaterRoom::to_string3(table, 2),
+                TheaterRoom::to_string3(table, 3),
+                TheaterRoom::to_string3(table, 4),
+                TheaterRoom::to_string3(table, 10),
+                TheaterRoom::to_string3(table, 11),
+                TheaterRoom::to_string3(table, 12),
+                TheaterRoom::to_string3(table, 13),
+                TheaterRoom::to_string3(table, 14),
+                TheaterRoom::to_string3(table, 20),
+                TheaterRoom::to_string3(table, 21),
+                TheaterRoom::to_string3(table, 22),
+                TheaterRoom::to_string3(table, 23),
+                TheaterRoom::to_string3(table, 24),
+                TheaterRoom::to_string3(table, 30),
+                TheaterRoom::to_string3(table, 31),
+                TheaterRoom::to_string3(table, 32),
+                TheaterRoom::to_string3(table, 33),
+                TheaterRoom::to_string3(table, 34),
+                TheaterRoom::to_string3(table, 40),
+                TheaterRoom::to_string3(table, 41),
+                TheaterRoom::to_string3(table, 42),
+                TheaterRoom::to_string3(table, 43),
+                TheaterRoom::to_string3(table, 44),
+                TheaterRoom::to_string3(table, 50),
+                TheaterRoom::to_string3(table, 51),
+                TheaterRoom::to_string3(table, 52),
+                TheaterRoom::to_string3(table, 53),
+                TheaterRoom::to_string3(table, 54),
+                TheaterRoom::to_string3(table, 60),
+                TheaterRoom::to_string3(table, 61),
+                TheaterRoom::to_string3(table, 62),
+                TheaterRoom::to_string3(table, 63),
+                TheaterRoom::to_string3(table, 64),
+                TheaterRoom::to_string3(table, 70),
+                TheaterRoom::to_string3(table, 71),
+                TheaterRoom::to_string3(table, 72),
+                TheaterRoom::to_string3(table, 73),
+                TheaterRoom::to_string3(table, 74),
+                TheaterRoom::to_string3(table, 80),
+                TheaterRoom::to_string3(table, 81),
+                TheaterRoom::to_string3(table, 82),
+                TheaterRoom::to_string3(table, 83),
+                TheaterRoom::to_string3(table, 84),
+                TheaterRoom::to_string3(table, 90),
+                TheaterRoom::to_string3(table, 91),
+                TheaterRoom::to_string3(table, 92),
+                TheaterRoom::to_string3(table, 93),
+                TheaterRoom::to_string3(table, 94),
+                TheaterRoom::to_string3(table, 100),
+                TheaterRoom::to_string3(table, 101),
+                TheaterRoom::to_string3(table, 102),
+                TheaterRoom::to_string3(table, 103),
+                TheaterRoom::to_string3(table, 104),
+                TheaterRoom::to_string3(table, 110),
+                TheaterRoom::to_string3(table, 111),
+                TheaterRoom::to_string3(table, 112),
+                TheaterRoom::to_string3(table, 113),
+                TheaterRoom::to_string3(table, 114),
+                TheaterRoom::to_string3(table, 120),
+                TheaterRoom::to_string3(table, 121),
+            ),
+            format!(
+                "     +----+----+----+----+----+----+----+----+----+----+----+----+
+     |{55}|{50}|{45}|{40}|{35}|{30}|{25}|{20}|{15}|{10}|{5 }|{0 }| e
+     +----+----+----+----+----+----+----+----+----+----+----+----+
+     |{56}|{51}|{46}|{41}|{36}|{31}|{26}|{21}|{16}|{11}|{6 }|{1 }| f
+     +----+----+----+----+----+----+----+----+----+----+----+----+
+     |{57}|{52}|{47}|{42}|{37}|{32}|{27}|{22}|{17}|{12}|{7 }|{2 }| g
+     +----+----+----+----+----+----+----+----+----+----+----+----+
+     |{58}|{53}|{48}|{43}|{38}|{33}|{28}|{23}|{18}|{13}|{8 }|{3 }| h
+     +----+----+----+----+----+----+----+----+----+----+----+----+
+     |{59}|{54}|{49}|{44}|{39}|{34}|{29}|{24}|{19}|{14}|{9 }|{4 }| i
+     +----+----+----+----+----+----+----+----+----+----+----+----+\
+",
+                TheaterRoom::to_string3(table, 5),
+                TheaterRoom::to_string3(table, 6),
+                TheaterRoom::to_string3(table, 7),
+                TheaterRoom::to_string3(table, 8),
+                TheaterRoom::to_string3(table, 9),
+                TheaterRoom::to_string3(table, 15),
+                TheaterRoom::to_string3(table, 16),
+                TheaterRoom::to_string3(table, 17),
+                TheaterRoom::to_string3(table, 18),
+                TheaterRoom::to_string3(table, 19),
+                TheaterRoom::to_string3(table, 25),
+                TheaterRoom::to_string3(table, 26),
+                TheaterRoom::to_string3(table, 27),
+                TheaterRoom::to_string3(table, 28),
+                TheaterRoom::to_string3(table, 29),
+                TheaterRoom::to_string3(table, 35),
+                TheaterRoom::to_string3(table, 36),
+                TheaterRoom::to_string3(table, 37),
+                TheaterRoom::to_string3(table, 38),
+                TheaterRoom::to_string3(table, 39),
+                TheaterRoom::to_string3(table, 45),
+                TheaterRoom::to_string3(table, 46),
+                TheaterRoom::to_string3(table, 47),
+                TheaterRoom::to_string3(table, 48),
+                TheaterRoom::to_string3(table, 49),
+                TheaterRoom::to_string3(table, 55),
+                TheaterRoom::to_string3(table, 56),
+                TheaterRoom::to_string3(table, 57),
+                TheaterRoom::to_string3(table, 58),
+                TheaterRoom::to_string3(table, 59),
+                TheaterRoom::to_string3(table, 65),
+                TheaterRoom::to_string3(table, 66),
+                TheaterRoom::to_string3(table, 67),
+                TheaterRoom::to_string3(table, 68),
+                TheaterRoom::to_string3(table, 69),
+                TheaterRoom::to_string3(table, 75),
+                TheaterRoom::to_string3(table, 76),
+                TheaterRoom::to_string3(table, 77),
+                TheaterRoom::to_string3(table, 78),
+                TheaterRoom::to_string3(table, 79),
+                TheaterRoom::to_string3(table, 85),
+                TheaterRoom::to_string3(table, 86),
+                TheaterRoom::to_string3(table, 87),
+                TheaterRoom::to_string3(table, 88),
+                TheaterRoom::to_string3(table, 89),
+                TheaterRoom::to_string3(table, 95),
+                TheaterRoom::to_string3(table, 96),
+                TheaterRoom::to_string3(table, 97),
+                TheaterRoom::to_string3(table, 98),
+                TheaterRoom::to_string3(table, 99),
+                TheaterRoom::to_string3(table, 105),
+                TheaterRoom::to_string3(table, 106),
+                TheaterRoom::to_string3(table, 107),
+                TheaterRoom::to_string3(table, 108),
+                TheaterRoom::to_string3(table, 109),
+                TheaterRoom::to_string3(table, 115),
+                TheaterRoom::to_string3(table, 116),
+                TheaterRoom::to_string3(table, 117),
+                TheaterRoom::to_string3(table, 118),
+                TheaterRoom::to_string3(table, 119),
+            )
+        )
+    }
+}
+
 /// 台所はこちらだぜ☆（＾～＾）！指し手の一覧が見れるぜ☆（＾～＾）！
 pub struct Kitchen {}
 impl Kitchen {

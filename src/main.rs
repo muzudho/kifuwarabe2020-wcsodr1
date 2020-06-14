@@ -91,6 +91,8 @@ fn help_chiyuri(line: &str, len: usize, starts: usize, universe: &mut Universe) 
     // P
     } else if 3 < len && &line[starts..4] == "pos0" {
         Chiyuri::pos0(universe);
+    } else if 3 < len && &line[starts..4] == "pos2" {
+        Chiyuri::pos2(universe);
     } else if 2 < len && &line[starts..3] == "pos" {
         Chiyuri::pos(universe);
     // S
