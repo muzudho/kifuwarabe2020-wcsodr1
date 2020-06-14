@@ -77,8 +77,14 @@ impl Mobility {
 ///
 /// 二歩とか、打った後で調べた方が高速になるはずだが、探索部がまだできてないので、指し手生成の中でチェックしているぜ☆（＾～＾）
 /// 香を２段目に打たないとか強い将棋を目指すことは　まだやってないぜ☆（＾～＾）
-pub struct PseudoLegalMoves {}
+pub struct PseudoLegalMoves {
+    /// 指し手生成中に手番が変わることは無いんで☆（＾～＾）
+    friend: Phase,
+}
 impl PseudoLegalMoves {
+    pub fn new(friend: Phase) -> Self {
+        PseudoLegalMoves { friend: friend }
+    }
     ///
     /// 現局面の、任意の移動先升の、
     /// - 盤上の駒の移動
@@ -100,16 +106,14 @@ impl PseudoLegalMoves {
     /// F1:
     /// * 指し手ハッシュ
     /// * 移動先にあった駒
-    pub fn make_move<F1>(friend: Phase, table: &GameTable, listen_move: &mut F1)
+    pub fn make_move<F1>(&self, table: &GameTable, listen_move: &mut F1)
     where
         F1: FnMut(Movement),
     {
         table.for_some_pieces_on_list40(
-            friend,
+            self.friend,
             // 移動元と、その駒の種類。
-            &mut |src_fire: &FireAddress| {
-                PseudoLegalMoves::start(friend, src_fire, table, listen_move)
-            },
+            &mut |src_fire: &FireAddress| self.start(src_fire, table, listen_move),
         );
     }
 
@@ -128,23 +132,23 @@ impl PseudoLegalMoves {
     /// F1:
     /// * 指し手ハッシュ
     /// * 移動先にあった駒
-    fn start<F1>(friend: Phase, source: &FireAddress, table: &GameTable, listen_move: &mut F1)
+    fn start<F1>(&self, source: &FireAddress, table: &GameTable, listen_move: &mut F1)
     where
         F1: FnMut(Movement),
     {
         match source {
             FireAddress::Board(_src_sq) => {
-                let piece_type = table.get_type(table.piece_num_at(friend, &source).unwrap());
+                let piece_type = table.get_type(table.piece_num_at(self.friend, &source).unwrap());
 
                 let moving =
                     &mut |destination: &FireAddress,
                           promotability,
                           _agility,
                           move_permission: Option<MovePermission>| {
-                        let pseudo_captured_num = table.piece_num_at(friend, &destination);
+                        let pseudo_captured_num = table.piece_num_at(self.friend, &destination);
 
                         let space = if let Some(pseudo_captured_num_val) = pseudo_captured_num {
-                            if table.get_phase(pseudo_captured_num_val) == friend {
+                            if table.get_phase(pseudo_captured_num_val) == self.friend {
                                 // 味方の駒を取った☆（＾～＾）なしだぜ☆（＾～＾）！
                                 // 真を返して処理を中断だぜ☆（＾～＾）！
                                 return true;
@@ -178,7 +182,7 @@ impl PseudoLegalMoves {
                                 // 成ったり、成れなかったりできるとき。
                                 if !forbidden {
                                     listen_move(Movement::new(
-                                        table.piece_num_at(friend, &source).unwrap(),
+                                        table.piece_num_at(self.friend, &source).unwrap(),
                                         *source,
                                         *destination,
                                         false,
@@ -196,7 +200,7 @@ impl PseudoLegalMoves {
                                     ));
                                 }
                                 listen_move(Movement::new(
-                                    table.piece_num_at(friend, &source).unwrap(),
+                                    table.piece_num_at(self.friend, &source).unwrap(),
                                     *source,
                                     *destination,
                                     true,
@@ -216,7 +220,7 @@ impl PseudoLegalMoves {
                                 // 成れるか、成れないかのどちらかのとき。
                                 if promotion || !forbidden {
                                     listen_move(Movement::new(
-                                        table.piece_num_at(friend, &source).unwrap(),
+                                        table.piece_num_at(self.friend, &source).unwrap(),
                                         *source,
                                         *destination,
                                         promotion,
@@ -238,13 +242,13 @@ impl PseudoLegalMoves {
 
                         !space
                     };
-                Area::piece_of(piece_type, friend, source, moving);
+                self.piece_of(piece_type, source, moving);
             }
             FireAddress::Hand(src_drop_type) => {
-                if let Some((piece_type, fire_hand)) = table.last_hand(friend, &source) {
+                if let Some((piece_type, fire_hand)) = table.last_hand(self.friend, &source) {
                     // 打つぜ☆（＾～＾）
                     let drop_fn = &mut |destination: &FireAddress| {
-                        if let None = table.piece_num_at(friend, &destination) {
+                        if let None = table.piece_num_at(self.friend, &destination) {
                             // 駒が無いところに打つ
                             use crate::cosmic::smart::features::PieceType::*;
                             match piece_type {
@@ -252,7 +256,7 @@ impl PseudoLegalMoves {
                                     match destination {
                                         FireAddress::Board(sq) => {
                                             // ひよこ　は２歩できない☆（＾～＾
-                                            if table.exists_pawn_on_file(friend, sq.file()) {
+                                            if table.exists_pawn_on_file(self.friend, sq.file()) {
                                                 return;
                                             }
                                         }
@@ -264,7 +268,7 @@ impl PseudoLegalMoves {
                                 _ => {}
                             }
                             listen_move(Movement::new(
-                                table.piece_num_at(friend, &fire_hand).unwrap(),
+                                table.piece_num_at(self.friend, &fire_hand).unwrap(),
                                 fire_hand,    // 打った駒種類
                                 *destination, // どの升へ行きたいか
                                 false,        // 打に成りは無し
@@ -299,6 +303,314 @@ impl PseudoLegalMoves {
                     }
                 }
             }
+        }
+    }
+
+    /// 先手から見た盤上の駒の動けるマスだぜ☆（＾～＾）
+    ///
+    /// Arguments
+    /// ---------
+    ///
+    /// * `piece_type` - 駒の種類だぜ☆（＾～＾）
+    /// * `source` - 移動元升だぜ☆（＾～＾）
+    /// * `hopping` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
+    /// * `sliding` -
+    fn piece_of<F1>(&self, piece_type: PieceType, source: &FireAddress, moving: &mut F1)
+    where
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+    {
+        match piece_type {
+            PieceType::Pawn => self.pawn(source, moving),
+            PieceType::Lance => self.lance(source, moving),
+            PieceType::Knight => self.knight(source, moving),
+            PieceType::Silver => self.silver(source, moving),
+            PieceType::Gold => self.gold(source, moving),
+            PieceType::King => self.king(source, moving),
+            PieceType::Bishop => self.bishop(source, moving),
+            PieceType::Rook => self.rook(source, moving),
+            PieceType::PromotedPawn => self.gold(source, moving),
+            PieceType::PromotedLance => self.gold(source, moving),
+            PieceType::PromotedKnight => self.gold(source, moving),
+            PieceType::PromotedSilver => self.gold(source, moving),
+            PieceType::Horse => self.horse(source, moving),
+            PieceType::Dragon => self.dragon(source, moving),
+        }
+    }
+
+    /// 先手から見た盤上の歩の動けるマスだぜ☆（＾～＾）
+    ///
+    /// Arguments
+    /// ---------
+    ///
+    /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
+    /// * `source` - 移動元升だぜ☆（＾～＾）
+    /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
+    fn pawn<F1>(&self, source: &FireAddress, moving: &mut F1)
+    where
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+    {
+        let moving = &mut |destination: &FireAddress, _agility| {
+            Promoting::pawn_lance(
+                self.friend,
+                destination,
+                moving,
+                Some(MovePermission::from_pawn_or_lance(self.friend)),
+            )
+        };
+
+        for mobility in PieceType::Pawn.mobility().iter() {
+            self.move_(source, *mobility, moving);
+        }
+    }
+
+    /// 先手から見た盤上の香の動けるマスだぜ☆（＾～＾）
+    ///
+    /// Arguments
+    /// ---------
+    ///
+    /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
+    /// * `source` - 移動元升だぜ☆（＾～＾）
+    /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
+    fn lance<F1>(&self, source: &FireAddress, moving: &mut F1)
+    where
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+    {
+        let moving = &mut |destination: &FireAddress, _agility| {
+            Promoting::pawn_lance(
+                self.friend,
+                destination,
+                moving,
+                Some(MovePermission::from_pawn_or_lance(self.friend)),
+            )
+        };
+
+        for mobility in PieceType::Lance.mobility().iter() {
+            self.move_(source, *mobility, moving);
+        }
+    }
+
+    /// 先手から見た盤上の桂の動けるマスだぜ☆（＾～＾）
+    ///
+    /// Arguments
+    /// ---------
+    ///
+    /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
+    /// * `source` - 移動元升だぜ☆（＾～＾）
+    /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
+    fn knight<F1>(&self, source: &FireAddress, moving: &mut F1)
+    where
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+    {
+        let moving = &mut |destination: &FireAddress, _agility| {
+            Promoting::knight(
+                self.friend,
+                destination,
+                moving,
+                Some(MovePermission::from_knight(self.friend)),
+            )
+        };
+
+        for mobility in PieceType::Knight.mobility().iter() {
+            self.move_(source, *mobility, moving);
+        }
+    }
+
+    /// 先手から見た盤上の銀の動けるマスだぜ☆（＾～＾）
+    ///
+    /// Arguments
+    /// ---------
+    ///
+    /// * `source` - 移動元升だぜ☆（＾～＾）
+    /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
+    fn silver<F1>(&self, source: &FireAddress, moving: &mut F1)
+    where
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+    {
+        let moving = &mut |destination: &FireAddress, _agility| {
+            Promoting::silver(self.friend, &source, destination, moving)
+        };
+
+        for mobility in PieceType::Silver.mobility().iter() {
+            self.move_(source, *mobility, moving);
+        }
+    }
+
+    /// 先手から見た盤上の金、と、杏、圭、全の動けるマスだぜ☆（＾～＾）
+    ///
+    /// Arguments
+    /// ---------
+    ///
+    /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
+    /// * `source` - 移動元升だぜ☆（＾～＾）
+    /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
+    fn gold<F1>(&self, source: &FireAddress, moving: &mut F1)
+    where
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+    {
+        let moving = &mut |destination: &FireAddress, _agility| {
+            moving(destination, Promotability::Deny, Agility::Hopping, None)
+        };
+
+        for mobility in PieceType::Gold.mobility().iter() {
+            self.move_(source, *mobility, moving);
+        }
+    }
+
+    /// 盤上の玉の動けるマスだぜ☆（＾～＾）
+    ///
+    /// Arguments
+    /// ---------
+    ///
+    /// * `source` - 移動元升だぜ☆（＾～＾）
+    /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
+    fn king<F1>(&self, source: &FireAddress, moving: &mut F1)
+    where
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+    {
+        let moving = &mut |destination: &FireAddress, _agility| {
+            moving(destination, Promotability::Deny, Agility::Hopping, None)
+        };
+
+        for mobility in PieceType::King.mobility().iter() {
+            self.move_(source, *mobility, moving);
+        }
+    }
+
+    /// 盤上の角の動けるマスだぜ☆（＾～＾）
+    ///
+    /// Arguments
+    /// ---------
+    ///
+    /// * `source` - 移動元升だぜ☆（＾～＾）
+    /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
+    fn bishop<F1>(&self, source: &FireAddress, moving: &mut F1)
+    where
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+    {
+        let moving = &mut |destination: &FireAddress, _agility| {
+            Promoting::bishop_rook(self.friend, source, destination, moving)
+        };
+        for mobility in PieceType::Bishop.mobility().iter() {
+            self.move_(source, *mobility, moving);
+        }
+    }
+
+    /// 盤上の飛の動けるマスだぜ☆（＾～＾）
+    ///
+    /// Arguments
+    /// ---------
+    ///
+    /// * `source` - 移動元升だぜ☆（＾～＾）
+    /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
+    fn rook<F1>(&self, source: &FireAddress, moving: &mut F1)
+    where
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+    {
+        let moving = &mut |destination: &FireAddress, _agility| {
+            Promoting::bishop_rook(self.friend, source, destination, moving)
+        };
+        for mobility in PieceType::Rook.mobility().iter() {
+            self.move_(source, *mobility, moving);
+        }
+    }
+
+    /// 盤上の馬の動けるマスだぜ☆（＾～＾）
+    ///
+    /// Arguments
+    /// ---------
+    ///
+    /// * `source` - 移動元升だぜ☆（＾～＾）
+    /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
+    fn horse<F1>(&self, source: &FireAddress, moving: &mut F1)
+    where
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+    {
+        let moving = &mut |destination: &FireAddress, agility| {
+            moving(destination, Promotability::Deny, agility, None)
+        };
+
+        for mobility in PieceType::Horse.mobility().iter() {
+            self.move_(source, *mobility, moving);
+        }
+    }
+
+    /// 盤上の竜の動けるマスだぜ☆（＾～＾）
+    ///
+    /// Arguments
+    /// ---------
+    ///
+    /// * `source` - 移動元升だぜ☆（＾～＾）
+    /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
+    fn dragon<F1>(&self, source: &FireAddress, moving: &mut F1)
+    where
+        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
+    {
+        let moving = &mut |destination: &FireAddress, agility| {
+            moving(destination, Promotability::Deny, agility, None)
+        };
+
+        for mobility in PieceType::Dragon.mobility().iter() {
+            self.move_(source, *mobility, moving);
+        }
+    }
+
+    /// 盤上の駒を指すぜ☆（＾～＾）
+    ///
+    /// Arguments
+    /// ---------
+    /// * `friend` - 先手か後手か、関係ないか☆（＾～＾）先後同型でも必要なのが変わってるだろ☆（＾～＾）
+    /// * `start` - 移動元升☆（＾～＾）
+    /// * `angle` - 角度☆（＾～＾）
+    /// * `agility` - 動き方☆（＾～＾）
+    /// * `callback` - 絶対番地を受け取れだぜ☆（＾～＾）
+    fn move_<F1>(&self, start: &FireAddress, mobility: Mobility, moving: &mut F1)
+    where
+        F1: FnMut(&FireAddress, Agility) -> bool,
+    {
+        let angle =
+            // 後手なら１８０°回転だぜ☆（＾～＾）
+            if self.friend == Phase::Second {
+                mobility.angle.rotate180()
+            } else {
+                mobility.angle
+            };
+
+        match start {
+            FireAddress::Board(start_sq) => {
+                match mobility.agility {
+                    Agility::Sliding => {
+                        let mut cur = start_sq.clone();
+                        let r = RelAdr2D::new(1, 0).rotate(angle).clone();
+                        loop {
+                            // 西隣から反時計回りだぜ☆（＾～＾）
+                            if cur.offset(&r).wall() {
+                                break;
+                            }
+                            if moving(&FireAddress::Board(cur), mobility.agility) {
+                                break;
+                            }
+                        }
+                    }
+                    // 桂馬専用☆（＾～＾）行き先の無いところに置いてないはずだぜ☆（＾～＾）
+                    Agility::Knight => {
+                        let mut cur = start_sq.clone();
+                        // 西隣から反時計回りだぜ☆（＾～＾）
+                        if !cur.offset(&angle.west_ccw_double_rank()).wall() {
+                            moving(&FireAddress::Board(cur), mobility.agility);
+                        }
+                    }
+                    Agility::Hopping => {
+                        let mut cur = start_sq.clone();
+                        // 西隣から反時計回りだぜ☆（＾～＾）
+                        if !cur.offset(&angle.west_ccw()).wall() {
+                            moving(&FireAddress::Board(cur), mobility.agility);
+                        }
+                    }
+                }
+            }
+            _ => panic!(Beam::trouble(&format!(
+                "(Err.641) まだ実装してないぜ☆（＾～＾）！",
+            ))),
         }
     }
 }
@@ -353,315 +665,7 @@ impl Default for Area {
         }
     }
 }
-impl Area {
-    /// 先手から見た盤上の駒の動けるマスだぜ☆（＾～＾）
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `piece_type` - 駒の種類だぜ☆（＾～＾）
-    /// * `source` - 移動元升だぜ☆（＾～＾）
-    /// * `hopping` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    /// * `sliding` -
-    fn piece_of<F1>(piece_type: PieceType, friend: Phase, source: &FireAddress, moving: &mut F1)
-    where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
-    {
-        match piece_type {
-            PieceType::Pawn => Area::pawn(friend, source, moving),
-            PieceType::Lance => Area::lance(friend, source, moving),
-            PieceType::Knight => Area::knight(friend, source, moving),
-            PieceType::Silver => Area::silver(friend, source, moving),
-            PieceType::Gold => Area::gold(friend, source, moving),
-            PieceType::King => Area::king(friend, source, moving),
-            PieceType::Bishop => Area::bishop(friend, source, moving),
-            PieceType::Rook => Area::rook(friend, source, moving),
-            PieceType::PromotedPawn => Area::gold(friend, source, moving),
-            PieceType::PromotedLance => Area::gold(friend, source, moving),
-            PieceType::PromotedKnight => Area::gold(friend, source, moving),
-            PieceType::PromotedSilver => Area::gold(friend, source, moving),
-            PieceType::Horse => Area::horse(friend, source, moving),
-            PieceType::Dragon => Area::dragon(friend, source, moving),
-        }
-    }
-
-    /// 先手から見た盤上の歩の動けるマスだぜ☆（＾～＾）
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
-    /// * `source` - 移動元升だぜ☆（＾～＾）
-    /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn pawn<F1>(friend: Phase, source: &FireAddress, moving: &mut F1)
-    where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
-    {
-        let moving = &mut |destination: &FireAddress, _agility| {
-            Promoting::pawn_lance(
-                friend,
-                destination,
-                moving,
-                Some(MovePermission::from_pawn_or_lance(friend)),
-            )
-        };
-
-        for mobility in PieceType::Pawn.mobility().iter() {
-            Area::move_(friend, source, *mobility, moving);
-        }
-    }
-
-    /// 先手から見た盤上の香の動けるマスだぜ☆（＾～＾）
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
-    /// * `source` - 移動元升だぜ☆（＾～＾）
-    /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn lance<F1>(friend: Phase, source: &FireAddress, moving: &mut F1)
-    where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
-    {
-        let moving = &mut |destination: &FireAddress, _agility| {
-            Promoting::pawn_lance(
-                friend,
-                destination,
-                moving,
-                Some(MovePermission::from_pawn_or_lance(friend)),
-            )
-        };
-
-        for mobility in PieceType::Lance.mobility().iter() {
-            Area::move_(friend, source, *mobility, moving);
-        }
-    }
-
-    /// 先手から見た盤上の桂の動けるマスだぜ☆（＾～＾）
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
-    /// * `source` - 移動元升だぜ☆（＾～＾）
-    /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn knight<F1>(friend: Phase, source: &FireAddress, moving: &mut F1)
-    where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
-    {
-        let moving = &mut |destination: &FireAddress, _agility| {
-            Promoting::knight(
-                friend,
-                destination,
-                moving,
-                Some(MovePermission::from_knight(friend)),
-            )
-        };
-
-        for mobility in PieceType::Knight.mobility().iter() {
-            Area::move_(friend, source, *mobility, moving);
-        }
-    }
-
-    /// 先手から見た盤上の銀の動けるマスだぜ☆（＾～＾）
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `source` - 移動元升だぜ☆（＾～＾）
-    /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn silver<F1>(friend: Phase, source: &FireAddress, moving: &mut F1)
-    where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
-    {
-        let moving = &mut |destination: &FireAddress, _agility| {
-            Promoting::silver(friend, &source, destination, moving)
-        };
-
-        for mobility in PieceType::Silver.mobility().iter() {
-            Area::move_(friend, source, *mobility, moving);
-        }
-    }
-
-    /// 先手から見た盤上の金、と、杏、圭、全の動けるマスだぜ☆（＾～＾）
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
-    /// * `source` - 移動元升だぜ☆（＾～＾）
-    /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn gold<F1>(friend: Phase, source: &FireAddress, moving: &mut F1)
-    where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
-    {
-        let moving = &mut |destination: &FireAddress, _agility| {
-            moving(destination, Promotability::Deny, Agility::Hopping, None)
-        };
-
-        for mobility in PieceType::Gold.mobility().iter() {
-            Area::move_(friend, source, *mobility, moving);
-        }
-    }
-
-    /// 盤上の玉の動けるマスだぜ☆（＾～＾）
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `source` - 移動元升だぜ☆（＾～＾）
-    /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn king<F1>(friend: Phase, source: &FireAddress, moving: &mut F1)
-    where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
-    {
-        let moving = &mut |destination: &FireAddress, _agility| {
-            moving(destination, Promotability::Deny, Agility::Hopping, None)
-        };
-
-        for mobility in PieceType::King.mobility().iter() {
-            Area::move_(friend, source, *mobility, moving);
-        }
-    }
-
-    /// 盤上の角の動けるマスだぜ☆（＾～＾）
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `source` - 移動元升だぜ☆（＾～＾）
-    /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn bishop<F1>(friend: Phase, source: &FireAddress, moving: &mut F1)
-    where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
-    {
-        let moving = &mut |destination: &FireAddress, _agility| {
-            Promoting::bishop_rook(friend, source, destination, moving)
-        };
-        for mobility in PieceType::Bishop.mobility().iter() {
-            Area::move_(friend, source, *mobility, moving);
-        }
-    }
-
-    /// 盤上の飛の動けるマスだぜ☆（＾～＾）
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `source` - 移動元升だぜ☆（＾～＾）
-    /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn rook<F1>(friend: Phase, source: &FireAddress, moving: &mut F1)
-    where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
-    {
-        let moving = &mut |destination: &FireAddress, _agility| {
-            Promoting::bishop_rook(friend, source, destination, moving)
-        };
-        for mobility in PieceType::Rook.mobility().iter() {
-            Area::move_(friend, source, *mobility, moving);
-        }
-    }
-
-    /// 盤上の馬の動けるマスだぜ☆（＾～＾）
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `source` - 移動元升だぜ☆（＾～＾）
-    /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn horse<F1>(friend: Phase, source: &FireAddress, moving: &mut F1)
-    where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
-    {
-        let moving = &mut |destination: &FireAddress, agility| {
-            moving(destination, Promotability::Deny, agility, None)
-        };
-
-        for mobility in PieceType::Horse.mobility().iter() {
-            Area::move_(friend, source, *mobility, moving);
-        }
-    }
-
-    /// 盤上の竜の動けるマスだぜ☆（＾～＾）
-    ///
-    /// Arguments
-    /// ---------
-    ///
-    /// * `source` - 移動元升だぜ☆（＾～＾）
-    /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn dragon<F1>(friend: Phase, source: &FireAddress, moving: &mut F1)
-    where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<MovePermission>) -> bool,
-    {
-        let moving = &mut |destination: &FireAddress, agility| {
-            moving(destination, Promotability::Deny, agility, None)
-        };
-
-        for mobility in PieceType::Dragon.mobility().iter() {
-            Area::move_(friend, source, *mobility, moving);
-        }
-    }
-
-    /// 盤上の駒を指すぜ☆（＾～＾）
-    ///
-    /// Arguments
-    /// ---------
-    /// * `friend` - 先手か後手か、関係ないか☆（＾～＾）先後同型でも必要なのが変わってるだろ☆（＾～＾）
-    /// * `start` - 移動元升☆（＾～＾）
-    /// * `angle` - 角度☆（＾～＾）
-    /// * `agility` - 動き方☆（＾～＾）
-    /// * `callback` - 絶対番地を受け取れだぜ☆（＾～＾）
-    fn move_<F1>(friend: Phase, start: &FireAddress, mobility: Mobility, moving: &mut F1)
-    where
-        F1: FnMut(&FireAddress, Agility) -> bool,
-    {
-        let angle =
-            // 後手なら１８０°回転だぜ☆（＾～＾）
-            if friend == Phase::Second {
-                mobility.angle.rotate180()
-            } else {
-                mobility.angle
-            };
-
-        match start {
-            FireAddress::Board(start_sq) => {
-                match mobility.agility {
-                    Agility::Sliding => {
-                        let mut cur = start_sq.clone();
-                        let r = RelAdr2D::new(1, 0).rotate(angle).clone();
-                        loop {
-                            // 西隣から反時計回りだぜ☆（＾～＾）
-                            if cur.offset(&r).wall() {
-                                break;
-                            }
-                            if moving(&FireAddress::Board(cur), mobility.agility) {
-                                break;
-                            }
-                        }
-                    }
-                    // 桂馬専用☆（＾～＾）行き先の無いところに置いてないはずだぜ☆（＾～＾）
-                    Agility::Knight => {
-                        let mut cur = start_sq.clone();
-                        // 西隣から反時計回りだぜ☆（＾～＾）
-                        if !cur.offset(&angle.west_ccw_double_rank()).wall() {
-                            moving(&FireAddress::Board(cur), mobility.agility);
-                        }
-                    }
-                    Agility::Hopping => {
-                        let mut cur = start_sq.clone();
-                        // 西隣から反時計回りだぜ☆（＾～＾）
-                        if !cur.offset(&angle.west_ccw()).wall() {
-                            moving(&FireAddress::Board(cur), mobility.agility);
-                        }
-                    }
-                }
-            }
-            _ => panic!(Beam::trouble(&format!(
-                "(Err.641) まだ実装してないぜ☆（＾～＾）！",
-            ))),
-        }
-    }
-}
+impl Area {}
 
 /// 機敏性。
 #[derive(Clone, Copy, Debug)]

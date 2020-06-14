@@ -140,7 +140,7 @@ impl Tree {
             let mut ways = Ways::new();
 
             // 現局面で、各駒が、他に駒がないと考えた場合の最大数の指し手を生成しろだぜ☆（＾～＾）
-            PseudoLegalMoves::make_move(game.history.get_friend(), &game.table, &mut |way| {
+            PseudoLegalMoves::new(game.history.get_friend()).make_move(&game.table, &mut |way| {
                 ways.push(&way);
             });
 
