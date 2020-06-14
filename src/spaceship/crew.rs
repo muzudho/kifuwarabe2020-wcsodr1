@@ -217,8 +217,8 @@ impl Chiyuri {
         // Generation move.
         // FIXME 合法手とは限らない
         let mut ways = Vec::<Movement>::new();
-        PseudoLegalMoves::new(game.history.get_friend()).make_move(
-            &game.table,
+        PseudoLegalMoves::make_move(
+            &game,
             match game.history.get_friend() {
                 Phase::First => &game.first_operation,
                 Phase::Second => &game.second_operation,

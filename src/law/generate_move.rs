@@ -2,6 +2,7 @@
 //! 現局面を使った指し手生成☆（＾～＾）
 //!
 
+use crate::cosmic::playing::Game;
 use crate::cosmic::recording::{CapturedMove, FireAddress, Movement, Phase};
 use crate::cosmic::smart::features::PieceType;
 use crate::cosmic::smart::square::FILE10U8;
@@ -15,7 +16,6 @@ use crate::cosmic::smart::square::RANK6U8;
 use crate::cosmic::smart::square::RANK7U8;
 use crate::cosmic::smart::square::RANK9U8;
 use crate::cosmic::smart::square::{AbsoluteAddress2D, Angle, RelAdr2D};
-use crate::cosmic::toy_box::GameTable;
 use crate::spaceship::equipment::Beam;
 
 /// 先手、後手で処理が変わるやつを吸収するぜ☆（＾～＾）
@@ -212,20 +212,10 @@ impl PhaseOperation for SecondOperation {
 ///
 /// 二歩とか、打った後で調べた方が高速になるはずだが、探索部がまだできてないので、指し手生成の中でチェックしているぜ☆（＾～＾）
 /// 香を２段目に打たないとか強い将棋を目指すことは　まだやってないぜ☆（＾～＾）
-pub struct PseudoLegalMoves {
-    /// 指し手生成中に手番が変わることは無いんで☆（＾～＾）
-    friend: Phase,
-}
+///
+/// 指し手生成中に手番が変わることは無いんで friend は game.history.get_friend() で取れだぜ☆（＾～＾）
+pub struct PseudoLegalMoves {}
 impl PseudoLegalMoves {
-    pub fn new(friend: Phase) -> Self {
-        // ▲P,▲L　は１段目(▽P,▽L　は９段目)には進めない
-        // ▲N　は１、２段目(▽N　は８、９段目)には進めない
-        match friend {
-            Phase::First => PseudoLegalMoves { friend: friend },
-            Phase::Second => PseudoLegalMoves { friend: friend },
-        }
-    }
-    ///
     /// 現局面の、任意の移動先升の、
     /// - 盤上の駒の移動
     /// - 打
@@ -247,17 +237,18 @@ impl PseudoLegalMoves {
     /// * 指し手ハッシュ
     /// * 移動先にあった駒
     pub fn make_move<F1>(
-        &self,
-        table: &GameTable,
+        game: &Game,
         phase_operation: &Box<dyn PhaseOperation>,
         listen_move: &mut F1,
     ) where
         F1: FnMut(Movement),
     {
-        table.for_some_pieces_on_list40(
-            self.friend,
+        game.table.for_some_pieces_on_list40(
+            game.history.get_friend(),
             // 移動元と、その駒の種類。
-            &mut |src_fire: &FireAddress| self.start(phase_operation, src_fire, table, listen_move),
+            &mut |src_fire: &FireAddress| {
+                PseudoLegalMoves::start(game, phase_operation, src_fire, listen_move)
+            },
         );
     }
 
@@ -277,27 +268,34 @@ impl PseudoLegalMoves {
     /// * 指し手ハッシュ
     /// * 移動先にあった駒
     fn start<F1>(
-        &self,
+        game: &Game,
         phase_operation: &Box<dyn PhaseOperation>,
         source: &FireAddress,
-        table: &GameTable,
         listen_move: &mut F1,
     ) where
         F1: FnMut(Movement),
     {
         match source {
             FireAddress::Board(_src_sq) => {
-                let piece_type = table.get_type(table.piece_num_at(self.friend, &source).unwrap());
+                let piece_type = game.table.get_type(
+                    game.table
+                        .piece_num_at(game.history.get_friend(), &source)
+                        .unwrap(),
+                );
 
                 let moving =
                     &mut |destination: &FireAddress,
                           promotability,
                           _agility,
                           permission_type: Option<PermissionType>| {
-                        let pseudo_captured_num = table.piece_num_at(self.friend, &destination);
+                        let pseudo_captured_num = game
+                            .table
+                            .piece_num_at(game.history.get_friend(), &destination);
 
                         let space = if let Some(pseudo_captured_num_val) = pseudo_captured_num {
-                            if table.get_phase(pseudo_captured_num_val) == self.friend {
+                            if game.table.get_phase(pseudo_captured_num_val)
+                                == game.history.get_friend()
+                            {
                                 // 味方の駒を取った☆（＾～＾）なしだぜ☆（＾～＾）！
                                 // 真を返して処理を中断だぜ☆（＾～＾）！
                                 return true;
@@ -328,7 +326,9 @@ impl PseudoLegalMoves {
                                 // 成ったり、成れなかったりできるとき。
                                 if !forbidden {
                                     listen_move(Movement::new(
-                                        table.piece_num_at(self.friend, &source).unwrap(),
+                                        game.table
+                                            .piece_num_at(game.history.get_friend(), &source)
+                                            .unwrap(),
                                         *source,
                                         *destination,
                                         false,
@@ -336,7 +336,7 @@ impl PseudoLegalMoves {
                                             Some(CapturedMove::new(
                                                 *destination,
                                                 FireAddress::Hand(
-                                                    table
+                                                    game.table
                                                         .get_double_faced_piece_type(piece_num_val),
                                                 ),
                                             ))
@@ -346,7 +346,9 @@ impl PseudoLegalMoves {
                                     ));
                                 }
                                 listen_move(Movement::new(
-                                    table.piece_num_at(self.friend, &source).unwrap(),
+                                    game.table
+                                        .piece_num_at(game.history.get_friend(), &source)
+                                        .unwrap(),
                                     *source,
                                     *destination,
                                     true,
@@ -354,7 +356,8 @@ impl PseudoLegalMoves {
                                         Some(CapturedMove::new(
                                             *destination,
                                             FireAddress::Hand(
-                                                table.get_double_faced_piece_type(piece_num_val),
+                                                game.table
+                                                    .get_double_faced_piece_type(piece_num_val),
                                             ),
                                         ))
                                     } else {
@@ -366,7 +369,9 @@ impl PseudoLegalMoves {
                                 // 成れるか、成れないかのどちらかのとき。
                                 if promotion || !forbidden {
                                     listen_move(Movement::new(
-                                        table.piece_num_at(self.friend, &source).unwrap(),
+                                        game.table
+                                            .piece_num_at(game.history.get_friend(), &source)
+                                            .unwrap(),
                                         *source,
                                         *destination,
                                         promotion,
@@ -374,7 +379,7 @@ impl PseudoLegalMoves {
                                             Some(CapturedMove::new(
                                                 *destination,
                                                 FireAddress::Hand(
-                                                    table
+                                                    game.table
                                                         .get_double_faced_piece_type(piece_num_val),
                                                 ),
                                             ))
@@ -388,13 +393,18 @@ impl PseudoLegalMoves {
 
                         !space
                     };
-                self.piece_of(phase_operation, piece_type, source, moving);
+                PseudoLegalMoves::piece_of(game, phase_operation, piece_type, source, moving);
             }
             FireAddress::Hand(src_drop_type) => {
-                if let Some((piece_type, fire_hand)) = table.last_hand(self.friend, &source) {
+                if let Some((piece_type, fire_hand)) =
+                    game.table.last_hand(game.history.get_friend(), &source)
+                {
                     // 打つぜ☆（＾～＾）
                     let drop_fn = &mut |destination: &FireAddress| {
-                        if let None = table.piece_num_at(self.friend, &destination) {
+                        if let None = game
+                            .table
+                            .piece_num_at(game.history.get_friend(), &destination)
+                        {
                             // 駒が無いところに打つ
                             use crate::cosmic::smart::features::PieceType::*;
                             match piece_type {
@@ -402,7 +412,10 @@ impl PseudoLegalMoves {
                                     match destination {
                                         FireAddress::Board(sq) => {
                                             // ひよこ　は２歩できない☆（＾～＾
-                                            if table.exists_pawn_on_file(self.friend, sq.file()) {
+                                            if game.table.exists_pawn_on_file(
+                                                game.history.get_friend(),
+                                                sq.file(),
+                                            ) {
                                                 return;
                                             }
                                         }
@@ -414,7 +427,9 @@ impl PseudoLegalMoves {
                                 _ => {}
                             }
                             listen_move(Movement::new(
-                                table.piece_num_at(self.friend, &fire_hand).unwrap(),
+                                game.table
+                                    .piece_num_at(game.history.get_friend(), &fire_hand)
+                                    .unwrap(),
                                 fire_hand,    // 打った駒種類
                                 *destination, // どの升へ行きたいか
                                 false,        // 打に成りは無し
@@ -428,9 +443,9 @@ impl PseudoLegalMoves {
                     // 桂: 先手から見た桂馬の打てる面積だぜ☆（＾～＾）
                     // それ以外の駒が打てる範囲は盤面全体。駒を打つときに使うぜ☆（＾～＾）
                     for sq in match src_drop_type {
-                        Pawn | Lance => table.area.drop_pawn_lance.iter(),
-                        Knight => table.area.drop_knight.iter(),
-                        _ => table.area.all_squares.iter(),
+                        Pawn | Lance => game.table.area.drop_pawn_lance.iter(),
+                        Knight => game.table.area.drop_knight.iter(),
+                        _ => game.table.area.all_squares.iter(),
                     } {
                         drop_fn(sq);
                     }
@@ -449,7 +464,7 @@ impl PseudoLegalMoves {
     /// * `hopping` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     /// * `sliding` -
     fn piece_of<F1>(
-        &self,
+        game: &Game,
         phase_operation: &Box<dyn PhaseOperation>,
         piece_type: PieceType,
         source: &FireAddress,
@@ -458,20 +473,20 @@ impl PseudoLegalMoves {
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         match piece_type {
-            PieceType::Pawn => self.pawn(phase_operation, source, moving),
-            PieceType::Lance => self.lance(phase_operation, source, moving),
-            PieceType::Knight => self.knight(phase_operation, source, moving),
-            PieceType::Silver => self.silver(phase_operation, source, moving),
-            PieceType::Gold => self.gold(source, moving),
-            PieceType::King => self.king(source, moving),
-            PieceType::Bishop => self.bishop(phase_operation, source, moving),
-            PieceType::Rook => self.rook(phase_operation, source, moving),
-            PieceType::PromotedPawn => self.gold(source, moving),
-            PieceType::PromotedLance => self.gold(source, moving),
-            PieceType::PromotedKnight => self.gold(source, moving),
-            PieceType::PromotedSilver => self.gold(source, moving),
-            PieceType::Horse => self.horse(source, moving),
-            PieceType::Dragon => self.dragon(source, moving),
+            PieceType::Pawn => PseudoLegalMoves::pawn(game, phase_operation, source, moving),
+            PieceType::Lance => PseudoLegalMoves::lance(game, phase_operation, source, moving),
+            PieceType::Knight => PseudoLegalMoves::knight(game, phase_operation, source, moving),
+            PieceType::Silver => PseudoLegalMoves::silver(game, phase_operation, source, moving),
+            PieceType::Gold => PseudoLegalMoves::gold(game, source, moving),
+            PieceType::King => PseudoLegalMoves::king(game, source, moving),
+            PieceType::Bishop => PseudoLegalMoves::bishop(game, phase_operation, source, moving),
+            PieceType::Rook => PseudoLegalMoves::rook(game, phase_operation, source, moving),
+            PieceType::PromotedPawn => PseudoLegalMoves::gold(game, source, moving),
+            PieceType::PromotedLance => PseudoLegalMoves::gold(game, source, moving),
+            PieceType::PromotedKnight => PseudoLegalMoves::gold(game, source, moving),
+            PieceType::PromotedSilver => PseudoLegalMoves::gold(game, source, moving),
+            PieceType::Horse => PseudoLegalMoves::horse(game, source, moving),
+            PieceType::Dragon => PseudoLegalMoves::dragon(game, source, moving),
         }
     }
 
@@ -484,7 +499,7 @@ impl PseudoLegalMoves {
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn pawn<F1>(
-        &self,
+        game: &Game,
         phase_operation: &Box<dyn PhaseOperation>,
         source: &FireAddress,
         moving: &mut F1,
@@ -492,11 +507,11 @@ impl PseudoLegalMoves {
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
-            self.promote_pawn_lance(phase_operation, destination, moving)
+            PseudoLegalMoves::promote_pawn_lance(phase_operation, destination, moving)
         };
 
         for mobility in PieceType::Pawn.mobility().iter() {
-            self.move_(source, *mobility, moving);
+            PseudoLegalMoves::move_(game, source, *mobility, moving);
         }
     }
 
@@ -509,7 +524,7 @@ impl PseudoLegalMoves {
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn lance<F1>(
-        &self,
+        game: &Game,
         phase_operation: &Box<dyn PhaseOperation>,
         source: &FireAddress,
         moving: &mut F1,
@@ -517,11 +532,11 @@ impl PseudoLegalMoves {
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
-            self.promote_pawn_lance(phase_operation, destination, moving)
+            PseudoLegalMoves::promote_pawn_lance(phase_operation, destination, moving)
         };
 
         for mobility in PieceType::Lance.mobility().iter() {
-            self.move_(source, *mobility, moving);
+            PseudoLegalMoves::move_(game, source, *mobility, moving);
         }
     }
 
@@ -534,7 +549,7 @@ impl PseudoLegalMoves {
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn knight<F1>(
-        &self,
+        game: &Game,
         phase_operation: &Box<dyn PhaseOperation>,
         source: &FireAddress,
         moving: &mut F1,
@@ -542,11 +557,11 @@ impl PseudoLegalMoves {
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
-            self.promote_knight(phase_operation, destination, moving)
+            PseudoLegalMoves::promote_knight(phase_operation, destination, moving)
         };
 
         for mobility in PieceType::Knight.mobility().iter() {
-            self.move_(source, *mobility, moving);
+            PseudoLegalMoves::move_(game, source, *mobility, moving);
         }
     }
 
@@ -558,7 +573,7 @@ impl PseudoLegalMoves {
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn silver<F1>(
-        &self,
+        game: &Game,
         phase_operation: &Box<dyn PhaseOperation>,
         source: &FireAddress,
         moving: &mut F1,
@@ -566,11 +581,11 @@ impl PseudoLegalMoves {
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
-            self.promote_silver(phase_operation, &source, destination, moving)
+            PseudoLegalMoves::promote_silver(phase_operation, &source, destination, moving)
         };
 
         for mobility in PieceType::Silver.mobility().iter() {
-            self.move_(source, *mobility, moving);
+            PseudoLegalMoves::move_(game, source, *mobility, moving);
         }
     }
 
@@ -582,7 +597,7 @@ impl PseudoLegalMoves {
     /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn gold<F1>(&self, source: &FireAddress, moving: &mut F1)
+    fn gold<F1>(game: &Game, source: &FireAddress, moving: &mut F1)
     where
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
@@ -591,7 +606,7 @@ impl PseudoLegalMoves {
         };
 
         for mobility in PieceType::Gold.mobility().iter() {
-            self.move_(source, *mobility, moving);
+            PseudoLegalMoves::move_(game, source, *mobility, moving);
         }
     }
 
@@ -602,7 +617,7 @@ impl PseudoLegalMoves {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn king<F1>(&self, source: &FireAddress, moving: &mut F1)
+    fn king<F1>(game: &Game, source: &FireAddress, moving: &mut F1)
     where
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
@@ -611,7 +626,7 @@ impl PseudoLegalMoves {
         };
 
         for mobility in PieceType::King.mobility().iter() {
-            self.move_(source, *mobility, moving);
+            PseudoLegalMoves::move_(game, source, *mobility, moving);
         }
     }
 
@@ -623,7 +638,7 @@ impl PseudoLegalMoves {
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn bishop<F1>(
-        &self,
+        game: &Game,
         phase_operation: &Box<dyn PhaseOperation>,
         source: &FireAddress,
         moving: &mut F1,
@@ -631,10 +646,10 @@ impl PseudoLegalMoves {
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
-            self.promote_bishop_rook(phase_operation, source, destination, moving)
+            PseudoLegalMoves::promote_bishop_rook(phase_operation, source, destination, moving)
         };
         for mobility in PieceType::Bishop.mobility().iter() {
-            self.move_(source, *mobility, moving);
+            PseudoLegalMoves::move_(game, source, *mobility, moving);
         }
     }
 
@@ -646,7 +661,7 @@ impl PseudoLegalMoves {
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn rook<F1>(
-        &self,
+        game: &Game,
         phase_operation: &Box<dyn PhaseOperation>,
         source: &FireAddress,
         moving: &mut F1,
@@ -654,10 +669,10 @@ impl PseudoLegalMoves {
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
-            self.promote_bishop_rook(phase_operation, source, destination, moving)
+            PseudoLegalMoves::promote_bishop_rook(phase_operation, source, destination, moving)
         };
         for mobility in PieceType::Rook.mobility().iter() {
-            self.move_(source, *mobility, moving);
+            PseudoLegalMoves::move_(game, source, *mobility, moving);
         }
     }
 
@@ -668,7 +683,7 @@ impl PseudoLegalMoves {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn horse<F1>(&self, source: &FireAddress, moving: &mut F1)
+    fn horse<F1>(game: &Game, source: &FireAddress, moving: &mut F1)
     where
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
@@ -677,7 +692,7 @@ impl PseudoLegalMoves {
         };
 
         for mobility in PieceType::Horse.mobility().iter() {
-            self.move_(source, *mobility, moving);
+            PseudoLegalMoves::move_(game, source, *mobility, moving);
         }
     }
 
@@ -688,7 +703,7 @@ impl PseudoLegalMoves {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn dragon<F1>(&self, source: &FireAddress, moving: &mut F1)
+    fn dragon<F1>(game: &Game, source: &FireAddress, moving: &mut F1)
     where
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
@@ -697,7 +712,7 @@ impl PseudoLegalMoves {
         };
 
         for mobility in PieceType::Dragon.mobility().iter() {
-            self.move_(source, *mobility, moving);
+            PseudoLegalMoves::move_(game, source, *mobility, moving);
         }
     }
 
@@ -710,13 +725,13 @@ impl PseudoLegalMoves {
     /// * `angle` - 角度☆（＾～＾）
     /// * `agility` - 動き方☆（＾～＾）
     /// * `callback` - 絶対番地を受け取れだぜ☆（＾～＾）
-    fn move_<F1>(&self, start: &FireAddress, mobility: Mobility, moving: &mut F1)
+    fn move_<F1>(game: &Game, start: &FireAddress, mobility: Mobility, moving: &mut F1)
     where
         F1: FnMut(&FireAddress, Agility) -> bool,
     {
         let angle =
             // 後手なら１８０°回転だぜ☆（＾～＾）
-            if self.friend == Phase::Second {
+            if game.history.get_friend() == Phase::Second {
                 mobility.angle.rotate180()
             } else {
                 mobility.angle
@@ -770,7 +785,6 @@ impl PseudoLegalMoves {
     /// * `callback` -
     /// * `move_permission` - 成らずに一番奥の段に移動することはできません。
     fn promote_pawn_lance<F1>(
-        &self,
         phase_operation: &Box<dyn PhaseOperation>,
         destination: &FireAddress,
         callback: &mut F1,
@@ -801,7 +815,6 @@ impl PseudoLegalMoves {
     /// * `callback` -
     /// * `move_permission` - 成らずに奥から２番目の段に移動することはできません。
     fn promote_knight<F1>(
-        &self,
         phase_operation: &Box<dyn PhaseOperation>,
         destination: &FireAddress,
         callback: &mut F1,
@@ -833,7 +846,6 @@ impl PseudoLegalMoves {
     /// * `destination` -
     /// * `callback` -
     fn promote_silver<F1>(
-        &self,
         phase_operation: &Box<dyn PhaseOperation>,
         source: &FireAddress,
         destination: &FireAddress,
@@ -866,7 +878,6 @@ impl PseudoLegalMoves {
     /// * `destination` -
     /// * `callback` -
     fn promote_bishop_rook<F1>(
-        &self,
         phase_operation: &Box<dyn PhaseOperation>,
         source: &FireAddress,
         destination: &FireAddress,
