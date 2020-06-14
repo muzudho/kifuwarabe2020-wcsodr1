@@ -20,6 +20,34 @@ use crate::cosmic::toy_box::GameTable;
 use crate::spaceship::equipment::Beam;
 use std::fmt;
 
+/// 先手、後手で処理が変わるやつを吸収するぜ☆（＾～＾）
+trait PhaseOperation {
+    /// 桂馬を打ち込める段か判定するぜ☆（＾～＾）先後で異なるぜ☆（＾～＾）
+    fn rank_can_drop_keima(&self, rank: u8) -> bool;
+}
+struct FirstOperation {}
+struct SecondOperation {}
+impl Default for FirstOperation {
+    fn default() -> Self {
+        FirstOperation {}
+    }
+}
+impl Default for SecondOperation {
+    fn default() -> Self {
+        SecondOperation {}
+    }
+}
+impl PhaseOperation for FirstOperation {
+    fn rank_can_drop_keima(&self, rank: u8) -> bool {
+        rank < RANK4U8
+    }
+}
+impl PhaseOperation for SecondOperation {
+    fn rank_can_drop_keima(&self, rank: u8) -> bool {
+        RANK6U8 < rank
+    }
+}
+
 /// Pseudo legal move(疑似合法手)☆（＾～＾）
 ///
 /// 先手の連続王手の千日手とか、空き王手とか、駒を見ただけでは調べられないだろ☆（＾～＾）
@@ -36,7 +64,23 @@ pub struct PseudoLegalMoves {
     permission_pawn_lance_max_rank: u8,
     permission_knight_min_rank: u8,
     permission_knight_max_rank: u8,
+    /// 先手、後手で処理が変わるやつを吸収するぜ☆（＾～＾）
+    phase_operation: Box<dyn PhaseOperation>,
 }
+/*
+    fn ff1(&self) -> bool {
+        let fa = |x| 2 < x;
+        let fb = |y| y > 2;
+        self.ff2(3, fa) || self.ff2(3, fb)
+    }
+    fn ff2<F1>(&self, x: u8, fc: F1) -> bool
+    where
+        F1: Fn(u8) -> bool,
+    {
+        fc(x)
+    }
+
+*/
 impl fmt::Debug for PseudoLegalMoves {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
@@ -60,6 +104,7 @@ impl PseudoLegalMoves {
                 permission_pawn_lance_max_rank: 9,
                 permission_knight_min_rank: 3,
                 permission_knight_max_rank: 9,
+                phase_operation: Box::new(FirstOperation::default()),
             },
             Phase::Second => PseudoLegalMoves {
                 friend: friend,
@@ -67,6 +112,7 @@ impl PseudoLegalMoves {
                 permission_pawn_lance_max_rank: 8,
                 permission_knight_min_rank: 1,
                 permission_knight_max_rank: 7,
+                phase_operation: Box::new(SecondOperation::default()),
             },
         }
     }
@@ -745,10 +791,7 @@ impl PseudoLegalMoves {
     /// * `destination` -
     fn is_promote_third_farthest_rank_from_friend(&self, destination: &FireAddress) -> bool {
         match destination {
-            FireAddress::Board(dst_sq) => match self.friend {
-                Phase::First => dst_sq.rank() == RANK3U8,
-                Phase::Second => RANK7U8 == dst_sq.rank(),
-            },
+            FireAddress::Board(dst_sq) => self.phase_operation.rank_can_drop_keima(dst_sq.rank()),
             _ => panic!(Beam::trouble(&format!(
                 "(Err.946) まだ実装してないぜ☆（＾～＾）！",
             ))),
