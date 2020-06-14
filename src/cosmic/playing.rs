@@ -2,6 +2,7 @@ use crate::cosmic::pos_hash::pos_hash::*;
 use crate::cosmic::recording::Phase;
 use crate::cosmic::recording::{FireAddress, History, Movement};
 use crate::cosmic::toy_box::GameTable;
+use crate::law::generate_move::{FirstOperation, PhaseOperation, SecondOperation};
 use crate::spaceship::equipment::{Beam, DestinationDisplay};
 
 /// 局面
@@ -23,6 +24,9 @@ pub struct Game {
     pub table: GameTable,
     /// 情報表示担当
     pub info: DestinationDisplay,
+    /// 先手、後手で処理が変わるやつを吸収するぜ☆（＾～＾）
+    pub first_operation: Box<dyn PhaseOperation>,
+    pub second_operation: Box<dyn PhaseOperation>,
 }
 impl Default for Game {
     fn default() -> Game {
@@ -32,6 +36,8 @@ impl Default for Game {
             hash_seed: GameHashSeed::default(),
             table: GameTable::default(),
             info: DestinationDisplay::default(),
+            first_operation: Box::new(FirstOperation::default()),
+            second_operation: Box::new(SecondOperation::default()),
         }
     }
 }

@@ -3,7 +3,7 @@
 //!
 
 use crate::cosmic::playing::Game;
-use crate::cosmic::recording::{Movement, PLY_SIZE, SENNTITE_NUM};
+use crate::cosmic::recording::{Movement, Phase, PLY_SIZE, SENNTITE_NUM};
 use crate::cosmic::smart::evaluator::{Evaluation, REPITITION_VALUE};
 use crate::cosmic::smart::features::PieceType;
 use crate::cosmic::smart::see::SEE;
@@ -13,6 +13,7 @@ use crate::spaceship::equipment::{Beam, PvString};
 use std::fmt;
 use std::time::Instant;
 
+/// ツリーは探索中に１つしか生成しないぜ☆（＾～＾）
 pub struct Tree {
     // この木を生成したと同時にストップ・ウォッチを開始するぜ☆（＾～＾）
     stopwatch: Instant,
@@ -140,9 +141,16 @@ impl Tree {
             let mut ways = Ways::new();
 
             // 現局面で、各駒が、他に駒がないと考えた場合の最大数の指し手を生成しろだぜ☆（＾～＾）
-            PseudoLegalMoves::new(game.history.get_friend()).make_move(&game.table, &mut |way| {
-                ways.push(&way);
-            });
+            PseudoLegalMoves::new(game.history.get_friend()).make_move(
+                &game.table,
+                match game.history.get_friend() {
+                    Phase::First => &game.first_operation,
+                    Phase::Second => &game.second_operation,
+                },
+                &mut |way| {
+                    ways.push(&way);
+                },
+            );
 
             ways
         };

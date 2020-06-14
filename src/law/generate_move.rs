@@ -19,7 +19,7 @@ use crate::cosmic::toy_box::GameTable;
 use crate::spaceship::equipment::Beam;
 
 /// 先手、後手で処理が変わるやつを吸収するぜ☆（＾～＾）
-trait PhaseOperation {
+pub trait PhaseOperation {
     /// 先手から見て、４、５、６、７、８、９段目かどうか☆（＾～＾）
     fn is_rank456789(&self, destination: &FireAddress) -> bool;
     /// 先手から見て、１、２、３段目かどうか☆（＾～＾）いわゆる敵陣だぜ☆（＾～＾）
@@ -35,8 +35,8 @@ trait PhaseOperation {
     /// 移動可能かどうか判定するぜ☆（＾～＾）
     fn check_permission(&self, dst_fire: &FireAddress, permission_type: PermissionType) -> bool;
 }
-struct FirstOperation {}
-struct SecondOperation {}
+pub struct FirstOperation {}
+pub struct SecondOperation {}
 impl Default for FirstOperation {
     fn default() -> Self {
         FirstOperation {}
@@ -215,22 +215,14 @@ impl PhaseOperation for SecondOperation {
 pub struct PseudoLegalMoves {
     /// 指し手生成中に手番が変わることは無いんで☆（＾～＾）
     friend: Phase,
-    /// 先手、後手で処理が変わるやつを吸収するぜ☆（＾～＾）
-    phase_operation: Box<dyn PhaseOperation>,
 }
 impl PseudoLegalMoves {
     pub fn new(friend: Phase) -> Self {
         // ▲P,▲L　は１段目(▽P,▽L　は９段目)には進めない
         // ▲N　は１、２段目(▽N　は８、９段目)には進めない
         match friend {
-            Phase::First => PseudoLegalMoves {
-                friend: friend,
-                phase_operation: Box::new(FirstOperation::default()),
-            },
-            Phase::Second => PseudoLegalMoves {
-                friend: friend,
-                phase_operation: Box::new(SecondOperation::default()),
-            },
+            Phase::First => PseudoLegalMoves { friend: friend },
+            Phase::Second => PseudoLegalMoves { friend: friend },
         }
     }
     ///
@@ -254,14 +246,18 @@ impl PseudoLegalMoves {
     /// F1:
     /// * 指し手ハッシュ
     /// * 移動先にあった駒
-    pub fn make_move<F1>(&self, table: &GameTable, listen_move: &mut F1)
-    where
+    pub fn make_move<F1>(
+        &self,
+        table: &GameTable,
+        phase_operation: &Box<dyn PhaseOperation>,
+        listen_move: &mut F1,
+    ) where
         F1: FnMut(Movement),
     {
         table.for_some_pieces_on_list40(
             self.friend,
             // 移動元と、その駒の種類。
-            &mut |src_fire: &FireAddress| self.start(src_fire, table, listen_move),
+            &mut |src_fire: &FireAddress| self.start(phase_operation, src_fire, table, listen_move),
         );
     }
 
@@ -280,8 +276,13 @@ impl PseudoLegalMoves {
     /// F1:
     /// * 指し手ハッシュ
     /// * 移動先にあった駒
-    fn start<F1>(&self, source: &FireAddress, table: &GameTable, listen_move: &mut F1)
-    where
+    fn start<F1>(
+        &self,
+        phase_operation: &Box<dyn PhaseOperation>,
+        source: &FireAddress,
+        table: &GameTable,
+        listen_move: &mut F1,
+    ) where
         F1: FnMut(Movement),
     {
         match source {
@@ -317,9 +318,7 @@ impl PseudoLegalMoves {
                         // 成りじゃない場合は、行き先のない動きを制限されるぜ☆（＾～＾）
                         let forbidden = if let Some(permission_type_val) = permission_type {
                             // permission があれば forbidden じゃないぜ☆（＾～＾）
-                            !self
-                                .phase_operation
-                                .check_permission(&destination, permission_type_val)
+                            !phase_operation.check_permission(&destination, permission_type_val)
                         } else {
                             false
                         };
@@ -389,7 +388,7 @@ impl PseudoLegalMoves {
 
                         !space
                     };
-                self.piece_of(piece_type, source, moving);
+                self.piece_of(phase_operation, piece_type, source, moving);
             }
             FireAddress::Hand(src_drop_type) => {
                 if let Some((piece_type, fire_hand)) = table.last_hand(self.friend, &source) {
@@ -449,19 +448,24 @@ impl PseudoLegalMoves {
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `hopping` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     /// * `sliding` -
-    fn piece_of<F1>(&self, piece_type: PieceType, source: &FireAddress, moving: &mut F1)
-    where
+    fn piece_of<F1>(
+        &self,
+        phase_operation: &Box<dyn PhaseOperation>,
+        piece_type: PieceType,
+        source: &FireAddress,
+        moving: &mut F1,
+    ) where
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         match piece_type {
-            PieceType::Pawn => self.pawn(source, moving),
-            PieceType::Lance => self.lance(source, moving),
-            PieceType::Knight => self.knight(source, moving),
-            PieceType::Silver => self.silver(source, moving),
+            PieceType::Pawn => self.pawn(phase_operation, source, moving),
+            PieceType::Lance => self.lance(phase_operation, source, moving),
+            PieceType::Knight => self.knight(phase_operation, source, moving),
+            PieceType::Silver => self.silver(phase_operation, source, moving),
             PieceType::Gold => self.gold(source, moving),
             PieceType::King => self.king(source, moving),
-            PieceType::Bishop => self.bishop(source, moving),
-            PieceType::Rook => self.rook(source, moving),
+            PieceType::Bishop => self.bishop(phase_operation, source, moving),
+            PieceType::Rook => self.rook(phase_operation, source, moving),
             PieceType::PromotedPawn => self.gold(source, moving),
             PieceType::PromotedLance => self.gold(source, moving),
             PieceType::PromotedKnight => self.gold(source, moving),
@@ -479,12 +483,17 @@ impl PseudoLegalMoves {
     /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn pawn<F1>(&self, source: &FireAddress, moving: &mut F1)
-    where
+    fn pawn<F1>(
+        &self,
+        phase_operation: &Box<dyn PhaseOperation>,
+        source: &FireAddress,
+        moving: &mut F1,
+    ) where
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
-        let moving =
-            &mut |destination: &FireAddress, _agility| self.promote_pawn_lance(destination, moving);
+        let moving = &mut |destination: &FireAddress, _agility| {
+            self.promote_pawn_lance(phase_operation, destination, moving)
+        };
 
         for mobility in PieceType::Pawn.mobility().iter() {
             self.move_(source, *mobility, moving);
@@ -499,12 +508,17 @@ impl PseudoLegalMoves {
     /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn lance<F1>(&self, source: &FireAddress, moving: &mut F1)
-    where
+    fn lance<F1>(
+        &self,
+        phase_operation: &Box<dyn PhaseOperation>,
+        source: &FireAddress,
+        moving: &mut F1,
+    ) where
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
-        let moving =
-            &mut |destination: &FireAddress, _agility| self.promote_pawn_lance(destination, moving);
+        let moving = &mut |destination: &FireAddress, _agility| {
+            self.promote_pawn_lance(phase_operation, destination, moving)
+        };
 
         for mobility in PieceType::Lance.mobility().iter() {
             self.move_(source, *mobility, moving);
@@ -519,12 +533,17 @@ impl PseudoLegalMoves {
     /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn knight<F1>(&self, source: &FireAddress, moving: &mut F1)
-    where
+    fn knight<F1>(
+        &self,
+        phase_operation: &Box<dyn PhaseOperation>,
+        source: &FireAddress,
+        moving: &mut F1,
+    ) where
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
-        let moving =
-            &mut |destination: &FireAddress, _agility| self.promote_knight(destination, moving);
+        let moving = &mut |destination: &FireAddress, _agility| {
+            self.promote_knight(phase_operation, destination, moving)
+        };
 
         for mobility in PieceType::Knight.mobility().iter() {
             self.move_(source, *mobility, moving);
@@ -538,12 +557,16 @@ impl PseudoLegalMoves {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn silver<F1>(&self, source: &FireAddress, moving: &mut F1)
-    where
+    fn silver<F1>(
+        &self,
+        phase_operation: &Box<dyn PhaseOperation>,
+        source: &FireAddress,
+        moving: &mut F1,
+    ) where
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
-            self.promote_silver(&source, destination, moving)
+            self.promote_silver(phase_operation, &source, destination, moving)
         };
 
         for mobility in PieceType::Silver.mobility().iter() {
@@ -599,12 +622,16 @@ impl PseudoLegalMoves {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn bishop<F1>(&self, source: &FireAddress, moving: &mut F1)
-    where
+    fn bishop<F1>(
+        &self,
+        phase_operation: &Box<dyn PhaseOperation>,
+        source: &FireAddress,
+        moving: &mut F1,
+    ) where
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
-            self.promote_bishop_rook(source, destination, moving)
+            self.promote_bishop_rook(phase_operation, source, destination, moving)
         };
         for mobility in PieceType::Bishop.mobility().iter() {
             self.move_(source, *mobility, moving);
@@ -618,12 +645,16 @@ impl PseudoLegalMoves {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn rook<F1>(&self, source: &FireAddress, moving: &mut F1)
-    where
+    fn rook<F1>(
+        &self,
+        phase_operation: &Box<dyn PhaseOperation>,
+        source: &FireAddress,
+        moving: &mut F1,
+    ) where
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
-            self.promote_bishop_rook(source, destination, moving)
+            self.promote_bishop_rook(phase_operation, source, destination, moving)
         };
         for mobility in PieceType::Rook.mobility().iter() {
             self.move_(source, *mobility, moving);
@@ -738,15 +769,20 @@ impl PseudoLegalMoves {
     /// * `destinaion` -
     /// * `callback` -
     /// * `move_permission` - 成らずに一番奥の段に移動することはできません。
-    fn promote_pawn_lance<F1>(&self, destination: &FireAddress, callback: &mut F1) -> bool
+    fn promote_pawn_lance<F1>(
+        &self,
+        phase_operation: &Box<dyn PhaseOperation>,
+        destination: &FireAddress,
+        callback: &mut F1,
+    ) -> bool
     where
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         callback(
             destination,
-            if self.phase_operation.is_rank456789(destination) {
+            if phase_operation.is_rank456789(destination) {
                 Promotability::Deny
-            } else if self.phase_operation.is_rank23(destination) {
+            } else if phase_operation.is_rank23(destination) {
                 Promotability::Any
             } else {
                 Promotability::Forced
@@ -764,15 +800,20 @@ impl PseudoLegalMoves {
     /// * `destinaion` -
     /// * `callback` -
     /// * `move_permission` - 成らずに奥から２番目の段に移動することはできません。
-    fn promote_knight<F1>(&self, destination: &FireAddress, callback: &mut F1) -> bool
+    fn promote_knight<F1>(
+        &self,
+        phase_operation: &Box<dyn PhaseOperation>,
+        destination: &FireAddress,
+        callback: &mut F1,
+    ) -> bool
     where
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
         callback(
             destination,
-            if self.phase_operation.is_rank456789(destination) {
+            if phase_operation.is_rank456789(destination) {
                 Promotability::Deny
-            } else if self.phase_operation.is_rank3(destination) {
+            } else if phase_operation.is_rank3(destination) {
                 Promotability::Any
             } else {
                 Promotability::Forced
@@ -793,6 +834,7 @@ impl PseudoLegalMoves {
     /// * `callback` -
     fn promote_silver<F1>(
         &self,
+        phase_operation: &Box<dyn PhaseOperation>,
         source: &FireAddress,
         destination: &FireAddress,
         callback: &mut F1,
@@ -803,9 +845,7 @@ impl PseudoLegalMoves {
         callback(
             destination,
             // 戻って成るのがある☆（＾～＾）
-            if self.phase_operation.is_rank123(destination)
-                || self.phase_operation.is_rank123(source)
-            {
+            if phase_operation.is_rank123(destination) || phase_operation.is_rank123(source) {
                 Promotability::Any
             } else {
                 Promotability::Deny
@@ -827,6 +867,7 @@ impl PseudoLegalMoves {
     /// * `callback` -
     fn promote_bishop_rook<F1>(
         &self,
+        phase_operation: &Box<dyn PhaseOperation>,
         source: &FireAddress,
         destination: &FireAddress,
         callback: &mut F1,
@@ -837,9 +878,7 @@ impl PseudoLegalMoves {
         callback(
             destination,
             // 戻って成るのがある☆（＾～＾）
-            if self.phase_operation.is_rank123(destination)
-                || self.phase_operation.is_rank123(source)
-            {
+            if phase_operation.is_rank123(destination) || phase_operation.is_rank123(source) {
                 Promotability::Any
             } else {
                 Promotability::Deny
