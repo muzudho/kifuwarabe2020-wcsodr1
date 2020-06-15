@@ -311,10 +311,11 @@ enum Piece {
     PromotedPawn2,
 }
 pub static PIECE_WHITE_SPACE: &str = "    ";
+/// きふわらべ「USIでは使わないから、独自の表記をして構わないぜ☆」
 impl fmt::Display for Piece {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         // 文字列リテラルでないとダメみたいなんで、他に似たようなコードがあるのに、また書くことに☆（＾～＾）
-        // ▲、▽ が半角サイズなのは、Windows Terminal の担当者 いい加減だぜ☆（＾～＾）
+        // ▲ が半角サイズ、▽ が見た目が全角の半角サイズなのは、Windows Terminal の担当者 いい加減だぜ☆（＾～＾）
         use crate::cosmic::toy_box::Piece::*;
         write!(
             f,
@@ -392,6 +393,8 @@ impl Piece {
 }
 
 /// ちゆり「駒そのものではなく、駒の情報が欲しいだけなら、これだぜ☆」
+/// きふわらべ「USIでは使わないから、独自の表記でOKだぜ☆」
+/// 夢美「new()で引数２つ設定する必要があるけど、必ずしもそれを利用する必要はないのね」
 pub struct PieceInfo {
     pub piece: String,
     pub num: String,
@@ -411,86 +414,140 @@ pub const NAMED_PIECES_LEN: usize = 40;
 /// 駒の背番号（名前）だぜ☆（＾～＾）大橋流で触る駒の順だぜ☆（＾～＾）
 #[derive(Clone, Copy, FromPrimitive, Debug, PartialEq)]
 pub enum PieceNum {
-    // 1 先手玉
+    /// 1 先手玉
     King1,
-    // 2 後手玉
+    /// 2 後手玉
     King2,
-    // 3 金
+    /// 3 金
     Gold3,
-    // 4 金
+    /// 4 金
     Gold4,
-    // 5 金
+    /// 5 金
     Gold5,
-    // 6 金
+    /// 6 金
     Gold6,
-    // 7 銀
+    /// 7 銀
     Silver7,
-    // 8 銀
+    /// 8 銀
     Silver8,
-    // 9 銀
+    /// 9 銀
     Silver9,
-    // 10 銀
+    /// 10 銀
     Silver10,
-    // 11 桂
+    /// 11 桂
     Knight11,
-    // 12 桂
+    /// 12 桂
     Knight12,
-    // 13 桂
+    /// 13 桂
     Knight13,
-    // 14 桂
+    /// 14 桂
     Knight14,
-    // 15 香
+    /// 15 香
     Lance15,
-    // 16 香
+    /// 16 香
     Lance16,
-    // 17 香
+    /// 17 香
     Lance17,
-    // 18 香
+    /// 18 香
     Lance18,
-    // 19 角
+    /// 19 角
     Bishop19,
-    // 20 角
+    /// 20 角
     Bishop20,
-    // 21 飛
+    /// 21 飛
     Rook21,
-    // 22 飛
+    /// 22 飛
     Rook22,
-    // 23 歩
+    /// 23 歩
     Pawn23,
-    // 24 歩
+    /// 24 歩
     Pawn24,
-    // 25 歩
+    /// 25 歩
     Pawn25,
-    // 26 歩
+    /// 26 歩
     Pawn26,
-    // 27 歩
+    /// 27 歩
     Pawn27,
-    // 28 歩
+    /// 28 歩
     Pawn28,
-    // 29 歩
+    /// 29 歩
     Pawn29,
-    // 30 歩
+    /// 30 歩
     Pawn30,
-    // 31 歩
+    /// 31 歩
     Pawn31,
-    // 32 歩
+    /// 32 歩
     Pawn32,
-    // 33 歩
+    /// 33 歩
     Pawn33,
-    // 34 歩
+    /// 34 歩
     Pawn34,
-    // 35 歩
+    /// 35 歩
     Pawn35,
-    // 36 歩
+    /// 36 歩
     Pawn36,
-    // 37 歩
+    /// 37 歩
     Pawn37,
-    // 38 歩
+    /// 38 歩
     Pawn38,
-    // 39 歩
+    /// 39 歩
     Pawn39,
-    // 40 歩
+    /// 40 歩
     Pawn40,
+}
+/// きふわらべ「USIでは使わないから、独自の表記をして構わないぜ☆」
+impl fmt::Display for PieceNum {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        // 文字列リテラルでないとダメみたいなんで、他に似たようなコードがあるのに、また書くことに☆（＾～＾）
+        // ▲ が半角サイズ、▽ が見た目が全角の半角サイズなのは、Windows Terminal の担当者 いい加減だぜ☆（＾～＾）
+        use crate::cosmic::toy_box::PieceNum::*;
+        write!(
+            f,
+            "{}",
+            match *self {
+                King1 => "01K ",
+                King2 => "02K ",
+                Gold3 => "03G ",
+                Gold4 => "04G ",
+                Gold5 => "05G ",
+                Gold6 => "06G ",
+                Silver7 => "07S ",
+                Silver8 => "08S ",
+                Silver9 => "09S ",
+                Silver10 => "10S ",
+                Knight11 => "11N ",
+                Knight12 => "12N ",
+                Knight13 => "13N ",
+                Knight14 => "14N ",
+                Lance15 => "15L ",
+                Lance16 => "16L ",
+                Lance17 => "17L ",
+                Lance18 => "18L ",
+                Bishop19 => "19B ",
+                Bishop20 => "20B ",
+                Rook21 => "21R ",
+                Rook22 => "22R ",
+                Pawn23 => "23P ",
+                Pawn24 => "24P ",
+                Pawn25 => "25P ",
+                Pawn26 => "26P ",
+                Pawn27 => "27P ",
+                Pawn28 => "28P ",
+                Pawn29 => "29P ",
+                Pawn30 => "30P ",
+                Pawn31 => "31P ",
+                Pawn32 => "32P ",
+                Pawn33 => "33P ",
+                Pawn34 => "34P ",
+                Pawn35 => "35P ",
+                Pawn36 => "36P ",
+                Pawn37 => "37P ",
+                Pawn38 => "38P ",
+                Pawn39 => "39P ",
+                Pawn40 => "40P ",
+            }
+        )
+    }
 }
 
 /// 卓☆（＾～＾）
@@ -807,7 +864,7 @@ impl GameTable {
             ))),
         }
     }
-    /// 駒台には対応してない。 -> 何に使っている？
+    /// 通常盤表示用。
     pub fn piece_info_at1(&self, addr: &FireAddress) -> Option<PieceInfo> {
         match addr {
             FireAddress::Board(sq) => {
@@ -817,6 +874,22 @@ impl GameTable {
                         &format!("{}", self.piece_list[piece_num_val as usize]),
                         piece_num_val,
                     ))
+                } else {
+                    None
+                }
+            }
+            _ => panic!(Beam::trouble(&format!(
+                "(Err.321) まだ実装してないぜ☆（＾～＾）！",
+            ))),
+        }
+    }
+    /// 盤2表示用。
+    pub fn piece_info_num_at(&self, addr: &FireAddress) -> Option<PieceInfo> {
+        match addr {
+            FireAddress::Board(sq) => {
+                let piece_num = self.board[sq.serial_number() as usize];
+                if let Some(piece_num_val) = piece_num {
+                    Some(PieceInfo::new(&format!("{}", piece_num_val), piece_num_val))
                 } else {
                     None
                 }

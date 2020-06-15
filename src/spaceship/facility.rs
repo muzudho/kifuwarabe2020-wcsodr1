@@ -231,7 +231,7 @@ pub struct TheaterRoom {}
 impl TheaterRoom {
     fn to_string3(table: &GameTable, serial: u8) -> String {
         if let Some(sq) = AbsoluteAddress2D::from_absolute_address(serial) {
-            if let Some(piece_info_val) = table.piece_info_at1(&FireAddress::Board(sq)) {
+            if let Some(piece_info_val) = table.piece_info_num_at(&FireAddress::Board(sq)) {
                 format!("{}", piece_info_val.piece).to_string()
             } else {
                 "    ".to_string()
