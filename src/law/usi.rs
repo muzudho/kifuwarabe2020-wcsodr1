@@ -56,31 +56,31 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
         // 1文字目が駒だったら打。2文字目は必ず「*」なはずなので読み飛ばす。
         "R" => {
             *starts += 2;
-            FireAddress::Hand(DoubleFacedPieceType::Rook)
+            FireAddress::Hand(DoubleFacedPieceType::Rook, AbsoluteAddress2D::default())
         }
         "B" => {
             *starts += 2;
-            FireAddress::Hand(DoubleFacedPieceType::Bishop)
+            FireAddress::Hand(DoubleFacedPieceType::Bishop, AbsoluteAddress2D::default())
         }
         "G" => {
             *starts += 2;
-            FireAddress::Hand(DoubleFacedPieceType::Gold)
+            FireAddress::Hand(DoubleFacedPieceType::Gold, AbsoluteAddress2D::default())
         }
         "S" => {
             *starts += 2;
-            FireAddress::Hand(DoubleFacedPieceType::Silver)
+            FireAddress::Hand(DoubleFacedPieceType::Silver, AbsoluteAddress2D::default())
         }
         "N" => {
             *starts += 2;
-            FireAddress::Hand(DoubleFacedPieceType::Knight)
+            FireAddress::Hand(DoubleFacedPieceType::Knight, AbsoluteAddress2D::default())
         }
         "L" => {
             *starts += 2;
-            FireAddress::Hand(DoubleFacedPieceType::Lance)
+            FireAddress::Hand(DoubleFacedPieceType::Lance, AbsoluteAddress2D::default())
         }
         "P" => {
             *starts += 2;
-            FireAddress::Hand(DoubleFacedPieceType::Pawn)
+            FireAddress::Hand(DoubleFacedPieceType::Pawn, AbsoluteAddress2D::default())
         }
         _ => {
             // 残りは「筋の数字」、「段のアルファベット」のはず。
@@ -198,6 +198,7 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
             FireAddress::Hand(
                 game.table
                     .get_double_faced_piece_type(captured_piece_num_val),
+                AbsoluteAddress2D::default(),
             ),
         ))
     } else {

@@ -106,7 +106,7 @@ impl PhaseOperation for FirstOperation {
                     }
                     true
                 }
-                FireAddress::Hand(_drop_type) => panic!(Beam::trouble(&format!(
+                FireAddress::Hand(_drop_type, _) => panic!(Beam::trouble(&format!(
                     "(Err.546) 盤上ではなかったぜ☆（＾～＾）！",
                 ))),
             },
@@ -118,7 +118,7 @@ impl PhaseOperation for FirstOperation {
                     }
                     true
                 }
-                FireAddress::Hand(_drop_type) => panic!(Beam::trouble(&format!(
+                FireAddress::Hand(_drop_type, _) => panic!(Beam::trouble(&format!(
                     "(Err.546) 盤上ではなかったぜ☆（＾～＾）！",
                 ))),
             },
@@ -184,7 +184,7 @@ impl PhaseOperation for SecondOperation {
                     }
                     true
                 }
-                FireAddress::Hand(_drop_type) => panic!(Beam::trouble(&format!(
+                FireAddress::Hand(_drop_type, _) => panic!(Beam::trouble(&format!(
                     "(Err.546) 盤上ではなかったぜ☆（＾～＾）！",
                 ))),
             },
@@ -196,7 +196,7 @@ impl PhaseOperation for SecondOperation {
                     }
                     true
                 }
-                FireAddress::Hand(_drop_type) => panic!(Beam::trouble(&format!(
+                FireAddress::Hand(_drop_type, _) => panic!(Beam::trouble(&format!(
                     "(Err.546) 盤上ではなかったぜ☆（＾～＾）！",
                 ))),
             },
@@ -338,6 +338,7 @@ impl MoveGen {
                                                 FireAddress::Hand(
                                                     game.table
                                                         .get_double_faced_piece_type(piece_num_val),
+                                                    AbsoluteAddress2D::default(),
                                                 ),
                                             ))
                                         } else {
@@ -358,6 +359,7 @@ impl MoveGen {
                                             FireAddress::Hand(
                                                 game.table
                                                     .get_double_faced_piece_type(piece_num_val),
+                                                AbsoluteAddress2D::default(),
                                             ),
                                         ))
                                     } else {
@@ -381,6 +383,7 @@ impl MoveGen {
                                                 FireAddress::Hand(
                                                     game.table
                                                         .get_double_faced_piece_type(piece_num_val),
+                                                    AbsoluteAddress2D::default(),
                                                 ),
                                             ))
                                         } else {
@@ -395,7 +398,7 @@ impl MoveGen {
                     };
                 MoveGen::piece_of(game, phase_operation, piece_type, source, moving);
             }
-            FireAddress::Hand(src_drop_type) => {
+            FireAddress::Hand(src_drop_type, _) => {
                 if let Some((piece_type, fire_hand)) =
                     game.table.last_hand(game.history.get_friend(), &source)
                 {

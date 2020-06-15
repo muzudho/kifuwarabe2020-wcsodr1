@@ -1,6 +1,7 @@
 use crate::cosmic::pos_hash::pos_hash::*;
 use crate::cosmic::recording::Phase;
 use crate::cosmic::recording::{FireAddress, History, Movement};
+use crate::cosmic::smart::square::AbsoluteAddress2D;
 use crate::cosmic::toy_box::GameTable;
 use crate::law::generate_move::{FirstOperation, PhaseOperation, SecondOperation};
 use crate::spaceship::equipment::{Beam, DestinationDisplay};
@@ -202,7 +203,7 @@ impl Game {
                         moveing_piece_num,
                     );
                 }
-                FireAddress::Hand(_src_drop_type) => {
+                FireAddress::Hand(_src_drop_type, _) => {
                     // 打なら
                     // 打った場所に駒があるはずだぜ☆（＾～＾）
                     let piece_num = moveing_piece_num.unwrap();
@@ -210,7 +211,10 @@ impl Game {
                     let friend = self.table.get_phase(piece_num);
                     self.table.push_piece(
                         friend,
-                        &FireAddress::Hand(self.table.get_double_faced_piece_type(piece_num)),
+                        &FireAddress::Hand(
+                            self.table.get_double_faced_piece_type(piece_num),
+                            AbsoluteAddress2D::default(),
+                        ),
                         moveing_piece_num,
                     );
                 }

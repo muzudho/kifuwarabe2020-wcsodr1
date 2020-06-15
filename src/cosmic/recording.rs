@@ -63,7 +63,7 @@ impl History {
 #[derive(Copy, Clone, Debug)]
 pub enum FireAddress {
     Board(AbsoluteAddress2D),
-    Hand(DoubleFacedPieceType),
+    Hand(DoubleFacedPieceType, AbsoluteAddress2D),
 }
 /// USI向け。
 impl fmt::Display for FireAddress {
@@ -76,7 +76,7 @@ impl fmt::Display for FireAddress {
                     let (file, rank) = sq.to_file_rank();
                     format!("{}{}", file, num_to_lower_case(rank as usize))
                 }
-                FireAddress::Hand(drop_type) => {
+                FireAddress::Hand(drop_type, _) => {
                     format!("{}", drop_type)
                 }
             },
@@ -178,7 +178,7 @@ impl fmt::Display for Movement {
                     if self.promote { "+" } else { "" }
                 )
             }
-            FireAddress::Hand(_src_drop_type) => write!(
+            FireAddress::Hand(_src_drop_type, _) => write!(
                 f,
                 "{}{}{}",
                 self.source, //src_drop_type,

@@ -693,7 +693,10 @@ impl GameTable {
             self.turn_phase(collision_piece_num_val);
             self.push_piece(
                 friend,
-                &FireAddress::Hand(self.get_double_faced_piece_type(collision_piece_num_val)),
+                &FireAddress::Hand(
+                    self.get_double_faced_piece_type(collision_piece_num_val),
+                    AbsoluteAddress2D::default(),
+                ),
                 Some(collision_piece_num_val),
             );
         }
@@ -714,7 +717,8 @@ impl GameTable {
                     friend,
                     piece_type.double_faced_piece_type(),
                 );
-                let fire1 = FireAddress::Hand(double_faced_piece.type_());
+                let fire1 =
+                    FireAddress::Hand(double_faced_piece.type_(), AbsoluteAddress2D::default());
                 self.pop_piece(friend, &fire1).unwrap()
             };
             // 先後をひっくり返す。
@@ -746,10 +750,14 @@ impl GameTable {
                     self.board[sq.serial_number() as usize] = None;
                 }
             }
-            FireAddress::Hand(drop_type) => {
+            FireAddress::Hand(drop_type, _) => {
                 if let Some(piece_num_val) = piece_num {
                     // 持ち駒を１つ増やします。
-                    self.push_hand(friend, &FireAddress::Hand(*drop_type), piece_num_val);
+                    self.push_hand(
+                        friend,
+                        &FireAddress::Hand(*drop_type, AbsoluteAddress2D::default()),
+                        piece_num_val,
+                    );
                     // 背番号に番地を紐づけます。
                     self.address_list[piece_num_val as usize] = *fire;
                 }
@@ -771,7 +779,7 @@ impl GameTable {
                 }
                 piece_num
             }
-            FireAddress::Hand(_drop_type) => {
+            FireAddress::Hand(_drop_type, _) => {
                 // 場所で指定します。
                 // 台から取りのぞきます。
                 let piece_num = self.pop_hand(friend, &fire);
@@ -787,7 +795,10 @@ impl GameTable {
         // 駒に背番号を付けるぜ☆（＾～＾）
         let piece_num = self.numbering_piece(friend, piece_type);
         // 駒台に置くぜ☆（＾～＾）
-        let drop = FireAddress::Hand(self.get_double_faced_piece_type(piece_num));
+        let drop = FireAddress::Hand(
+            self.get_double_faced_piece_type(piece_num),
+            AbsoluteAddress2D::default(),
+        );
         self.push_piece(friend, &drop, Some(piece_num));
     }
 
@@ -835,7 +846,7 @@ impl GameTable {
                     None
                 }
             }
-            FireAddress::Hand(_drop_type) => panic!(Beam::trouble(&format!(
+            FireAddress::Hand(_drop_type, _) => panic!(Beam::trouble(&format!(
                 "(Err.345) 駒台は非対応☆（＾～＾）！",
             ))),
         }
@@ -900,42 +911,18 @@ impl GameTable {
         }
     }
     /// 盤2表示用。
-    pub fn piece_info_address_at(&self, addr: &FireAddress) -> Option<PieceInfo> {
-        match addr {
-            FireAddress::Board(sq) => {
-                let piece_num = self.board[sq.serial_number() as usize];
-                if let Some(piece_num_val) = piece_num {
-                    Some(PieceInfo::new(
-                        &format!("{}", self.address_list[piece_num_val as usize]),
-                        piece_num_val,
-                    ))
-                } else {
-                    None
-                }
-            }
-            _ => panic!(Beam::trouble(&format!(
-                "(Err.321) まだ実装してないぜ☆（＾～＾）！",
-            ))),
-        }
+    pub fn piece_info_address_at(&self, piece_num: PieceNum) -> Option<PieceInfo> {
+        Some(PieceInfo::new(
+            &format!("{}", self.address_list[piece_num as usize]),
+            piece_num,
+        ))
     }
     /// 盤2表示用。
-    pub fn piece_info_piece_at(&self, addr: &FireAddress) -> Option<PieceInfo> {
-        match addr {
-            FireAddress::Board(sq) => {
-                let piece_num = self.board[sq.serial_number() as usize];
-                if let Some(piece_num_val) = piece_num {
-                    Some(PieceInfo::new(
-                        &format!("{}", self.piece_list[piece_num_val as usize]),
-                        piece_num_val,
-                    ))
-                } else {
-                    None
-                }
-            }
-            _ => panic!(Beam::trouble(&format!(
-                "(Err.321) まだ実装してないぜ☆（＾～＾）！",
-            ))),
-        }
+    pub fn piece_info_piece_at(&self, piece_num: PieceNum) -> Option<PieceInfo> {
+        Some(PieceInfo::new(
+            &format!("{}", self.piece_list[piece_num as usize]),
+            piece_num,
+        ))
     }
     pub fn promotion_value_at(&self, table: &GameTable, fire: &FireAddress) -> isize {
         match fire {
@@ -950,7 +937,7 @@ impl GameTable {
                     0
                 }
             }
-            FireAddress::Hand(_drop_type) => panic!(Beam::trouble(&format!(
+            FireAddress::Hand(_drop_type, _) => panic!(Beam::trouble(&format!(
                 "(Err.254) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
@@ -968,7 +955,10 @@ impl GameTable {
             FireAddress::Board(_sq) => {
                 panic!(Beam::trouble(&format!("(Err.3266) 未対応☆（＾～＾）！",)))
             }
-            FireAddress::Hand(drop_type) => self.len_hand(friend, &FireAddress::Hand(*drop_type)),
+            FireAddress::Hand(drop_type, _) => self.len_hand(
+                friend,
+                &FireAddress::Hand(*drop_type, AbsoluteAddress2D::default()),
+            ),
         }
     }
 
@@ -985,7 +975,7 @@ impl GameTable {
                     let piece_info = self.piece_info_at1(&fire).unwrap();
                     piece_get(i, Some(&sq), Some(piece_info));
                 }
-                FireAddress::Hand(_drop) => {
+                FireAddress::Hand(_drop, _) => {
                     // TODO 持ち駒☆（＾～＾）
                     piece_get(i, None, None);
                 }
@@ -1009,7 +999,7 @@ impl GameTable {
                         piece_get(&fire);
                     }
                 }
-                FireAddress::Hand(_drop) => {
+                FireAddress::Hand(_drop, _) => {
                     // 持ち駒はここで調べるのは無駄な気がするよな☆（＾～＾）持ち駒に歩が１８個とか☆（＾～＾）
                 }
             }
@@ -1038,9 +1028,12 @@ impl GameTable {
             ],
         ];
         for drop in &FIRST_SECOND[friend as usize] {
-            let fire = &FireAddress::Hand(drop.type_());
+            let fire = &FireAddress::Hand(drop.type_(), AbsoluteAddress2D::default());
             if !self.is_empty_hand(friend, fire) {
-                piece_get(&FireAddress::Hand(drop.type_())); // TODO この fire は使い回せないのかだぜ☆（＾～＾）？
+                piece_get(&FireAddress::Hand(
+                    drop.type_(),
+                    AbsoluteAddress2D::default(),
+                )); // TODO この fire は使い回せないのかだぜ☆（＾～＾）？
             }
         }
     }
@@ -1094,7 +1087,7 @@ impl GameTable {
             FireAddress::Board(_sq) => {
                 // TODO 現在未実装だが、あとで使う☆（＾～＾）
             }
-            FireAddress::Hand(drop_type) => {
+            FireAddress::Hand(drop_type, _) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(friend, *drop_type);
                 // 駒台に駒を置くぜ☆（＾～＾）
                 self.board[self.hand_cur(drop) as usize] = Some(num);
@@ -1113,7 +1106,7 @@ impl GameTable {
                 // TODO さっき抜いた先端の要素を、中段の要素のところへスワップ。
                 PieceNum::King1 // ゴミ値を返しとくぜ☆（＾～＾）
             }
-            FireAddress::Hand(drop_type) => {
+            FireAddress::Hand(drop_type, _) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(friend, *drop_type);
                 // 位置を増減するぜ☆（＾～＾）
                 self.add_hand_cur(drop, -GameTable::hand_direction(drop));
@@ -1131,13 +1124,18 @@ impl GameTable {
             FireAddress::Board(_sq) => {
                 panic!(Beam::trouble(&format!("(Err.3251) 未対応☆（＾～＾）！",)))
             }
-            FireAddress::Hand(drop_type) => {
-                if let Some(piece_num) = self.last_hand_num(friend, &FireAddress::Hand(*drop_type))
-                {
+            FireAddress::Hand(drop_type, _) => {
+                if let Some(piece_num) = self.last_hand_num(
+                    friend,
+                    &FireAddress::Hand(*drop_type, AbsoluteAddress2D::default()),
+                ) {
                     let piece = self.piece_list[piece_num as usize];
                     Some((
                         piece.type_(),
-                        FireAddress::Hand(piece.double_faced_piece().type_()),
+                        FireAddress::Hand(
+                            piece.double_faced_piece().type_(),
+                            AbsoluteAddress2D::default(),
+                        ),
                     ))
                 } else {
                     None
@@ -1148,7 +1146,7 @@ impl GameTable {
     pub fn last_hand_num(&self, friend: Phase, fire: &FireAddress) -> Option<PieceNum> {
         match fire {
             FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3431) 未対応☆（＾～＾）")),
-            FireAddress::Hand(drop_type) => {
+            FireAddress::Hand(drop_type, _) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(friend, *drop_type);
                 let direction = GameTable::hand_direction(drop);
                 if direction < 0 {
@@ -1173,7 +1171,7 @@ impl GameTable {
     pub fn is_empty_hand(&self, friend: Phase, fire: &FireAddress) -> bool {
         match fire {
             FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3431) 未対応☆（＾～＾）")),
-            FireAddress::Hand(drop_type) => {
+            FireAddress::Hand(drop_type, _) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(friend, *drop_type);
                 if GameTable::hand_direction(drop) < 0 {
                     // 先手
@@ -1196,7 +1194,7 @@ impl GameTable {
     fn len_hand(&self, friend: Phase, fire: &FireAddress) -> usize {
         match fire {
             FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3431) 未対応☆（＾～＾）")),
-            FireAddress::Hand(drop_type) => {
+            FireAddress::Hand(drop_type, _) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(friend, *drop_type);
                 if GameTable::hand_direction(drop) < 0 {
                     // 先手

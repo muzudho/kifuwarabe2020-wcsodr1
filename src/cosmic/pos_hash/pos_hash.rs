@@ -87,12 +87,12 @@ impl GameHashSeed {
                         prev_hash ^=
                             self.piece[dst_sq.serial_number() as usize][src_piece_hash_index];
                     }
-                    FireAddress::Hand(_dst_drop_type) => {
+                    FireAddress::Hand(_dst_drop_type, _) => {
                         panic!(Beam::trouble("(Err.90) 未対応☆（＾～＾）"))
                     }
                 }
             }
-            FireAddress::Hand(src_drop_type) => {
+            FireAddress::Hand(src_drop_type, _) => {
                 let src_drop =
                     DoubleFacedPiece::from_phase_and_type(history.get_friend(), src_drop_type);
                 let count = table.count_hand(history.get_friend(), &move_.source);
@@ -104,7 +104,7 @@ impl GameHashSeed {
                         prev_hash ^= self.piece[dst_sq.serial_number() as usize]
                             [src_drop.nonpromoted_piece_hash_index()];
                     }
-                    FireAddress::Hand(_dst_drop_type) => {
+                    FireAddress::Hand(_dst_drop_type, _) => {
                         panic!(Beam::trouble("(Err.90) 未対応☆（＾～＾）"))
                     }
                 }
@@ -123,12 +123,15 @@ impl GameHashSeed {
                         let double_faced_piece = table.get_double_faced_piece(dst_piece_num);
                         let count = table.count_hand(
                             history.get_friend(),
-                            &FireAddress::Hand(double_faced_piece.type_()),
+                            &FireAddress::Hand(
+                                double_faced_piece.type_(),
+                                AbsoluteAddress2D::default(),
+                            ),
                         );
                         // 打つ前の駒の枚数のハッシュ。
                         prev_hash ^= self.hands[double_faced_piece as usize][count as usize + 1];
                     }
-                    FireAddress::Hand(_dst_drop_type) => {
+                    FireAddress::Hand(_dst_drop_type, _) => {
                         panic!(Beam::trouble("(Err.90) 未対応☆（＾～＾）"))
                     }
                 }
@@ -185,7 +188,7 @@ impl GameHashSeed {
         HandAddresses::for_all(
             &mut |friend: &Phase, fire_hand: &FireAddress| match fire_hand {
                 FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.175) 未対応☆（＾～＾）")),
-                FireAddress::Hand(drop_type) => {
+                FireAddress::Hand(drop_type, _) => {
                     let drop = DoubleFacedPiece::from_phase_and_type(*friend, *drop_type);
                     let count = table.count_hand(*friend, fire_hand);
                     /*

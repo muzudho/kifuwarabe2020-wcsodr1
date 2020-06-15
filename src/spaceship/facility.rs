@@ -2,7 +2,7 @@ use crate::cosmic::playing::{Game, PosNums};
 use crate::cosmic::recording::{FireAddress, Movement, Phase};
 use crate::cosmic::smart::features::DoubleFacedPieceType;
 use crate::cosmic::smart::square::AbsoluteAddress2D;
-use crate::cosmic::toy_box::{GameTable, PIECE_WHITE_SPACE};
+use crate::cosmic::toy_box::{GameTable, PieceNum, PIECE_WHITE_SPACE};
 use crate::spaceship::equipment::Beam;
 
 /// 指令室はこちらだぜ☆（＾～＾）！
@@ -162,53 +162,62 @@ P x{87:2}   |{63}|{64}|{65}|{66}|{67}|{68}|{69}|{70}|{71}| h8   p x{94:2}
             Self::to_string3(table, 2, 9),
             Self::to_string3(table, 1, 9),
             //                   ▲き,　                   ▲ぞ,                     ▲い,                     ▲ね,                     ▲う,                     ▲し,                     ▲ひ,
-            table.count_hand(Phase::First, &FireAddress::Hand(DoubleFacedPieceType::Rook)),
             table.count_hand(
                 Phase::First,
-                &FireAddress::Hand(DoubleFacedPieceType::Bishop)
-            ),
-            table.count_hand(Phase::First, &FireAddress::Hand(DoubleFacedPieceType::Gold)),
-            table.count_hand(
-                Phase::First,
-                &FireAddress::Hand(DoubleFacedPieceType::Silver)
+                &FireAddress::Hand(DoubleFacedPieceType::Rook, AbsoluteAddress2D::default())
             ),
             table.count_hand(
                 Phase::First,
-                &FireAddress::Hand(DoubleFacedPieceType::Knight)
+                &FireAddress::Hand(DoubleFacedPieceType::Bishop, AbsoluteAddress2D::default())
             ),
             table.count_hand(
                 Phase::First,
-                &FireAddress::Hand(DoubleFacedPieceType::Lance)
+                &FireAddress::Hand(DoubleFacedPieceType::Gold, AbsoluteAddress2D::default())
             ),
-            table.count_hand(Phase::First, &FireAddress::Hand(DoubleFacedPieceType::Pawn)),
+            table.count_hand(
+                Phase::First,
+                &FireAddress::Hand(DoubleFacedPieceType::Silver, AbsoluteAddress2D::default())
+            ),
+            table.count_hand(
+                Phase::First,
+                &FireAddress::Hand(DoubleFacedPieceType::Knight, AbsoluteAddress2D::default())
+            ),
+            table.count_hand(
+                Phase::First,
+                &FireAddress::Hand(DoubleFacedPieceType::Lance, AbsoluteAddress2D::default())
+            ),
+            table.count_hand(
+                Phase::First,
+                &FireAddress::Hand(DoubleFacedPieceType::Pawn, AbsoluteAddress2D::default())
+            ),
             //                   ▽キ,                     ▽ゾ,                     ▽イ,                     ▽ネ,                     ▽ウ,                     ▽シ,                     ▽ヒ,
             table.count_hand(
                 Phase::Second,
-                &FireAddress::Hand(DoubleFacedPieceType::Rook)
+                &FireAddress::Hand(DoubleFacedPieceType::Rook, AbsoluteAddress2D::default())
             ),
             table.count_hand(
                 Phase::Second,
-                &FireAddress::Hand(DoubleFacedPieceType::Bishop)
+                &FireAddress::Hand(DoubleFacedPieceType::Bishop, AbsoluteAddress2D::default())
             ),
             table.count_hand(
                 Phase::Second,
-                &FireAddress::Hand(DoubleFacedPieceType::Gold)
+                &FireAddress::Hand(DoubleFacedPieceType::Gold, AbsoluteAddress2D::default())
             ),
             table.count_hand(
                 Phase::Second,
-                &FireAddress::Hand(DoubleFacedPieceType::Silver)
+                &FireAddress::Hand(DoubleFacedPieceType::Silver, AbsoluteAddress2D::default())
             ),
             table.count_hand(
                 Phase::Second,
-                &FireAddress::Hand(DoubleFacedPieceType::Knight)
+                &FireAddress::Hand(DoubleFacedPieceType::Knight, AbsoluteAddress2D::default())
             ),
             table.count_hand(
                 Phase::Second,
-                &FireAddress::Hand(DoubleFacedPieceType::Lance)
+                &FireAddress::Hand(DoubleFacedPieceType::Lance, AbsoluteAddress2D::default())
             ),
             table.count_hand(
                 Phase::Second,
-                &FireAddress::Hand(DoubleFacedPieceType::Pawn)
+                &FireAddress::Hand(DoubleFacedPieceType::Pawn, AbsoluteAddress2D::default())
             ),
             ply,
             phase,
@@ -427,128 +436,118 @@ impl TheaterRoom2 {
 +----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
 |{0 }|{1 }|{2 }|{3 }|{4 }|{5 }|{6 }|{7 }|{8 }|{9 }|{10}|{11}|{12}|{13}|{14}|{15}|{16}|{17}|{18}|{19}|
 ",
-                Self::to_string3(table, 0),
-                Self::to_string3(table, 1),
-                Self::to_string3(table, 2),
-                Self::to_string3(table, 3),
-                Self::to_string3(table, 4),
-                Self::to_string3(table, 5),
-                Self::to_string3(table, 6),
-                Self::to_string3(table, 7),
-                Self::to_string3(table, 8),
-                Self::to_string3(table, 9),
-                Self::to_string3(table, 10),
-                Self::to_string3(table, 11),
-                Self::to_string3(table, 12),
-                Self::to_string3(table, 13),
-                Self::to_string3(table, 14),
-                Self::to_string3(table, 15),
-                Self::to_string3(table, 16),
-                Self::to_string3(table, 17),
-                Self::to_string3(table, 18),
-                Self::to_string3(table, 19),
+                Self::to_string3(table, PieceNum::King1),
+                Self::to_string3(table, PieceNum::King2),
+                Self::to_string3(table, PieceNum::Gold3),
+                Self::to_string3(table, PieceNum::Gold4),
+                Self::to_string3(table, PieceNum::Gold5),
+                Self::to_string3(table, PieceNum::Gold6),
+                Self::to_string3(table, PieceNum::Silver7),
+                Self::to_string3(table, PieceNum::Silver8),
+                Self::to_string3(table, PieceNum::Silver9),
+                Self::to_string3(table, PieceNum::Silver10),
+                Self::to_string3(table, PieceNum::Knight11),
+                Self::to_string3(table, PieceNum::Knight12),
+                Self::to_string3(table, PieceNum::Knight13),
+                Self::to_string3(table, PieceNum::Knight14),
+                Self::to_string3(table, PieceNum::Lance15),
+                Self::to_string3(table, PieceNum::Lance16),
+                Self::to_string3(table, PieceNum::Lance17),
+                Self::to_string3(table, PieceNum::Lance18),
+                Self::to_string3(table, PieceNum::Bishop19),
+                Self::to_string3(table, PieceNum::Bishop20),
             ),
             format!(
                 "\
 |{0 }|{1 }|{2 }|{3 }|{4 }|{5 }|{6 }|{7 }|{8 }|{9 }|{10}|{11}|{12}|{13}|{14}|{15}|{16}|{17}|{18}|{19}|
 +----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
 ",
-                Self::to_string4(table, 0),
-                Self::to_string4(table, 1),
-                Self::to_string4(table, 2),
-                Self::to_string4(table, 3),
-                Self::to_string4(table, 4),
-                Self::to_string4(table, 5),
-                Self::to_string4(table, 6),
-                Self::to_string4(table, 7),
-                Self::to_string4(table, 8),
-                Self::to_string4(table, 9),
-                Self::to_string4(table, 10),
-                Self::to_string4(table, 11),
-                Self::to_string4(table, 12),
-                Self::to_string4(table, 13),
-                Self::to_string4(table, 14),
-                Self::to_string4(table, 15),
-                Self::to_string4(table, 16),
-                Self::to_string4(table, 17),
-                Self::to_string4(table, 18),
-                Self::to_string4(table, 19),
+                Self::to_string4(table, PieceNum::King1),
+                Self::to_string4(table, PieceNum::King2),
+                Self::to_string4(table, PieceNum::Gold3),
+                Self::to_string4(table, PieceNum::Gold4),
+                Self::to_string4(table, PieceNum::Gold5),
+                Self::to_string4(table, PieceNum::Gold6),
+                Self::to_string4(table, PieceNum::Silver7),
+                Self::to_string4(table, PieceNum::Silver8),
+                Self::to_string4(table, PieceNum::Silver9),
+                Self::to_string4(table, PieceNum::Silver10),
+                Self::to_string4(table, PieceNum::Knight11),
+                Self::to_string4(table, PieceNum::Knight12),
+                Self::to_string4(table, PieceNum::Knight13),
+                Self::to_string4(table, PieceNum::Knight14),
+                Self::to_string4(table, PieceNum::Lance15),
+                Self::to_string4(table, PieceNum::Lance16),
+                Self::to_string4(table, PieceNum::Lance17),
+                Self::to_string4(table, PieceNum::Lance18),
+                Self::to_string4(table, PieceNum::Bishop19),
+                Self::to_string4(table, PieceNum::Bishop20),
             ),
             format!(
                 " 21R  22R  23P  24P  25P  26P  27P  28P  29P  30P  31P  32P  33P  34P  35P  36P  37P  38P  39P  40P
 +----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
 |{0 }|{1 }|{2 }|{3 }|{4 }|{5 }|{6 }|{7 }|{8 }|{9 }|{10}|{11}|{12}|{13}|{14}|{15}|{16}|{17}|{18}|{19}|
 ",
-                Self::to_string3(table, 20),
-                Self::to_string3(table, 21),
-                Self::to_string3(table, 22),
-                Self::to_string3(table, 23),
-                Self::to_string3(table, 24),
-                Self::to_string3(table, 25),
-                Self::to_string3(table, 26),
-                Self::to_string3(table, 27),
-                Self::to_string3(table, 28),
-                Self::to_string3(table, 29),
-                Self::to_string3(table, 30),
-                Self::to_string3(table, 31),
-                Self::to_string3(table, 32),
-                Self::to_string3(table, 33),
-                Self::to_string3(table, 34),
-                Self::to_string3(table, 35),
-                Self::to_string3(table, 36),
-                Self::to_string3(table, 37),
-                Self::to_string3(table, 38),
-                Self::to_string3(table, 39),
+                Self::to_string3(table, PieceNum::Rook21),
+                Self::to_string3(table, PieceNum::Rook22),
+                Self::to_string3(table, PieceNum::Pawn23),
+                Self::to_string3(table, PieceNum::Pawn24),
+                Self::to_string3(table, PieceNum::Pawn25),
+                Self::to_string3(table, PieceNum::Pawn26),
+                Self::to_string3(table, PieceNum::Pawn27),
+                Self::to_string3(table, PieceNum::Pawn28),
+                Self::to_string3(table, PieceNum::Pawn29),
+                Self::to_string3(table, PieceNum::Pawn30),
+                Self::to_string3(table, PieceNum::Pawn31),
+                Self::to_string3(table, PieceNum::Pawn32),
+                Self::to_string3(table, PieceNum::Pawn33),
+                Self::to_string3(table, PieceNum::Pawn34),
+                Self::to_string3(table, PieceNum::Pawn35),
+                Self::to_string3(table, PieceNum::Pawn36),
+                Self::to_string3(table, PieceNum::Pawn37),
+                Self::to_string3(table, PieceNum::Pawn38),
+                Self::to_string3(table, PieceNum::Pawn39),
+                Self::to_string3(table, PieceNum::Pawn40),
             ),
             format!(
                 "\
 |{0 }|{1 }|{2 }|{3 }|{4 }|{5 }|{6 }|{7 }|{8 }|{9 }|{10}|{11}|{12}|{13}|{14}|{15}|{16}|{17}|{18}|{19}|
 +----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
 ",
-                Self::to_string4(table, 20),
-                Self::to_string4(table, 21),
-                Self::to_string4(table, 22),
-                Self::to_string4(table, 23),
-                Self::to_string4(table, 24),
-                Self::to_string4(table, 25),
-                Self::to_string4(table, 26),
-                Self::to_string4(table, 27),
-                Self::to_string4(table, 28),
-                Self::to_string4(table, 29),
-                Self::to_string4(table, 30),
-                Self::to_string4(table, 31),
-                Self::to_string4(table, 32),
-                Self::to_string4(table, 33),
-                Self::to_string4(table, 34),
-                Self::to_string4(table, 35),
-                Self::to_string4(table, 36),
-                Self::to_string4(table, 37),
-                Self::to_string4(table, 38),
-                Self::to_string4(table, 39),
+                Self::to_string4(table, PieceNum::Rook21),
+                Self::to_string4(table, PieceNum::Rook22),
+                Self::to_string4(table, PieceNum::Pawn23),
+                Self::to_string4(table, PieceNum::Pawn24),
+                Self::to_string4(table, PieceNum::Pawn25),
+                Self::to_string4(table, PieceNum::Pawn26),
+                Self::to_string4(table, PieceNum::Pawn27),
+                Self::to_string4(table, PieceNum::Pawn28),
+                Self::to_string4(table, PieceNum::Pawn29),
+                Self::to_string4(table, PieceNum::Pawn30),
+                Self::to_string4(table, PieceNum::Pawn31),
+                Self::to_string4(table, PieceNum::Pawn32),
+                Self::to_string4(table, PieceNum::Pawn33),
+                Self::to_string4(table, PieceNum::Pawn34),
+                Self::to_string4(table, PieceNum::Pawn35),
+                Self::to_string4(table, PieceNum::Pawn36),
+                Self::to_string4(table, PieceNum::Pawn37),
+                Self::to_string4(table, PieceNum::Pawn38),
+                Self::to_string4(table, PieceNum::Pawn39),
+                Self::to_string4(table, PieceNum::Pawn40),
             ),
         )
     }
-    fn to_string3(table: &GameTable, serial: u8) -> String {
-        if let Some(sq) = AbsoluteAddress2D::from_absolute_address(serial) {
-            if let Some(piece_info_val) = table.piece_info_address_at(&FireAddress::Board(sq)) {
-                format!("{: >4}", piece_info_val.text1).to_string()
-            } else {
-                "    ".to_string()
-            }
+    fn to_string3(table: &GameTable, piece_num: PieceNum) -> String {
+        if let Some(piece_info_val) = table.piece_info_address_at(piece_num) {
+            format!("{: >4}", piece_info_val.text1).to_string()
         } else {
-            // 0 は None.
             "    ".to_string()
         }
     }
-    fn to_string4(table: &GameTable, serial: u8) -> String {
-        if let Some(sq) = AbsoluteAddress2D::from_absolute_address(serial) {
-            if let Some(piece_info_val) = table.piece_info_piece_at(&FireAddress::Board(sq)) {
-                format!("{: >4}", piece_info_val.text1).to_string()
-            } else {
-                "    ".to_string()
-            }
+    fn to_string4(table: &GameTable, piece_num: PieceNum) -> String {
+        if let Some(piece_info_val) = table.piece_info_piece_at(piece_num) {
+            format!("{: >4}", piece_info_val.text1).to_string()
         } else {
-            // 0 は None.
             "    ".to_string()
         }
     }
