@@ -1,6 +1,6 @@
 use crate::config::*;
 use crate::cosmic::daydream::Tree;
-use crate::cosmic::playing::{Game, PosNums};
+use crate::cosmic::playing::PosNums;
 use crate::cosmic::recording::Movement;
 use crate::cosmic::recording::Phase;
 use crate::cosmic::smart::square::AbsoluteAddress2D;
@@ -11,7 +11,7 @@ use crate::law::generate_move::MoveGen;
 use crate::law::usi::*;
 use crate::spaceship::engine;
 use crate::spaceship::equipment::{Beam, PvString, Telescope};
-use crate::spaceship::facility::{CommandRoom, GameRoom, Kitchen, TheaterRoom};
+use crate::spaceship::facility::{CommandRoom, GameRoom, Kitchen, TheaterRoom1, TheaterRoom2};
 use rand::Rng;
 use std;
 use std::io as std_io;
@@ -266,7 +266,7 @@ impl Chiyuri {
                         " --".to_string()
                     },
                     if let Some(piece_val) = piece {
-                        format!(" {} {:?}", piece_val.piece, piece_val.num)
+                        format!(" {} {:?}", piece_val.text1, piece_val.num)
                     } else {
                         " --".to_string()
                     }
@@ -296,7 +296,11 @@ impl Chiyuri {
     }
     pub fn pos2(universe: &Universe) {
         // 現局面表示
-        let s = TheaterRoom::to_string(&universe.game, PosNums::Current);
+        let s = format!(
+            "{}{}",
+            TheaterRoom1::to_string(&universe.game, PosNums::Current),
+            TheaterRoom2::to_string(&universe.game, PosNums::Current)
+        );
         Beam::shoot(&s);
     }
     pub fn pos0(universe: &Universe) {

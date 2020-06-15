@@ -396,13 +396,13 @@ impl Piece {
 /// きふわらべ「USIでは使わないから、独自の表記でOKだぜ☆」
 /// 夢美「new()で引数２つ設定する必要があるけど、必ずしもそれを利用する必要はないのね」
 pub struct PieceInfo {
-    pub piece: String,
+    pub text1: String,
     pub num: String,
 }
 impl PieceInfo {
     pub fn new(piece_display: &str, num: PieceNum) -> Self {
         PieceInfo {
-            piece: piece_display.to_string(),
+            text1: piece_display.to_string(),
             num: format!("{:?}", num),
         }
     }
@@ -890,6 +890,44 @@ impl GameTable {
                 let piece_num = self.board[sq.serial_number() as usize];
                 if let Some(piece_num_val) = piece_num {
                     Some(PieceInfo::new(&format!("{}", piece_num_val), piece_num_val))
+                } else {
+                    None
+                }
+            }
+            _ => panic!(Beam::trouble(&format!(
+                "(Err.321) まだ実装してないぜ☆（＾～＾）！",
+            ))),
+        }
+    }
+    /// 盤2表示用。
+    pub fn piece_info_address_at(&self, addr: &FireAddress) -> Option<PieceInfo> {
+        match addr {
+            FireAddress::Board(sq) => {
+                let piece_num = self.board[sq.serial_number() as usize];
+                if let Some(piece_num_val) = piece_num {
+                    Some(PieceInfo::new(
+                        &format!("{}", self.address_list[piece_num_val as usize]),
+                        piece_num_val,
+                    ))
+                } else {
+                    None
+                }
+            }
+            _ => panic!(Beam::trouble(&format!(
+                "(Err.321) まだ実装してないぜ☆（＾～＾）！",
+            ))),
+        }
+    }
+    /// 盤2表示用。
+    pub fn piece_info_piece_at(&self, addr: &FireAddress) -> Option<PieceInfo> {
+        match addr {
+            FireAddress::Board(sq) => {
+                let piece_num = self.board[sq.serial_number() as usize];
+                if let Some(piece_num_val) = piece_num {
+                    Some(PieceInfo::new(
+                        &format!("{}", self.piece_list[piece_num_val as usize]),
+                        piece_num_val,
+                    ))
                 } else {
                     None
                 }
