@@ -3,7 +3,7 @@
 //!
 
 use crate::cosmic::playing::Game;
-use crate::cosmic::recording::{CapturedMove, FireAddress, Movement, Phase};
+use crate::cosmic::recording::{CapturedMove, FireAddress, HandAddress, Movement, Phase};
 use crate::cosmic::smart::features::PieceType;
 use crate::cosmic::smart::square::FILE10U8;
 use crate::cosmic::smart::square::FILE1U8;
@@ -106,7 +106,7 @@ impl PhaseOperation for FirstOperation {
                     }
                     true
                 }
-                FireAddress::Hand(_drop_type, _) => panic!(Beam::trouble(&format!(
+                FireAddress::Hand(_drop_type) => panic!(Beam::trouble(&format!(
                     "(Err.546) 盤上ではなかったぜ☆（＾～＾）！",
                 ))),
             },
@@ -118,7 +118,7 @@ impl PhaseOperation for FirstOperation {
                     }
                     true
                 }
-                FireAddress::Hand(_drop_type, _) => panic!(Beam::trouble(&format!(
+                FireAddress::Hand(_drop_type) => panic!(Beam::trouble(&format!(
                     "(Err.546) 盤上ではなかったぜ☆（＾～＾）！",
                 ))),
             },
@@ -184,7 +184,7 @@ impl PhaseOperation for SecondOperation {
                     }
                     true
                 }
-                FireAddress::Hand(_drop_type, _) => panic!(Beam::trouble(&format!(
+                FireAddress::Hand(_drop_type) => panic!(Beam::trouble(&format!(
                     "(Err.546) 盤上ではなかったぜ☆（＾～＾）！",
                 ))),
             },
@@ -196,7 +196,7 @@ impl PhaseOperation for SecondOperation {
                     }
                     true
                 }
-                FireAddress::Hand(_drop_type, _) => panic!(Beam::trouble(&format!(
+                FireAddress::Hand(_drop_type) => panic!(Beam::trouble(&format!(
                     "(Err.546) 盤上ではなかったぜ☆（＾～＾）！",
                 ))),
             },
@@ -335,11 +335,11 @@ impl MoveGen {
                                         if let Some(piece_num_val) = pseudo_captured_num {
                                             Some(CapturedMove::new(
                                                 *destination,
-                                                FireAddress::Hand(
+                                                FireAddress::Hand(HandAddress::new(
                                                     game.table
                                                         .get_double_faced_piece_type(piece_num_val),
                                                     AbsoluteAddress2D::default(),
-                                                ),
+                                                )),
                                             ))
                                         } else {
                                             None
@@ -356,11 +356,11 @@ impl MoveGen {
                                     if let Some(piece_num_val) = pseudo_captured_num {
                                         Some(CapturedMove::new(
                                             *destination,
-                                            FireAddress::Hand(
+                                            FireAddress::Hand(HandAddress::new(
                                                 game.table
                                                     .get_double_faced_piece_type(piece_num_val),
                                                 AbsoluteAddress2D::default(),
-                                            ),
+                                            )),
                                         ))
                                     } else {
                                         None
@@ -380,11 +380,11 @@ impl MoveGen {
                                         if let Some(piece_num_val) = pseudo_captured_num {
                                             Some(CapturedMove::new(
                                                 *destination,
-                                                FireAddress::Hand(
+                                                FireAddress::Hand(HandAddress::new(
                                                     game.table
                                                         .get_double_faced_piece_type(piece_num_val),
                                                     AbsoluteAddress2D::default(),
-                                                ),
+                                                )),
                                             ))
                                         } else {
                                             None
@@ -398,7 +398,7 @@ impl MoveGen {
                     };
                 MoveGen::piece_of(game, phase_operation, piece_type, source, moving);
             }
-            FireAddress::Hand(src_drop_type, _) => {
+            FireAddress::Hand(src_drop_type) => {
                 if let Some((piece_type, fire_hand)) =
                     game.table.last_hand(game.history.get_friend(), &source)
                 {
@@ -445,7 +445,7 @@ impl MoveGen {
                     // 歩、香: 先手から見た歩、香車の打てる面積だぜ☆（＾～＾）
                     // 桂: 先手から見た桂馬の打てる面積だぜ☆（＾～＾）
                     // それ以外の駒が打てる範囲は盤面全体。駒を打つときに使うぜ☆（＾～＾）
-                    for sq in match src_drop_type {
+                    for sq in match src_drop_type.old {
                         Pawn | Lance => game.table.area.drop_pawn_lance.iter(),
                         Knight => game.table.area.drop_knight.iter(),
                         _ => game.table.area.all_squares.iter(),

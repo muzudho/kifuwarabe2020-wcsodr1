@@ -59,11 +59,25 @@ impl History {
     */
 }
 
+#[derive(Copy, Clone, Debug)]
+pub struct HandAddress {
+    pub old: DoubleFacedPieceType,
+    pub new_: AbsoluteAddress2D,
+}
+impl HandAddress {
+    pub fn new(old: DoubleFacedPieceType, new_: AbsoluteAddress2D) -> Self {
+        HandAddress {
+            old: old,
+            new_: new_,
+        }
+    }
+}
+
 /// 盤上と、駒台で　共通しないものを並列にします。
 #[derive(Copy, Clone, Debug)]
 pub enum FireAddress {
     Board(AbsoluteAddress2D),
-    Hand(DoubleFacedPieceType, AbsoluteAddress2D),
+    Hand(HandAddress),
 }
 /// USI向け。
 impl fmt::Display for FireAddress {
@@ -76,8 +90,8 @@ impl fmt::Display for FireAddress {
                     let (file, rank) = sq.to_file_rank();
                     format!("{}{}", file, num_to_lower_case(rank as usize))
                 }
-                FireAddress::Hand(drop_type, _) => {
-                    format!("{}", drop_type)
+                FireAddress::Hand(drop_type) => {
+                    format!("{}", drop_type.old)
                 }
             },
         )
@@ -178,7 +192,7 @@ impl fmt::Display for Movement {
                     if self.promote { "+" } else { "" }
                 )
             }
-            FireAddress::Hand(_src_drop_type, _) => write!(
+            FireAddress::Hand(_src_drop_type) => write!(
                 f,
                 "{}{}{}",
                 self.source, //src_drop_type,

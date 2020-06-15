@@ -7,7 +7,7 @@
 //! 駒早見表 (PieceChart),
 //! 駒種類早見表 (PieceTypeChart).
 //!
-use crate::cosmic::recording::{FireAddress, Phase, PHASE_LEN};
+use crate::cosmic::recording::{FireAddress, HandAddress, Phase, PHASE_LEN};
 use crate::cosmic::smart::features::PHYSICAL_PIECES_LEN;
 use crate::cosmic::smart::features::PHYSICAL_PIECE_TYPE_LEN;
 use crate::cosmic::smart::features::PIECE_TYPE_LEN;
@@ -378,59 +378,101 @@ impl Default for SpeedOfLight {
             hand_legal_all: [
                 (
                     Phase::First,
-                    FireAddress::Hand(DoubleFacedPieceType::Rook, AbsoluteAddress2D::default()),
+                    FireAddress::Hand(HandAddress::new(
+                        DoubleFacedPieceType::Rook,
+                        AbsoluteAddress2D::default(),
+                    )),
                 ),
                 (
                     Phase::First,
-                    FireAddress::Hand(DoubleFacedPieceType::Bishop, AbsoluteAddress2D::default()),
+                    FireAddress::Hand(HandAddress::new(
+                        DoubleFacedPieceType::Bishop,
+                        AbsoluteAddress2D::default(),
+                    )),
                 ),
                 (
                     Phase::First,
-                    FireAddress::Hand(DoubleFacedPieceType::Gold, AbsoluteAddress2D::default()),
+                    FireAddress::Hand(HandAddress::new(
+                        DoubleFacedPieceType::Gold,
+                        AbsoluteAddress2D::default(),
+                    )),
                 ),
                 (
                     Phase::First,
-                    FireAddress::Hand(DoubleFacedPieceType::Silver, AbsoluteAddress2D::default()),
+                    FireAddress::Hand(HandAddress::new(
+                        DoubleFacedPieceType::Silver,
+                        AbsoluteAddress2D::default(),
+                    )),
                 ),
                 (
                     Phase::First,
-                    FireAddress::Hand(DoubleFacedPieceType::Knight, AbsoluteAddress2D::default()),
+                    FireAddress::Hand(HandAddress::new(
+                        DoubleFacedPieceType::Knight,
+                        AbsoluteAddress2D::default(),
+                    )),
                 ),
                 (
                     Phase::First,
-                    FireAddress::Hand(DoubleFacedPieceType::Lance, AbsoluteAddress2D::default()),
+                    FireAddress::Hand(HandAddress::new(
+                        DoubleFacedPieceType::Lance,
+                        AbsoluteAddress2D::default(),
+                    )),
                 ),
                 (
                     Phase::First,
-                    FireAddress::Hand(DoubleFacedPieceType::Pawn, AbsoluteAddress2D::default()),
+                    FireAddress::Hand(HandAddress::new(
+                        DoubleFacedPieceType::Pawn,
+                        AbsoluteAddress2D::default(),
+                    )),
                 ),
                 (
                     Phase::Second,
-                    FireAddress::Hand(DoubleFacedPieceType::Rook, AbsoluteAddress2D::default()),
+                    FireAddress::Hand(HandAddress::new(
+                        DoubleFacedPieceType::Rook,
+                        AbsoluteAddress2D::default(),
+                    )),
                 ),
                 (
                     Phase::Second,
-                    FireAddress::Hand(DoubleFacedPieceType::Bishop, AbsoluteAddress2D::default()),
+                    FireAddress::Hand(HandAddress::new(
+                        DoubleFacedPieceType::Bishop,
+                        AbsoluteAddress2D::default(),
+                    )),
                 ),
                 (
                     Phase::Second,
-                    FireAddress::Hand(DoubleFacedPieceType::Gold, AbsoluteAddress2D::default()),
+                    FireAddress::Hand(HandAddress::new(
+                        DoubleFacedPieceType::Gold,
+                        AbsoluteAddress2D::default(),
+                    )),
                 ),
                 (
                     Phase::Second,
-                    FireAddress::Hand(DoubleFacedPieceType::Silver, AbsoluteAddress2D::default()),
+                    FireAddress::Hand(HandAddress::new(
+                        DoubleFacedPieceType::Silver,
+                        AbsoluteAddress2D::default(),
+                    )),
                 ),
                 (
                     Phase::Second,
-                    FireAddress::Hand(DoubleFacedPieceType::Knight, AbsoluteAddress2D::default()),
+                    FireAddress::Hand(HandAddress::new(
+                        DoubleFacedPieceType::Knight,
+                        AbsoluteAddress2D::default(),
+                    )),
                 ),
                 (
                     Phase::Second,
-                    FireAddress::Hand(DoubleFacedPieceType::Lance, AbsoluteAddress2D::default()),
+                    FireAddress::Hand(HandAddress::new(
+                        DoubleFacedPieceType::Lance,
+                        AbsoluteAddress2D::default(),
+                    )),
                 ),
                 (
                     Phase::Second,
-                    FireAddress::Hand(DoubleFacedPieceType::Pawn, AbsoluteAddress2D::default()),
+                    FireAddress::Hand(HandAddress::new(
+                        DoubleFacedPieceType::Pawn,
+                        AbsoluteAddress2D::default(),
+                    )),
                 ),
             ],
         }

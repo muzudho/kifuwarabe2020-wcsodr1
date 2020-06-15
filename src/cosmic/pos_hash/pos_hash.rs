@@ -3,7 +3,9 @@
 
 use crate::cosmic::playing::Game;
 use crate::cosmic::recording::Phase;
-use crate::cosmic::recording::{FireAddress, History, Movement, PHASE_LEN, PHASE_SECOND};
+use crate::cosmic::recording::{
+    FireAddress, HandAddress, History, Movement, PHASE_LEN, PHASE_SECOND,
+};
 use crate::cosmic::smart::features::DoubleFacedPiece;
 use crate::cosmic::smart::features::{HAND_MAX, PHYSICAL_PIECES_LEN};
 use crate::cosmic::smart::square::FILE10U8;
@@ -87,14 +89,14 @@ impl GameHashSeed {
                         prev_hash ^=
                             self.piece[dst_sq.serial_number() as usize][src_piece_hash_index];
                     }
-                    FireAddress::Hand(_dst_drop_type, _) => {
+                    FireAddress::Hand(_dst_drop_type) => {
                         panic!(Beam::trouble("(Err.90) 未対応☆（＾～＾）"))
                     }
                 }
             }
-            FireAddress::Hand(src_drop_type, _) => {
+            FireAddress::Hand(src_drop_type) => {
                 let src_drop =
-                    DoubleFacedPiece::from_phase_and_type(history.get_friend(), src_drop_type);
+                    DoubleFacedPiece::from_phase_and_type(history.get_friend(), src_drop_type.old);
                 let count = table.count_hand(history.get_friend(), &move_.source);
                 // 打つ前の駒の枚数のハッシュ。
                 prev_hash ^= self.hands[src_drop as usize][count as usize];
@@ -104,7 +106,7 @@ impl GameHashSeed {
                         prev_hash ^= self.piece[dst_sq.serial_number() as usize]
                             [src_drop.nonpromoted_piece_hash_index()];
                     }
-                    FireAddress::Hand(_dst_drop_type, _) => {
+                    FireAddress::Hand(_dst_drop_type) => {
                         panic!(Beam::trouble("(Err.90) 未対応☆（＾～＾）"))
                     }
                 }
@@ -123,15 +125,15 @@ impl GameHashSeed {
                         let double_faced_piece = table.get_double_faced_piece(dst_piece_num);
                         let count = table.count_hand(
                             history.get_friend(),
-                            &FireAddress::Hand(
+                            &FireAddress::Hand(HandAddress::new(
                                 double_faced_piece.type_(),
                                 AbsoluteAddress2D::default(),
-                            ),
+                            )),
                         );
                         // 打つ前の駒の枚数のハッシュ。
                         prev_hash ^= self.hands[double_faced_piece as usize][count as usize + 1];
                     }
-                    FireAddress::Hand(_dst_drop_type, _) => {
+                    FireAddress::Hand(_dst_drop_type) => {
                         panic!(Beam::trouble("(Err.90) 未対応☆（＾～＾）"))
                     }
                 }
@@ -188,8 +190,8 @@ impl GameHashSeed {
         HandAddresses::for_all(
             &mut |friend: &Phase, fire_hand: &FireAddress| match fire_hand {
                 FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.175) 未対応☆（＾～＾）")),
-                FireAddress::Hand(drop_type, _) => {
-                    let drop = DoubleFacedPiece::from_phase_and_type(*friend, *drop_type);
+                FireAddress::Hand(drop_type) => {
+                    let drop = DoubleFacedPiece::from_phase_and_type(*friend, drop_type.old);
                     let count = table.count_hand(*friend, fire_hand);
                     /*
                     debug_assert!(

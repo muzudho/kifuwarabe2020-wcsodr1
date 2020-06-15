@@ -1,5 +1,5 @@
 use crate::cosmic::playing::{Game, PosNums};
-use crate::cosmic::recording::{FireAddress, Movement, Phase};
+use crate::cosmic::recording::{FireAddress, HandAddress, Movement, Phase};
 use crate::cosmic::smart::features::DoubleFacedPieceType;
 use crate::cosmic::smart::square::AbsoluteAddress2D;
 use crate::cosmic::toy_box::{GameTable, PieceNum, PIECE_WHITE_SPACE};
@@ -164,60 +164,102 @@ P x{87:2}   |{63}|{64}|{65}|{66}|{67}|{68}|{69}|{70}|{71}| h8   p x{94:2}
             //                   ▲き,　                   ▲ぞ,                     ▲い,                     ▲ね,                     ▲う,                     ▲し,                     ▲ひ,
             table.count_hand(
                 Phase::First,
-                &FireAddress::Hand(DoubleFacedPieceType::Rook, AbsoluteAddress2D::default())
+                &FireAddress::Hand(HandAddress::new(
+                    DoubleFacedPieceType::Rook,
+                    AbsoluteAddress2D::default()
+                ))
             ),
             table.count_hand(
                 Phase::First,
-                &FireAddress::Hand(DoubleFacedPieceType::Bishop, AbsoluteAddress2D::default())
+                &FireAddress::Hand(HandAddress::new(
+                    DoubleFacedPieceType::Bishop,
+                    AbsoluteAddress2D::default()
+                ))
             ),
             table.count_hand(
                 Phase::First,
-                &FireAddress::Hand(DoubleFacedPieceType::Gold, AbsoluteAddress2D::default())
+                &FireAddress::Hand(HandAddress::new(
+                    DoubleFacedPieceType::Gold,
+                    AbsoluteAddress2D::default()
+                ))
             ),
             table.count_hand(
                 Phase::First,
-                &FireAddress::Hand(DoubleFacedPieceType::Silver, AbsoluteAddress2D::default())
+                &FireAddress::Hand(HandAddress::new(
+                    DoubleFacedPieceType::Silver,
+                    AbsoluteAddress2D::default()
+                ))
             ),
             table.count_hand(
                 Phase::First,
-                &FireAddress::Hand(DoubleFacedPieceType::Knight, AbsoluteAddress2D::default())
+                &FireAddress::Hand(HandAddress::new(
+                    DoubleFacedPieceType::Knight,
+                    AbsoluteAddress2D::default()
+                ))
             ),
             table.count_hand(
                 Phase::First,
-                &FireAddress::Hand(DoubleFacedPieceType::Lance, AbsoluteAddress2D::default())
+                &FireAddress::Hand(HandAddress::new(
+                    DoubleFacedPieceType::Lance,
+                    AbsoluteAddress2D::default()
+                ))
             ),
             table.count_hand(
                 Phase::First,
-                &FireAddress::Hand(DoubleFacedPieceType::Pawn, AbsoluteAddress2D::default())
+                &FireAddress::Hand(HandAddress::new(
+                    DoubleFacedPieceType::Pawn,
+                    AbsoluteAddress2D::default()
+                ))
             ),
             //                   ▽キ,                     ▽ゾ,                     ▽イ,                     ▽ネ,                     ▽ウ,                     ▽シ,                     ▽ヒ,
             table.count_hand(
                 Phase::Second,
-                &FireAddress::Hand(DoubleFacedPieceType::Rook, AbsoluteAddress2D::default())
+                &FireAddress::Hand(HandAddress::new(
+                    DoubleFacedPieceType::Rook,
+                    AbsoluteAddress2D::default()
+                ))
             ),
             table.count_hand(
                 Phase::Second,
-                &FireAddress::Hand(DoubleFacedPieceType::Bishop, AbsoluteAddress2D::default())
+                &FireAddress::Hand(HandAddress::new(
+                    DoubleFacedPieceType::Bishop,
+                    AbsoluteAddress2D::default()
+                ))
             ),
             table.count_hand(
                 Phase::Second,
-                &FireAddress::Hand(DoubleFacedPieceType::Gold, AbsoluteAddress2D::default())
+                &FireAddress::Hand(HandAddress::new(
+                    DoubleFacedPieceType::Gold,
+                    AbsoluteAddress2D::default()
+                ))
             ),
             table.count_hand(
                 Phase::Second,
-                &FireAddress::Hand(DoubleFacedPieceType::Silver, AbsoluteAddress2D::default())
+                &FireAddress::Hand(HandAddress::new(
+                    DoubleFacedPieceType::Silver,
+                    AbsoluteAddress2D::default()
+                ))
             ),
             table.count_hand(
                 Phase::Second,
-                &FireAddress::Hand(DoubleFacedPieceType::Knight, AbsoluteAddress2D::default())
+                &FireAddress::Hand(HandAddress::new(
+                    DoubleFacedPieceType::Knight,
+                    AbsoluteAddress2D::default()
+                ))
             ),
             table.count_hand(
                 Phase::Second,
-                &FireAddress::Hand(DoubleFacedPieceType::Lance, AbsoluteAddress2D::default())
+                &FireAddress::Hand(HandAddress::new(
+                    DoubleFacedPieceType::Lance,
+                    AbsoluteAddress2D::default()
+                ))
             ),
             table.count_hand(
                 Phase::Second,
-                &FireAddress::Hand(DoubleFacedPieceType::Pawn, AbsoluteAddress2D::default())
+                &FireAddress::Hand(HandAddress::new(
+                    DoubleFacedPieceType::Pawn,
+                    AbsoluteAddress2D::default()
+                ))
             ),
             ply,
             phase,

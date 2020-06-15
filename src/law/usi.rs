@@ -2,7 +2,7 @@
 //! USIプロトコル
 //!
 use crate::cosmic::playing::Game;
-use crate::cosmic::recording::{CapturedMove, FireAddress, Movement, Phase};
+use crate::cosmic::recording::{CapturedMove, FireAddress, HandAddress, Movement, Phase};
 use crate::cosmic::smart::features::{DoubleFacedPieceType, PieceType};
 use crate::cosmic::smart::square::AbsoluteAddress2D;
 use crate::cosmic::smart::square::FILE9U8;
@@ -56,31 +56,52 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
         // 1文字目が駒だったら打。2文字目は必ず「*」なはずなので読み飛ばす。
         "R" => {
             *starts += 2;
-            FireAddress::Hand(DoubleFacedPieceType::Rook, AbsoluteAddress2D::default())
+            FireAddress::Hand(HandAddress::new(
+                DoubleFacedPieceType::Rook,
+                AbsoluteAddress2D::default(),
+            ))
         }
         "B" => {
             *starts += 2;
-            FireAddress::Hand(DoubleFacedPieceType::Bishop, AbsoluteAddress2D::default())
+            FireAddress::Hand(HandAddress::new(
+                DoubleFacedPieceType::Bishop,
+                AbsoluteAddress2D::default(),
+            ))
         }
         "G" => {
             *starts += 2;
-            FireAddress::Hand(DoubleFacedPieceType::Gold, AbsoluteAddress2D::default())
+            FireAddress::Hand(HandAddress::new(
+                DoubleFacedPieceType::Gold,
+                AbsoluteAddress2D::default(),
+            ))
         }
         "S" => {
             *starts += 2;
-            FireAddress::Hand(DoubleFacedPieceType::Silver, AbsoluteAddress2D::default())
+            FireAddress::Hand(HandAddress::new(
+                DoubleFacedPieceType::Silver,
+                AbsoluteAddress2D::default(),
+            ))
         }
         "N" => {
             *starts += 2;
-            FireAddress::Hand(DoubleFacedPieceType::Knight, AbsoluteAddress2D::default())
+            FireAddress::Hand(HandAddress::new(
+                DoubleFacedPieceType::Knight,
+                AbsoluteAddress2D::default(),
+            ))
         }
         "L" => {
             *starts += 2;
-            FireAddress::Hand(DoubleFacedPieceType::Lance, AbsoluteAddress2D::default())
+            FireAddress::Hand(HandAddress::new(
+                DoubleFacedPieceType::Lance,
+                AbsoluteAddress2D::default(),
+            ))
         }
         "P" => {
             *starts += 2;
-            FireAddress::Hand(DoubleFacedPieceType::Pawn, AbsoluteAddress2D::default())
+            FireAddress::Hand(HandAddress::new(
+                DoubleFacedPieceType::Pawn,
+                AbsoluteAddress2D::default(),
+            ))
         }
         _ => {
             // 残りは「筋の数字」、「段のアルファベット」のはず。
@@ -195,11 +216,11 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
     buffer.captured = if let Some(captured_piece_num_val) = captured_piece_num {
         Some(CapturedMove::new(
             buffer.destination,
-            FireAddress::Hand(
+            FireAddress::Hand(HandAddress::new(
                 game.table
                     .get_double_faced_piece_type(captured_piece_num_val),
                 AbsoluteAddress2D::default(),
-            ),
+            )),
         ))
     } else {
         None

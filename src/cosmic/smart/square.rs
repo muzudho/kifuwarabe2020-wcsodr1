@@ -303,7 +303,7 @@ pub const BOARD_MEMORY_AREA: usize = 122;
 
 /// 筋、段は 1 から始まる、という明示。
 /// usize が速い☆（＾～＾）
-pub const FILE_0: usize = 0;
+// pub const FILE_0: usize = 0;
 pub const FILE0U8: u8 = 0;
 // pub const FILE_1: usize = 1;
 pub const FILE1U8: u8 = 1;
@@ -311,10 +311,10 @@ pub const FILE1U8: u8 = 1;
 pub const FILE9U8: u8 = 9;
 // pub const FILE_10: usize = 10;
 pub const FILE10U8: u8 = 10;
-pub const FILE_11: usize = 11;
+// pub const FILE_11: usize = 11;
 // pub const FILE11U8: u8 = 11;
 pub const FILE13U8: u8 = 13;
-pub const RANK_0: usize = 0;
+// pub const RANK_0: usize = 0;
 pub const RANK0U8: u8 = 0;
 // pub const RANK_1: usize = 1;
 pub const RANK1U8: u8 = 1;
@@ -335,7 +335,7 @@ pub const RANK7U8: u8 = 7;
 pub const RANK9U8: u8 = 9;
 // pub const RANK_10: usize = 10;
 pub const RANK10U8: u8 = 10;
-pub const RANK_11: usize = 11;
+// pub const RANK_11: usize = 11;
 // pub const RANK11U8: u8 = 11;
 
 /// 升の検索等で、該当なしの場合
