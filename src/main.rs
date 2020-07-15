@@ -24,10 +24,13 @@ mod cosmic;
 mod law;
 mod spaceship;
 
+use crate::config::LOG_FILE;
 use crate::cosmic::universe::Universe;
 use crate::spaceship::crew::{Chiyuri, Kifuwarabe, Yumemi};
+use casual_logger::Log;
 
 fn main() {
+    Log::set_file_name(LOG_FILE);
     // 宇宙☆（＾～＾）変化するぜ☆（＾～＾）
     let mut universe: Universe = Universe::default();
 
@@ -68,6 +71,8 @@ fn main_loop(universe: &mut Universe) {
             help_chiyuri(&line, len, starts, universe);
         }
     } //loop
+
+    Log::wait();
 }
 
 /// 独自コマンド☆（＾～＾）
@@ -110,5 +115,24 @@ fn help_chiyuri(line: &str, len: usize, starts: usize, universe: &mut Universe) 
     // U
     } else if 3 < len && &line[starts..4] == "undo" {
         Chiyuri::undo(universe);
+    }
+}
+
+pub trait LogExt {
+    fn println(s: &str);
+    fn panic(s: &str) -> String;
+}
+impl LogExt for Log {
+    /// Info level logging and add print to stdout.
+    fn println(s: &str) {
+        println!("{}", s);
+        Log::infoln(s);
+    }
+    /// panic! で強制終了する前に、ヤケクソで読み筋欄に表示できないかトライするぜ☆（＾～＾）
+    fn panic(s: &str) -> String {
+        let s2 = format!("info string panic! {}", s);
+        Log::fatalln(&s2);
+        println!("{}", s2);
+        s2
     }
 }

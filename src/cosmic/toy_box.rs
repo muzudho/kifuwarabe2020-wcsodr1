@@ -10,7 +10,8 @@ use crate::cosmic::smart::square::RANK1U8;
 use crate::cosmic::smart::square::{AbsoluteAddress2D, BOARD_MEMORY_AREA};
 use crate::law::generate_move::Area;
 use crate::law::speed_of_light::Nine299792458;
-use crate::spaceship::equipment::Beam;
+use crate::LogExt;
+use casual_logger::Log;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 use std::*;
@@ -844,9 +845,9 @@ impl GameTable {
                     None
                 }
             }
-            FireAddress::Hand(_drop_type) => panic!(Beam::trouble(&format!(
-                "(Err.345) 駒台は非対応☆（＾～＾）！",
-            ))),
+            FireAddress::Hand(_drop_type) => {
+                panic!(Log::panic(&format!("(Err.345) 駒台は非対応☆（＾～＾）！",)))
+            }
         }
     }
     /// TODO Piece をカプセル化したい。外に出したくないぜ☆（＾～＾）
@@ -858,7 +859,7 @@ impl GameTable {
             _ => {
                 self.last_hand_num(friend, fire)
                 /*
-                    panic!(Beam::trouble(&format!(
+                    panic!(Log::panic(&format!(
                     "(Err.254) まだ駒台は実装してないぜ☆（＾～＾）！",
                 )))
                 */
@@ -868,7 +869,7 @@ impl GameTable {
     pub fn piece_num_board_at(&self, addr: &FireAddress) -> Option<PieceNum> {
         match addr {
             FireAddress::Board(sq) => self.board[sq.serial_number() as usize],
-            _ => panic!(Beam::trouble(&format!(
+            _ => panic!(Log::panic(&format!(
                 "(Err.254) まだ駒台は実装してないぜ☆（＾～＾）！",
             ))),
         }
@@ -887,7 +888,7 @@ impl GameTable {
                     None
                 }
             }
-            _ => panic!(Beam::trouble(&format!(
+            _ => panic!(Log::panic(&format!(
                 "(Err.321) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
@@ -903,7 +904,7 @@ impl GameTable {
                     None
                 }
             }
-            _ => panic!(Beam::trouble(&format!(
+            _ => panic!(Log::panic(&format!(
                 "(Err.321) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
@@ -935,7 +936,7 @@ impl GameTable {
                     0
                 }
             }
-            FireAddress::Hand(_drop_type) => panic!(Beam::trouble(&format!(
+            FireAddress::Hand(_drop_type) => panic!(Log::panic(&format!(
                 "(Err.254) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
@@ -951,7 +952,7 @@ impl GameTable {
     pub fn count_hand(&self, friend: Phase, fire: &FireAddress) -> usize {
         match fire {
             FireAddress::Board(_sq) => {
-                panic!(Beam::trouble(&format!("(Err.3266) 未対応☆（＾～＾）！",)))
+                panic!(Log::panic(&format!("(Err.3266) 未対応☆（＾～＾）！",)))
             }
             FireAddress::Hand(drop_type) => self.len_hand(friend, &FireAddress::Hand(*drop_type)),
         }
@@ -1118,7 +1119,7 @@ impl GameTable {
     pub fn last_hand(&self, friend: Phase, fire: &FireAddress) -> Option<(PieceType, FireAddress)> {
         match fire {
             FireAddress::Board(_sq) => {
-                panic!(Beam::trouble(&format!("(Err.3251) 未対応☆（＾～＾）！",)))
+                panic!(Log::panic(&format!("(Err.3251) 未対応☆（＾～＾）！",)))
             }
             FireAddress::Hand(drop_type) => {
                 if let Some(piece_num) = self.last_hand_num(
@@ -1144,7 +1145,7 @@ impl GameTable {
     }
     pub fn last_hand_num(&self, friend: Phase, fire: &FireAddress) -> Option<PieceNum> {
         match fire {
-            FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3431) 未対応☆（＾～＾）")),
+            FireAddress::Board(_sq) => panic!(Log::panic("(Err.3431) 未対応☆（＾～＾）")),
             FireAddress::Hand(drop_type) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(friend, drop_type.old);
                 let direction = GameTable::hand_direction(drop);
@@ -1169,7 +1170,7 @@ impl GameTable {
     /// 指し手生成で使うぜ☆（＾～＾）有無を調べるぜ☆（＾～＾）
     pub fn is_empty_hand(&self, friend: Phase, fire: &FireAddress) -> bool {
         match fire {
-            FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3431) 未対応☆（＾～＾）")),
+            FireAddress::Board(_sq) => panic!(Log::panic("(Err.3431) 未対応☆（＾～＾）")),
             FireAddress::Hand(drop_type) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(friend, drop_type.old);
                 if GameTable::hand_direction(drop) < 0 {
@@ -1192,7 +1193,7 @@ impl GameTable {
 
     fn len_hand(&self, friend: Phase, fire: &FireAddress) -> usize {
         match fire {
-            FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.3431) 未対応☆（＾～＾）")),
+            FireAddress::Board(_sq) => panic!(Log::panic("(Err.3431) 未対応☆（＾～＾）")),
             FireAddress::Hand(drop_type) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(friend, drop_type.old);
                 if GameTable::hand_direction(drop) < 0 {

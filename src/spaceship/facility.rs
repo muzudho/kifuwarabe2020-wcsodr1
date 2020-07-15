@@ -3,7 +3,8 @@ use crate::cosmic::recording::{FireAddress, HandAddress, Movement, Phase};
 use crate::cosmic::smart::features::DoubleFacedPieceType;
 use crate::cosmic::smart::square::AbsoluteAddress2D;
 use crate::cosmic::toy_box::{GameTable, PieceNum, PIECE_WHITE_SPACE};
-use crate::spaceship::equipment::Beam;
+use crate::LogExt;
+use casual_logger::Log;
 
 /// 指令室はこちらだぜ☆（＾～＾）！
 pub struct CommandRoom {}
@@ -12,7 +13,7 @@ impl CommandRoom {
     pub fn print_title() {
         // 横幅は 半角79文字使えるぜ☆（＾～＾）
         // 80文字目を使うと、次の行が改行で空行になってしまう☆（＾～＾）
-        Beam::shoot(
+        Log::println(
             &"\
 +--------- --------- --------- --------- --------- --------- --------- -------+
 | KifuWarabe Shogi 2020                                                       |
@@ -600,7 +601,7 @@ pub struct Kitchen {}
 impl Kitchen {
     /// 現在の局面での、指し手の一覧を表示するぜ☆（＾～＾）
     pub fn print_ways(friend: Phase, table: &GameTable, ways: &Vec<Movement>) {
-        Beam::shoot(&format!("Moves count={}", ways.len()));
+        Log::println(&format!("Moves count={}", ways.len()));
         // 辞書順ソート
         let mut move_names = Vec::new();
         for move_ in ways {
@@ -639,7 +640,7 @@ impl Kitchen {
         move_names.reverse();
 
         for (i, move_name) in move_names.into_iter().enumerate() {
-            Beam::shoot(&format!("[{}] {}", i, move_name));
+            Log::println(&format!("[{}] {}", i, move_name));
         }
     }
 }

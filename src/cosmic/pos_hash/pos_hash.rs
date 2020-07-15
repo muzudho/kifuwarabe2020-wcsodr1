@@ -15,7 +15,8 @@ use crate::cosmic::smart::square::RANK1U8;
 use crate::cosmic::smart::square::{AbsoluteAddress2D, BOARD_MEMORY_AREA, SQUARE_NONE};
 use crate::cosmic::toy_box::{GameTable, PIECE_LEN};
 use crate::law::speed_of_light::HandAddresses;
-use crate::spaceship::equipment::Beam;
+use crate::LogExt;
+use casual_logger::Log;
 use rand::Rng;
 
 /// 現対局ハッシュ種
@@ -90,7 +91,7 @@ impl GameHashSeed {
                             self.piece[dst_sq.serial_number() as usize][src_piece_hash_index];
                     }
                     FireAddress::Hand(_dst_drop_type) => {
-                        panic!(Beam::trouble("(Err.90) 未対応☆（＾～＾）"))
+                        panic!(Log::panic("(Err.90) 未対応☆（＾～＾）"))
                     }
                 }
             }
@@ -107,7 +108,7 @@ impl GameHashSeed {
                             [src_drop.nonpromoted_piece_hash_index()];
                     }
                     FireAddress::Hand(_dst_drop_type) => {
-                        panic!(Beam::trouble("(Err.90) 未対応☆（＾～＾）"))
+                        panic!(Log::panic("(Err.90) 未対応☆（＾～＾）"))
                     }
                 }
             }
@@ -134,7 +135,7 @@ impl GameHashSeed {
                         prev_hash ^= self.hands[double_faced_piece as usize][count as usize + 1];
                     }
                     FireAddress::Hand(_dst_drop_type) => {
-                        panic!(Beam::trouble("(Err.90) 未対応☆（＾～＾）"))
+                        panic!(Log::panic("(Err.90) 未対応☆（＾～＾）"))
                     }
                 }
             }
@@ -189,7 +190,7 @@ impl GameHashSeed {
         // 持ち駒ハッシュ
         HandAddresses::for_all(
             &mut |friend: &Phase, fire_hand: &FireAddress| match fire_hand {
-                FireAddress::Board(_sq) => panic!(Beam::trouble("(Err.175) 未対応☆（＾～＾）")),
+                FireAddress::Board(_sq) => panic!(Log::panic("(Err.175) 未対応☆（＾～＾）")),
                 FireAddress::Hand(drop_type) => {
                     let drop = DoubleFacedPiece::from_phase_and_type(*friend, drop_type.old);
                     let count = table.count_hand(*friend, fire_hand);

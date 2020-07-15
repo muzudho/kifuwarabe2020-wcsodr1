@@ -10,8 +10,10 @@ use crate::law::cryptographic::*;
 use crate::law::generate_move::MoveGen;
 use crate::law::usi::*;
 use crate::spaceship::engine;
-use crate::spaceship::equipment::{Beam, PvString, Telescope};
+use crate::spaceship::equipment::{PvString, Telescope};
 use crate::spaceship::facility::{CommandRoom, GameRoom, Kitchen, TheaterRoom1, TheaterRoom2};
+use crate::LogExt;
+use casual_logger::Log;
 use rand::Rng;
 use std;
 use std::io as std_io;
@@ -27,7 +29,7 @@ impl Kifuwarabe {
         // まず最初に、コマンドライン入力を待機しろだぜ☆（＾～＾）
         match std_io::stdin().read_line(&mut line) {
             Ok(_n) => {}
-            Err(e) => panic!(Beam::trouble(&format!(
+            Err(e) => panic!(Log::panic(&format!(
                 "(Err.28)  Failed to read line. / {}",
                 e
             ))),
@@ -37,10 +39,7 @@ impl Kifuwarabe {
         // trim すると空白も消えるぜ☆（＾～＾）
         let line: String = match line.trim().parse() {
             Ok(n) => n,
-            Err(e) => panic!(Beam::trouble(&format!(
-                "(Err.38)  Failed to parse. / {}",
-                e
-            ))),
+            Err(e) => panic!(Log::panic(&format!("(Err.38)  Failed to parse. / {}", e))),
         };
 
         // 文字数を調べようぜ☆（＾～＾）
@@ -53,7 +52,7 @@ impl Kifuwarabe {
     pub fn go(universe: &mut Universe, line: &str) {
         // go btime 40000 wtime 50000 binc 10000 winc 10000
         let go1 = engine::Go::parse(line);
-        Beam::shoot(&format!("info string test {}", go1));
+        Log::println(&format!("info string test {}", go1));
         let mut tree = Tree::new(
             universe.option_many_ways_weight,
             universe.option_komawari_weight,
@@ -103,7 +102,7 @@ impl Kifuwarabe {
         );
         // 例: bestmove 7g7f
         // 例: bestmove resign
-        Beam::shoot(&format!(
+        Log::println(&format!(
             "bestmove {}",
             if let Some(bestmove) = ts.bestmove.movement {
                 format!("{}", bestmove)
@@ -113,7 +112,7 @@ impl Kifuwarabe {
         ));
     }
     pub fn isready() {
-        Beam::shoot("readyok");
+        Log::println("readyok");
     }
     pub fn position(universe: &mut Universe, line: &str) {
         // positionコマンドの読取を丸投げ
@@ -158,8 +157,8 @@ impl Kifuwarabe {
         };
     }
     pub fn usi() {
-        Beam::shoot(&format!("id name {}", ENGINE_NAME));
-        Beam::shoot(&format!("id author {}", ENGINE_AUTHOR));
+        Log::println(&format!("id name {}", ENGINE_NAME));
+        Log::println(&format!("id author {}", ENGINE_AUTHOR));
         /*
         IO::writeln("option name BookFile type string default public.bin");
         IO::writeln("option name UseBook type check default true");
@@ -172,22 +171,22 @@ impl Kifuwarabe {
         */
         // アルファベット順ではなく、将棋所のダイアログボックスが見やすくなるように並べろだぜ☆（＾～＾）
         // 大会ルール関連☆（＾～＾）
-        Beam::shoot("option name MaxPly type spin default 320 min 1 max 10000");
+        Log::println("option name MaxPly type spin default 320 min 1 max 10000");
         // 読みの深さ関連☆（＾～＾）
-        Beam::shoot("option name DepthNotToGiveUp type spin default 4 min 1 max 8");
-        Beam::shoot("option name MaxDepth type spin default 7 min 1 max 15");
+        Log::println("option name DepthNotToGiveUp type spin default 4 min 1 max 8");
+        Log::println("option name MaxDepth type spin default 7 min 1 max 15");
         // 思考時間関連☆（＾～＾）
-        Beam::shoot("option name MinThinkMsec type spin default 5000 min 0 max 599000");
-        Beam::shoot("option name MaxThinkMsec type spin default 17000 min 1000 max 600000");
+        Log::println("option name MinThinkMsec type spin default 5000 min 0 max 599000");
+        Log::println("option name MaxThinkMsec type spin default 17000 min 1000 max 600000");
         // 評価値関連☆（＾～＾）
-        Beam::shoot(
+        Log::println(
             "option name KomawariWeightPer1000 type spin default 1000 min -100000 max 100000",
         );
-        Beam::shoot("option name ManyWaysPer1000 type spin default 1000 min -100000 max 100000");
-        Beam::shoot(
+        Log::println("option name ManyWaysPer1000 type spin default 1000 min -100000 max 100000");
+        Log::println(
             "option name PromotionWeightPer1000 type spin default 1000 min -100000 max 100000",
         );
-        Beam::shoot("usiok");
+        Log::println("usiok");
     }
     pub fn usinewgame(universe: &mut Universe) {
         universe.game.clear();
@@ -227,37 +226,37 @@ impl Chiyuri {
                 ways.push(way);
             },
         );
-        Beam::shoot("----指し手生成(合法手とは限らない) ここから----");
+        Log::println("----指し手生成(合法手とは限らない) ここから----");
         Kitchen::print_ways(
             universe.game.history.get_friend(),
             &universe.game.table,
             &ways,
         );
-        Beam::shoot("----指し手生成(合法手とは限らない) ここまで----");
+        Log::println("----指し手生成(合法手とは限らない) ここまで----");
     }
     pub fn hash(universe: &Universe) {
-        Beam::shoot("局面ハッシュ表示");
+        Log::println("局面ハッシュ表示");
         let s = universe.game.get_positions_hash_text();
-        Beam::shoot(&s);
+        Log::println(&s);
     }
     pub fn how_much(line: &str) {
         // Example: how-much 7g7f
         let bestmove = &line[9..];
-        Beam::shoot(&format!("Debug   | bestmove=|{}|", bestmove));
+        Log::println(&format!("Debug   | bestmove=|{}|", bestmove));
     }
     pub fn kifu(universe: &Universe) {
-        Beam::shoot("棋譜表示");
+        Log::println("棋譜表示");
         let s = universe.game.get_moves_history_text();
-        Beam::shoot(&s);
+        Log::println(&s);
     }
     /// 表示するだけ☆（＾～＾）
     pub fn list40(universe: &Universe) {
-        Beam::shoot("----駒リスト40表示 ここから----");
+        Log::println("----駒リスト40表示 ここから----");
         universe
             .game
             .table
             .for_all_pieces_on_table(&mut |i, adr, piece| {
-                Beam::shoot(&format!(
+                Log::println(&format!(
                     "[{}]{}{}",
                     i,
                     if let Some(adr_val) = adr {
@@ -272,10 +271,10 @@ impl Chiyuri {
                     }
                 ));
             });
-        Beam::shoot("----駒リスト40表示 ここまで----");
+        Log::println("----駒リスト40表示 ここまで----");
     }
     pub fn len0(universe: &mut Universe) {
-        Beam::shoot("len==0");
+        Log::println("len==0");
         if !&universe.dialogue_mode {
             // 空打ち１回目なら、対話モードへ☆（＾～＾）
             universe.dialogue_mode = true;
@@ -286,13 +285,13 @@ impl Chiyuri {
         } else {
             // 局面表示
             let s = GameRoom::to_string(&universe.game, PosNums::Current);
-            Beam::shoot(&s);
+            Log::println(&s);
         }
     }
     pub fn pos(universe: &Universe) {
         // 現局面表示
         let s = GameRoom::to_string(&universe.game, PosNums::Current);
-        Beam::shoot(&s);
+        Log::println(&s);
     }
     pub fn pos2(universe: &Universe) {
         // 現局面表示
@@ -301,36 +300,36 @@ impl Chiyuri {
             TheaterRoom1::to_string(&universe.game, PosNums::Current),
             TheaterRoom2::to_string(&universe.game, PosNums::Current)
         );
-        Beam::shoot(&s);
+        Log::println(&s);
     }
     pub fn pos0(universe: &Universe) {
         // 初期局面表示
         let s = GameRoom::to_string(&universe.game, PosNums::Start);
-        Beam::shoot(&s);
+        Log::println(&s);
     }
     pub fn rand() {
-        Beam::shoot("3<len rand");
+        Log::println("3<len rand");
         // 乱数の試し
         let secret_number = rand::thread_rng().gen_range(1, 101); //1~100
-        Beam::shoot(&format!("乱数={}", secret_number));
+        Log::println(&format!("乱数={}", secret_number));
     }
     pub fn same(universe: &Universe) {
         let count = universe.game.count_same_position();
-        Beam::shoot(&format!("同一局面調べ count={}", count));
+        Log::println(&format!("同一局面調べ count={}", count));
     }
     pub fn startpos(universe: &mut Universe) {
         // 平手初期局面
         set_position(&POS_1.to_string(), &mut universe.game);
     }
     pub fn teigi_conv() {
-        Beam::shoot("teigi::convのテスト");
+        Log::println("teigi::convのテスト");
 
         for ms in 1..9 {
             for hash in 0..10 {
                 let sq = AbsoluteAddress2D::new(FILE1U8, ms);
                 let next = push_sq_to_hash(hash, Some(&sq));
                 let (hash_orig, square_orig) = pop_sq_from_hash(next);
-                Beam::shoot( &format!("push_ms_to_hash(0b{:4b},0b{:5b})=0b{:11b} pop_sq_from_hash(...)=(0b{:4b},0b{:5b})"
+                Log::println( &format!("push_ms_to_hash(0b{:4b},0b{:5b})=0b{:11b} pop_sq_from_hash(...)=(0b{:4b},0b{:5b})"
                     ,hash
                     ,ms
                     ,next
@@ -342,7 +341,7 @@ impl Chiyuri {
     }
     pub fn undo(universe: &mut Universe) {
         if !universe.game.read_move_in_reverse() {
-            Beam::shoot(&format!(
+            Log::println(&format!(
                 "ply={} を、これより戻せません",
                 universe.game.history.ply
             ));

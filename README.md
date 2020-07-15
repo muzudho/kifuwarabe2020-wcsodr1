@@ -191,4 +191,20 @@ setoption name ManyWaysPer1000 value 60
 setoption name PromotionWeightPer1000 value 1000
 position startpos moves 7g7f 5a5b 6i7h 5b5a 7i6h 6a6b 6h7g 3c3d 5i6h 5a5b 4i5h 6b6a 6g6f 5b5a 5h6g 2b4d 4g4f 5a5b 4f4e 5c5d 4e4d 4c4d 2h4h 2a3c 4h4d
 go btime 352000 wtime 210000 binc 5000 winc 5000
+
+### 2020-06-15(mon) 21:28 強制終了するバグを盛ってしまったぜ☆（＾～＾）
+usi
+isready
+setoption name USI_Ponder value true
+setoption name USI_Hash value 256
+setoption name MaxPly value 512
+setoption name DepthNotToGiveUp value 5
+setoption name MaxDepth value 7
+setoption name MinThinkMsec value 10000
+setoption name MaxThinkMsec value 15000
+setoption name KomawariWeightPer1000 value 1000
+setoption name ManyWaysPer1000 value 60
+setoption name PromotionWeightPer1000 value 1000
+position startpos moves 2g2f 3c3d 7g7f 2b8h+ 7i8h 2a3c 6i7h
+go btime 316000 wtime 274000 binc 5000 winc 5000
 ```

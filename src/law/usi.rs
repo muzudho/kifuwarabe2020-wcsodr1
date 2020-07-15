@@ -7,8 +7,9 @@ use crate::cosmic::smart::features::{DoubleFacedPieceType, PieceType};
 use crate::cosmic::smart::square::AbsoluteAddress2D;
 use crate::cosmic::smart::square::FILE9U8;
 use crate::cosmic::smart::square::RANK1U8;
-use crate::spaceship::equipment::Beam;
+use crate::LogExt;
 use atoi::atoi;
+use casual_logger::Log;
 
 // 局面の最多合法手５９３手
 //pub const MAX_WAYS: usize = 593;
@@ -109,7 +110,7 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
             let file = if let Some(num) = atoi::<u8>(line[*starts..=*starts].as_bytes()) {
                 num
             } else {
-                panic!(Beam::trouble(&format!(
+                panic!(Log::panic(&format!(
                     "(Err.72)  '{}' だった。",
                     &line[*starts..=*starts]
                 )))
@@ -154,7 +155,7 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
                     FireAddress::Board(AbsoluteAddress2D::new(file, 9))
                 }
                 _ => {
-                    panic!(Beam::trouble(&format!(
+                    panic!(Log::panic(&format!(
                         "(Err.90)  '{}' だった。",
                         &line[*starts..=*starts]
                     )));
@@ -169,7 +170,7 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
     let file = if let Some(num) = atoi::<u8>(line[*starts..=*starts].as_bytes()) {
         num
     } else {
-        panic!(Beam::trouble(&format!(
+        panic!(Log::panic(&format!(
             "(Err.118)  '{}' だった。",
             &line[*starts..=*starts]
         )));
@@ -187,7 +188,7 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
         "h" => 8,
         "i" => 9,
         _ => {
-            panic!(Beam::trouble(&format!(
+            panic!(Log::panic(&format!(
                 "(Err.136)  '{}' だった。",
                 &line[*starts..=*starts]
             )));
@@ -296,7 +297,7 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Game) {
                     "l" => BoardPart::Alphabet((Phase::Second, PieceType::PromotedLance)),
                     "p" => BoardPart::Alphabet((Phase::Second, PieceType::PromotedPawn)),
                     _ => {
-                        panic!(Beam::trouble(&format!(
+                        panic!(Log::panic(&format!(
                             "(Err.235)  盤部(0) '{}' だった。",
                             &line[*starts..=*starts]
                         )));
@@ -405,7 +406,7 @@ pub fn set_position(line: &str, game: &mut Game) {
                                 "7" => HandCount::N2Digit(17),
                                 "8" => HandCount::N2Digit(18),
                                 _ => {
-                                    panic!(Beam::trouble(&format!(
+                                    panic!(Log::panic(&format!(
                                         "(Err.346)  持駒部(0) '{}' だった。",
                                         &line[starts..(starts + 2)]
                                     )));
@@ -471,7 +472,7 @@ pub fn set_position(line: &str, game: &mut Game) {
             starts += 3;
         }
     } else {
-        Beam::shoot("'position startpos' でも、'position sfen ' でも始まらなかった。");
+        Log::println("'position startpos' でも、'position sfen ' でも始まらなかった。");
         return;
     }
 

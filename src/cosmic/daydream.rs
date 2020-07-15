@@ -9,7 +9,9 @@ use crate::cosmic::smart::features::PieceType;
 use crate::cosmic::smart::see::SEE;
 use crate::cosmic::universe::Universe;
 use crate::law::generate_move::{MoveGen, Ways};
-use crate::spaceship::equipment::{Beam, PvString};
+use crate::spaceship::equipment::PvString;
+use crate::LogExt;
+use casual_logger::Log;
 use std::fmt;
 use std::time::Instant;
 
@@ -473,7 +475,7 @@ impl TreeState {
                 } else {
                     match self.bestmove.value {
                         Value::Win => {
-                            panic!(Beam::trouble(
+                            panic!(Log::panic(
                                 "(Err.405) 自分が勝つ手を既に読んでるのに、ここに来るのはおかしいぜ☆（＾～＾）"
                             ))
                         }
@@ -506,7 +508,7 @@ impl TreeState {
             return;
         } else {
             match self.bestmove.value {
-                Value::Win => panic!(Beam::trouble(
+                Value::Win => panic!(Log::panic(
                     "(Err.397) 自分が勝つ手を読んでるなら、ここに来るのはおかしいぜ☆（＾～＾）"
                 )),
                 Value::Lose => {

@@ -4,7 +4,9 @@ use crate::cosmic::recording::{FireAddress, HandAddress, History, Movement};
 use crate::cosmic::smart::square::AbsoluteAddress2D;
 use crate::cosmic::toy_box::GameTable;
 use crate::law::generate_move::{FirstOperation, PhaseOperation, SecondOperation};
-use crate::spaceship::equipment::{Beam, DestinationDisplay};
+use crate::spaceship::equipment::DestinationDisplay;
+use crate::LogExt;
+use casual_logger::Log;
 
 /// 指し手生成で、先手、後手で処理が変わるやつを吸収するぜ☆（＾～＾）
 pub struct MovegenPhase {
@@ -152,7 +154,7 @@ impl Game {
             if let Some(piece_num) = src_piece_num {
                 self.table.promote(piece_num);
             } else {
-                panic!(Beam::trouble(
+                panic!(Log::panic(
                     "(Err.248) 成ったのに、元の升に駒がなかった☆（＾～＾）"
                 ));
             }
@@ -190,7 +192,7 @@ impl Game {
                         if let Some(source_piece_num) = moveing_piece_num {
                             self.table.demote(source_piece_num);
                         } else {
-                            panic!(Beam::trouble(
+                            panic!(Log::panic(
                                 "(Err.305) 成ったのに移動先に駒が無いぜ☆（＾～＾）！"
                             ))
                         }
@@ -209,6 +211,7 @@ impl Game {
                     let piece_num = moveing_piece_num.unwrap();
                     // 自分の持ち駒を増やそうぜ☆（＾～＾）！
                     let friend = self.table.get_phase(piece_num);
+                    // TODO この駒を置くことになる場所は☆（＾～＾）？
                     self.table.push_piece(
                         friend,
                         &FireAddress::Hand(HandAddress::new(
