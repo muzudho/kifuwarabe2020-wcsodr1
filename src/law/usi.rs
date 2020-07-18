@@ -347,11 +347,14 @@ pub fn set_position(pos: &mut Position, p: &mut CommandLineSeek) {
     pos.clear();
 
     if p.starts_with("position startpos") {
-        // 'position startpos' は無視。
-        // 別途用意した平手初期局面文字列を読取
-        *p = CommandLineSeek::new(STARTPOS);
-        read_board(pos, p);
+        // 'position startpos' を読み飛ばし
+        p.go_next_to("position startpos");
 
+        // 別途用意した平手初期局面文字列を読取
+        let mut p2 = CommandLineSeek::new(STARTPOS);
+        read_board(pos, &mut p2);
+
+        // 元のパーサーで続行。
         if p.starts_with(" ") {
             // ' ' を読み飛ばした。
             p.go_next_to(" ");

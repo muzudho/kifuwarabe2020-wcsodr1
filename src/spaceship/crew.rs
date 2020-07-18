@@ -14,7 +14,7 @@ use crate::log::LogExt;
 use crate::look_and_model::facility::{CommandRoom, GameRoom, Kitchen, TheaterRoom1, TheaterRoom2};
 use crate::spaceship::engine;
 use crate::spaceship::equipment::{PvString, Telescope};
-use casual_logger::Log;
+use casual_logger::{Log, Table};
 use rand::Rng;
 
 /// 船長：きふわらべ
@@ -23,10 +23,10 @@ use rand::Rng;
 pub struct Kifuwarabe {}
 impl Kifuwarabe {
     /// bestmoveコマンドを送るぜ☆（＾～＾） 思考するのもこの中だぜ☆（＾～＾）
-    pub fn go(universe: &mut Universe, line: &str) {
+    pub fn go(universe: &mut Universe, p: &mut CommandLineSeek) {
         // go btime 40000 wtime 50000 binc 10000 winc 10000
-        let go1 = engine::Go::parse(line);
-        Log::print_info(&format!("info string test {}", go1));
+        let go1 = engine::Go::parse(p);
+        Log::debug(&format!("info string test {}", go1));
         let mut tree = Search::new(
             universe.option_many_ways_weight,
             universe.option_komawari_weight,
@@ -98,10 +98,12 @@ impl Kifuwarabe {
         if let Some(name_len) = p.line()[p.current()..].find(' ') {
             let name = p.line()[p.current()..(p.current() + name_len)].to_string();
             p.go_next_to(&name);
-            // IO::writeln(&format!("Debug name=|{}|", name));
             p.go_next_to(" value ");
             let value = &p.line()[(p.current())..];
-            // IO::writeln(&format!("Debug value=|{}|", value));
+            Log::debug_t(
+                "SetOption",
+                Table::default().str("Name", &name).str("Value", value),
+            );
             match name.as_str() {
                 "MaxPly" => {
                     universe.option_max_ply = value.parse().unwrap();

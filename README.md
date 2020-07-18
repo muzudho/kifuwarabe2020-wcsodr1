@@ -211,7 +211,7 @@ go btime 316000 wtime 274000 binc 5000 winc 5000
 
 ### 2020-07-18(sat) 23:46 前からの強制終了するバグだぜ☆（＾～＾）
 
-```
+```plain
 usi
 isready
 setoption name USI_Ponder value true
@@ -226,4 +226,23 @@ setoption name ManyWaysPer1000 value 60
 setoption name PromotionWeightPer1000 value 1000
 position startpos moves 7g7f 3c3d 8h2b+ 3a2b 9i9h B*6e
 go btime 293000 wtime 312000 binc 5000 winc 5000
+```
+
+### 2020-07-19(sun) 05:01 パーサーいじって壊した☆（＾～＾）
+
+```plain
+usi
+isready
+setoption name USI_Ponder value true
+setoption name USI_Hash value 256
+setoption name MaxPly value 512
+setoption name DepthNotToGiveUp value 5
+setoption name MaxDepth value 7
+setoption name MinThinkMsec value 10000
+setoption name MaxThinkMsec value 15000
+setoption name KomawariWeightPer1000 value 1000
+setoption name ManyWaysPer1000 value 60
+setoption name PromotionWeightPer1000 value 1000
+position startpos moves 6g6f 4a3b
+go btime 304000 wtime 304000 binc 5000 winc 5000
 ```

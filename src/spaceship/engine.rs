@@ -1,3 +1,4 @@
+use crate::command_line_seek::CommandLineSeek;
 use regex::Regex;
 use std::fmt;
 
@@ -20,9 +21,9 @@ impl Go {
     /// Example
     /// -------
     /// go btime 40000 wtime 50000 binc 10000 winc 10000
-    pub fn parse(line: &str) -> Go {
+    pub fn parse(p: &mut CommandLineSeek) -> Go {
         let re = Regex::new(r"^go btime (\d+) wtime (\d+) binc (\d+) winc (\d+)$").unwrap();
-        if let Some(cap) = re.captures(line) {
+        if let Some(cap) = re.captures(p.line()) {
             Go {
                 btime: cap[1].parse().unwrap(),
                 wtime: cap[2].parse().unwrap(),

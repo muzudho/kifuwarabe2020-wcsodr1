@@ -96,7 +96,7 @@ fn main_loop(universe: &mut Universe) {
         } else if p.starts_with("usi") {
             Kifuwarabe::usi();
         } else if p.starts_with("go") {
-            Kifuwarabe::go(universe, &line);
+            Kifuwarabe::go(universe, &mut p);
         } else {
             help_chiyuri(universe, &mut p);
         }
