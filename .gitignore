@@ -1,3 +1,7 @@
+# Python
+*.pdb
+__pycache__
+
 # Log
 /*.log
 /*.log.toml

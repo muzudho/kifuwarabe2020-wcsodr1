@@ -6,7 +6,6 @@ use crate::cosmic::playing::Game;
 use crate::cosmic::recording::{Movement, Phase, PLY_SIZE, SENNTITE_NUM};
 use crate::cosmic::smart::evaluator::{Evaluation, REPITITION_VALUE};
 use crate::cosmic::smart::features::PieceType;
-use crate::cosmic::smart::see::SEE;
 use crate::cosmic::universe::Universe;
 use crate::law::generate_move::{MoveGen, Ways};
 use crate::spaceship::equipment::PvString;
@@ -267,11 +266,6 @@ impl Search {
                 ts.repetition_movement = Some(move_);
             } else if self.max_depth0 < self.pv.len() {
                 // 葉だぜ☆（＾～＾）
-
-                if let Some(_captured) = move_.captured {
-                    // TODO SEEやろうぜ☆（＾～＾）
-                    SEE::go(game, &move_.destination);
-                }
 
                 // 評価を集計するぜ☆（＾～＾）
                 ts.choice_friend(&Value::CentiPawn(self.evaluation.centi_pawn()), move_);
