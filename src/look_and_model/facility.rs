@@ -4,8 +4,8 @@ use crate::cosmic::smart::features::DoubleFacedPieceType;
 use crate::cosmic::smart::square::AbsoluteAddress2D;
 use crate::cosmic::toy_box::PieceNum;
 use crate::look_and_model::piece::PIECE_WHITE_SPACE;
-use crate::position::Game;
 use crate::position::GameTable;
+use crate::position::Position;
 use crate::LogExt;
 use casual_logger::Log;
 
@@ -52,11 +52,11 @@ impl CommandRoom {
 pub struct GameRoom {}
 impl GameRoom {
     /// 表示
-    pub fn to_string(game: &Game, pos_nums: PosNums) -> String {
-        let table = game.get_table(pos_nums);
-        let ply = game.history.ply;
-        let phase = game.history.get_turn();
-        let same_pos_count = game.count_same_position();
+    pub fn to_string(pos: &Position, pos_nums: PosNums) -> String {
+        let table = pos.get_table(pos_nums);
+        let ply = pos.history.ply;
+        let phase = pos.history.get_turn();
+        let same_pos_count = pos.count_same_position();
 
         // 局面表示
         format!(
@@ -285,11 +285,11 @@ P x{87:2}   |{63}|{64}|{65}|{66}|{67}|{68}|{69}|{70}|{71}| h8   p x{94:2}
 pub struct TheaterRoom1 {}
 impl TheaterRoom1 {
     /// 表示
-    pub fn to_string(game: &Game, pos_nums: PosNums) -> String {
-        let table = game.get_table(pos_nums);
-        let ply = game.history.ply;
-        let phase = game.history.get_turn();
-        let same_pos_count = game.count_same_position();
+    pub fn to_string(pos: &Position, pos_nums: PosNums) -> String {
+        let table = pos.get_table(pos_nums);
+        let ply = pos.history.ply;
+        let phase = pos.history.get_turn();
+        let same_pos_count = pos.count_same_position();
 
         // 局面表示
         // フォーマットの引数は 98個まで。
@@ -470,8 +470,8 @@ impl TheaterRoom1 {
 pub struct TheaterRoom2 {}
 impl TheaterRoom2 {
     /// 表示
-    pub fn to_string(game: &Game, pos_nums: PosNums) -> String {
-        let table = game.get_table(pos_nums);
+    pub fn to_string(pos: &Position, pos_nums: PosNums) -> String {
+        let table = pos.get_table(pos_nums);
 
         // 局面表示
         // フォーマットの引数は 98個まで。

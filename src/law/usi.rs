@@ -1,13 +1,12 @@
 //!
 //! USIプロトコル
 //!
-use crate::computer_player::daydream::Search;
 use crate::cosmic::recording::{CapturedMove, FireAddress, HandAddress, Movement, Phase};
 use crate::cosmic::smart::features::{DoubleFacedPieceType, PieceType};
 use crate::cosmic::smart::square::AbsoluteAddress2D;
 use crate::cosmic::smart::square::FILE9U8;
 use crate::cosmic::smart::square::RANK1U8;
-use crate::position::Game;
+use crate::position::Position;
 use crate::LogExt;
 use atoi::atoi;
 use casual_logger::Log;
@@ -41,7 +40,7 @@ pub const STARTPOS: &str = "lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSG
 ///
 /// 読み取った指し手は、棋譜に入れる。
 /// 現在の手目のところに入れ、手目のカウントアップも行う。
-pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) -> bool {
+pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Position) -> bool {
     // 4文字か5文字あるはず。
     if (len - *starts) < 4 {
         // 指し手読取終了時にここを通るぜ☆（＾～＾）
@@ -237,7 +236,7 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
 
 /// position コマンド 盤上部分のみ 読取
 /// 初期化は既に終わらせてあります。
-pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Game) {
+pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Position) {
     // 初期盤面
     let table = game.mut_starting();
     let mut file = FILE9U8; //９筋から右方向へ読取
@@ -341,7 +340,7 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Game) {
 }
 
 /// position コマンド読取
-pub fn set_position(line: &str, game: &mut Game) {
+pub fn set_position(line: &str, game: &mut Position) {
     let mut starts = 0;
 
     // 全体の長さ
@@ -489,7 +488,6 @@ pub fn set_position(line: &str, game: &mut Game) {
     game.table.copy_from(&game.starting_table);
 
     // 指し手を全部読んでいくぜ☆（＾～＾）手目のカウントも増えていくぜ☆（＾～＾）
-    let mut dammy = Search::new(0, 0, 0, 0);
     while read_sasite(line, &mut starts, len, game) {
         // 手目を戻す
         game.history.ply -= 1;
@@ -497,6 +495,6 @@ pub fn set_position(line: &str, game: &mut Game) {
         let ply = game.history.ply;
 
         let move_ = game.history.movements[ply as usize];
-        game.read_move(game.history.get_turn(), &move_, &mut dammy);
+        game.do_move(game.history.get_turn(), &move_);
     }
 }

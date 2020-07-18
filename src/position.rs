@@ -1,6 +1,6 @@
 //! GameTable. A record of the game used to suspend or resume it.  
 //! 局面。 ゲームを中断したり、再開したりするときに使うゲームの記録です。  
-use crate::computer_player::daydream::Search;
+use crate::config::PV_BUFFER;
 use crate::cosmic::playing::{MovegenPhase, PosNums};
 use crate::cosmic::pos_hash::pos_hash::*;
 use crate::cosmic::recording::History;
@@ -21,10 +21,11 @@ use crate::spaceship::equipment::DestinationDisplay;
 use crate::LogExt;
 use casual_logger::Log;
 use num_traits::FromPrimitive;
+use std::fmt;
 
 /// Position. A record of the game used to suspend or resume it.  
 /// 局面。 ゲームを中断したり、再開したりするときに使うゲームの記録です。  
-pub struct Game {
+pub struct Position {
     /// 棋譜
     pub history: History,
     /// 初期の卓
@@ -36,20 +37,24 @@ pub struct Game {
     /// 情報表示担当
     pub info: DestinationDisplay,
     pub movegen_phase: MovegenPhase,
+
+    // Principal variation(読み筋)☆（＾～＾）
+    pub pv: PrincipalVariation,
 }
-impl Default for Game {
-    fn default() -> Game {
-        Game {
+impl Default for Position {
+    fn default() -> Position {
+        Position {
             history: History::default(),
             starting_table: GameTable::default(),
             hash_seed: GameHashSeed::default(),
             table: GameTable::default(),
             info: DestinationDisplay::default(),
             movegen_phase: MovegenPhase::default(),
+            pv: PrincipalVariation::default(),
         }
     }
 }
-impl Game {
+impl Position {
     /// 宇宙誕生
     pub fn big_bang(&mut self) {
         // 局面ハッシュの種をリセット
@@ -133,7 +138,7 @@ impl Game {
     }
 
     /// 入れた指し手の通り指すぜ☆（＾～＾）
-    pub fn read_move(&mut self, turn: Phase, move_: &Movement, search: &mut Search) {
+    pub fn do_move(&mut self, turn: Phase, move_: &Movement) {
         // 局面ハッシュを作り直す
         self.hash_seed
             .update_by_do_move(&mut self.history, &self.table, move_);
@@ -165,12 +170,12 @@ impl Game {
         // self.history.set_position_hash(ky_hash);
 
         self.history.ply += 1;
-        search.pv.push(&move_);
+        self.pv.push(&move_);
     }
 
     /// 逆順に指します。
-    pub fn read_move_in_reverse(&mut self, search: &mut Search) -> bool {
-        search.pv.pop();
+    pub fn undo_move(&mut self) -> bool {
+        self.pv.pop();
         if 0 < self.history.ply {
             // 棋譜から読取、手目も減る
             self.history.ply -= 1;
@@ -926,5 +931,56 @@ impl GameTable {
             DoubleFacedPiece::Lance2 => self.hand_lance2_cur += direction,
             DoubleFacedPiece::Pawn2 => self.hand_pawn2_cur += direction,
         }
+    }
+}
+
+#[derive(Clone)]
+pub struct PrincipalVariation {
+    text: String,
+    ply: usize,
+}
+impl Default for PrincipalVariation {
+    fn default() -> Self {
+        PrincipalVariation {
+            // ゴミの値で埋めるぜ☆（＾～＾）
+            text: String::with_capacity(PV_BUFFER),
+            ply: 0,
+        }
+    }
+}
+impl PrincipalVariation {
+    pub fn push(&mut self, movement: &Movement) {
+        if self.text.is_empty() {
+            self.text.push_str(&movement.to_string());
+        } else {
+            self.text.push_str(&format!(" {}", movement));
+        }
+        self.ply += 1;
+    }
+
+    pub fn pop(&mut self) {
+        // None か スペースが出てくるまで削除しようぜ☆（＾～＾）
+        loop {
+            if let Some(ch) = self.text.pop() {
+                if ch == ' ' {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+
+        if 0 < self.ply {
+            self.ply -= 1;
+        }
+    }
+
+    pub fn len(&self) -> usize {
+        self.ply
+    }
+}
+impl fmt::Display for PrincipalVariation {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.text)
     }
 }

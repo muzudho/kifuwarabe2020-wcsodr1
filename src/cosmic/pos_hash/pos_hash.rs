@@ -14,8 +14,8 @@ use crate::cosmic::smart::square::RANK1U8;
 use crate::cosmic::smart::square::{AbsoluteAddress2D, BOARD_MEMORY_AREA, SQUARE_NONE};
 use crate::law::speed_of_light::HandAddresses;
 use crate::look_and_model::piece::PIECE_LEN;
-use crate::position::Game;
 use crate::position::GameTable;
+use crate::position::Position;
 use crate::LogExt;
 use casual_logger::Log;
 use rand::Rng;
@@ -148,7 +148,7 @@ impl GameHashSeed {
 
     /*
     /// 局面ハッシュを作り直す
-    pub fn current_position(&self, game: &Game) -> u64 {
+    pub fn current_position(&self, game: &Position) -> u64 {
         let mut hash = self.table(&game.table);
 
         // 手番ハッシュ
@@ -163,7 +163,7 @@ impl GameHashSeed {
     */
 
     /// 初期局面ハッシュを作り直す
-    pub fn starting_position(&self, game: &Game) -> u64 {
+    pub fn starting_position(&self, game: &Position) -> u64 {
         let mut hash = self.from_table(&game.starting_table);
 
         // 手番ハッシュ（後手固定）

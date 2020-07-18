@@ -15,7 +15,7 @@ use crate::cosmic::smart::square::RANK6U8;
 use crate::cosmic::smart::square::RANK7U8;
 use crate::cosmic::smart::square::RANK9U8;
 use crate::cosmic::smart::square::{AbsoluteAddress2D, Angle, RelAdr2D};
-use crate::position::Game;
+use crate::position::Position;
 use crate::LogExt;
 use casual_logger::Log;
 
@@ -238,7 +238,7 @@ impl MoveGen {
     /// * 指し手ハッシュ
     /// * 移動先にあった駒
     pub fn make_move<F1>(
-        game: &Game,
+        game: &Position,
         phase_operation: &Box<dyn PhaseOperation>,
         listen_move: &mut F1,
     ) where
@@ -269,7 +269,7 @@ impl MoveGen {
     /// * 指し手ハッシュ
     /// * 移動先にあった駒
     fn start<F1>(
-        game: &Game,
+        game: &Position,
         phase_operation: &Box<dyn PhaseOperation>,
         source: &FireAddress,
         listen_move: &mut F1,
@@ -468,7 +468,7 @@ impl MoveGen {
     /// * `hopping` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     /// * `sliding` -
     fn piece_of<F1>(
-        game: &Game,
+        game: &Position,
         phase_operation: &Box<dyn PhaseOperation>,
         piece_type: PieceType,
         source: &FireAddress,
@@ -503,7 +503,7 @@ impl MoveGen {
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn pawn<F1>(
-        game: &Game,
+        game: &Position,
         phase_operation: &Box<dyn PhaseOperation>,
         source: &FireAddress,
         moving: &mut F1,
@@ -528,7 +528,7 @@ impl MoveGen {
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn lance<F1>(
-        game: &Game,
+        game: &Position,
         phase_operation: &Box<dyn PhaseOperation>,
         source: &FireAddress,
         moving: &mut F1,
@@ -553,7 +553,7 @@ impl MoveGen {
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn knight<F1>(
-        game: &Game,
+        game: &Position,
         phase_operation: &Box<dyn PhaseOperation>,
         source: &FireAddress,
         moving: &mut F1,
@@ -577,7 +577,7 @@ impl MoveGen {
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn silver<F1>(
-        game: &Game,
+        game: &Position,
         phase_operation: &Box<dyn PhaseOperation>,
         source: &FireAddress,
         moving: &mut F1,
@@ -601,7 +601,7 @@ impl MoveGen {
     /// * `turn` - 後手視点にしたけりゃ turn.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn gold<F1>(game: &Game, source: &FireAddress, moving: &mut F1)
+    fn gold<F1>(game: &Position, source: &FireAddress, moving: &mut F1)
     where
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
@@ -621,7 +621,7 @@ impl MoveGen {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn king<F1>(game: &Game, source: &FireAddress, moving: &mut F1)
+    fn king<F1>(game: &Position, source: &FireAddress, moving: &mut F1)
     where
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
@@ -642,7 +642,7 @@ impl MoveGen {
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn bishop<F1>(
-        game: &Game,
+        game: &Position,
         phase_operation: &Box<dyn PhaseOperation>,
         source: &FireAddress,
         moving: &mut F1,
@@ -665,7 +665,7 @@ impl MoveGen {
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn rook<F1>(
-        game: &Game,
+        game: &Position,
         phase_operation: &Box<dyn PhaseOperation>,
         source: &FireAddress,
         moving: &mut F1,
@@ -687,7 +687,7 @@ impl MoveGen {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn horse<F1>(game: &Game, source: &FireAddress, moving: &mut F1)
+    fn horse<F1>(game: &Position, source: &FireAddress, moving: &mut F1)
     where
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
@@ -707,7 +707,7 @@ impl MoveGen {
     ///
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
-    fn dragon<F1>(game: &Game, source: &FireAddress, moving: &mut F1)
+    fn dragon<F1>(game: &Position, source: &FireAddress, moving: &mut F1)
     where
         F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
     {
@@ -728,7 +728,7 @@ impl MoveGen {
     /// * `start` - 移動元升☆（＾～＾）
     /// * `mobility` - 動き方☆（＾～＾）
     /// * `moving` - 絶対番地を受け取れだぜ☆（＾～＾）
-    fn move_<F1>(game: &Game, start: &FireAddress, mobility: Mobility, moving: &mut F1)
+    fn move_<F1>(game: &Position, start: &FireAddress, mobility: Mobility, moving: &mut F1)
     where
         F1: FnMut(&FireAddress, Agility) -> bool,
     {

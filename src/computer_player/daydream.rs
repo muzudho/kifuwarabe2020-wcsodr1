@@ -2,13 +2,12 @@
 //! 駒たちが躍動するぜ☆（＾～＾）
 //!
 
-use crate::config::PV_BUFFER;
 use crate::cosmic::recording::{Movement, Phase, SENNTITE_NUM};
 use crate::cosmic::smart::evaluator::{Evaluation, REPITITION_VALUE};
 use crate::cosmic::smart::features::PieceType;
 use crate::cosmic::universe::Universe;
 use crate::law::generate_move::{MoveGen, Ways};
-use crate::position::Game;
+use crate::position::Position;
 use crate::spaceship::equipment::PvString;
 use crate::LogExt;
 use casual_logger::Log;
@@ -23,9 +22,6 @@ pub struct Search {
     /// Start the stopwatch when this structure is created.  
     /// この構造体を生成した時点からストップ・ウォッチを開始します。  
     pub stopwatch: Instant,
-
-    // Principal variation(読み筋)☆（＾～＾）
-    pub pv: PrincipalVariation,
 
     // 思考時間（ミリ秒）をランダムにすることで、指し手を変えるぜ☆（＾～＾）
     pub think_msec: u128,
@@ -47,7 +43,6 @@ impl Search {
         Search {
             stopwatch: Instant::now(),
             nodes: 0,
-            pv: PrincipalVariation::default(),
             think_msec: 0,
             evaluation: Evaluation::new(many_ways_weight, komawari_weight, promotion_weight),
             depth_not_to_give_up: depth_not_to_give_up,
@@ -128,13 +123,13 @@ impl Search {
     ///
     /// # Arguments
     ///
-    /// * `game` - 対局。
+    /// * `pos` - 局面。
     /// * `sibling_best` - アルファベータ探索のベータ値。兄弟で一番良い評価値。
     ///
     /// # Returns
     ///
     /// Best movement, Value, Sum nodes
-    fn node(&mut self, game: &mut Game, another_branch_best: Value) -> TreeState {
+    fn node(&mut self, pos: &mut Position, another_branch_best: Value) -> TreeState {
         let mut ts = TreeState::default();
 
         // この手を指すと負けてしまう、という手が見えていたら、このフラグを立てろだぜ☆（＾～＾）
@@ -146,10 +141,10 @@ impl Search {
 
             // 現局面で、各駒が、他に駒がないと考えた場合の最大数の指し手を生成しろだぜ☆（＾～＾）
             MoveGen::make_move(
-                &game,
-                match game.history.get_turn() {
-                    Phase::First => &game.movegen_phase.first_movegen,
-                    Phase::Second => &game.movegen_phase.second_movegen,
+                &pos,
+                match pos.history.get_turn() {
+                    Phase::First => &pos.movegen_phase.first_movegen,
+                    Phase::Second => &pos.movegen_phase.second_movegen,
                 },
                 &mut |way| {
                     ways.push(&way);
@@ -179,9 +174,9 @@ impl Search {
             let mut king = 0;
             for i in 0..cap {
                 let fire = ways.get(i).captured.unwrap().source;
-                let piece_type = game.table.get_type(
-                    game.table
-                        .piece_num_at(game.history.get_turn(), &fire)
+                let piece_type = pos.table.get_type(
+                    pos.table
+                        .piece_num_at(pos.history.get_turn(), &fire)
                         .unwrap(),
                 );
                 // let piece_type = ways.get(i).captured.unwrap().piece_type;
@@ -197,7 +192,7 @@ impl Search {
             }
         }
 
-        let coverage_sign = if self.pv.len() % 2 == 0 {
+        let coverage_sign = if pos.pv.len() % 2 == 0 {
             // 先手が指すところだぜ☆（＾～＾）
             1
         } else {
@@ -219,7 +214,7 @@ impl Search {
             self.nodes += 1;
             // * `promotion_value` - 評価値用。成ったら加点☆（＾～＾）
             let promotion_value = if move_.promote {
-                game.table.promotion_value_at(&game.table, &move_.source)
+                pos.table.promotion_value_at(&pos.table, &move_.source)
             } else {
                 0
             };
@@ -227,9 +222,9 @@ impl Search {
             // 1手進める前に、これから取ることになる駒を盤上から読み取っておきます。
             let captured_piece_type = if let Some(captured) = move_.captured {
                 Some(
-                    game.table.get_type(
-                        game.table
-                            .piece_num_at(game.history.get_turn(), &captured.source)
+                    pos.table.get_type(
+                        pos.table
+                            .piece_num_at(pos.history.get_turn(), &captured.source)
                             .unwrap(),
                     ),
                 )
@@ -239,8 +234,8 @@ impl Search {
             };
 
             // 棋譜に入れる☆
-            game.set_move(&move_);
-            game.read_move(game.history.get_turn(), &move_, self);
+            pos.set_move(&move_);
+            pos.do_move(pos.history.get_turn(), &move_);
 
             let (captured_piece_centi_pawn, delta_promotion_bonus) = self
                 .evaluation
@@ -254,26 +249,26 @@ impl Search {
 
                     self.evaluation
                         .before_undo_move(captured_piece_centi_pawn, delta_promotion_bonus);
-                    game.read_move_in_reverse(self);
+                    pos.undo_move();
                     break;
                 }
             }
 
             // 千日手かどうかを判定する☆（＾～＾）
-            if SENNTITE_NUM <= game.count_same_position() {
+            if SENNTITE_NUM <= pos.count_same_position() {
                 // 千日手か……☆（＾～＾） 一応覚えておくぜ☆（＾～＾）
                 ts.repetition_movement = Some(move_);
-            } else if self.max_depth0 < self.pv.len() {
+            } else if self.max_depth0 < pos.pv.len() {
                 // 葉だぜ☆（＾～＾）
 
                 // 評価を集計するぜ☆（＾～＾）
                 ts.choice_friend(&Value::CentiPawn(self.evaluation.centi_pawn()), move_);
 
-                if game.info.is_printable() {
+                if pos.info.is_printable() {
                     // 何かあったタイミングで読み筋表示するのではなく、定期的に表示しようぜ☆（＾～＾）
                     // PV を表示するには、葉のタイミングで出すしかないぜ☆（＾～＾）
                     let movement = ts.bestmove.movement;
-                    game.info.print(
+                    pos.info.print(
                         None,
                         None,
                         None,
@@ -285,19 +280,19 @@ impl Search {
                             self.evaluation.promotion(),
                         ))),
                     );
-                    game.info.print(
-                        Some(self.pv.len()),
+                    pos.info.print(
+                        Some(pos.pv.len()),
                         Some((self.nodes, self.nps())),
                         Some(ts.bestmove.value),
                         movement,
-                        &Some(PvString::PV(self.msec(), format!("{}", self.pv))),
+                        &Some(PvString::PV(self.msec(), format!("{}", pos.pv))),
                     );
                 }
             } else {
                 // 枝局面なら、更に深く進むぜ☆（＾～＾）
                 self.evaluation.before_search();
                 let opponent_ts = self.node(
-                    game,
+                    pos,
                     match ts.bestmove.value {
                         Value::CentiPawn(centi_pawn) => Value::CentiPawn(-centi_pawn),
                         Value::Win => Value::Lose,
@@ -318,7 +313,7 @@ impl Search {
 
             self.evaluation
                 .before_undo_move(captured_piece_centi_pawn, delta_promotion_bonus);
-            game.read_move_in_reverse(self);
+            pos.undo_move();
 
             match ts.bestmove.value {
                 Value::Win => {
@@ -531,55 +526,6 @@ pub enum Value {
 
     /// 負け☆（＾～＾）
     Lose,
-}
-
-#[derive(Clone)]
-pub struct PrincipalVariation {
-    text: String,
-    ply: usize,
-}
-impl Default for PrincipalVariation {
-    fn default() -> Self {
-        PrincipalVariation {
-            // ゴミの値で埋めるぜ☆（＾～＾）
-            text: String::with_capacity(PV_BUFFER),
-            ply: 0,
-        }
-    }
-}
-impl PrincipalVariation {
-    pub fn push(&mut self, movement: &Movement) {
-        if self.text.is_empty() {
-            self.text.push_str(&movement.to_string());
-        } else {
-            self.text.push_str(&format!(" {}", movement));
-        }
-        self.ply += 1;
-    }
-
-    pub fn pop(&mut self) {
-        // None か スペースが出てくるまで削除しようぜ☆（＾～＾）
-        loop {
-            if let Some(ch) = self.text.pop() {
-                if ch == ' ' {
-                    break;
-                }
-            } else {
-                break;
-            }
-        }
-        self.ply -= 1;
-        // ゴミの値は消さないぜ☆（＾～＾）
-    }
-
-    fn len(&self) -> usize {
-        self.ply
-    }
-}
-impl fmt::Display for PrincipalVariation {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.text)
-    }
 }
 
 #[derive(Clone)]

@@ -3,12 +3,12 @@
 //!
 extern crate rand;
 
-use crate::position::Game;
+use crate::position::Position;
 
 /// アプリケーション開始時に決め終えておくものだぜ☆（＾～＾）
 pub struct Universe {
     /// 対局
-    pub game: Game,
+    pub game: Position,
     /// 対話モード
     pub dialogue_mode: bool,
     /// 大会ルールの最大手数☆（＾～＾）
@@ -31,7 +31,7 @@ pub struct Universe {
 impl Default for Universe {
     fn default() -> Self {
         Universe {
-            game: Game::default(),
+            game: Position::default(),
             dialogue_mode: false,
             option_max_ply: 320,
             option_max_depth: 1,

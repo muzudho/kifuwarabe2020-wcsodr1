@@ -207,10 +207,9 @@ impl Chiyuri {
             // 入っている指し手の通り指すぜ☆（＾～＾）
             let ply = universe.game.history.ply;
             let move_ = universe.game.history.movements[ply as usize];
-            let mut dammy = Search::new(0, 0, 0, 0);
             universe
                 .game
-                .read_move(universe.game.history.get_turn(), &move_, &mut dammy);
+                .do_move(universe.game.history.get_turn(), &move_);
         }
     }
     pub fn genmove(universe: &Universe) {
@@ -341,8 +340,7 @@ impl Chiyuri {
         }
     }
     pub fn undo(universe: &mut Universe) {
-        let mut dammy = Search::new(0, 0, 0, 0);
-        if !universe.game.read_move_in_reverse(&mut dammy) {
+        if !universe.game.undo_move() {
             Log::println(&format!(
                 "ply={} を、これより戻せません",
                 universe.game.history.ply
