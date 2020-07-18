@@ -145,7 +145,7 @@ impl Tree {
             // 現局面で、各駒が、他に駒がないと考えた場合の最大数の指し手を生成しろだぜ☆（＾～＾）
             MoveGen::make_move(
                 &game,
-                match game.history.get_friend() {
+                match game.history.get_turn() {
                     Phase::First => &game.movegen_phase.first_movegen,
                     Phase::Second => &game.movegen_phase.second_movegen,
                 },
@@ -179,7 +179,7 @@ impl Tree {
                 let fire = ways.get(i).captured.unwrap().source;
                 let piece_type = game.table.get_type(
                     game.table
-                        .piece_num_at(game.history.get_friend(), &fire)
+                        .piece_num_at(game.history.get_turn(), &fire)
                         .unwrap(),
                 );
                 // let piece_type = ways.get(i).captured.unwrap().piece_type;
@@ -227,7 +227,7 @@ impl Tree {
                 Some(
                     game.table.get_type(
                         game.table
-                            .piece_num_at(game.history.get_friend(), &captured.source)
+                            .piece_num_at(game.history.get_turn(), &captured.source)
                             .unwrap(),
                     ),
                 )
@@ -238,7 +238,7 @@ impl Tree {
 
             // 棋譜に入れる☆
             game.set_move(&move_);
-            game.read_move(game.history.get_friend(), &move_);
+            game.read_move(game.history.get_turn(), &move_);
 
             self.pv.push(&move_);
             let (captured_piece_centi_pawn, delta_promotion_bonus) = self

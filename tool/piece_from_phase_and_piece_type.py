@@ -2,7 +2,7 @@ print('trace   | Start.')
 
 print('impl Piece {')
 print(
-    '    pub fn from_phase_and_piece_tpye(friend: Phase, piece_type: PieceType) -> Self {')
+    '    pub fn from_phase_and_piece_tpye(turn: Phase, piece_type: PieceType) -> Self {')
 print('        use crate::cosmic::toy_box::UnifiedAddress::*;')
 print('        match self {')
 hands = ['King', 'Rook', 'Bishop', 'Gold', 'Silver', 'Knight', 'Lance', 'Pawn',

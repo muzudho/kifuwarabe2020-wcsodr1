@@ -22,6 +22,7 @@ extern crate regex;
 mod config;
 mod cosmic;
 mod law;
+mod look_and_model;
 mod spaceship;
 
 use crate::config::LOG_FILE;

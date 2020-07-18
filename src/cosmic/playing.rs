@@ -140,13 +140,13 @@ impl Game {
     }
 
     /// 入れた指し手の通り指すぜ☆（＾～＾）
-    pub fn read_move(&mut self, friend: Phase, move_: &Movement) {
+    pub fn read_move(&mut self, turn: Phase, move_: &Movement) {
         // 局面ハッシュを作り直す
         self.hash_seed
             .update_by_do_move(&mut self.history, &self.table, move_);
 
         // 移動元のマスにある駒をポップすることは確定。
-        let src_piece_num = self.table.pop_piece(friend, &move_.source);
+        let src_piece_num = self.table.pop_piece(turn, &move_.source);
 
         // 持ち駒は成ることは無いので、成るなら盤上の駒であることが確定。
         if move_.promote {
@@ -161,11 +161,11 @@ impl Game {
         }
         // 移動先升に駒があるかどうか
         // あれば　盤の相手の駒を先後反転して、自分の駒台に置きます。
-        self.table.rotate_piece_board_to_hand(friend, &move_);
+        self.table.rotate_piece_board_to_hand(turn, &move_);
 
         // 移動先升に駒を置く
         self.table
-            .push_piece(friend, &move_.destination, src_piece_num);
+            .push_piece(turn, &move_.destination, src_piece_num);
 
         // // 局面ハッシュを作り直す
         // let ky_hash = self.hash_seed.current_position(&self);
@@ -183,7 +183,7 @@ impl Game {
             // 移動先にある駒をポップするのは確定。
             let moveing_piece_num = self
                 .table
-                .pop_piece(self.history.get_friend(), &move_.destination);
+                .pop_piece(self.history.get_turn(), &move_.destination);
             match move_.source {
                 FireAddress::Board(_src_sq) => {
                     // 盤上の移動なら
@@ -200,7 +200,7 @@ impl Game {
 
                     // 打でなければ、移動元升に、動かした駒を置く☆（＾～＾）打なら何もしないぜ☆（＾～＾）
                     self.table.push_piece(
-                        self.history.get_friend(),
+                        self.history.get_turn(),
                         &move_.source,
                         moveing_piece_num,
                     );
@@ -210,10 +210,10 @@ impl Game {
                     // 打った場所に駒があるはずだぜ☆（＾～＾）
                     let piece_num = moveing_piece_num.unwrap();
                     // 自分の持ち駒を増やそうぜ☆（＾～＾）！
-                    let friend = self.table.get_phase(piece_num);
+                    let turn = self.table.get_phase(piece_num);
                     // TODO この駒を置くことになる場所は☆（＾～＾）？
                     self.table.push_piece(
-                        friend,
+                        turn,
                         &FireAddress::Hand(HandAddress::new(
                             self.table.get_double_faced_piece_type(piece_num),
                             AbsoluteAddress2D::default(),
@@ -226,7 +226,7 @@ impl Game {
             // 取った駒が有ったか。
             // あれば、指し手で取った駒の先後をひっくり返せば、自分の駒台にある駒を取り出せるので取り出して、盤の上に指し手の取った駒のまま駒を置きます。
             self.table
-                .rotate_piece_hand_to_board(self.history.get_friend(), &move_);
+                .rotate_piece_hand_to_board(self.history.get_turn(), &move_);
 
             // TODO 局面ハッシュを作り直したいぜ☆（＾～＾）
 

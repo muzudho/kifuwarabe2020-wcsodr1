@@ -49,7 +49,7 @@ struct SpeedOfLight {
     /// 持ち駒☆（＾～＾）
     /// 玉２枚引く☆（＾～＾）
     double_faced_pieces: [[DoubleFacedPiece; PHYSICAL_PIECE_TYPE_LEN]; PHASE_LEN],
-    double_faced_piece_to_phase_table: [Phase; PHYSICAL_PIECES_LEN],
+    // double_faced_piece_to_phase_table: [Phase; PHYSICAL_PIECES_LEN],
     double_faced_piece_to_type_table: [DoubleFacedPieceType; PHYSICAL_PIECES_LEN],
     double_faced_piece_to_captured_value: [isize; PHYSICAL_PIECE_TYPE_LEN],
 
@@ -270,6 +270,7 @@ impl Default for SpeedOfLight {
                 ],
             ],
 
+            /*
             double_faced_piece_to_phase_table: [
                 Phase::First,  // King1
                 Phase::First,  // Rook1
@@ -288,7 +289,7 @@ impl Default for SpeedOfLight {
                 Phase::Second, // Lance2
                 Phase::Second, // Pawn2
             ],
-
+            */
             double_faced_piece_to_type_table: [
                 DoubleFacedPieceType::King,
                 DoubleFacedPieceType::Rook,
@@ -509,8 +510,8 @@ impl HandAddresses {
     where
         F1: FnMut(&Phase, &FireAddress),
     {
-        for (friend, fire) in &NINE_299792458.hand_legal_all {
-            callback(friend, fire);
+        for (turn, fire) in &NINE_299792458.hand_legal_all {
+            callback(turn, fire);
         }
     }
 }
@@ -520,9 +521,11 @@ impl DoubleFacedPiece {
     pub fn from_phase_and_type(phase: Phase, adr: DoubleFacedPieceType) -> Self {
         NINE_299792458.double_faced_pieces[phase as usize][adr as usize]
     }
+    /*
     pub fn phase(self) -> Phase {
         NINE_299792458.double_faced_piece_to_phase_table[self as usize]
     }
+    */
     pub fn type_(self) -> DoubleFacedPieceType {
         NINE_299792458.double_faced_piece_to_type_table[self as usize]
     }

@@ -5,9 +5,9 @@ enums = ['Sq11', 'Sq12', 'Sq13', 'Sq14', 'Sq15', 'Sq16', 'Sq17', 'Sq18', 'Sq19',
          'Sq55', 'Sq56', 'Sq57', 'Sq58', 'Sq59', 'Sq61', 'Sq62', 'Sq63', 'Sq64', 'Sq65', 'Sq66', 'Sq67', 'Sq68', 'Sq69', 'Sq71', 'Sq72', 'Sq73', 'Sq74', 'Sq75', 'Sq76', 'Sq77', 'Sq78', 'Sq79', 'Sq81', 'Sq82', 'Sq83', 'Sq84', 'Sq85', 'Sq86', 'Sq87', 'Sq88', 'Sq89', 'Sq91', 'Sq92', 'Sq93', 'Sq94', 'Sq95', 'Sq96', 'Sq97', 'Sq98', 'Sq99', ]
 print('impl SquareType {')
 print(
-    '    pub fn to_unified_address(&self, friend: Phase) -> UnifiedAddress {')
+    '    pub fn to_unified_address(&self, turn: Phase) -> UnifiedAddress {')
 print('        use crate::cosmic::toy_box::SquareType::*;')
-print('        if friend == Phase::First {')
+print('        if turn == Phase::First {')
 print('            match self {')
 i = 0
 for file in range(1, 10):

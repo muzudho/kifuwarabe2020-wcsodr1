@@ -214,7 +214,7 @@ impl PhaseOperation for SecondOperation {
 /// 二歩とか、打った後で調べた方が高速になるはずだが、探索部がまだできてないので、指し手生成の中でチェックしているぜ☆（＾～＾）
 /// 香を２段目に打たないとか強い将棋を目指すことは　まだやってないぜ☆（＾～＾）
 ///
-/// 指し手生成中に手番が変わることは無いんで friend は game.history.get_friend() で取れだぜ☆（＾～＾）
+/// 指し手生成中に手番が変わることは無いんで turn は game.history.get_turn() で取れだぜ☆（＾～＾）
 pub struct MoveGen {}
 impl MoveGen {
     /// 現局面の、任意の移動先升の、
@@ -228,7 +228,7 @@ impl MoveGen {
     ///
     /// Arguments
     /// ---------
-    /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
+    /// * `turn` - 後手視点にしたけりゃ turn.turn() しろだぜ☆（＾～＾）
     /// * `table` - 現局面の盤上だぜ☆（＾～＾）
     /// * `listen_move` - 指し手を受け取れだぜ☆（＾～＾）
     ///
@@ -245,7 +245,7 @@ impl MoveGen {
         F1: FnMut(Movement),
     {
         game.table.for_some_pieces_on_list40(
-            game.history.get_friend(),
+            game.history.get_turn(),
             // 移動元と、その駒の種類。
             &mut |src_fire: &FireAddress| {
                 MoveGen::start(game, phase_operation, src_fire, listen_move)
@@ -257,7 +257,7 @@ impl MoveGen {
     ///
     /// Arguments
     /// ---------
-    /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
+    /// * `turn` - 後手視点にしたけりゃ turn.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `piece` - 駒だぜ☆（＾～＾）
     /// * `table` - 現局面の盤上だぜ☆（＾～＾）
@@ -280,7 +280,7 @@ impl MoveGen {
             FireAddress::Board(_src_sq) => {
                 let piece_type = game.table.get_type(
                     game.table
-                        .piece_num_at(game.history.get_friend(), &source)
+                        .piece_num_at(game.history.get_turn(), &source)
                         .unwrap(),
                 );
 
@@ -291,11 +291,11 @@ impl MoveGen {
                           permission_type: Option<PermissionType>| {
                         let pseudo_captured_num = game
                             .table
-                            .piece_num_at(game.history.get_friend(), &destination);
+                            .piece_num_at(game.history.get_turn(), &destination);
 
                         let space = if let Some(pseudo_captured_num_val) = pseudo_captured_num {
                             if game.table.get_phase(pseudo_captured_num_val)
-                                == game.history.get_friend()
+                                == game.history.get_turn()
                             {
                                 // 味方の駒を取った☆（＾～＾）なしだぜ☆（＾～＾）！
                                 // 真を返して処理を中断だぜ☆（＾～＾）！
@@ -328,7 +328,7 @@ impl MoveGen {
                                 if !forbidden {
                                     listen_move(Movement::new(
                                         game.table
-                                            .piece_num_at(game.history.get_friend(), &source)
+                                            .piece_num_at(game.history.get_turn(), &source)
                                             .unwrap(),
                                         *source,
                                         *destination,
@@ -349,7 +349,7 @@ impl MoveGen {
                                 }
                                 listen_move(Movement::new(
                                     game.table
-                                        .piece_num_at(game.history.get_friend(), &source)
+                                        .piece_num_at(game.history.get_turn(), &source)
                                         .unwrap(),
                                     *source,
                                     *destination,
@@ -373,7 +373,7 @@ impl MoveGen {
                                 if promotion || !forbidden {
                                     listen_move(Movement::new(
                                         game.table
-                                            .piece_num_at(game.history.get_friend(), &source)
+                                            .piece_num_at(game.history.get_turn(), &source)
                                             .unwrap(),
                                         *source,
                                         *destination,
@@ -401,13 +401,13 @@ impl MoveGen {
             }
             FireAddress::Hand(src_drop_type) => {
                 if let Some((piece_type, fire_hand)) =
-                    game.table.last_hand(game.history.get_friend(), &source)
+                    game.table.last_hand(game.history.get_turn(), &source)
                 {
                     // 打つぜ☆（＾～＾）
                     let drop_fn = &mut |destination: &FireAddress| {
                         if let None = game
                             .table
-                            .piece_num_at(game.history.get_friend(), &destination)
+                            .piece_num_at(game.history.get_turn(), &destination)
                         {
                             // 駒が無いところに打つ
                             use crate::cosmic::smart::features::PieceType::*;
@@ -417,7 +417,7 @@ impl MoveGen {
                                         FireAddress::Board(sq) => {
                                             // ひよこ　は２歩できない☆（＾～＾
                                             if game.table.exists_pawn_on_file(
-                                                game.history.get_friend(),
+                                                game.history.get_turn(),
                                                 sq.file(),
                                             ) {
                                                 return;
@@ -432,7 +432,7 @@ impl MoveGen {
                             }
                             listen_move(Movement::new(
                                 game.table
-                                    .piece_num_at(game.history.get_friend(), &fire_hand)
+                                    .piece_num_at(game.history.get_turn(), &fire_hand)
                                     .unwrap(),
                                 fire_hand,    // 打った駒種類
                                 *destination, // どの升へ行きたいか
@@ -499,7 +499,7 @@ impl MoveGen {
     /// Arguments
     /// ---------
     ///
-    /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
+    /// * `turn` - 後手視点にしたけりゃ turn.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn pawn<F1>(
@@ -524,7 +524,7 @@ impl MoveGen {
     /// Arguments
     /// ---------
     ///
-    /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
+    /// * `turn` - 後手視点にしたけりゃ turn.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn lance<F1>(
@@ -549,7 +549,7 @@ impl MoveGen {
     /// Arguments
     /// ---------
     ///
-    /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
+    /// * `turn` - 後手視点にしたけりゃ turn.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn knight<F1>(
@@ -598,7 +598,7 @@ impl MoveGen {
     /// Arguments
     /// ---------
     ///
-    /// * `friend` - 後手視点にしたけりゃ friend.turn() しろだぜ☆（＾～＾）
+    /// * `turn` - 後手視点にしたけりゃ turn.turn() しろだぜ☆（＾～＾）
     /// * `source` - 移動元升だぜ☆（＾～＾）
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn gold<F1>(game: &Game, source: &FireAddress, moving: &mut F1)
@@ -724,18 +724,17 @@ impl MoveGen {
     ///
     /// Arguments
     /// ---------
-    /// * `friend` - 先手か後手か、関係ないか☆（＾～＾）先後同型でも必要なのが変わってるだろ☆（＾～＾）
+    /// * `game` - 先手か後手か、関係ないか☆（＾～＾）先後同型でも必要なのが変わってるだろ☆（＾～＾）
     /// * `start` - 移動元升☆（＾～＾）
-    /// * `angle` - 角度☆（＾～＾）
-    /// * `agility` - 動き方☆（＾～＾）
-    /// * `callback` - 絶対番地を受け取れだぜ☆（＾～＾）
+    /// * `mobility` - 動き方☆（＾～＾）
+    /// * `moving` - 絶対番地を受け取れだぜ☆（＾～＾）
     fn move_<F1>(game: &Game, start: &FireAddress, mobility: Mobility, moving: &mut F1)
     where
         F1: FnMut(&FireAddress, Agility) -> bool,
     {
         let angle =
             // 後手なら１８０°回転だぜ☆（＾～＾）
-            if game.history.get_friend() == Phase::Second {
+            if game.history.get_turn() == Phase::Second {
                 mobility.angle.rotate180()
             } else {
                 mobility.angle
@@ -877,7 +876,7 @@ impl MoveGen {
     /// Arguments
     /// ---------
     ///
-    /// * `friend` -
+    /// * `phase_operation` -
     /// * `source` -
     /// * `destination` -
     /// * `callback` -

@@ -2,7 +2,8 @@ use crate::cosmic::playing::{Game, PosNums};
 use crate::cosmic::recording::{FireAddress, HandAddress, Movement, Phase};
 use crate::cosmic::smart::features::DoubleFacedPieceType;
 use crate::cosmic::smart::square::AbsoluteAddress2D;
-use crate::cosmic::toy_box::{GameTable, PieceNum, PIECE_WHITE_SPACE};
+use crate::cosmic::toy_box::{GameTable, PieceNum};
+use crate::look_and_model::piece::PIECE_WHITE_SPACE;
 use crate::LogExt;
 use casual_logger::Log;
 
@@ -52,7 +53,7 @@ impl GameRoom {
     pub fn to_string(game: &Game, pos_nums: PosNums) -> String {
         let table = game.get_table(pos_nums);
         let ply = game.history.ply;
-        let phase = game.history.get_friend();
+        let phase = game.history.get_turn();
         let same_pos_count = game.count_same_position();
 
         // 局面表示
@@ -285,7 +286,7 @@ impl TheaterRoom1 {
     pub fn to_string(game: &Game, pos_nums: PosNums) -> String {
         let table = game.get_table(pos_nums);
         let ply = game.history.ply;
-        let phase = game.history.get_friend();
+        let phase = game.history.get_turn();
         let same_pos_count = game.count_same_position();
 
         // 局面表示
@@ -600,7 +601,7 @@ impl TheaterRoom2 {
 pub struct Kitchen {}
 impl Kitchen {
     /// 現在の局面での、指し手の一覧を表示するぜ☆（＾～＾）
-    pub fn print_ways(friend: Phase, table: &GameTable, ways: &Vec<Movement>) {
+    pub fn print_ways(turn: Phase, table: &GameTable, ways: &Vec<Movement>) {
         Log::println(&format!("Moves count={}", ways.len()));
         // 辞書順ソート
         let mut move_names = Vec::new();
@@ -610,7 +611,7 @@ impl Kitchen {
                 format!("{}", move_),
                 if let Some(captured_move) = move_.captured {
                     let piece_type =
-                        table.get_type(table.piece_num_at(friend, &captured_move.source).unwrap());
+                        table.get_type(table.piece_num_at(turn, &captured_move.source).unwrap());
                     format!(" ({})", piece_type)
                 } else {
                     "".to_string()

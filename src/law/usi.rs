@@ -50,7 +50,7 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
 
     let mut buffer = Movement::default();
 
-    let friend = game.history.get_friend();
+    let turn = game.history.get_turn();
 
     // 1文字目と2文字目。盤上の移動元か、ドロップする駒種類。
     buffer.source = match &line[*starts..=*starts] {
@@ -213,7 +213,7 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Game) 
     }
 
     // 取られる駒を事前に調べてセットするぜ☆（＾～＾）！
-    let captured_piece_num = game.table.piece_num_at(friend, &buffer.destination);
+    let captured_piece_num = game.table.piece_num_at(turn, &buffer.destination);
     buffer.captured = if let Some(captured_piece_num_val) = captured_piece_num {
         Some(CapturedMove::new(
             buffer.destination,
@@ -310,14 +310,14 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Game) {
         };
 
         match board_part {
-            BoardPart::Alphabet((friend, piece_type)) => {
+            BoardPart::Alphabet((turn, piece_type)) => {
                 *starts += 1;
                 let fire = FireAddress::Board(AbsoluteAddress2D::new(file, rank));
 
                 // 駒に背番号を付けるぜ☆（＾～＾）
-                let piece_num = table.numbering_piece(friend, piece_type);
+                let piece_num = table.numbering_piece(turn, piece_type);
                 // 盤に置くぜ☆（＾～＾）
-                table.push_piece(friend, &fire, Some(piece_num));
+                table.push_piece(turn, &fire, Some(piece_num));
 
                 file -= 1;
             }
@@ -439,7 +439,7 @@ pub fn set_position(line: &str, game: &mut Game) {
                         }
                     };
 
-                    let (friend, piece_type) = match &line[starts..=starts] {
+                    let (turn, piece_type) = match &line[starts..=starts] {
                         "R" => (Phase::First, PieceType::Rook),
                         "B" => (Phase::First, PieceType::Bishop),
                         "G" => (Phase::First, PieceType::Gold),
@@ -462,7 +462,7 @@ pub fn set_position(line: &str, game: &mut Game) {
 
                     for _i in 0..hand_num {
                         // 散らばっている駒に、背番号を付けて、駒台に置くぜ☆（＾～＾）
-                        game.mut_starting().init_hand(friend, piece_type);
+                        game.mut_starting().init_hand(turn, piece_type);
                     }
                 } //if
             } //loop
@@ -495,6 +495,6 @@ pub fn set_position(line: &str, game: &mut Game) {
         let ply = game.history.ply;
 
         let move_ = game.history.movements[ply as usize];
-        game.read_move(game.history.get_friend(), &move_);
+        game.read_move(game.history.get_turn(), &move_);
     }
 }

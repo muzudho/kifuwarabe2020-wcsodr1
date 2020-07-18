@@ -10,9 +10,9 @@ for phase in range(1, 3):
             i += 1
 for phase in range(1, 3):
     for hand in ['King', 'Rook', 'Bishop', 'Gold', 'Silver', 'Knight', 'Lance', 'Pawn']:
-        friend = "Phase::First" if phase == 1 else "Phase::Second"
+        turn = "Phase::First" if phase == 1 else "Phase::Second"
         print(
-            f'const UNIFIED_ADDRESS_{i}_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Hand(({friend},DoubleFacedPieceType::{hand}));')
+            f'const UNIFIED_ADDRESS_{i}_TO_ADDRESS_POS1: AddressPos1 = AddressPos1::Hand(({turn},DoubleFacedPieceType::{hand}));')
         i += 1
 
 # 配列アクセスは遅い気がするので、match構文で書こうぜ☆（＾～＾）

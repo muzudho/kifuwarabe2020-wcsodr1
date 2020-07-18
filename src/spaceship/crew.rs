@@ -9,9 +9,9 @@ use crate::cosmic::universe::Universe;
 use crate::law::cryptographic::*;
 use crate::law::generate_move::MoveGen;
 use crate::law::usi::*;
+use crate::look_and_model::facility::{CommandRoom, GameRoom, Kitchen, TheaterRoom1, TheaterRoom2};
 use crate::spaceship::engine;
 use crate::spaceship::equipment::{PvString, Telescope};
-use crate::spaceship::facility::{CommandRoom, GameRoom, Kitchen, TheaterRoom1, TheaterRoom2};
 use crate::LogExt;
 use casual_logger::Log;
 use rand::Rng;
@@ -68,7 +68,7 @@ impl Kifuwarabe {
                 0
             }
         }
-        let (msec, _minc) = match universe.game.history.get_friend() {
+        let (msec, _minc) = match universe.game.history.get_turn() {
             // 2秒余裕を見ておけば、探索を中断できるだろ……☆（＾～＾）負の数になったらエラーな☆（＾～＾）
             Phase::First => (margined_msec(go1.btime), go1.binc),
             Phase::Second => (margined_msec(go1.wtime), go1.winc),
@@ -209,7 +209,7 @@ impl Chiyuri {
             let move_ = universe.game.history.movements[ply as usize];
             universe
                 .game
-                .read_move(universe.game.history.get_friend(), &move_);
+                .read_move(universe.game.history.get_turn(), &move_);
         }
     }
     pub fn genmove(universe: &Universe) {
@@ -218,7 +218,7 @@ impl Chiyuri {
         let mut ways = Vec::<Movement>::new();
         MoveGen::make_move(
             &universe.game,
-            match universe.game.history.get_friend() {
+            match universe.game.history.get_turn() {
                 Phase::First => &universe.game.movegen_phase.first_movegen,
                 Phase::Second => &universe.game.movegen_phase.second_movegen,
             },
@@ -228,7 +228,7 @@ impl Chiyuri {
         );
         Log::println("----指し手生成(合法手とは限らない) ここから----");
         Kitchen::print_ways(
-            universe.game.history.get_friend(),
+            universe.game.history.get_turn(),
             &universe.game.table,
             &ways,
         );

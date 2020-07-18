@@ -13,8 +13,9 @@ use crate::cosmic::smart::square::FILE1U8;
 use crate::cosmic::smart::square::RANK10U8;
 use crate::cosmic::smart::square::RANK1U8;
 use crate::cosmic::smart::square::{AbsoluteAddress2D, BOARD_MEMORY_AREA, SQUARE_NONE};
-use crate::cosmic::toy_box::{GameTable, PIECE_LEN};
+use crate::cosmic::toy_box::GameTable;
 use crate::law::speed_of_light::HandAddresses;
+use crate::look_and_model::piece::PIECE_LEN;
 use crate::LogExt;
 use casual_logger::Log;
 use rand::Rng;
@@ -97,8 +98,8 @@ impl GameHashSeed {
             }
             FireAddress::Hand(src_drop_type) => {
                 let src_drop =
-                    DoubleFacedPiece::from_phase_and_type(history.get_friend(), src_drop_type.old);
-                let count = table.count_hand(history.get_friend(), &move_.source);
+                    DoubleFacedPiece::from_phase_and_type(history.get_turn(), src_drop_type.old);
+                let count = table.count_hand(history.get_turn(), &move_.source);
                 // 打つ前の駒の枚数のハッシュ。
                 prev_hash ^= self.hands[src_drop as usize][count as usize];
                 // 移動後マスに、打った駒があるときのハッシュ。
@@ -114,7 +115,7 @@ impl GameHashSeed {
             }
         }
         // 移動先に駒があれば、自分の持ち駒になります。
-        if let Some(dst_piece_num) = table.piece_num_at(history.get_friend(), &move_.destination) {
+        if let Some(dst_piece_num) = table.piece_num_at(history.get_turn(), &move_.destination) {
             if let Some(dst_piece_hash_index) = table.get_piece_board_hash_index(&move_.destination)
             {
                 match move_.destination {
@@ -125,7 +126,7 @@ impl GameHashSeed {
                         // 自分の持ち駒になるケースの追加
                         let double_faced_piece = table.get_double_faced_piece(dst_piece_num);
                         let count = table.count_hand(
-                            history.get_friend(),
+                            history.get_turn(),
                             &FireAddress::Hand(HandAddress::new(
                                 double_faced_piece.type_(),
                                 AbsoluteAddress2D::default(),
@@ -152,7 +153,7 @@ impl GameHashSeed {
 
         // 手番ハッシュ
         use crate::cosmic::recording::Phase::*;
-        match game.history.get_friend() {
+        match game.history.get_turn() {
             First => hash ^= self.phase[PHASE_FIRST],
             Second => hash ^= self.phase[PHASE_SECOND],
         }
@@ -189,11 +190,11 @@ impl GameHashSeed {
 
         // 持ち駒ハッシュ
         HandAddresses::for_all(
-            &mut |friend: &Phase, fire_hand: &FireAddress| match fire_hand {
+            &mut |turn: &Phase, fire_hand: &FireAddress| match fire_hand {
                 FireAddress::Board(_sq) => panic!(Log::panic("(Err.175) 未対応☆（＾～＾）")),
                 FireAddress::Hand(drop_type) => {
-                    let drop = DoubleFacedPiece::from_phase_and_type(*friend, drop_type.old);
-                    let count = table.count_hand(*friend, fire_hand);
+                    let drop = DoubleFacedPiece::from_phase_and_type(*turn, drop_type.old);
+                    let count = table.count_hand(*turn, fire_hand);
                     /*
                     debug_assert!(
                         count <= HAND_MAX,

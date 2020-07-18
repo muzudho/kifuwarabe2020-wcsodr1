@@ -10,216 +10,12 @@ use crate::cosmic::smart::square::RANK1U8;
 use crate::cosmic::smart::square::{AbsoluteAddress2D, BOARD_MEMORY_AREA};
 use crate::law::generate_move::Area;
 use crate::law::speed_of_light::Nine299792458;
+use crate::look_and_model::piece::Piece;
 use crate::LogExt;
 use casual_logger::Log;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 use std::*;
-
-/// コーディングを短くするためのものだぜ☆（＾～＾）
-impl Piece {
-    pub fn phase(self) -> Phase {
-        match self {
-            Piece::King1 => Phase::First,
-            Piece::Rook1 => Phase::First,
-            Piece::Bishop1 => Phase::First,
-            Piece::Gold1 => Phase::First,
-            Piece::Silver1 => Phase::First,
-            Piece::Knight1 => Phase::First,
-            Piece::Lance1 => Phase::First,
-            Piece::Pawn1 => Phase::First,
-            Piece::Dragon1 => Phase::First,
-            Piece::Horse1 => Phase::First,
-            Piece::PromotedSilver1 => Phase::First,
-            Piece::PromotedKnight1 => Phase::First,
-            Piece::PromotedLance1 => Phase::First,
-            Piece::PromotedPawn1 => Phase::First,
-            Piece::King2 => Phase::Second,
-            Piece::Rook2 => Phase::Second,
-            Piece::Bishop2 => Phase::Second,
-            Piece::Gold2 => Phase::Second,
-            Piece::Silver2 => Phase::Second,
-            Piece::Knight2 => Phase::Second,
-            Piece::Lance2 => Phase::Second,
-            Piece::Pawn2 => Phase::Second,
-            Piece::Dragon2 => Phase::Second,
-            Piece::Horse2 => Phase::Second,
-            Piece::PromotedSilver2 => Phase::Second,
-            Piece::PromotedKnight2 => Phase::Second,
-            Piece::PromotedLance2 => Phase::Second,
-            Piece::PromotedPawn2 => Phase::Second,
-        }
-    }
-
-    pub fn type_(self) -> PieceType {
-        match self {
-            Piece::King1 => PieceType::King,
-            Piece::Rook1 => PieceType::Rook,
-            Piece::Bishop1 => PieceType::Bishop,
-            Piece::Gold1 => PieceType::Gold,
-            Piece::Silver1 => PieceType::Silver,
-            Piece::Knight1 => PieceType::Knight,
-            Piece::Lance1 => PieceType::Lance,
-            Piece::Pawn1 => PieceType::Pawn,
-            Piece::Dragon1 => PieceType::Dragon,
-            Piece::Horse1 => PieceType::Horse,
-            Piece::PromotedSilver1 => PieceType::PromotedSilver,
-            Piece::PromotedKnight1 => PieceType::PromotedKnight,
-            Piece::PromotedLance1 => PieceType::PromotedLance,
-            Piece::PromotedPawn1 => PieceType::PromotedPawn,
-            Piece::King2 => PieceType::King,
-            Piece::Rook2 => PieceType::Rook,
-            Piece::Bishop2 => PieceType::Bishop,
-            Piece::Gold2 => PieceType::Gold,
-            Piece::Silver2 => PieceType::Silver,
-            Piece::Knight2 => PieceType::Knight,
-            Piece::Lance2 => PieceType::Lance,
-            Piece::Pawn2 => PieceType::Pawn,
-            Piece::Dragon2 => PieceType::Dragon,
-            Piece::Horse2 => PieceType::Horse,
-            Piece::PromotedSilver2 => PieceType::PromotedSilver,
-            Piece::PromotedKnight2 => PieceType::PromotedKnight,
-            Piece::PromotedLance2 => PieceType::PromotedLance,
-            Piece::PromotedPawn2 => PieceType::PromotedPawn,
-        }
-    }
-
-    /// 駒→成駒　（成れない駒は、そのまま）
-    pub fn promoted(self) -> Self {
-        match self {
-            Piece::King1 => Piece::King1,
-            Piece::Rook1 => Piece::Dragon1,
-            Piece::Bishop1 => Piece::Horse1,
-            Piece::Gold1 => Piece::Gold1,
-            Piece::Silver1 => Piece::PromotedSilver1,
-            Piece::Knight1 => Piece::PromotedKnight1,
-            Piece::Lance1 => Piece::PromotedLance1,
-            Piece::Pawn1 => Piece::PromotedPawn1,
-            Piece::Dragon1 => Piece::Dragon1,
-            Piece::Horse1 => Piece::Horse1,
-            Piece::PromotedSilver1 => Piece::PromotedSilver1,
-            Piece::PromotedKnight1 => Piece::PromotedKnight1,
-            Piece::PromotedLance1 => Piece::PromotedLance1,
-            Piece::PromotedPawn1 => Piece::PromotedPawn1,
-            Piece::King2 => Piece::King2,
-            Piece::Rook2 => Piece::Dragon2,
-            Piece::Bishop2 => Piece::Horse2,
-            Piece::Gold2 => Piece::Gold2,
-            Piece::Silver2 => Piece::PromotedSilver2,
-            Piece::Knight2 => Piece::PromotedKnight2,
-            Piece::Lance2 => Piece::PromotedLance2,
-            Piece::Pawn2 => Piece::PromotedPawn2,
-            Piece::Dragon2 => Piece::Dragon2,
-            Piece::Horse2 => Piece::Horse2,
-            Piece::PromotedSilver2 => Piece::PromotedSilver2,
-            Piece::PromotedKnight2 => Piece::PromotedKnight2,
-            Piece::PromotedLance2 => Piece::PromotedLance2,
-            Piece::PromotedPawn2 => Piece::PromotedPawn2,
-        }
-    }
-
-    /// 成駒→駒　（成っていない駒は、そのまま）
-    pub fn demoted(self) -> Self {
-        match self {
-            Piece::King1 => Piece::King1,
-            Piece::Rook1 => Piece::Rook1,
-            Piece::Bishop1 => Piece::Bishop1,
-            Piece::Gold1 => Piece::Gold1,
-            Piece::Silver1 => Piece::Silver1,
-            Piece::Knight1 => Piece::Knight1,
-            Piece::Lance1 => Piece::Lance1,
-            Piece::Pawn1 => Piece::Pawn1,
-            Piece::Dragon1 => Piece::Rook1,
-            Piece::Horse1 => Piece::Bishop1,
-            Piece::PromotedSilver1 => Piece::Silver1,
-            Piece::PromotedKnight1 => Piece::Knight1,
-            Piece::PromotedLance1 => Piece::Lance1,
-            Piece::PromotedPawn1 => Piece::Pawn1,
-            Piece::King2 => Piece::King2,
-            Piece::Rook2 => Piece::Rook2,
-            Piece::Bishop2 => Piece::Bishop2,
-            Piece::Gold2 => Piece::Gold2,
-            Piece::Silver2 => Piece::Silver2,
-            Piece::Knight2 => Piece::Knight2,
-            Piece::Lance2 => Piece::Lance2,
-            Piece::Pawn2 => Piece::Pawn2,
-            Piece::Dragon2 => Piece::Rook2,
-            Piece::Horse2 => Piece::Bishop2,
-            Piece::PromotedSilver2 => Piece::Silver2,
-            Piece::PromotedKnight2 => Piece::Knight2,
-            Piece::PromotedLance2 => Piece::Lance2,
-            Piece::PromotedPawn2 => Piece::Pawn2,
-        }
-    }
-
-    /// この駒を取ったら、先後が反転して、相手の駒になる、というリンクだぜ☆（＾～＾）
-    /// 探索部では、玉のような取れない駒も　らいおんきゃっち　しているので、玉も取れるように作っておけだぜ☆（＾～＾）
-    pub fn captured(self) -> Self {
-        match self {
-            Piece::King1 => Piece::King2,
-            Piece::Rook1 => Piece::Rook2,
-            Piece::Bishop1 => Piece::Bishop2,
-            Piece::Gold1 => Piece::Gold2,
-            Piece::Silver1 => Piece::Silver2,
-            Piece::Knight1 => Piece::Knight2,
-            Piece::Lance1 => Piece::Lance2,
-            Piece::Pawn1 => Piece::Pawn2,
-            Piece::Dragon1 => Piece::Rook2,
-            Piece::Horse1 => Piece::Bishop2,
-            Piece::PromotedSilver1 => Piece::Silver2,
-            Piece::PromotedKnight1 => Piece::Knight2,
-            Piece::PromotedLance1 => Piece::Lance2,
-            Piece::PromotedPawn1 => Piece::Pawn2,
-            Piece::King2 => Piece::King1,
-            Piece::Rook2 => Piece::Rook1,
-            Piece::Bishop2 => Piece::Bishop1,
-            Piece::Gold2 => Piece::Gold1,
-            Piece::Silver2 => Piece::Silver1,
-            Piece::Knight2 => Piece::Knight1,
-            Piece::Lance2 => Piece::Lance1,
-            Piece::Pawn2 => Piece::Pawn1,
-            Piece::Dragon2 => Piece::Rook1,
-            Piece::Horse2 => Piece::Bishop1,
-            Piece::PromotedSilver2 => Piece::Silver1,
-            Piece::PromotedKnight2 => Piece::Knight1,
-            Piece::PromotedLance2 => Piece::Lance1,
-            Piece::PromotedPawn2 => Piece::Pawn1,
-        }
-    }
-
-    pub fn double_faced_piece(self) -> DoubleFacedPiece {
-        match self {
-            Piece::King1 => DoubleFacedPiece::King1,
-            Piece::Rook1 => DoubleFacedPiece::Rook1,
-            Piece::Bishop1 => DoubleFacedPiece::Bishop1,
-            Piece::Gold1 => DoubleFacedPiece::Gold1,
-            Piece::Silver1 => DoubleFacedPiece::Silver1,
-            Piece::Knight1 => DoubleFacedPiece::Knight1,
-            Piece::Lance1 => DoubleFacedPiece::Lance1,
-            Piece::Pawn1 => DoubleFacedPiece::Pawn1,
-            Piece::Dragon1 => DoubleFacedPiece::Rook1,
-            Piece::Horse1 => DoubleFacedPiece::Bishop1,
-            Piece::PromotedSilver1 => DoubleFacedPiece::Silver1,
-            Piece::PromotedKnight1 => DoubleFacedPiece::Knight1,
-            Piece::PromotedLance1 => DoubleFacedPiece::Lance1,
-            Piece::PromotedPawn1 => DoubleFacedPiece::Pawn1,
-            Piece::King2 => DoubleFacedPiece::King2,
-            Piece::Rook2 => DoubleFacedPiece::Rook2,
-            Piece::Bishop2 => DoubleFacedPiece::Bishop2,
-            Piece::Gold2 => DoubleFacedPiece::Gold2,
-            Piece::Silver2 => DoubleFacedPiece::Silver2,
-            Piece::Knight2 => DoubleFacedPiece::Knight2,
-            Piece::Lance2 => DoubleFacedPiece::Lance2,
-            Piece::Pawn2 => DoubleFacedPiece::Pawn2,
-            Piece::Dragon2 => DoubleFacedPiece::Rook2,
-            Piece::Horse2 => DoubleFacedPiece::Bishop2,
-            Piece::PromotedSilver2 => DoubleFacedPiece::Silver2,
-            Piece::PromotedKnight2 => DoubleFacedPiece::Knight2,
-            Piece::PromotedLance2 => DoubleFacedPiece::Lance2,
-            Piece::PromotedPawn2 => DoubleFacedPiece::Pawn2,
-        }
-    }
-}
 
 /// コーディングを短くするためのものだぜ☆（＾～＾）
 impl DoubleFacedPiece {
@@ -242,154 +38,6 @@ impl DoubleFacedPiece {
             DoubleFacedPiece::Lance2 => Piece::Lance2,
             DoubleFacedPiece::Pawn2 => Piece::Pawn2,
         }) as usize
-    }
-}
-
-pub const PIECE_LEN: usize = 28;
-
-/// toy_boxの中にカプセル化するぜ☆（＾～＾）
-/// 先後付きの駒と空白。
-/// 接尾辞の 1 は先手、 2 は後手。
-///
-/// Copy: 配列の要素の初期化のために利用。
-#[derive(Copy, Clone, PartialEq, FromPrimitive)]
-enum Piece {
-    // ▲玉
-    King1,
-    // ▲きりん
-    Rook1,
-    // ▲ぞう
-    Bishop1,
-    // ▲いぬ
-    Gold1,
-    // ▲ねこ
-    Silver1,
-    // ▲うさぎ
-    Knight1,
-    // ▲いのしし
-    Lance1,
-    // ▲ひよこ
-    Pawn1,
-    // ▲ぱわーあっぷきりん
-    Dragon1,
-    // ▲ぱわーあっぷぞう
-    Horse1,
-    // ▲ぱわーあっぷねこ
-    PromotedSilver1,
-    // ▲ぱわーあっぷうさぎ
-    PromotedKnight1,
-    // ▲ぱわーあっぷいのしし
-    PromotedLance1,
-    // ▲ぱわーあっぷひよこ
-    PromotedPawn1,
-    // ▽ライオン
-    King2,
-    // ▽キリン
-    Rook2,
-    // ▽ゾウ
-    Bishop2,
-    // ▽イヌ
-    Gold2,
-    // ▽ネコ
-    Silver2,
-    // ▽ウサギ
-    Knight2,
-    // ▽イノシシ
-    Lance2,
-    // ▽ヒヨコ
-    Pawn2,
-    // ▽パワーアップキリン
-    Dragon2,
-    // ▽パワーアップゾウ
-    Horse2,
-    // ▽パワーアップネコ
-    PromotedSilver2,
-    // ▽パワーアップウサギ
-    PromotedKnight2,
-    // ▽パワーアップイノシシ
-    PromotedLance2,
-    // ▽パワーアップヒヨコ
-    PromotedPawn2,
-}
-pub static PIECE_WHITE_SPACE: &str = "    ";
-/// きふわらべ「USIでは使わないから、独自の表記をして構わないぜ☆」
-impl fmt::Display for Piece {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        // 文字列リテラルでないとダメみたいなんで、他に似たようなコードがあるのに、また書くことに☆（＾～＾）
-        // ▲ が半角サイズ、▽ が見た目が全角の半角サイズなのは、Windows Terminal の担当者 いい加減だぜ☆（＾～＾）
-        use crate::cosmic::toy_box::Piece::*;
-        write!(
-            f,
-            "{}",
-            match *self {
-                King1 => " ▲K ",
-                Rook1 => " ▲R ",
-                Bishop1 => " ▲B ",
-                Gold1 => " ▲G ",
-                Silver1 => " ▲S ",
-                Knight1 => " ▲N ",
-                Lance1 => " ▲L ",
-                Pawn1 => " ▲P ",
-                Dragon1 => " ▲PR",
-                Horse1 => " ▲PB",
-                PromotedSilver1 => " ▲PS",
-                PromotedKnight1 => " ▲PN",
-                PromotedLance1 => " ▲PL",
-                PromotedPawn1 => " ▲PP",
-                King2 => " ▽k ",
-                Rook2 => " ▽r ",
-                Bishop2 => " ▽b ",
-                Gold2 => " ▽g ",
-                Silver2 => " ▽s ",
-                Knight2 => " ▽n ",
-                Lance2 => " ▽l ",
-                Pawn2 => " ▽p ",
-                Dragon2 => " ▽pr",
-                Horse2 => " ▽pb",
-                PromotedSilver2 => " ▽ps",
-                PromotedKnight2 => " ▽pn",
-                PromotedLance2 => " ▽pl",
-                PromotedPawn2 => " ▽pp",
-            }
-        )
-    }
-}
-impl Piece {
-    pub fn from_phase_and_piece_type(friend: Phase, piece_type: PieceType) -> Self {
-        match friend {
-            Phase::First => match piece_type {
-                PieceType::King => Piece::King1,
-                PieceType::Rook => Piece::Rook1,
-                PieceType::Bishop => Piece::Bishop1,
-                PieceType::Gold => Piece::Gold1,
-                PieceType::Silver => Piece::Silver1,
-                PieceType::Knight => Piece::Knight1,
-                PieceType::Lance => Piece::Lance1,
-                PieceType::Pawn => Piece::Pawn1,
-                PieceType::Dragon => Piece::Dragon1,
-                PieceType::Horse => Piece::Horse1,
-                PieceType::PromotedSilver => Piece::PromotedSilver1,
-                PieceType::PromotedKnight => Piece::PromotedKnight1,
-                PieceType::PromotedLance => Piece::PromotedLance1,
-                PieceType::PromotedPawn => Piece::PromotedPawn1,
-            },
-            Phase::Second => match piece_type {
-                PieceType::King => Piece::King2,
-                PieceType::Rook => Piece::Rook2,
-                PieceType::Bishop => Piece::Bishop2,
-                PieceType::Gold => Piece::Gold2,
-                PieceType::Silver => Piece::Silver2,
-                PieceType::Knight => Piece::Knight2,
-                PieceType::Lance => Piece::Lance2,
-                PieceType::Pawn => Piece::Pawn2,
-                PieceType::Dragon => Piece::Dragon2,
-                PieceType::Horse => Piece::Horse2,
-                PieceType::PromotedSilver => Piece::PromotedSilver2,
-                PieceType::PromotedKnight => Piece::PromotedKnight2,
-                PieceType::PromotedLance => Piece::PromotedLance2,
-                PieceType::PromotedPawn => Piece::PromotedPawn2,
-            },
-        }
     }
 }
 
@@ -687,13 +335,13 @@ impl GameTable {
     /// ドゥ時の動き。
     /// 駒の先後を反転させるぜ☆（＾～＾）
     // あれば　盤の相手の駒を先後反転して、自分の駒台に置きます。
-    pub fn rotate_piece_board_to_hand(&mut self, friend: Phase, move_: &Movement) {
-        if let Some(collision_piece_num_val) = self.pop_piece(friend, &move_.destination) {
+    pub fn rotate_piece_board_to_hand(&mut self, turn: Phase, move_: &Movement) {
+        if let Some(collision_piece_num_val) = self.pop_piece(turn, &move_.destination) {
             // 移動先升の駒を盤上から消し、自分の持ち駒に増やす
             // 先後ひっくり返す。
             self.turn_phase(collision_piece_num_val);
             self.push_piece(
-                friend,
+                turn,
                 &FireAddress::Hand(HandAddress::new(
                     self.get_double_faced_piece_type(collision_piece_num_val),
                     AbsoluteAddress2D::default(),
@@ -705,24 +353,24 @@ impl GameTable {
 
     /// アンドゥ時の動き。
     /// あれば、指し手で取った駒の先後をひっくり返せば、自分の駒台にある駒を取り出せるので取り出して、盤の上に指し手の取った駒のまま駒を置きます。
-    pub fn rotate_piece_hand_to_board(&mut self, friend: Phase, move_: &Movement) {
+    pub fn rotate_piece_hand_to_board(&mut self, turn: Phase, move_: &Movement) {
         if let Some(move2_val) = move_.captured {
             // アンドゥだから盤にまだない。
-            let piece_type = self.last_hand_type(friend, &move2_val.destination).unwrap();
+            let piece_type = self.last_hand_type(turn, &move2_val.destination).unwrap();
 
             // 取った方の駒台の先後に合わせるぜ☆（＾～＾）
             // 取った方の持ち駒を減らす
             let piece_num = {
                 // TODO テスト中☆（＾～＾）
                 let double_faced_piece = DoubleFacedPiece::from_phase_and_type(
-                    friend,
+                    turn,
                     piece_type.double_faced_piece_type(),
                 );
                 let fire1 = FireAddress::Hand(HandAddress::new(
                     double_faced_piece.type_(),
                     AbsoluteAddress2D::default(),
                 ));
-                self.pop_piece(friend, &fire1).unwrap()
+                self.pop_piece(turn, &fire1).unwrap()
             };
             // 先後をひっくり返す。
             self.turn_phase(piece_num);
@@ -734,18 +382,18 @@ impl GameTable {
                 self.demote(piece_num);
             }
             // 取られた方に、駒を返すぜ☆（＾～＾）置くのは指し手の移動先☆（＾～＾）
-            self.push_piece(friend, &move_.destination, Some(piece_num));
+            self.push_piece(turn, &move_.destination, Some(piece_num));
         }
     }
     /// 駒を置く。
-    pub fn push_piece(&mut self, friend: Phase, fire: &FireAddress, piece_num: Option<PieceNum>) {
+    pub fn push_piece(&mut self, turn: Phase, fire: &FireAddress, piece_num: Option<PieceNum>) {
         match fire {
             FireAddress::Board(sq) => {
                 if let Some(piece_num_val) = piece_num {
                     // マスに駒を置きます。
                     self.board[sq.serial_number() as usize] = piece_num;
                     // データベース
-                    self.push_hand(friend, &FireAddress::Board(*sq), piece_num_val);
+                    self.push_hand(turn, &FireAddress::Board(*sq), piece_num_val);
                     // 背番号に番地を紐づけます。
                     self.address_list[piece_num_val as usize] = FireAddress::Board(*sq);
                 } else {
@@ -756,7 +404,7 @@ impl GameTable {
             FireAddress::Hand(drop_type) => {
                 if let Some(piece_num_val) = piece_num {
                     // 持ち駒を１つ増やします。
-                    self.push_hand(friend, &FireAddress::Hand(*drop_type), piece_num_val);
+                    self.push_hand(turn, &FireAddress::Hand(*drop_type), piece_num_val);
                     // 背番号に番地を紐づけます。
                     self.address_list[piece_num_val as usize] = *fire;
                 }
@@ -764,7 +412,7 @@ impl GameTable {
         }
     }
     /// 駒を取りのぞく。
-    pub fn pop_piece(&mut self, friend: Phase, fire: &FireAddress) -> Option<PieceNum> {
+    pub fn pop_piece(&mut self, turn: Phase, fire: &FireAddress) -> Option<PieceNum> {
         match fire {
             FireAddress::Board(sq) => {
                 let piece_num = self.board[sq.serial_number() as usize];
@@ -772,7 +420,7 @@ impl GameTable {
                     // マスを空にします。
                     self.board[sq.serial_number() as usize] = None;
                     // データベース
-                    self.pop_hand(friend, &fire);
+                    self.pop_hand(turn, &fire);
                     // TODO 背番号の番地を、ゴミ値で塗りつぶすが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
                     self.address_list[piece_num_val as usize] = FireAddress::default();
                 }
@@ -781,7 +429,7 @@ impl GameTable {
             FireAddress::Hand(_drop_type) => {
                 // 場所で指定します。
                 // 台から取りのぞきます。
-                let piece_num = self.pop_hand(friend, &fire);
+                let piece_num = self.pop_hand(turn, &fire);
                 // TODO 背番号の番地に、ゴミ値を入れて消去するが、できれば pop ではなく swap にしろだぜ☆（＾～＾）
                 self.address_list[piece_num as usize] = FireAddress::default();
                 Some(piece_num)
@@ -790,20 +438,20 @@ impl GameTable {
     }
 
     /// 散らばっている駒に、背番号を付けて、駒台に置くぜ☆（＾～＾）
-    pub fn init_hand(&mut self, friend: Phase, piece_type: PieceType) {
+    pub fn init_hand(&mut self, turn: Phase, piece_type: PieceType) {
         // 駒に背番号を付けるぜ☆（＾～＾）
-        let piece_num = self.numbering_piece(friend, piece_type);
+        let piece_num = self.numbering_piece(turn, piece_type);
         // 駒台に置くぜ☆（＾～＾）
         let drop = FireAddress::Hand(HandAddress::new(
             self.get_double_faced_piece_type(piece_num),
             AbsoluteAddress2D::default(),
         ));
-        self.push_piece(friend, &drop, Some(piece_num));
+        self.push_piece(turn, &drop, Some(piece_num));
     }
 
     /// 駒の新しい背番号を生成します。
-    pub fn numbering_piece(&mut self, friend: Phase, piece_type: PieceType) -> PieceNum {
-        let piece = Piece::from_phase_and_piece_type(friend, piece_type);
+    pub fn numbering_piece(&mut self, turn: Phase, piece_type: PieceType) -> PieceNum {
+        let piece = Piece::from_phase_and_piece_type(turn, piece_type);
         match piece {
             // 玉だけ、先後は決まってるから従えだぜ☆（＾～＾）
             Piece::King1 => self.new_piece_num(piece, PieceNum::King1),
@@ -821,13 +469,12 @@ impl GameTable {
     }
 
     /// 歩が置いてあるか確認
-    pub fn exists_pawn_on_file(&self, friend: Phase, file: u8) -> bool {
+    pub fn exists_pawn_on_file(&self, turn: Phase, file: u8) -> bool {
         for rank in RANK1U8..RANK10U8 {
             if let Some(piece_num) =
                 self.piece_num_board_at(&FireAddress::Board(AbsoluteAddress2D::new(file, rank)))
             {
-                if self.get_phase(piece_num) == friend
-                    && self.get_type(piece_num) == PieceType::Pawn
+                if self.get_phase(piece_num) == turn && self.get_type(piece_num) == PieceType::Pawn
                 {
                     return true;
                 }
@@ -853,11 +500,11 @@ impl GameTable {
     /// TODO Piece をカプセル化したい。外に出したくないぜ☆（＾～＾）
     /// 升で指定して駒を取得。
     /// 駒台には対応してない。 -> 何に使っている？
-    pub fn piece_num_at(&self, friend: Phase, fire: &FireAddress) -> Option<PieceNum> {
+    pub fn piece_num_at(&self, turn: Phase, fire: &FireAddress) -> Option<PieceNum> {
         match fire {
             FireAddress::Board(sq) => self.board[sq.serial_number() as usize],
             _ => {
-                self.last_hand_num(friend, fire)
+                self.last_hand_num(turn, fire)
                 /*
                     panic!(Log::panic(&format!(
                     "(Err.254) まだ駒台は実装してないぜ☆（＾～＾）！",
@@ -942,19 +589,19 @@ impl GameTable {
         }
     }
     /// 指し手生成で使うぜ☆（＾～＾）有無を調べるぜ☆（＾～＾）
-    pub fn last_hand_type(&self, friend: Phase, fire: &FireAddress) -> Option<PieceType> {
-        if let Some(piece_num) = self.last_hand_num(friend, &fire) {
+    pub fn last_hand_type(&self, turn: Phase, fire: &FireAddress) -> Option<PieceType> {
+        if let Some(piece_num) = self.last_hand_num(turn, &fire) {
             Some(self.get_type(piece_num))
         } else {
             None
         }
     }
-    pub fn count_hand(&self, friend: Phase, fire: &FireAddress) -> usize {
+    pub fn count_hand(&self, turn: Phase, fire: &FireAddress) -> usize {
         match fire {
             FireAddress::Board(_sq) => {
                 panic!(Log::panic(&format!("(Err.3266) 未対応☆（＾～＾）！",)))
             }
-            FireAddress::Hand(drop_type) => self.len_hand(friend, &FireAddress::Hand(*drop_type)),
+            FireAddress::Hand(drop_type) => self.len_hand(turn, &FireAddress::Hand(*drop_type)),
         }
     }
 
@@ -982,7 +629,7 @@ impl GameTable {
     /// 盤上を検索するのではなく、４０個の駒を検索するぜ☆（＾～＾）
     /// TODO 自分、相手で分けて持っておけば２倍ぐらい短縮できないか☆（＾～＾）？
     /// TODO できれば、「自分の盤上の駒」「自分の持ち駒」「相手の盤上の駒」「相手の持ち駒」の４チャンネルで分けておけないか☆（＾～＾）？
-    pub fn for_some_pieces_on_list40<F>(&self, friend: Phase, piece_get: &mut F)
+    pub fn for_some_pieces_on_list40<F>(&self, turn: Phase, piece_get: &mut F)
     where
         F: FnMut(&FireAddress),
     {
@@ -991,7 +638,7 @@ impl GameTable {
             let fire = self.address_list[*piece_num as usize];
             match fire {
                 FireAddress::Board(_sq) => {
-                    if self.get_phase(*piece_num) == friend {
+                    if self.get_phase(*piece_num) == turn {
                         piece_get(&fire);
                     }
                 }
@@ -1023,10 +670,10 @@ impl GameTable {
                 DoubleFacedPiece::Pawn2,
             ],
         ];
-        for drop in &FIRST_SECOND[friend as usize] {
+        for drop in &FIRST_SECOND[turn as usize] {
             let fire =
                 &FireAddress::Hand(HandAddress::new(drop.type_(), AbsoluteAddress2D::default()));
-            if !self.is_empty_hand(friend, fire) {
+            if !self.is_empty_hand(turn, fire) {
                 piece_get(&FireAddress::Hand(HandAddress::new(
                     drop.type_(),
                     AbsoluteAddress2D::default(),
@@ -1079,13 +726,13 @@ impl GameTable {
     }
 
     /// 駒の先後を ひっくり返してから入れてください。
-    pub fn push_hand(&mut self, friend: Phase, fire: &FireAddress, num: PieceNum) {
+    pub fn push_hand(&mut self, turn: Phase, fire: &FireAddress, num: PieceNum) {
         match fire {
             FireAddress::Board(_sq) => {
                 // TODO 現在未実装だが、あとで使う☆（＾～＾）
             }
             FireAddress::Hand(drop_type) => {
-                let drop = DoubleFacedPiece::from_phase_and_type(friend, drop_type.old);
+                let drop = DoubleFacedPiece::from_phase_and_type(turn, drop_type.old);
                 // 駒台に駒を置くぜ☆（＾～＾）
                 self.board[self.hand_cur(drop) as usize] = Some(num);
                 // 位置を増減するぜ☆（＾～＾）
@@ -1093,18 +740,18 @@ impl GameTable {
             }
         }
     }
-    pub fn pop_hand(&mut self, friend: Phase, fire: &FireAddress) -> PieceNum {
+    pub fn pop_hand(&mut self, turn: Phase, fire: &FireAddress) -> PieceNum {
         match fire {
             FireAddress::Board(_sq) => {
                 // TODO 先端の要素をポップ。
-                // let peak = self.items[self.board_cur(friend) as usize];
+                // let peak = self.items[self.board_cur(turn) as usize];
                 // TODO 中段の要素をポップ。
                 // let middle =
                 // TODO さっき抜いた先端の要素を、中段の要素のところへスワップ。
                 PieceNum::King1 // ゴミ値を返しとくぜ☆（＾～＾）
             }
             FireAddress::Hand(drop_type) => {
-                let drop = DoubleFacedPiece::from_phase_and_type(friend, drop_type.old);
+                let drop = DoubleFacedPiece::from_phase_and_type(turn, drop_type.old);
                 // 位置を増減するぜ☆（＾～＾）
                 self.add_hand_cur(drop, -GameTable::hand_direction(drop));
                 // 駒台の駒をはがすぜ☆（＾～＾）
@@ -1116,14 +763,14 @@ impl GameTable {
     }
 
     /// 指し手生成で使うぜ☆（＾～＾）
-    pub fn last_hand(&self, friend: Phase, fire: &FireAddress) -> Option<(PieceType, FireAddress)> {
+    pub fn last_hand(&self, turn: Phase, fire: &FireAddress) -> Option<(PieceType, FireAddress)> {
         match fire {
             FireAddress::Board(_sq) => {
                 panic!(Log::panic(&format!("(Err.3251) 未対応☆（＾～＾）！",)))
             }
             FireAddress::Hand(drop_type) => {
                 if let Some(piece_num) = self.last_hand_num(
-                    friend,
+                    turn,
                     &FireAddress::Hand(HandAddress::new(
                         drop_type.old,
                         AbsoluteAddress2D::default(),
@@ -1143,11 +790,11 @@ impl GameTable {
             }
         }
     }
-    pub fn last_hand_num(&self, friend: Phase, fire: &FireAddress) -> Option<PieceNum> {
+    pub fn last_hand_num(&self, turn: Phase, fire: &FireAddress) -> Option<PieceNum> {
         match fire {
             FireAddress::Board(_sq) => panic!(Log::panic("(Err.3431) 未対応☆（＾～＾）")),
             FireAddress::Hand(drop_type) => {
-                let drop = DoubleFacedPiece::from_phase_and_type(friend, drop_type.old);
+                let drop = DoubleFacedPiece::from_phase_and_type(turn, drop_type.old);
                 let direction = GameTable::hand_direction(drop);
                 if direction < 0 {
                     // 先手
@@ -1168,11 +815,11 @@ impl GameTable {
     }
 
     /// 指し手生成で使うぜ☆（＾～＾）有無を調べるぜ☆（＾～＾）
-    pub fn is_empty_hand(&self, friend: Phase, fire: &FireAddress) -> bool {
+    pub fn is_empty_hand(&self, turn: Phase, fire: &FireAddress) -> bool {
         match fire {
             FireAddress::Board(_sq) => panic!(Log::panic("(Err.3431) 未対応☆（＾～＾）")),
             FireAddress::Hand(drop_type) => {
-                let drop = DoubleFacedPiece::from_phase_and_type(friend, drop_type.old);
+                let drop = DoubleFacedPiece::from_phase_and_type(turn, drop_type.old);
                 if GameTable::hand_direction(drop) < 0 {
                     // 先手
                     if self.hand_cur(drop) < GameTable::hand_start(drop) {
@@ -1191,11 +838,11 @@ impl GameTable {
         }
     }
 
-    fn len_hand(&self, friend: Phase, fire: &FireAddress) -> usize {
+    fn len_hand(&self, turn: Phase, fire: &FireAddress) -> usize {
         match fire {
             FireAddress::Board(_sq) => panic!(Log::panic("(Err.3431) 未対応☆（＾～＾）")),
             FireAddress::Hand(drop_type) => {
-                let drop = DoubleFacedPiece::from_phase_and_type(friend, drop_type.old);
+                let drop = DoubleFacedPiece::from_phase_and_type(turn, drop_type.old);
                 if GameTable::hand_direction(drop) < 0 {
                     // 先手
                     (GameTable::hand_start(drop) - self.hand_cur(drop)) as usize
@@ -1271,25 +918,29 @@ impl Default for PhaseClassification {
     }
 }
 impl PhaseClassification {
+    /*
     /// TODO
-    fn board_cur(&self, friend: Phase) -> isize {
+    fn board_cur(&self, turn: Phase) -> isize {
         0
         /*
-        match friend {
+        match turn {
             Phase::First => self.board1_cur,
             Phase::Second => self.board2_cur,
         }
         */
     }
+    */
+    /*
     /// TODO
-    fn add_board_cur(&mut self, friend: Phase, direction: isize) {
+    fn add_board_cur(&mut self, turn: Phase, direction: isize) {
         /*
-        match friend {
+        match turn {
             Phase::First => self.board1_cur += direction,
             Phase::Second => self.board2_cur += direction,
         }
         */
     }
+    */
     /*
     fn to_debug(&self, table: &GameTable) -> String {
         let mut buffer = String::new();

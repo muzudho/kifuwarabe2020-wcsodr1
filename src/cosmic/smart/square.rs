@@ -651,6 +651,7 @@ impl AbsoluteAddress2D {
         (self.file(), self.rank())
     }
 
+    /*
     pub fn rotate_180(&self) -> Self {
         let file = FILE10U8 - self.file();
         let rank = RANK10U8 - self.rank();
@@ -658,6 +659,7 @@ impl AbsoluteAddress2D {
         debug_assert!(RANK0U8 < rank && rank < RANK10U8, format!("rank={}", rank));
         AbsoluteAddress2D::new(file, rank)
     }
+    */
 
     /// 壁の中にいる☆（＾～＾）
     pub fn wall(&self) -> bool {
