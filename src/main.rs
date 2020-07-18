@@ -19,6 +19,7 @@ extern crate regex;
 //
 // 使いたい ディレクトリー名を pub mod しろだぜ☆（＾～＾）
 // 別のアプリにも見えるようにしたけりゃ pub mod にしろだぜ☆（＾～＾）
+mod command_line_seek;
 mod computer_player;
 mod config;
 mod cosmic;
@@ -29,13 +30,16 @@ mod performance_measurement;
 mod position;
 mod spaceship;
 
+use crate::command_line_seek::CommandLineSeek;
 use crate::config::LOG_FILE;
 use crate::cosmic::universe::Universe;
+use crate::log::LogExt;
 use crate::spaceship::crew::{Chiyuri, Kifuwarabe, Yumemi};
-use casual_logger::Log;
+use casual_logger::{Log, Table};
 
 fn main() {
     Log::set_file_name(LOG_FILE);
+    Log::remove_old_logs();
     // 宇宙☆（＾～＾）変化するぜ☆（＾～＾）
     let mut universe: Universe = Universe::default();
 
@@ -50,30 +54,51 @@ fn main() {
 }
 
 fn main_loop(universe: &mut Universe) {
+    // End the loop with 'quit'. Forced termination with [Ctrl]+[C].
+    // 'quit' でループを終了。 [Ctrl]+[C] で強制終了。
     loop {
-        let (line, len, starts) = Kifuwarabe::catch_the_message();
+        let mut line: String = String::new();
+        // Wait for command line input from standard input.
+        // 標準入力からのコマンドライン入力を待機します。
+        match std::io::stdin().read_line(&mut line) {
+            Ok(_n) => {}
+            // Tips. You can separate error numbers by simply specifying the line number.
+            // テクニック。 エラー番号は行番号を振っておくだけで少しはばらけます。
+            Err(e) => panic!(Log::print_fatal(&format!(
+                "(Err.373) Failed to read line. / {}",
+                e
+            ))),
+        };
 
-        if len == 0 {
+        // Write input to log.
+        // 入力をログに書きます。
+        Log::notice_t(&line, Table::default().str("Description", "Input."));
+
+        // p is the acronym for parser.
+        // p は parser の頭文字。
+        let mut p = CommandLineSeek::new(&line);
+
+        if p.len() == 0 {
             // 任せろだぜ☆（＾～＾）
             Chiyuri::len0(universe);
         // 文字数の長いものからチェック
-        } else if 9 < len && &line[starts..10] == "usinewgame" {
+        } else if p.starts_with("usinewgame") {
             Kifuwarabe::usinewgame(universe);
-        } else if line.starts_with("position") {
+        } else if p.starts_with("position") {
             Kifuwarabe::position(universe, &line);
-        } else if 6 < len && &line[starts..7] == "isready" {
+        } else if p.starts_with("isready") {
             Kifuwarabe::isready();
-        } else if 3 < len && &line[starts..4] == "quit" {
+        } else if p.starts_with("quit") {
             // ループを抜けて終了
             break;
-        } else if 15 < len && &line[starts..15] == "setoption name " {
-            Kifuwarabe::setoption_name(universe, &line);
-        } else if 2 < len && &line[starts..3] == "usi" {
+        } else if p.starts_with("setoption name ") {
+            Kifuwarabe::setoption_name(universe, &mut CommandLineSeek::new(&line));
+        } else if p.starts_with("usi") {
             Kifuwarabe::usi();
-        } else if 1 < len && &line[starts..2] == "go" {
+        } else if p.starts_with("go") {
             Kifuwarabe::go(universe, &line);
         } else {
-            help_chiyuri(&line, len, starts, universe);
+            help_chiyuri(universe, &mut p);
         }
     } //loop
 
@@ -81,44 +106,45 @@ fn main_loop(universe: &mut Universe) {
 }
 
 /// 独自コマンド☆（＾～＾）
-fn help_chiyuri(line: &str, len: usize, starts: usize, universe: &mut Universe) {
+fn help_chiyuri(universe: &mut Universe, p: &mut CommandLineSeek) {
     // D
-    if 2 < len && &line[starts..3] == "do " {
-        Chiyuri::do_(universe, line, len, starts);
+    if p.starts_with("do ") {
+        p.go_next_to("do ");
+        Chiyuri::do_(universe, p);
     // G
-    } else if 6 < len && &line[starts..7] == "genmove" {
+    } else if p.starts_with("genmove") {
         Chiyuri::genmove(&universe);
     // H
-    } else if 7 < len && &line[starts..8] == "how-much" {
-        Chiyuri::how_much(line);
-    } else if 3 < len && &line[starts..4] == "hash" {
+    } else if p.starts_with("how-much") {
+        Chiyuri::how_much(p.line());
+    } else if p.starts_with("hash") {
         Chiyuri::hash(universe);
-    } else if 3 < len && &line[starts..4] == "kifu" {
+    } else if p.starts_with("kifu") {
         Chiyuri::kifu(universe);
     // L
-    } else if 5 < len && &line[starts..6] == "list40" {
+    } else if p.starts_with("list40") {
         Chiyuri::list40(universe);
     // P
-    } else if 3 < len && &line[starts..4] == "pos0" {
+    } else if p.starts_with("pos0") {
         Chiyuri::pos0(universe);
-    } else if 3 < len && &line[starts..4] == "pos2" {
+    } else if p.starts_with("pos2") {
         Chiyuri::pos2(universe);
-    } else if 2 < len && &line[starts..3] == "pos" {
+    } else if p.starts_with("pos") {
         Chiyuri::pos(universe);
     // S
-    } else if 7 < len && &line[starts..8] == "startpos" {
+    } else if p.starts_with("startpos") {
         Chiyuri::startpos(universe);
     // R
-    } else if 3 < len && &line[starts..4] == "rand" {
+    } else if p.starts_with("rand") {
         Chiyuri::rand();
     // S
-    } else if 3 < len && &line[starts..4] == "same" {
+    } else if p.starts_with("same") {
         Chiyuri::same(universe);
     // T
-    } else if 3 < len && &line[starts..4] == "teigi::conv" {
+    } else if p.starts_with("teigi::conv") {
         Chiyuri::teigi_conv();
     // U
-    } else if 3 < len && &line[starts..4] == "undo" {
+    } else if p.starts_with("undo") {
         Chiyuri::undo(universe);
     }
 }

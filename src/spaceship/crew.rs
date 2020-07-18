@@ -1,3 +1,4 @@
+use crate::command_line_seek::CommandLineSeek;
 use crate::computer_player::daydream::Search;
 use crate::config::*;
 use crate::cosmic::playing::PosNums;
@@ -15,42 +16,12 @@ use crate::spaceship::engine;
 use crate::spaceship::equipment::{PvString, Telescope};
 use casual_logger::Log;
 use rand::Rng;
-use std;
-use std::io as std_io;
 
 /// 船長：きふわらべ
 ///
 /// 対局で許されている命令だけをするぜ☆（＾～＾）
 pub struct Kifuwarabe {}
 impl Kifuwarabe {
-    pub fn catch_the_message() -> (String, usize, usize) {
-        let mut line: String = String::new();
-
-        // まず最初に、コマンドライン入力を待機しろだぜ☆（＾～＾）
-        match std_io::stdin().read_line(&mut line) {
-            Ok(_n) => {}
-            Err(e) => panic!(Log::print_fatal(&format!(
-                "(Err.28)  Failed to read line. / {}",
-                e
-            ))),
-        };
-
-        // 末尾の改行を除こうぜ☆（＾～＾）
-        // trim すると空白も消えるぜ☆（＾～＾）
-        let line: String = match line.trim().parse() {
-            Ok(n) => n,
-            Err(e) => panic!(Log::print_fatal(&format!(
-                "(Err.38)  Failed to parse. / {}",
-                e
-            ))),
-        };
-
-        // 文字数を調べようぜ☆（＾～＾）
-        let len = line.chars().count();
-        let starts = 0;
-
-        (line, len, starts)
-    }
     /// bestmoveコマンドを送るぜ☆（＾～＾） 思考するのもこの中だぜ☆（＾～＾）
     pub fn go(universe: &mut Universe, line: &str) {
         // go btime 40000 wtime 50000 binc 10000 winc 10000
@@ -119,18 +90,19 @@ impl Kifuwarabe {
     }
     pub fn position(universe: &mut Universe, line: &str) {
         // positionコマンドの読取を丸投げ
-        set_position(&line, &mut universe.game);
+        set_position(&mut universe.game, &mut CommandLineSeek::new(line));
     }
-    pub fn setoption_name(universe: &mut Universe, line: &str) {
+    pub fn setoption_name(universe: &mut Universe, p: &mut CommandLineSeek) {
         // Example: setoption name USI_Ponder value true
-        let label1_width = "setoption name ".len(); // 15
-        if let Some(name_width) = line[label1_width..].find(' ') {
-            let name = &line[label1_width..(label1_width + name_width)];
+        p.go_next_to("setoption name ");
+        if let Some(name_len) = p.line()[p.current()..].find(' ') {
+            let name = p.line()[p.current()..(p.current() + name_len)].to_string();
+            p.go_next_to(&name);
             // IO::writeln(&format!("Debug name=|{}|", name));
-            let label2_width = " value ".len(); // 7
-            let value = &line[(label1_width + name_width + label2_width)..];
+            p.go_next_to(" value ");
+            let value = &p.line()[(p.current())..];
             // IO::writeln(&format!("Debug value=|{}|", value));
-            match name {
+            match name.as_str() {
                 "MaxPly" => {
                     universe.option_max_ply = value.parse().unwrap();
                 }
@@ -203,10 +175,9 @@ impl Kifuwarabe {
 /// 対局でやっちゃいかん命令なら任せろだぜ☆（＾～＾）
 pub struct Chiyuri {}
 impl Chiyuri {
-    pub fn do_(universe: &mut Universe, line: &str, len: usize, mut starts: usize) {
-        starts += 3;
+    pub fn do_(universe: &mut Universe, p: &mut CommandLineSeek) {
         // コマンド読取。棋譜に追加され、手目も増える
-        if read_sasite(&line, &mut starts, len, &mut universe.game) {
+        if read_sasite(&mut universe.game, p) {
             // 手目を戻す
             universe.game.history.ply -= 1;
             // 入っている指し手の通り指すぜ☆（＾～＾）
@@ -324,7 +295,10 @@ impl Chiyuri {
     }
     pub fn startpos(universe: &mut Universe) {
         // 平手初期局面
-        set_position(&POS_1.to_string(), &mut universe.game);
+        set_position(
+            &mut universe.game,
+            &mut CommandLineSeek::new(&POS_1.to_string()),
+        );
     }
     pub fn teigi_conv() {
         Log::print_info("teigi::convのテスト");

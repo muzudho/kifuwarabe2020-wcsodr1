@@ -1,6 +1,7 @@
 //!
 //! USIプロトコル
 //!
+use crate::command_line_seek::CommandLineSeek;
 use crate::cosmic::recording::{CapturedMove, FireAddress, HandAddress, Movement, Phase};
 use crate::cosmic::smart::features::{DoubleFacedPieceType, PieceType};
 use crate::cosmic::smart::square::AbsoluteAddress2D;
@@ -32,7 +33,7 @@ pub const POS_2: &str =
 */
 
 /// USIプロトコル表記: 平手初期局面（の盤上の駒配置部分のみ）
-pub const STARTPOS_LN: usize = 57;
+//pub const STARTPOS_LN: usize = 57;
 pub const STARTPOS: &str = "lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL";
 
 /// 指し手読取
@@ -40,9 +41,9 @@ pub const STARTPOS: &str = "lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSG
 ///
 /// 読み取った指し手は、棋譜に入れる。
 /// 現在の手目のところに入れ、手目のカウントアップも行う。
-pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Position) -> bool {
+pub fn read_sasite(pos: &mut Position, p: &mut CommandLineSeek) -> bool {
     // 4文字か5文字あるはず。
-    if (len - *starts) < 4 {
+    if (p.len() - p.current()) < 4 {
         // 指し手読取終了時にここを通るぜ☆（＾～＾）
         // 残り４文字もない。
         return false;
@@ -50,55 +51,55 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Positi
 
     let mut buffer = Movement::default();
 
-    let turn = game.history.get_turn();
+    let turn = pos.history.get_turn();
 
     // 1文字目と2文字目。盤上の移動元か、ドロップする駒種類。
-    buffer.source = match &line[*starts..=*starts] {
+    buffer.source = match &p.line()[p.current()..=p.current()] {
         // 1文字目が駒だったら打。2文字目は必ず「*」なはずなので読み飛ばす。
         "R" => {
-            *starts += 2;
+            p.go_next_to("R*");
             FireAddress::Hand(HandAddress::new(
                 DoubleFacedPieceType::Rook,
                 AbsoluteAddress2D::default(),
             ))
         }
         "B" => {
-            *starts += 2;
+            p.go_next_to("B*");
             FireAddress::Hand(HandAddress::new(
                 DoubleFacedPieceType::Bishop,
                 AbsoluteAddress2D::default(),
             ))
         }
         "G" => {
-            *starts += 2;
+            p.go_next_to("G*");
             FireAddress::Hand(HandAddress::new(
                 DoubleFacedPieceType::Gold,
                 AbsoluteAddress2D::default(),
             ))
         }
         "S" => {
-            *starts += 2;
+            p.go_next_to("S*");
             FireAddress::Hand(HandAddress::new(
                 DoubleFacedPieceType::Silver,
                 AbsoluteAddress2D::default(),
             ))
         }
         "N" => {
-            *starts += 2;
+            p.go_next_to("N*");
             FireAddress::Hand(HandAddress::new(
                 DoubleFacedPieceType::Knight,
                 AbsoluteAddress2D::default(),
             ))
         }
         "L" => {
-            *starts += 2;
+            p.go_next_to("L*");
             FireAddress::Hand(HandAddress::new(
                 DoubleFacedPieceType::Lance,
                 AbsoluteAddress2D::default(),
             ))
         }
         "P" => {
-            *starts += 2;
+            p.go_next_to("P*");
             FireAddress::Hand(HandAddress::new(
                 DoubleFacedPieceType::Pawn,
                 AbsoluteAddress2D::default(),
@@ -107,57 +108,58 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Positi
         _ => {
             // 残りは「筋の数字」、「段のアルファベット」のはず。
             // 数字じゃないものが入ったら強制終了するんじゃないか☆（＾～＾）
-            let file = if let Some(num) = atoi::<u8>(line[*starts..=*starts].as_bytes()) {
+            let file = if let Some(num) = atoi::<u8>(p.line()[p.current()..=p.current()].as_bytes())
+            {
                 num
             } else {
                 panic!(Log::print_fatal(&format!(
                     "(Err.72)  '{}' だった。",
-                    &line[*starts..=*starts]
+                    &p.line()[p.current()..=p.current()]
                 )))
             };
-            *starts += 1;
+            p.go_next_to("1"); // 1桁の数。
 
-            match &line[*starts..=*starts] {
+            match &p.line()[p.current()..=p.current()] {
                 "a" => {
-                    *starts += 1;
+                    p.go_next_to("a");
                     FireAddress::Board(AbsoluteAddress2D::new(file, 1))
                 }
                 "b" => {
-                    *starts += 1;
+                    p.go_next_to("b");
                     FireAddress::Board(AbsoluteAddress2D::new(file, 2))
                 }
                 "c" => {
-                    *starts += 1;
+                    p.go_next_to("c");
                     FireAddress::Board(AbsoluteAddress2D::new(file, 3))
                 }
                 "d" => {
-                    *starts += 1;
+                    p.go_next_to("d");
                     FireAddress::Board(AbsoluteAddress2D::new(file, 4))
                 }
                 "e" => {
-                    *starts += 1;
+                    p.go_next_to("e");
                     FireAddress::Board(AbsoluteAddress2D::new(file, 5))
                 }
                 "f" => {
-                    *starts += 1;
+                    p.go_next_to("f");
                     FireAddress::Board(AbsoluteAddress2D::new(file, 6))
                 }
                 "g" => {
-                    *starts += 1;
+                    p.go_next_to("g");
                     FireAddress::Board(AbsoluteAddress2D::new(file, 7))
                 }
                 "h" => {
-                    *starts += 1;
+                    p.go_next_to("h");
                     FireAddress::Board(AbsoluteAddress2D::new(file, 8))
                 }
                 "i" => {
-                    *starts += 1;
+                    p.go_next_to("i");
                     FireAddress::Board(AbsoluteAddress2D::new(file, 9))
                 }
                 _ => {
                     panic!(Log::print_fatal(&format!(
                         "(Err.90)  '{}' だった。",
-                        &line[*starts..=*starts]
+                        &p.line()[p.current()..=p.current()]
                     )));
                 }
             }
@@ -167,17 +169,17 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Positi
     // 残りは「筋の数字」、「段のアルファベット」のはず。
 
     // 3文字目
-    let file = if let Some(num) = atoi::<u8>(line[*starts..=*starts].as_bytes()) {
+    let file = if let Some(num) = atoi::<u8>(&p.line()[p.current()..=p.current()].as_bytes()) {
         num
     } else {
         panic!(Log::print_fatal(&format!(
             "(Err.118)  '{}' だった。",
-            &line[*starts..=*starts]
+            &p.line()[p.current()..=p.current()]
         )));
     };
-    *starts += 1;
-    // 4文字目
-    let rank = match &line[*starts..=*starts] {
+    p.go_next_to("1"); // 1桁の数。
+                       // 4文字目
+    let rank = match &p.line()[p.current()..=p.current()] {
         "a" => 1,
         "b" => 2,
         "c" => 3,
@@ -190,35 +192,35 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Positi
         _ => {
             panic!(Log::print_fatal(&format!(
                 "(Err.136)  '{}' だった。",
-                &line[*starts..=*starts]
+                &p.line()[p.current()..=p.current()]
             )));
         }
     };
-    *starts += 1;
+    p.go_next_to("a"); // 1文字。
 
     // 行き先。
     buffer.destination = FireAddress::Board(AbsoluteAddress2D::new(file, rank));
 
     // 5文字に「+」があれば成り。
-    buffer.promote = if 0 < (len - *starts) && &line[*starts..=*starts] == "+" {
-        *starts += 1;
+    buffer.promote = if 0 < (p.len() - p.current()) && &p.line()[p.current()..=p.current()] == "+" {
+        p.go_next_to("+");
         true
     } else {
         false
     };
 
     // 続きにスペース「 」が１つあれば読み飛ばす
-    if 0 < (len - *starts) && &line[*starts..=*starts] == " " {
-        *starts += 1;
+    if 0 < (p.len() - p.current()) && &p.line()[p.current()..=p.current()] == " " {
+        p.go_next_to(" ");
     }
 
     // 取られる駒を事前に調べてセットするぜ☆（＾～＾）！
-    let captured_piece_num = game.table.piece_num_at(turn, &buffer.destination);
+    let captured_piece_num = pos.table.piece_num_at(turn, &buffer.destination);
     buffer.captured = if let Some(captured_piece_num_val) = captured_piece_num {
         Some(CapturedMove::new(
             buffer.destination,
             FireAddress::Hand(HandAddress::new(
-                game.table
+                pos.table
                     .get_double_faced_piece_type(captured_piece_num_val),
                 AbsoluteAddress2D::default(),
             )),
@@ -228,17 +230,17 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Positi
     };
 
     // 確定。
-    game.set_move(&buffer);
+    pos.set_move(&buffer);
 
-    game.history.ply += 1;
+    pos.history.ply += 1;
     true
 }
 
 /// position コマンド 盤上部分のみ 読取
 /// 初期化は既に終わらせてあります。
-pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Position) {
+pub fn read_board(pos: &mut Position, p: &mut CommandLineSeek) {
     // 初期盤面
-    let table = game.mut_starting();
+    let table = pos.mut_starting();
     let mut file = FILE9U8; //９筋から右方向へ読取
     let mut rank = RANK1U8;
 
@@ -252,8 +254,8 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Positio
         Alphabet((Phase, PieceType)),
     }
 
-    'ban: while 0 < (len - *starts) {
-        let board_part = match &line[*starts..=*starts] {
+    'ban: while 0 < (p.len() - p.current()) {
+        let board_part = match &p.line()[p.current()..=p.current()] {
             "/" => BoardPart::NewLine,
             "1" => BoardPart::Number(1),
             "2" => BoardPart::Number(2),
@@ -281,9 +283,9 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Positio
             "l" => BoardPart::Alphabet((Phase::Second, PieceType::Lance)),
             "p" => BoardPart::Alphabet((Phase::Second, PieceType::Pawn)),
             "+" => {
-                *starts += 1;
-                // 次に必ず１文字が来るぜ☆（＾～＾）
-                match &line[*starts..=*starts] {
+                p.go_next_to("+"); // 1文字。
+                                   // 次に必ず１文字が来るぜ☆（＾～＾）
+                match &p.line()[p.current()..=p.current()] {
                     "R" => BoardPart::Alphabet((Phase::First, PieceType::Dragon)),
                     "B" => BoardPart::Alphabet((Phase::First, PieceType::Horse)),
                     "S" => BoardPart::Alphabet((Phase::First, PieceType::PromotedSilver)),
@@ -299,7 +301,7 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Positio
                     _ => {
                         panic!(Log::print_fatal(&format!(
                             "(Err.235)  盤部(0) '{}' だった。",
-                            &line[*starts..=*starts]
+                            &p.line()[p.current()..=p.current()]
                         )));
                     }
                 }
@@ -311,7 +313,7 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Positio
 
         match board_part {
             BoardPart::Alphabet((turn, piece_type)) => {
-                *starts += 1;
+                p.go_next_to("K"); // 1文字。
                 let fire = FireAddress::Board(AbsoluteAddress2D::new(file, rank));
 
                 // 駒に背番号を付けるぜ☆（＾～＾）
@@ -322,12 +324,12 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Positio
                 file -= 1;
             }
             BoardPart::Number(space_num) => {
-                *starts += 1;
-                // もともと空升なんで、飛ばそうぜ☆（＾～＾）
+                p.go_next_to("1"); // 1文字。
+                                   // もともと空升なんで、飛ばそうぜ☆（＾～＾）
                 file -= space_num;
             }
             BoardPart::NewLine => {
-                *starts += 1;
+                p.go_next_to("/");
                 file = FILE9U8;
                 rank += 1;
             }
@@ -335,50 +337,45 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Positio
     }
 
     // 初期局面ハッシュを作り直す
-    let ky_hash = game.hash_seed.starting_position(game);
-    game.history.starting_position_hash = ky_hash;
+    let ky_hash = pos.hash_seed.starting_position(pos);
+    pos.history.starting_position_hash = ky_hash;
 }
 
 /// position コマンド読取
-pub fn set_position(line: &str, game: &mut Position) {
-    let mut starts = 0;
-
-    // 全体の長さ
-    let len = line.chars().count();
-
+pub fn set_position(pos: &mut Position, p: &mut CommandLineSeek) {
     // 局面をクリアー。手目も 0 に戻します。
-    game.clear();
+    pos.clear();
 
-    if 16 < (len - starts) && &line[starts..(starts + 17)] == "position startpos" {
-        // 'position startpos' を読み飛ばし
-        starts += 17;
+    if p.starts_with("position startpos") {
+        // 'position startpos' は無視。
         // 別途用意した平手初期局面文字列を読取
-        let mut local_starts = 0;
-        read_board(&STARTPOS.to_string(), &mut local_starts, STARTPOS_LN, game);
+        *p = CommandLineSeek::new(STARTPOS);
+        read_board(pos, p);
 
-        if 0 < (len - starts) && &line[starts..=starts] == " " {
+        if p.starts_with(" ") {
             // ' ' を読み飛ばした。
-            starts += 1;
+            p.go_next_to(" ");
         }
-    } else if 13 < (len - starts) && &line[starts..(starts + 14)] == "position sfen " {
-        starts += 14; // 'position sfen ' を読み飛ばし
-        read_board(line, &mut starts, len, game);
+    } else if p.starts_with("position sfen ") {
+        // 'position sfen ' を読み飛ばし
+        p.go_next_to("position sfen ");
+        read_board(pos, p);
 
-        if 0 < (len - starts) && &line[starts..=starts] == " " {
-            starts += 1;
-        }
-
-        if 0 < (len - starts) && (&line[starts..=starts] == "w" || &line[starts..=starts] == "b") {
-            starts += 1;
+        if p.starts_with(" ") {
+            p.go_next_to(" ");
         }
 
-        if 0 < (len - starts) && &line[starts..=starts] == " " {
-            starts += 1;
+        if p.starts_with("w") || p.starts_with("b") {
+            p.go_next_to("w"); // 文字の長さは "b" も同じ。
+        }
+
+        if p.starts_with(" ") {
+            p.go_next_to(" ");
         }
 
         // 持ち駒の読取
-        if 0 < (len - starts) && &line[starts..=starts] == "-" {
-            starts += 1;
+        if p.starts_with("-") {
+            p.go_next_to("-");
         } else {
             enum HandCount {
                 // 数字なし
@@ -389,13 +386,13 @@ pub fn set_position(line: &str, game: &mut Position) {
                 N2Digit(isize),
             }
             'mg: loop {
-                if 0 < (len - starts) {
+                if 0 < (p.len() - p.current()) {
                     // 数字か、数字でないかで大きく分かれるぜ☆（＾～＾）
                     // let mut count = 1;
-                    let hand_count = match &line[starts..=starts] {
+                    let hand_count = match &p.line()[p.current()..=p.current()] {
                         "1" => {
                             // 1枚のときは数字は付かないので、10～18 と確定☆
-                            match &line[starts..=starts] {
+                            match &p.line()[p.current()..=p.current()] {
                                 "0" => HandCount::N2Digit(10),
                                 "1" => HandCount::N2Digit(11),
                                 "2" => HandCount::N2Digit(12),
@@ -408,7 +405,7 @@ pub fn set_position(line: &str, game: &mut Position) {
                                 _ => {
                                     panic!(Log::print_fatal(&format!(
                                         "(Err.346)  持駒部(0) '{}' だった。",
-                                        &line[starts..(starts + 2)]
+                                        &p.line()[p.current()..(p.current() + 2)]
                                     )));
                                 }
                             }
@@ -430,16 +427,16 @@ pub fn set_position(line: &str, game: &mut Position) {
                             1
                         }
                         HandCount::N1Digit(hand_num) => {
-                            starts += 1;
+                            p.go_next_to("1"); // 1桁の数。
                             hand_num
                         }
                         HandCount::N2Digit(hand_num) => {
-                            starts += 2;
+                            p.go_next_to("10"); // 2桁の数。
                             hand_num
                         }
                     };
 
-                    let (turn, piece_type) = match &line[starts..=starts] {
+                    let (turn, piece_type) = match &p.line()[p.current()..=p.current()] {
                         "R" => (Phase::First, PieceType::Rook),
                         "B" => (Phase::First, PieceType::Bishop),
                         "G" => (Phase::First, PieceType::Gold),
@@ -458,43 +455,43 @@ pub fn set_position(line: &str, game: &mut Position) {
                             break 'mg;
                         } // 持駒部 正常終了
                     };
-                    starts += 1;
+                    p.go_next_to("R"); // 1文字。
 
                     for _i in 0..hand_num {
                         // 散らばっている駒に、背番号を付けて、駒台に置くぜ☆（＾～＾）
-                        game.mut_starting().init_hand(turn, piece_type);
+                        pos.mut_starting().init_hand(turn, piece_type);
                     }
                 } //if
             } //loop
         } //else
 
-        if 2 < (len - starts) && &line[starts..(starts + 3)] == " 1 " {
-            starts += 3;
+        if p.starts_with(" 1 ") {
+            p.go_next_to(" 1 ");
         }
     } else {
         Log::print_info("'position startpos' でも、'position sfen ' でも始まらなかった。");
         return;
     }
 
-    if 4 < (len - starts) && &line[starts..(starts + 5)] == "moves" {
-        starts += 5;
+    if p.starts_with("moves") {
+        p.go_next_to("moves");
     }
 
-    if 0 < (len - starts) && &line[starts..=starts] == " " {
-        starts += 1;
+    if p.starts_with(" ") {
+        p.go_next_to(" ");
     }
 
     // 初期局面を、現局面にコピーします
-    game.table.copy_from(&game.starting_table);
+    pos.table.copy_from(&pos.starting_table);
 
     // 指し手を全部読んでいくぜ☆（＾～＾）手目のカウントも増えていくぜ☆（＾～＾）
-    while read_sasite(line, &mut starts, len, game) {
+    while read_sasite(pos, p) {
         // 手目を戻す
-        game.history.ply -= 1;
+        pos.history.ply -= 1;
         // 入っている指し手の通り指すぜ☆（＾～＾）
-        let ply = game.history.ply;
+        let ply = pos.history.ply;
 
-        let move_ = game.history.movements[ply as usize];
-        game.do_move(game.history.get_turn(), &move_);
+        let move_ = pos.history.movements[ply as usize];
+        pos.do_move(pos.history.get_turn(), &move_);
     }
 }
