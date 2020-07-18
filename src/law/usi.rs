@@ -2,12 +2,12 @@
 //! USIプロトコル
 //!
 use crate::computer_player::daydream::Search;
-use crate::cosmic::playing::Game;
 use crate::cosmic::recording::{CapturedMove, FireAddress, HandAddress, Movement, Phase};
 use crate::cosmic::smart::features::{DoubleFacedPieceType, PieceType};
 use crate::cosmic::smart::square::AbsoluteAddress2D;
 use crate::cosmic::smart::square::FILE9U8;
 use crate::cosmic::smart::square::RANK1U8;
+use crate::position::Game;
 use crate::LogExt;
 use atoi::atoi;
 use casual_logger::Log;

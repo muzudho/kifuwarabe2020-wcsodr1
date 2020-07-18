@@ -2,7 +2,6 @@
 //! 現局面を使った指し手生成☆（＾～＾）
 //!
 
-use crate::cosmic::playing::Game;
 use crate::cosmic::recording::{CapturedMove, FireAddress, HandAddress, Movement, Phase};
 use crate::cosmic::smart::features::PieceType;
 use crate::cosmic::smart::square::FILE10U8;
@@ -16,6 +15,7 @@ use crate::cosmic::smart::square::RANK6U8;
 use crate::cosmic::smart::square::RANK7U8;
 use crate::cosmic::smart::square::RANK9U8;
 use crate::cosmic::smart::square::{AbsoluteAddress2D, Angle, RelAdr2D};
+use crate::position::Game;
 use crate::LogExt;
 use casual_logger::Log;
 

@@ -1,29 +1,243 @@
-//! Position. A record of the game used to suspend or resume it.  
+//! GameTable. A record of the game used to suspend or resume it.  
 //! 局面。 ゲームを中断したり、再開したりするときに使うゲームの記録です。  
-use crate::cosmic::recording::{FireAddress, HandAddress, Movement, Phase};
+use crate::computer_player::daydream::Search;
+use crate::cosmic::playing::{MovegenPhase, PosNums};
+use crate::cosmic::pos_hash::pos_hash::*;
+use crate::cosmic::recording::History;
+use crate::cosmic::recording::Phase;
+use crate::cosmic::recording::{FireAddress, HandAddress, Movement};
 use crate::cosmic::smart::features::{
     DoubleFacedPiece, DoubleFacedPieceType, PieceType, PHYSICAL_PIECE_TYPE_LEN,
 };
+use crate::cosmic::smart::square::AbsoluteAddress2D;
+use crate::cosmic::smart::square::BOARD_MEMORY_AREA;
 use crate::cosmic::smart::square::RANK10U8;
 use crate::cosmic::smart::square::RANK1U8;
-use crate::cosmic::smart::square::{AbsoluteAddress2D, BOARD_MEMORY_AREA};
 use crate::cosmic::toy_box::*;
 use crate::law::generate_move::Area;
 use crate::law::speed_of_light::Nine299792458;
 use crate::look_and_model::piece::Piece;
+use crate::spaceship::equipment::DestinationDisplay;
 use crate::LogExt;
 use casual_logger::Log;
 use num_traits::FromPrimitive;
-use std::*;
 
 /// Position. A record of the game used to suspend or resume it.  
 /// 局面。 ゲームを中断したり、再開したりするときに使うゲームの記録です。  
-///
+pub struct Game {
+    /// 棋譜
+    pub history: History,
+    /// 初期の卓
+    pub starting_table: GameTable,
+    /// 現対局ハッシュ種☆（＾～＾）
+    pub hash_seed: GameHashSeed,
+    /// 現在の卓
+    pub table: GameTable,
+    /// 情報表示担当
+    pub info: DestinationDisplay,
+    pub movegen_phase: MovegenPhase,
+}
+impl Default for Game {
+    fn default() -> Game {
+        Game {
+            history: History::default(),
+            starting_table: GameTable::default(),
+            hash_seed: GameHashSeed::default(),
+            table: GameTable::default(),
+            info: DestinationDisplay::default(),
+            movegen_phase: MovegenPhase::default(),
+        }
+    }
+}
+impl Game {
+    /// 宇宙誕生
+    pub fn big_bang(&mut self) {
+        // 局面ハッシュの種をリセット
+        self.hash_seed.big_bang();
+    }
+
+    /// 棋譜の作成
+    pub fn set_move(&mut self, move_: &Movement) {
+        self.history.movements[self.history.ply as usize] = *move_; // クローンが入る☆（＾～＾）？
+    }
+    /// テスト用に棋譜表示☆（＾～＾）
+    pub fn get_moves_history_text(&self) -> String {
+        let mut s = String::new();
+        for ply in 0..self.history.ply {
+            let movement = &self.history.movements[ply as usize];
+            s.push_str(&format!("[{}] {}", ply, movement));
+        }
+        s
+    }
+
+    pub fn get_table(&self, num: PosNums) -> &GameTable {
+        match num {
+            PosNums::Current => &self.table,
+            PosNums::Start => &self.starting_table,
+        }
+    }
+    pub fn mut_starting(&mut self) -> &mut GameTable {
+        &mut self.starting_table
+    }
+
+    /// 初期局面、現局面ともにクリアーします。
+    /// 手目も 0 に戻します。
+    pub fn clear(&mut self) {
+        self.starting_table.clear();
+        self.table.clear();
+        self.history.ply = 0;
+    }
+
+    /// テスト用に局面ハッシュ☆（＾～＾）
+    pub fn get_positions_hash_text(&self) -> String {
+        let mut s = String::new();
+        s.push_str(&format!(
+            "[ini] {:20}\n",
+            &self.history.starting_position_hash
+        ));
+
+        for ply in 0..self.history.ply {
+            let hash = &self.history.position_hashs[ply as usize];
+            // 64bitは10進数20桁。改行する
+            s.push_str(&format!("[{:3}] {:20}\n", ply, hash));
+        }
+        s
+    }
+
+    /// 千日手を調べるために、
+    /// 現局面は、同一局面が何回目かを調べるぜ☆（＾～＾）
+    /// TODO 初期局面を何に使ってるのか☆（＾～＾）？
+    pub fn count_same_position(&self) -> isize {
+        if self.history.ply < 1 {
+            return 0;
+        }
+
+        let mut count = 0;
+        let last_ply = self.history.ply - 1;
+        let new_ply = self.history.ply;
+        for i_ply in 0..new_ply {
+            let t = last_ply - i_ply;
+            if self.history.position_hashs[t as usize]
+                == self.history.position_hashs[last_ply as usize]
+            {
+                count += 1;
+            }
+        }
+
+        // 初期局面のハッシュ
+        if self.history.starting_position_hash == self.history.position_hashs[last_ply as usize] {
+            count += 1;
+        }
+
+        count
+    }
+
+    /// 入れた指し手の通り指すぜ☆（＾～＾）
+    pub fn read_move(&mut self, turn: Phase, move_: &Movement, search: &mut Search) {
+        // 局面ハッシュを作り直す
+        self.hash_seed
+            .update_by_do_move(&mut self.history, &self.table, move_);
+
+        // 移動元のマスにある駒をポップすることは確定。
+        let src_piece_num = self.table.pop_piece(turn, &move_.source);
+
+        // 持ち駒は成ることは無いので、成るなら盤上の駒であることが確定。
+        if move_.promote {
+            // 成ったのなら、元のマスの駒を成らすぜ☆（＾～＾）
+            if let Some(piece_num) = src_piece_num {
+                self.table.promote(piece_num);
+            } else {
+                panic!(Log::panic(
+                    "(Err.248) 成ったのに、元の升に駒がなかった☆（＾～＾）"
+                ));
+            }
+        }
+        // 移動先升に駒があるかどうか
+        // あれば　盤の相手の駒を先後反転して、自分の駒台に置きます。
+        self.table.rotate_piece_board_to_hand(turn, &move_);
+
+        // 移動先升に駒を置く
+        self.table
+            .push_piece(turn, &move_.destination, src_piece_num);
+
+        // // 局面ハッシュを作り直す
+        // let ky_hash = self.hash_seed.current_position(&self);
+        // self.history.set_position_hash(ky_hash);
+
+        self.history.ply += 1;
+        search.pv.push(&move_);
+    }
+
+    /// 逆順に指します。
+    pub fn read_move_in_reverse(&mut self, search: &mut Search) -> bool {
+        search.pv.pop();
+        if 0 < self.history.ply {
+            // 棋譜から読取、手目も減る
+            self.history.ply -= 1;
+            let move_ = &self.history.get_move();
+            // 移動先にある駒をポップするのは確定。
+            let moveing_piece_num = self
+                .table
+                .pop_piece(self.history.get_turn(), &move_.destination);
+            match move_.source {
+                FireAddress::Board(_src_sq) => {
+                    // 盤上の移動なら
+                    if move_.promote {
+                        // 成ったなら、成る前へ
+                        if let Some(source_piece_num) = moveing_piece_num {
+                            self.table.demote(source_piece_num);
+                        } else {
+                            panic!(Log::panic(
+                                "(Err.305) 成ったのに移動先に駒が無いぜ☆（＾～＾）！"
+                            ))
+                        }
+                    }
+
+                    // 打でなければ、移動元升に、動かした駒を置く☆（＾～＾）打なら何もしないぜ☆（＾～＾）
+                    self.table.push_piece(
+                        self.history.get_turn(),
+                        &move_.source,
+                        moveing_piece_num,
+                    );
+                }
+                FireAddress::Hand(_src_drop_type) => {
+                    // 打なら
+                    // 打った場所に駒があるはずだぜ☆（＾～＾）
+                    let piece_num = moveing_piece_num.unwrap();
+                    // 自分の持ち駒を増やそうぜ☆（＾～＾）！
+                    let turn = self.table.get_phase(piece_num);
+                    // TODO この駒を置くことになる場所は☆（＾～＾）？
+                    self.table.push_piece(
+                        turn,
+                        &FireAddress::Hand(HandAddress::new(
+                            self.table.get_double_faced_piece_type(piece_num),
+                            AbsoluteAddress2D::default(),
+                        )),
+                        moveing_piece_num,
+                    );
+                }
+            }
+
+            // 取った駒が有ったか。
+            // あれば、指し手で取った駒の先後をひっくり返せば、自分の駒台にある駒を取り出せるので取り出して、盤の上に指し手の取った駒のまま駒を置きます。
+            self.table
+                .rotate_piece_hand_to_board(self.history.get_turn(), &move_);
+
+            // TODO 局面ハッシュを作り直したいぜ☆（＾～＾）
+
+            // 棋譜にアンドゥした指し手がまだ残っているが、とりあえず残しとく
+            true
+        } else {
+            false
+        }
+    }
+}
+
 /// 卓☆（＾～＾）
 /// でかいのでコピーもクローンも不可☆（＾～＾）！
 /// 10の位を筋、1の位を段とする。
 /// 0筋、0段は未使用
-pub struct Position {
+pub struct GameTable {
     /// 盤に、駒が紐づくぜ☆（＾～＾）
     board: [Option<PieceNum>; BOARD_MEMORY_AREA as usize],
     hand_king1_cur: isize,
@@ -53,9 +267,9 @@ pub struct Position {
     /// 指し手生成に利用☆（＾～＾）
     pub area: Area,
 }
-impl Default for Position {
+impl Default for GameTable {
     fn default() -> Self {
-        Position {
+        GameTable {
             // 盤上
             board: [None; BOARD_MEMORY_AREA],
             /// 初期値はゴミ値だぜ☆（＾～＾）上書きして消せだぜ☆（＾～＾）
@@ -75,26 +289,26 @@ impl Default for Position {
             // 持ち駒
             phase_classification: PhaseClassification::default(),
             area: Area::default(),
-            hand_king1_cur: Position::hand_start(DoubleFacedPiece::King1),
-            hand_rook1_cur: Position::hand_start(DoubleFacedPiece::Rook1),
-            hand_bishop1_cur: Position::hand_start(DoubleFacedPiece::Bishop1),
-            hand_gold1_cur: Position::hand_start(DoubleFacedPiece::Gold1),
-            hand_silver1_cur: Position::hand_start(DoubleFacedPiece::Silver1),
-            hand_knight1_cur: Position::hand_start(DoubleFacedPiece::Knight1),
-            hand_lance1_cur: Position::hand_start(DoubleFacedPiece::Lance1),
-            hand_pawn1_cur: Position::hand_start(DoubleFacedPiece::Pawn1),
-            hand_king2_cur: Position::hand_start(DoubleFacedPiece::King2),
-            hand_rook2_cur: Position::hand_start(DoubleFacedPiece::Rook2),
-            hand_bishop2_cur: Position::hand_start(DoubleFacedPiece::Bishop2),
-            hand_gold2_cur: Position::hand_start(DoubleFacedPiece::Gold2),
-            hand_silver2_cur: Position::hand_start(DoubleFacedPiece::Silver2),
-            hand_knight2_cur: Position::hand_start(DoubleFacedPiece::Knight2),
-            hand_lance2_cur: Position::hand_start(DoubleFacedPiece::Lance2),
-            hand_pawn2_cur: Position::hand_start(DoubleFacedPiece::Pawn2),
+            hand_king1_cur: GameTable::hand_start(DoubleFacedPiece::King1),
+            hand_rook1_cur: GameTable::hand_start(DoubleFacedPiece::Rook1),
+            hand_bishop1_cur: GameTable::hand_start(DoubleFacedPiece::Bishop1),
+            hand_gold1_cur: GameTable::hand_start(DoubleFacedPiece::Gold1),
+            hand_silver1_cur: GameTable::hand_start(DoubleFacedPiece::Silver1),
+            hand_knight1_cur: GameTable::hand_start(DoubleFacedPiece::Knight1),
+            hand_lance1_cur: GameTable::hand_start(DoubleFacedPiece::Lance1),
+            hand_pawn1_cur: GameTable::hand_start(DoubleFacedPiece::Pawn1),
+            hand_king2_cur: GameTable::hand_start(DoubleFacedPiece::King2),
+            hand_rook2_cur: GameTable::hand_start(DoubleFacedPiece::Rook2),
+            hand_bishop2_cur: GameTable::hand_start(DoubleFacedPiece::Bishop2),
+            hand_gold2_cur: GameTable::hand_start(DoubleFacedPiece::Gold2),
+            hand_silver2_cur: GameTable::hand_start(DoubleFacedPiece::Silver2),
+            hand_knight2_cur: GameTable::hand_start(DoubleFacedPiece::Knight2),
+            hand_lance2_cur: GameTable::hand_start(DoubleFacedPiece::Lance2),
+            hand_pawn2_cur: GameTable::hand_start(DoubleFacedPiece::Pawn2),
         }
     }
 }
-impl Position {
+impl GameTable {
     pub fn clear(&mut self) {
         self.board = [None; BOARD_MEMORY_AREA];
         // 初期値はゴミ値だぜ☆（＾～＾）上書きして消せだぜ☆（＾～＾）
@@ -116,7 +330,7 @@ impl Position {
     }
 
     /// 開始盤面を、現盤面にコピーしたいときに使うぜ☆（＾～＾）
-    pub fn copy_from(&mut self, table: &Position) {
+    pub fn copy_from(&mut self, table: &GameTable) {
         self.board = table.board.clone();
         self.address_list = table.address_list.clone();
         self.piece_list = table.piece_list.clone();
@@ -390,7 +604,7 @@ impl Position {
             piece_num,
         ))
     }
-    pub fn promotion_value_at(&self, table: &Position, fire: &FireAddress) -> isize {
+    pub fn promotion_value_at(&self, table: &GameTable, fire: &FireAddress) -> isize {
         match fire {
             FireAddress::Board(sq) => {
                 let piece_num = self.board[sq.serial_number() as usize];
@@ -556,7 +770,7 @@ impl Position {
                 // 駒台に駒を置くぜ☆（＾～＾）
                 self.board[self.hand_cur(drop) as usize] = Some(num);
                 // 位置を増減するぜ☆（＾～＾）
-                self.add_hand_cur(drop, Position::hand_direction(drop));
+                self.add_hand_cur(drop, GameTable::hand_direction(drop));
             }
         }
     }
@@ -573,7 +787,7 @@ impl Position {
             FireAddress::Hand(drop_type) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(turn, drop_type.old);
                 // 位置を増減するぜ☆（＾～＾）
-                self.add_hand_cur(drop, -Position::hand_direction(drop));
+                self.add_hand_cur(drop, -GameTable::hand_direction(drop));
                 // 駒台の駒をはがすぜ☆（＾～＾）
                 let num = self.board[self.hand_cur(drop) as usize].unwrap();
                 self.board[self.hand_cur(drop) as usize] = None;
@@ -615,16 +829,16 @@ impl Position {
             FireAddress::Board(_sq) => panic!(Log::panic("(Err.3431) 未対応☆（＾～＾）")),
             FireAddress::Hand(drop_type) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(turn, drop_type.old);
-                let direction = Position::hand_direction(drop);
+                let direction = GameTable::hand_direction(drop);
                 if direction < 0 {
                     // 先手
-                    if self.hand_cur(drop) < Position::hand_start(drop) {
+                    if self.hand_cur(drop) < GameTable::hand_start(drop) {
                         self.board[(self.hand_cur(drop) - direction) as usize]
                     } else {
                         None
                     }
                 } else {
-                    if Position::hand_start(drop) < self.hand_cur(drop) {
+                    if GameTable::hand_start(drop) < self.hand_cur(drop) {
                         self.board[(self.hand_cur(drop) - direction) as usize]
                     } else {
                         None
@@ -640,15 +854,15 @@ impl Position {
             FireAddress::Board(_sq) => panic!(Log::panic("(Err.3431) 未対応☆（＾～＾）")),
             FireAddress::Hand(drop_type) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(turn, drop_type.old);
-                if Position::hand_direction(drop) < 0 {
+                if GameTable::hand_direction(drop) < 0 {
                     // 先手
-                    if self.hand_cur(drop) < Position::hand_start(drop) {
+                    if self.hand_cur(drop) < GameTable::hand_start(drop) {
                         false
                     } else {
                         true
                     }
                 } else {
-                    if Position::hand_start(drop) < self.hand_cur(drop) {
+                    if GameTable::hand_start(drop) < self.hand_cur(drop) {
                         false
                     } else {
                         true
@@ -663,11 +877,11 @@ impl Position {
             FireAddress::Board(_sq) => panic!(Log::panic("(Err.3431) 未対応☆（＾～＾）")),
             FireAddress::Hand(drop_type) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(turn, drop_type.old);
-                if Position::hand_direction(drop) < 0 {
+                if GameTable::hand_direction(drop) < 0 {
                     // 先手
-                    (Position::hand_start(drop) - self.hand_cur(drop)) as usize
+                    (GameTable::hand_start(drop) - self.hand_cur(drop)) as usize
                 } else {
-                    (self.hand_cur(drop) - Position::hand_start(drop)) as usize
+                    (self.hand_cur(drop) - GameTable::hand_start(drop)) as usize
                 }
             }
         }

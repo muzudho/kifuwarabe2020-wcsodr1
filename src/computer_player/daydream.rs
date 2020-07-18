@@ -3,12 +3,12 @@
 //!
 
 use crate::config::PV_BUFFER;
-use crate::cosmic::playing::Game;
 use crate::cosmic::recording::{Movement, Phase, SENNTITE_NUM};
 use crate::cosmic::smart::evaluator::{Evaluation, REPITITION_VALUE};
 use crate::cosmic::smart::features::PieceType;
 use crate::cosmic::universe::Universe;
 use crate::law::generate_move::{MoveGen, Ways};
+use crate::position::Game;
 use crate::spaceship::equipment::PvString;
 use crate::LogExt;
 use casual_logger::Log;

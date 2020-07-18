@@ -236,7 +236,7 @@ impl PhaseClassification {
     }
     */
     /*
-    fn to_debug(&self, table: &Position) -> String {
+    fn to_debug(&self, table: &GameTable) -> String {
         let mut buffer = String::new();
         for i in 0..=self.count {
             buffer.push_str(&format!(
