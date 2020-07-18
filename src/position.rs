@@ -17,11 +17,10 @@ use crate::cosmic::toy_box::*;
 use crate::law::generate_move::Area;
 use crate::law::speed_of_light::Nine299792458;
 use crate::log::LogExt;
+use crate::look_and_model::info_display::InfoDisplay;
 use crate::look_and_model::piece::Piece;
-use crate::spaceship::equipment::DestinationDisplay;
 use casual_logger::Log;
 use num_traits::FromPrimitive;
-use std::fmt;
 
 /// Position. A record of the game used to suspend or resume it.  
 /// 局面。 ゲームを中断したり、再開したりするときに使うゲームの記録です。  
@@ -35,11 +34,12 @@ pub struct Position {
     /// 現在の卓
     pub table: GameTable,
     /// 情報表示担当
-    pub info: DestinationDisplay,
+    pub info: InfoDisplay,
     pub movegen_phase: MovegenPhase,
 
     // Principal variation(読み筋)☆（＾～＾）
-    pub pv: PrincipalVariation,
+    pv_text: String,
+    pv_len: usize,
 }
 impl Default for Position {
     fn default() -> Position {
@@ -48,13 +48,20 @@ impl Default for Position {
             starting_table: GameTable::default(),
             hash_seed: GameHashSeed::default(),
             table: GameTable::default(),
-            info: DestinationDisplay::default(),
+            info: InfoDisplay::default(),
             movegen_phase: MovegenPhase::default(),
-            pv: PrincipalVariation::default(),
+            pv_text: String::with_capacity(PV_BUFFER),
+            pv_len: 0,
         }
     }
 }
 impl Position {
+    pub fn pv_text(&self) -> &str {
+        &self.pv_text
+    }
+    pub fn pv_len(&self) -> usize {
+        self.pv_len
+    }
     /// 宇宙誕生
     pub fn big_bang(&mut self) {
         // 局面ハッシュの種をリセット
@@ -91,6 +98,8 @@ impl Position {
         self.starting_table.clear();
         self.table.clear();
         self.history.ply = 0;
+        self.pv_text = String::with_capacity(PV_BUFFER);
+        self.pv_len = 0;
     }
 
     /// テスト用に局面ハッシュ☆（＾～＾）
@@ -170,12 +179,33 @@ impl Position {
         // self.history.set_position_hash(ky_hash);
 
         self.history.ply += 1;
-        self.pv.push(&move_);
+
+        // Principal variation.
+        if self.pv_text.is_empty() {
+            self.pv_text.push_str(&move_.to_string());
+        } else {
+            self.pv_text.push_str(&format!(" {}", move_));
+        }
+        self.pv_len += 1;
     }
 
     /// 逆順に指します。
     pub fn undo_move(&mut self) -> bool {
-        self.pv.pop();
+        // Principal variation.
+        // None か スペースが出てくるまで削除しようぜ☆（＾～＾）
+        loop {
+            if let Some(ch) = self.pv_text.pop() {
+                if ch == ' ' {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+
+        if 0 < self.pv_len {
+            self.pv_len -= 1;
+        }
         if 0 < self.history.ply {
             // 棋譜から読取、手目も減る
             self.history.ply -= 1;
@@ -931,56 +961,5 @@ impl GameTable {
             DoubleFacedPiece::Lance2 => self.hand_lance2_cur += direction,
             DoubleFacedPiece::Pawn2 => self.hand_pawn2_cur += direction,
         }
-    }
-}
-
-#[derive(Clone)]
-pub struct PrincipalVariation {
-    text: String,
-    ply: usize,
-}
-impl Default for PrincipalVariation {
-    fn default() -> Self {
-        PrincipalVariation {
-            // ゴミの値で埋めるぜ☆（＾～＾）
-            text: String::with_capacity(PV_BUFFER),
-            ply: 0,
-        }
-    }
-}
-impl PrincipalVariation {
-    pub fn push(&mut self, movement: &Movement) {
-        if self.text.is_empty() {
-            self.text.push_str(&movement.to_string());
-        } else {
-            self.text.push_str(&format!(" {}", movement));
-        }
-        self.ply += 1;
-    }
-
-    pub fn pop(&mut self) {
-        // None か スペースが出てくるまで削除しようぜ☆（＾～＾）
-        loop {
-            if let Some(ch) = self.text.pop() {
-                if ch == ' ' {
-                    break;
-                }
-            } else {
-                break;
-            }
-        }
-
-        if 0 < self.ply {
-            self.ply -= 1;
-        }
-    }
-
-    pub fn len(&self) -> usize {
-        self.ply
-    }
-}
-impl fmt::Display for PrincipalVariation {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.text)
     }
 }

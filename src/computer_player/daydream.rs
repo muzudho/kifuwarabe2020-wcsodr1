@@ -192,7 +192,8 @@ impl Search {
             }
         }
 
-        let coverage_sign = if pos.pv.len() % 2 == 0 {
+        // TODO ターン切替にしたいぜ☆（＾～＾）
+        let coverage_sign = if pos.pv_len() % 2 == 0 {
             // 先手が指すところだぜ☆（＾～＾）
             1
         } else {
@@ -258,7 +259,7 @@ impl Search {
             if SENNTITE_NUM <= pos.count_same_position() {
                 // 千日手か……☆（＾～＾） 一応覚えておくぜ☆（＾～＾）
                 ts.repetition_movement = Some(move_);
-            } else if self.max_depth0 < pos.pv.len() {
+            } else if self.max_depth0 < pos.pv_len() {
                 // 葉だぜ☆（＾～＾）
 
                 // 評価を集計するぜ☆（＾～＾）
@@ -281,11 +282,11 @@ impl Search {
                         ))),
                     );
                     pos.info.print(
-                        Some(pos.pv.len()),
+                        Some(pos.pv_len()),
                         Some((self.nodes, self.nps())),
                         Some(ts.bestmove.value),
                         movement,
-                        &Some(PvString::PV(self.msec(), format!("{}", pos.pv))),
+                        &Some(PvString::PV(self.msec(), pos.pv_text().to_string())),
                     );
                 }
             } else {
