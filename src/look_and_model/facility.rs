@@ -2,8 +2,9 @@ use crate::cosmic::playing::{Game, PosNums};
 use crate::cosmic::recording::{FireAddress, HandAddress, Movement, Phase};
 use crate::cosmic::smart::features::DoubleFacedPieceType;
 use crate::cosmic::smart::square::AbsoluteAddress2D;
-use crate::cosmic::toy_box::{GameTable, PieceNum};
+use crate::cosmic::toy_box::PieceNum;
 use crate::look_and_model::piece::PIECE_WHITE_SPACE;
+use crate::position::Position;
 use crate::LogExt;
 use casual_logger::Log;
 
@@ -268,7 +269,7 @@ P x{87:2}   |{63}|{64}|{65}|{66}|{67}|{68}|{69}|{70}|{71}| h8   p x{94:2}
             same_pos_count
         )
     }
-    fn to_string3(table: &GameTable, file: u8, rank: u8) -> String {
+    fn to_string3(table: &Position, file: u8, rank: u8) -> String {
         if let Some(piece_info_val) =
             table.piece_info_at1(&FireAddress::Board(AbsoluteAddress2D::new(file, rank)))
         {
@@ -451,7 +452,7 @@ impl TheaterRoom1 {
             )
         )
     }
-    fn to_string3(table: &GameTable, serial: u8) -> String {
+    fn to_string3(table: &Position, serial: u8) -> String {
         if let Some(sq) = AbsoluteAddress2D::from_absolute_address(serial) {
             if let Some(piece_info_val) = table.piece_info_num_at(&FireAddress::Board(sq)) {
                 format!("{}", piece_info_val.text1).to_string()
@@ -581,14 +582,14 @@ impl TheaterRoom2 {
             ),
         )
     }
-    fn to_string3(table: &GameTable, piece_num: PieceNum) -> String {
+    fn to_string3(table: &Position, piece_num: PieceNum) -> String {
         if let Some(piece_info_val) = table.piece_info_address_at(piece_num) {
             format!("{: >4}", piece_info_val.text1).to_string()
         } else {
             "    ".to_string()
         }
     }
-    fn to_string4(table: &GameTable, piece_num: PieceNum) -> String {
+    fn to_string4(table: &Position, piece_num: PieceNum) -> String {
         if let Some(piece_info_val) = table.piece_info_piece_at(piece_num) {
             format!("{: >4}", piece_info_val.text1).to_string()
         } else {
@@ -601,7 +602,7 @@ impl TheaterRoom2 {
 pub struct Kitchen {}
 impl Kitchen {
     /// 現在の局面での、指し手の一覧を表示するぜ☆（＾～＾）
-    pub fn print_ways(turn: Phase, table: &GameTable, ways: &Vec<Movement>) {
+    pub fn print_ways(turn: Phase, table: &Position, ways: &Vec<Movement>) {
         Log::println(&format!("Moves count={}", ways.len()));
         // 辞書順ソート
         let mut move_names = Vec::new();

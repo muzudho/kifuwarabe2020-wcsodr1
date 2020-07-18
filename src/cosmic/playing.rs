@@ -3,8 +3,8 @@ use crate::cosmic::pos_hash::pos_hash::*;
 use crate::cosmic::recording::Phase;
 use crate::cosmic::recording::{FireAddress, HandAddress, History, Movement};
 use crate::cosmic::smart::square::AbsoluteAddress2D;
-use crate::cosmic::toy_box::GameTable;
 use crate::law::generate_move::{FirstOperation, PhaseOperation, SecondOperation};
+use crate::position::Position;
 use crate::spaceship::equipment::DestinationDisplay;
 use crate::LogExt;
 use casual_logger::Log;
@@ -36,11 +36,11 @@ pub struct Game {
     /// 棋譜
     pub history: History,
     /// 初期の卓
-    pub starting_table: GameTable,
+    pub starting_table: Position,
     /// 現対局ハッシュ種☆（＾～＾）
     pub hash_seed: GameHashSeed,
     /// 現在の卓
-    pub table: GameTable,
+    pub table: Position,
     /// 情報表示担当
     pub info: DestinationDisplay,
     pub movegen_phase: MovegenPhase,
@@ -49,9 +49,9 @@ impl Default for Game {
     fn default() -> Game {
         Game {
             history: History::default(),
-            starting_table: GameTable::default(),
+            starting_table: Position::default(),
             hash_seed: GameHashSeed::default(),
-            table: GameTable::default(),
+            table: Position::default(),
             info: DestinationDisplay::default(),
             movegen_phase: MovegenPhase::default(),
         }
@@ -78,13 +78,13 @@ impl Game {
         s
     }
 
-    pub fn get_table(&self, num: PosNums) -> &GameTable {
+    pub fn get_table(&self, num: PosNums) -> &Position {
         match num {
             PosNums::Current => &self.table,
             PosNums::Start => &self.starting_table,
         }
     }
-    pub fn mut_starting(&mut self) -> &mut GameTable {
+    pub fn mut_starting(&mut self) -> &mut Position {
         &mut self.starting_table
     }
 

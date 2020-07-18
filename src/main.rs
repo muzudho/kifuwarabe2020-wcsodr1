@@ -25,6 +25,7 @@ mod cosmic;
 mod law;
 mod look_and_model;
 mod performance_measurement;
+mod position;
 mod spaceship;
 
 use crate::config::LOG_FILE;

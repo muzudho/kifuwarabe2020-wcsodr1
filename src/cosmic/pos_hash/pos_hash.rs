@@ -13,9 +13,9 @@ use crate::cosmic::smart::square::FILE1U8;
 use crate::cosmic::smart::square::RANK10U8;
 use crate::cosmic::smart::square::RANK1U8;
 use crate::cosmic::smart::square::{AbsoluteAddress2D, BOARD_MEMORY_AREA, SQUARE_NONE};
-use crate::cosmic::toy_box::GameTable;
 use crate::law::speed_of_light::HandAddresses;
 use crate::look_and_model::piece::PIECE_LEN;
+use crate::position::Position;
 use crate::LogExt;
 use casual_logger::Log;
 use rand::Rng;
@@ -71,7 +71,7 @@ impl GameHashSeed {
     /// TODO 指し手を使って差分更新
     /// 駒を動かしたあとに使う。
     /// TODO 持ち駒の枚数がトグルになってないぜ☆（＾～＾）？
-    pub fn update_by_do_move(&self, history: &mut History, table: &GameTable, move_: &Movement) {
+    pub fn update_by_do_move(&self, history: &mut History, table: &Position, move_: &Movement) {
         // TODO １つ前の局面のハッシュ。
         let mut prev_hash = if history.ply == 0 {
             history.starting_position_hash
@@ -173,7 +173,7 @@ impl GameHashSeed {
     }
 
     /// 盤面からハッシュ作成
-    fn from_table(&self, table: &GameTable) -> u64 {
+    fn from_table(&self, table: &Position) -> u64 {
         let mut hash: u64 = 0;
 
         // 盤上の駒
