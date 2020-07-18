@@ -2,8 +2,9 @@
 //! 駒たちが躍動するぜ☆（＾～＾）
 //!
 
+use crate::config::PV_BUFFER;
 use crate::cosmic::playing::Game;
-use crate::cosmic::recording::{Movement, Phase, PLY_SIZE, SENNTITE_NUM};
+use crate::cosmic::recording::{Movement, Phase, SENNTITE_NUM};
 use crate::cosmic::smart::evaluator::{Evaluation, REPITITION_VALUE};
 use crate::cosmic::smart::features::PieceType;
 use crate::cosmic::universe::Universe;
@@ -537,25 +538,39 @@ pub enum Value {
 
 #[derive(Clone)]
 pub struct PrincipalVariation {
-    moves: [Movement; PLY_SIZE],
+    text: String,
     ply: usize,
 }
 impl Default for PrincipalVariation {
     fn default() -> Self {
         PrincipalVariation {
             // ゴミの値で埋めるぜ☆（＾～＾）
-            moves: [Movement::default(); PLY_SIZE],
+            text: String::with_capacity(PV_BUFFER),
             ply: 0,
         }
     }
 }
 impl PrincipalVariation {
     fn push(&mut self, movement: &Movement) {
-        self.moves[self.ply].set(movement);
+        if self.text.is_empty() {
+            self.text.push_str(&movement.to_string());
+        } else {
+            self.text.push_str(&format!(" {}", movement));
+        }
         self.ply += 1;
     }
 
     fn pop(&mut self) {
+        // None か スペースが出てくるまで削除しようぜ☆（＾～＾）
+        loop {
+            if let Some(ch) = self.text.pop() {
+                if ch == ' ' {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
         self.ply -= 1;
         // ゴミの値は消さないぜ☆（＾～＾）
     }
@@ -566,11 +581,7 @@ impl PrincipalVariation {
 }
 impl fmt::Display for PrincipalVariation {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let mut buffer = String::new();
-        for i in 0..self.ply {
-            buffer.push_str(&format!("{} ", self.moves[i]));
-        }
-        write!(f, "{}", buffer.trim_end())
+        write!(f, "{}", self.text)
     }
 }
 

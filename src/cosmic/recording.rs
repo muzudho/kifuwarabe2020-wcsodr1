@@ -169,14 +169,6 @@ impl Movement {
             captured: captured,
         }
     }
-
-    pub fn set(&mut self, b: &Movement) {
-        self.piece_num = b.piece_num;
-        self.source = b.source;
-        self.destination = b.destination;
-        self.promote = b.promote;
-        self.captured = b.captured;
-    }
 }
 impl fmt::Display for Movement {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
