@@ -447,7 +447,7 @@ impl TreeState {
                 } else {
                     match self.bestmove.value {
                         Value::Win => {
-                            panic!(Log::panic(
+                            panic!(Log::print_fatal(
                                 "(Err.405) 自分が勝つ手を既に読んでるのに、ここに来るのはおかしいぜ☆（＾～＾）"
                             ))
                         }
@@ -480,7 +480,7 @@ impl TreeState {
             return;
         } else {
             match self.bestmove.value {
-                Value::Win => panic!(Log::panic(
+                Value::Win => panic!(Log::print_fatal(
                     "(Err.397) 自分が勝つ手を読んでるなら、ここに来るのはおかしいぜ☆（＾～＾）"
                 )),
                 Value::Lose => {

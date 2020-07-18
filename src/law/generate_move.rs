@@ -52,7 +52,7 @@ impl PhaseOperation for FirstOperation {
     fn is_rank456789(&self, destination: &FireAddress) -> bool {
         match destination {
             FireAddress::Board(dst_sq) => RANK3U8 < dst_sq.rank(),
-            _ => panic!(Log::panic(&format!(
+            _ => panic!(Log::print_fatal(&format!(
                 "(Err.905) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
@@ -60,7 +60,7 @@ impl PhaseOperation for FirstOperation {
     fn is_rank123(&self, destination: &FireAddress) -> bool {
         match destination {
             FireAddress::Board(dst_sq) => dst_sq.rank() < RANK4U8,
-            _ => panic!(Log::panic(&format!(
+            _ => panic!(Log::print_fatal(&format!(
                 "(Err.905) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
@@ -68,7 +68,7 @@ impl PhaseOperation for FirstOperation {
     fn is_rank12(&self, destination: &FireAddress) -> bool {
         match destination {
             FireAddress::Board(dst_sq) => dst_sq.rank() < RANK3U8,
-            _ => panic!(Log::panic(&format!(
+            _ => panic!(Log::print_fatal(&format!(
                 "(Err.905) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
@@ -76,7 +76,7 @@ impl PhaseOperation for FirstOperation {
     fn is_rank23(&self, destination: &FireAddress) -> bool {
         match destination {
             FireAddress::Board(dst_sq) => RANK1U8 < dst_sq.rank() && dst_sq.rank() < RANK4U8,
-            _ => panic!(Log::panic(&format!(
+            _ => panic!(Log::print_fatal(&format!(
                 "(Err.905) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
@@ -84,7 +84,7 @@ impl PhaseOperation for FirstOperation {
     fn is_rank1(&self, destination: &FireAddress) -> bool {
         match destination {
             FireAddress::Board(dst_sq) => dst_sq.rank() == RANK1U8,
-            _ => panic!(Log::panic(&format!(
+            _ => panic!(Log::print_fatal(&format!(
                 "(Err.905) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
@@ -92,7 +92,7 @@ impl PhaseOperation for FirstOperation {
     fn is_rank3(&self, destination: &FireAddress) -> bool {
         match destination {
             FireAddress::Board(dst_sq) => dst_sq.rank() == RANK3U8,
-            _ => panic!(Log::panic(&format!(
+            _ => panic!(Log::print_fatal(&format!(
                 "(Err.905) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
@@ -107,7 +107,7 @@ impl PhaseOperation for FirstOperation {
                     }
                     true
                 }
-                FireAddress::Hand(_drop_type) => panic!(Log::panic(&format!(
+                FireAddress::Hand(_drop_type) => panic!(Log::print_fatal(&format!(
                     "(Err.546) 盤上ではなかったぜ☆（＾～＾）！",
                 ))),
             },
@@ -119,7 +119,7 @@ impl PhaseOperation for FirstOperation {
                     }
                     true
                 }
-                FireAddress::Hand(_drop_type) => panic!(Log::panic(&format!(
+                FireAddress::Hand(_drop_type) => panic!(Log::print_fatal(&format!(
                     "(Err.546) 盤上ではなかったぜ☆（＾～＾）！",
                 ))),
             },
@@ -130,7 +130,7 @@ impl PhaseOperation for SecondOperation {
     fn is_rank456789(&self, destination: &FireAddress) -> bool {
         match destination {
             FireAddress::Board(dst_sq) => dst_sq.rank() < RANK7U8,
-            _ => panic!(Log::panic(&format!(
+            _ => panic!(Log::print_fatal(&format!(
                 "(Err.905) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
@@ -138,7 +138,7 @@ impl PhaseOperation for SecondOperation {
     fn is_rank123(&self, destination: &FireAddress) -> bool {
         match destination {
             FireAddress::Board(dst_sq) => RANK6U8 < dst_sq.rank(),
-            _ => panic!(Log::panic(&format!(
+            _ => panic!(Log::print_fatal(&format!(
                 "(Err.905) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
@@ -146,7 +146,7 @@ impl PhaseOperation for SecondOperation {
     fn is_rank12(&self, destination: &FireAddress) -> bool {
         match destination {
             FireAddress::Board(dst_sq) => RANK7U8 < dst_sq.rank(),
-            _ => panic!(Log::panic(&format!(
+            _ => panic!(Log::print_fatal(&format!(
                 "(Err.905) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
@@ -154,7 +154,7 @@ impl PhaseOperation for SecondOperation {
     fn is_rank23(&self, destination: &FireAddress) -> bool {
         match destination {
             FireAddress::Board(dst_sq) => RANK6U8 < dst_sq.rank() && dst_sq.rank() < RANK9U8,
-            _ => panic!(Log::panic(&format!(
+            _ => panic!(Log::print_fatal(&format!(
                 "(Err.905) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
@@ -162,7 +162,7 @@ impl PhaseOperation for SecondOperation {
     fn is_rank1(&self, destination: &FireAddress) -> bool {
         match destination {
             FireAddress::Board(dst_sq) => RANK9U8 == dst_sq.rank(),
-            _ => panic!(Log::panic(&format!(
+            _ => panic!(Log::print_fatal(&format!(
                 "(Err.905) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
@@ -170,7 +170,7 @@ impl PhaseOperation for SecondOperation {
     fn is_rank3(&self, destination: &FireAddress) -> bool {
         match destination {
             FireAddress::Board(dst_sq) => RANK7U8 == dst_sq.rank(),
-            _ => panic!(Log::panic(&format!(
+            _ => panic!(Log::print_fatal(&format!(
                 "(Err.905) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
@@ -185,7 +185,7 @@ impl PhaseOperation for SecondOperation {
                     }
                     true
                 }
-                FireAddress::Hand(_drop_type) => panic!(Log::panic(&format!(
+                FireAddress::Hand(_drop_type) => panic!(Log::print_fatal(&format!(
                     "(Err.546) 盤上ではなかったぜ☆（＾～＾）！",
                 ))),
             },
@@ -197,7 +197,7 @@ impl PhaseOperation for SecondOperation {
                     }
                     true
                 }
-                FireAddress::Hand(_drop_type) => panic!(Log::panic(&format!(
+                FireAddress::Hand(_drop_type) => panic!(Log::print_fatal(&format!(
                     "(Err.546) 盤上ではなかったぜ☆（＾～＾）！",
                 ))),
             },
@@ -423,7 +423,7 @@ impl MoveGen {
                                                 return;
                                             }
                                         }
-                                        _ => panic!(Log::panic(&format!(
+                                        _ => panic!(Log::print_fatal(&format!(
                                             "(Err.641) 盤上じゃなかったぜ☆（＾～＾）！",
                                         ))),
                                     }
@@ -773,7 +773,7 @@ impl MoveGen {
                     }
                 }
             }
-            _ => panic!(Log::panic(&format!(
+            _ => panic!(Log::print_fatal(&format!(
                 "(Err.641) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }

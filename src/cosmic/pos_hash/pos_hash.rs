@@ -92,7 +92,7 @@ impl GameHashSeed {
                             self.piece[dst_sq.serial_number() as usize][src_piece_hash_index];
                     }
                     FireAddress::Hand(_dst_drop_type) => {
-                        panic!(Log::panic("(Err.90) 未対応☆（＾～＾）"))
+                        panic!(Log::print_fatal("(Err.90) 未対応☆（＾～＾）"))
                     }
                 }
             }
@@ -109,7 +109,7 @@ impl GameHashSeed {
                             [src_drop.nonpromoted_piece_hash_index()];
                     }
                     FireAddress::Hand(_dst_drop_type) => {
-                        panic!(Log::panic("(Err.90) 未対応☆（＾～＾）"))
+                        panic!(Log::print_fatal("(Err.90) 未対応☆（＾～＾）"))
                     }
                 }
             }
@@ -136,7 +136,7 @@ impl GameHashSeed {
                         prev_hash ^= self.hands[double_faced_piece as usize][count as usize + 1];
                     }
                     FireAddress::Hand(_dst_drop_type) => {
-                        panic!(Log::panic("(Err.90) 未対応☆（＾～＾）"))
+                        panic!(Log::print_fatal("(Err.90) 未対応☆（＾～＾）"))
                     }
                 }
             }
@@ -191,7 +191,7 @@ impl GameHashSeed {
         // 持ち駒ハッシュ
         HandAddresses::for_all(
             &mut |turn: &Phase, fire_hand: &FireAddress| match fire_hand {
-                FireAddress::Board(_sq) => panic!(Log::panic("(Err.175) 未対応☆（＾～＾）")),
+                FireAddress::Board(_sq) => panic!(Log::print_fatal("(Err.175) 未対応☆（＾～＾）")),
                 FireAddress::Hand(drop_type) => {
                     let drop = DoubleFacedPiece::from_phase_and_type(*turn, drop_type.old);
                     let count = table.count_hand(*turn, fire_hand);

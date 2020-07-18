@@ -110,7 +110,7 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Positi
             let file = if let Some(num) = atoi::<u8>(line[*starts..=*starts].as_bytes()) {
                 num
             } else {
-                panic!(Log::panic(&format!(
+                panic!(Log::print_fatal(&format!(
                     "(Err.72)  '{}' だった。",
                     &line[*starts..=*starts]
                 )))
@@ -155,7 +155,7 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Positi
                     FireAddress::Board(AbsoluteAddress2D::new(file, 9))
                 }
                 _ => {
-                    panic!(Log::panic(&format!(
+                    panic!(Log::print_fatal(&format!(
                         "(Err.90)  '{}' だった。",
                         &line[*starts..=*starts]
                     )));
@@ -170,7 +170,7 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Positi
     let file = if let Some(num) = atoi::<u8>(line[*starts..=*starts].as_bytes()) {
         num
     } else {
-        panic!(Log::panic(&format!(
+        panic!(Log::print_fatal(&format!(
             "(Err.118)  '{}' だった。",
             &line[*starts..=*starts]
         )));
@@ -188,7 +188,7 @@ pub fn read_sasite(line: &str, starts: &mut usize, len: usize, game: &mut Positi
         "h" => 8,
         "i" => 9,
         _ => {
-            panic!(Log::panic(&format!(
+            panic!(Log::print_fatal(&format!(
                 "(Err.136)  '{}' だった。",
                 &line[*starts..=*starts]
             )));
@@ -297,7 +297,7 @@ pub fn read_board(line: &str, starts: &mut usize, len: usize, game: &mut Positio
                     "l" => BoardPart::Alphabet((Phase::Second, PieceType::PromotedLance)),
                     "p" => BoardPart::Alphabet((Phase::Second, PieceType::PromotedPawn)),
                     _ => {
-                        panic!(Log::panic(&format!(
+                        panic!(Log::print_fatal(&format!(
                             "(Err.235)  盤部(0) '{}' だった。",
                             &line[*starts..=*starts]
                         )));
@@ -406,7 +406,7 @@ pub fn set_position(line: &str, game: &mut Position) {
                                 "7" => HandCount::N2Digit(17),
                                 "8" => HandCount::N2Digit(18),
                                 _ => {
-                                    panic!(Log::panic(&format!(
+                                    panic!(Log::print_fatal(&format!(
                                         "(Err.346)  持駒部(0) '{}' だった。",
                                         &line[starts..(starts + 2)]
                                     )));
@@ -472,7 +472,7 @@ pub fn set_position(line: &str, game: &mut Position) {
             starts += 3;
         }
     } else {
-        Log::println("'position startpos' でも、'position sfen ' でも始まらなかった。");
+        Log::print_info("'position startpos' でも、'position sfen ' でも始まらなかった。");
         return;
     }
 

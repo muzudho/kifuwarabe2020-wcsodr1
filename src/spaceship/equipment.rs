@@ -63,7 +63,7 @@ impl DestinationDisplay {
         pv_string: &Option<PvString>,
     ) {
         // TODO 評価値が自分のか相手のか調べてないぜ☆（＾～＾）
-        Log::println(&format!(
+        Log::print_info(&format!(
             "info{}{}{}{}{}{}",
             // 1. 思考を開始してからのミリ秒☆（＾～＾）
             if let Some(pv_string_val) = pv_string {

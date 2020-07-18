@@ -16,7 +16,7 @@ impl CommandRoom {
     pub fn print_title() {
         // 横幅は 半角79文字使えるぜ☆（＾～＾）
         // 80文字目を使うと、次の行が改行で空行になってしまう☆（＾～＾）
-        Log::println(
+        Log::print_info(
             &"\
 +--------- --------- --------- --------- --------- --------- --------- -------+
 | KifuWarabe Shogi 2020                                                       |
@@ -604,7 +604,7 @@ pub struct Kitchen {}
 impl Kitchen {
     /// 現在の局面での、指し手の一覧を表示するぜ☆（＾～＾）
     pub fn print_ways(turn: Phase, table: &GameTable, ways: &Vec<Movement>) {
-        Log::println(&format!("Moves count={}", ways.len()));
+        Log::print_info(&format!("Moves count={}", ways.len()));
         // 辞書順ソート
         let mut move_names = Vec::new();
         for move_ in ways {
@@ -643,7 +643,7 @@ impl Kitchen {
         move_names.reverse();
 
         for (i, move_name) in move_names.into_iter().enumerate() {
-            Log::println(&format!("[{}] {}", i, move_name));
+            Log::print_info(&format!("[{}] {}", i, move_name));
         }
     }
 }
