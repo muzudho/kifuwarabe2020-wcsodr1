@@ -6,8 +6,8 @@ use crate::cosmic::smart::features::{DoubleFacedPieceType, PieceType};
 use crate::cosmic::smart::square::AbsoluteAddress2D;
 use crate::cosmic::smart::square::FILE9U8;
 use crate::cosmic::smart::square::RANK1U8;
+use crate::log::LogExt;
 use crate::position::Position;
-use crate::LogExt;
 use atoi::atoi;
 use casual_logger::Log;
 

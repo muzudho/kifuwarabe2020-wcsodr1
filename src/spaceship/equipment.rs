@@ -2,7 +2,7 @@
 use crate::computer_player::daydream::Value;
 use crate::cosmic::recording::Movement;
 use crate::cosmic::smart::square::test_rotation;
-use crate::LogExt;
+use crate::log::LogExt;
 use casual_logger::Log;
 use std::time::{Duration, Instant};
 

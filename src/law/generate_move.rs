@@ -15,8 +15,8 @@ use crate::cosmic::smart::square::RANK6U8;
 use crate::cosmic::smart::square::RANK7U8;
 use crate::cosmic::smart::square::RANK9U8;
 use crate::cosmic::smart::square::{AbsoluteAddress2D, Angle, RelAdr2D};
+use crate::log::LogExt;
 use crate::position::Position;
-use crate::LogExt;
 use casual_logger::Log;
 
 /// 先手、後手で処理が変わるやつを吸収するぜ☆（＾～＾）

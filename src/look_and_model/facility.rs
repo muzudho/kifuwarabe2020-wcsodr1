@@ -3,10 +3,10 @@ use crate::cosmic::recording::{FireAddress, HandAddress, Movement, Phase};
 use crate::cosmic::smart::features::DoubleFacedPieceType;
 use crate::cosmic::smart::square::AbsoluteAddress2D;
 use crate::cosmic::toy_box::PieceNum;
+use crate::log::LogExt;
 use crate::look_and_model::piece::PIECE_WHITE_SPACE;
 use crate::position::GameTable;
 use crate::position::Position;
-use crate::LogExt;
 use casual_logger::Log;
 
 /// 指令室はこちらだぜ☆（＾～＾）！
