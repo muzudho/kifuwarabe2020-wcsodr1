@@ -246,3 +246,8 @@ setoption name PromotionWeightPer1000 value 1000
 position startpos moves 6g6f 4a3b
 go btime 304000 wtime 304000 binc 5000 winc 5000
 ```
+
+```plain
+position startpos moves 7g7f 8c8d 5i5h 4a3b 5h4h 6a5b 4h5i 5a4b 8h4d 4c4d 9g9f B*6e 7f7e 6e8g+ 7e7d 8g8f 5i5h 7c7d 8i7g 8f7g 1g1f N*7e
+
+```

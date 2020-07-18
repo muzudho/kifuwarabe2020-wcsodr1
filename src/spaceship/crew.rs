@@ -252,7 +252,7 @@ impl Chiyuri {
         Log::print_info("----駒リスト40表示 ここまで----");
     }
     pub fn len0(universe: &mut Universe) {
-        Log::print_info("len==0");
+        Log::debug("info string EnterEmpty.");
         if !&universe.dialogue_mode {
             // 空打ち１回目なら、対話モードへ☆（＾～＾）
             universe.dialogue_mode = true;
