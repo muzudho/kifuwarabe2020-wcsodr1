@@ -1,6 +1,7 @@
 //!
 //! USIプロトコル
 //!
+use crate::computer_player::daydream::Search;
 use crate::cosmic::playing::Game;
 use crate::cosmic::recording::{CapturedMove, FireAddress, HandAddress, Movement, Phase};
 use crate::cosmic::smart::features::{DoubleFacedPieceType, PieceType};
@@ -488,6 +489,7 @@ pub fn set_position(line: &str, game: &mut Game) {
     game.table.copy_from(&game.starting_table);
 
     // 指し手を全部読んでいくぜ☆（＾～＾）手目のカウントも増えていくぜ☆（＾～＾）
+    let mut dammy = Search::new(0, 0, 0, 0);
     while read_sasite(line, &mut starts, len, game) {
         // 手目を戻す
         game.history.ply -= 1;
@@ -495,6 +497,6 @@ pub fn set_position(line: &str, game: &mut Game) {
         let ply = game.history.ply;
 
         let move_ = game.history.movements[ply as usize];
-        game.read_move(game.history.get_turn(), &move_);
+        game.read_move(game.history.get_turn(), &move_, &mut dammy);
     }
 }

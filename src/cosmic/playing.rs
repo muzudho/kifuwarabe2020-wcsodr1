@@ -1,3 +1,4 @@
+use crate::computer_player::daydream::Search;
 use crate::cosmic::pos_hash::pos_hash::*;
 use crate::cosmic::recording::Phase;
 use crate::cosmic::recording::{FireAddress, HandAddress, History, Movement};
@@ -140,7 +141,7 @@ impl Game {
     }
 
     /// 入れた指し手の通り指すぜ☆（＾～＾）
-    pub fn read_move(&mut self, turn: Phase, move_: &Movement) {
+    pub fn read_move(&mut self, turn: Phase, move_: &Movement, search: &mut Search) {
         // 局面ハッシュを作り直す
         self.hash_seed
             .update_by_do_move(&mut self.history, &self.table, move_);
@@ -172,10 +173,12 @@ impl Game {
         // self.history.set_position_hash(ky_hash);
 
         self.history.ply += 1;
+        search.pv.push(&move_);
     }
 
     /// 逆順に指します。
-    pub fn read_move_in_reverse(&mut self) -> bool {
+    pub fn read_move_in_reverse(&mut self, search: &mut Search) -> bool {
+        search.pv.pop();
         if 0 < self.history.ply {
             // 棋譜から読取、手目も減る
             self.history.ply -= 1;

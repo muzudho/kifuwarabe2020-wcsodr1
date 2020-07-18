@@ -25,7 +25,7 @@ pub struct Search {
     pub stopwatch: Instant,
 
     // Principal variation(読み筋)☆（＾～＾）
-    pv: PrincipalVariation,
+    pub pv: PrincipalVariation,
 
     // 思考時間（ミリ秒）をランダムにすることで、指し手を変えるぜ☆（＾～＾）
     pub think_msec: u128,
@@ -240,9 +240,8 @@ impl Search {
 
             // 棋譜に入れる☆
             game.set_move(&move_);
-            game.read_move(game.history.get_turn(), &move_);
+            game.read_move(game.history.get_turn(), &move_, self);
 
-            self.pv.push(&move_);
             let (captured_piece_centi_pawn, delta_promotion_bonus) = self
                 .evaluation
                 .after_do_move(captured_piece_type, promotion_value);
@@ -255,8 +254,7 @@ impl Search {
 
                     self.evaluation
                         .before_undo_move(captured_piece_centi_pawn, delta_promotion_bonus);
-                    self.pv.pop();
-                    game.read_move_in_reverse();
+                    game.read_move_in_reverse(self);
                     break;
                 }
             }
@@ -320,8 +318,7 @@ impl Search {
 
             self.evaluation
                 .before_undo_move(captured_piece_centi_pawn, delta_promotion_bonus);
-            self.pv.pop();
-            game.read_move_in_reverse();
+            game.read_move_in_reverse(self);
 
             match ts.bestmove.value {
                 Value::Win => {
@@ -551,7 +548,7 @@ impl Default for PrincipalVariation {
     }
 }
 impl PrincipalVariation {
-    fn push(&mut self, movement: &Movement) {
+    pub fn push(&mut self, movement: &Movement) {
         if self.text.is_empty() {
             self.text.push_str(&movement.to_string());
         } else {
@@ -560,7 +557,7 @@ impl PrincipalVariation {
         self.ply += 1;
     }
 
-    fn pop(&mut self) {
+    pub fn pop(&mut self) {
         // None か スペースが出てくるまで削除しようぜ☆（＾～＾）
         loop {
             if let Some(ch) = self.text.pop() {
