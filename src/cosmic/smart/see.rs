@@ -1,6 +1,6 @@
 //! Static exchange evaluation
 
-use crate::cosmic::daydream::Value;
+use crate::computer_player::daydream::Value;
 use crate::cosmic::playing::Game;
 use crate::cosmic::recording::FireAddress;
 

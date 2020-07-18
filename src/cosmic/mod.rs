@@ -1,4 +1,3 @@
-pub mod daydream;
 pub mod playing;
 pub mod pos_hash;
 pub mod recording;

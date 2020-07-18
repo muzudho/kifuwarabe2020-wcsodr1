@@ -1,5 +1,5 @@
+use crate::computer_player::daydream::Search;
 use crate::config::*;
-use crate::cosmic::daydream::Tree;
 use crate::cosmic::playing::PosNums;
 use crate::cosmic::recording::Movement;
 use crate::cosmic::recording::Phase;
@@ -53,7 +53,7 @@ impl Kifuwarabe {
         // go btime 40000 wtime 50000 binc 10000 winc 10000
         let go1 = engine::Go::parse(line);
         Log::println(&format!("info string test {}", go1));
-        let mut tree = Tree::new(
+        let mut tree = Search::new(
             universe.option_many_ways_weight,
             universe.option_komawari_weight,
             universe.option_promotion_weight,
@@ -95,7 +95,7 @@ impl Kifuwarabe {
         // その手を選んだ理由☆（＾～＾）
         universe.game.info.print(
             None,
-            Some((tree.state_nodes, tree.nps())),
+            Some((tree.nodes, tree.nps())),
             Some(ts.bestmove.value),
             ts.bestmove.movement,
             &Some(PvString::String(ts.bestmove.reason.to_string())),

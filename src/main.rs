@@ -19,10 +19,12 @@ extern crate regex;
 //
 // 使いたい ディレクトリー名を pub mod しろだぜ☆（＾～＾）
 // 別のアプリにも見えるようにしたけりゃ pub mod にしろだぜ☆（＾～＾）
+mod computer_player;
 mod config;
 mod cosmic;
 mod law;
 mod look_and_model;
+mod performance_measurement;
 mod spaceship;
 
 use crate::config::LOG_FILE;

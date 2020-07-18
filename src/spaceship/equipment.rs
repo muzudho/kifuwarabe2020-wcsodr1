@@ -1,5 +1,5 @@
 //! 宇宙船の備品だぜ☆（＾～＾）
-use crate::cosmic::daydream::Value;
+use crate::computer_player::daydream::Value;
 use crate::cosmic::recording::Movement;
 use crate::cosmic::smart::square::test_rotation;
 use crate::LogExt;

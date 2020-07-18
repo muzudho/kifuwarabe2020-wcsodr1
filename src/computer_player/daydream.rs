@@ -16,11 +16,13 @@ use std::fmt;
 use std::time::Instant;
 
 /// ツリーは探索中に１つしか生成しないぜ☆（＾～＾）
-pub struct Tree {
-    // この木を生成したと同時にストップ・ウォッチを開始するぜ☆（＾～＾）
-    stopwatch: Instant,
-    // 状態ノード数☆（＾～＾）
-    pub state_nodes: u64,
+pub struct Search {
+    /// Number of state nodes searched.  
+    /// 探索した状態ノード数。  
+    pub nodes: u64,
+    /// Start the stopwatch when this structure is created.  
+    /// この構造体を生成した時点からストップ・ウォッチを開始します。  
+    pub stopwatch: Instant,
 
     // Principal variation(読み筋)☆（＾～＾）
     pv: PrincipalVariation,
@@ -35,16 +37,16 @@ pub struct Tree {
     // 読みの深さの上限☆（＾～＾）１手を読み切るなら 0 を指定しろだぜ☆（＾～＾）
     max_depth0: usize,
 }
-impl Tree {
+impl Search {
     pub fn new(
         many_ways_weight: isize,
         komawari_weight: isize,
         promotion_weight: isize,
         depth_not_to_give_up: usize,
     ) -> Self {
-        Tree {
+        Search {
             stopwatch: Instant::now(),
-            state_nodes: 0,
+            nodes: 0,
             pv: PrincipalVariation::default(),
             think_msec: 0,
             evaluation: Evaluation::new(many_ways_weight, komawari_weight, promotion_weight),
@@ -74,7 +76,7 @@ impl Tree {
             let movement = best_ts.bestmove.movement;
             universe.game.info.print(
                 Some(self.max_depth0),
-                Some((self.state_nodes, self.nps())),
+                Some((self.nodes, self.nps())),
                 Some(best_ts.bestmove.value),
                 movement,
                 &Some(PvString::PV(
@@ -214,7 +216,7 @@ impl Tree {
             }
 
             // 1手進めるぜ☆（＾～＾）
-            self.state_nodes += 1;
+            self.nodes += 1;
             // * `promotion_value` - 評価値用。成ったら加点☆（＾～＾）
             let promotion_value = if move_.promote {
                 game.table.promotion_value_at(&game.table, &move_.source)
@@ -292,7 +294,7 @@ impl Tree {
                     );
                     game.info.print(
                         Some(self.pv.len()),
-                        Some((self.state_nodes, self.nps())),
+                        Some((self.nodes, self.nps())),
                         Some(ts.bestmove.value),
                         movement,
                         &Some(PvString::PV(self.msec(), format!("{}", self.pv))),
@@ -373,23 +375,6 @@ impl Tree {
         }
 
         ts
-    }
-
-    pub fn sec(&self) -> u64 {
-        self.stopwatch.elapsed().as_secs()
-    }
-
-    pub fn msec(&self) -> u128 {
-        self.stopwatch.elapsed().as_millis()
-    }
-
-    pub fn nps(&self) -> u64 {
-        let sec = self.sec();
-        if 0 < sec {
-            self.state_nodes / sec
-        } else {
-            0
-        }
     }
 }
 
