@@ -171,15 +171,29 @@ impl Search {
         self.evaluation.add_control(coverage_sign, &ways);
         for index in ways.indexes.iter() {
             let move_ = ways.get(*index);
-            // 時間を見ようぜ☆（＾～＾）？
+
+            // Find out why you are not doing a forward search.
+            // If not, I will search.
+            // 前向き検索を行わない理由を調べてください。
+            // 無ければ探索します。
+            let mut forward_cut_off1 = None;
             if self.think_msec < self.msec() && self.depth_not_to_give_up <= self.max_depth0 {
                 // とりあえず ランダム秒で探索を打ち切ろうぜ☆（＾～＾）？
                 // タイムアウトしたんだったら、終了処理 すっとばして早よ終われだぜ☆（＾～＾）
                 ts.timeout = true;
-                return ts;
+                forward_cut_off1 = Some(ForwardCutOff1::TimeOut);
             }
 
-            // 1手進めるぜ☆（＾～＾）
+            if let Some(forward_cut_off1) = forward_cut_off1 {
+                match forward_cut_off1 {
+                    ForwardCutOff1::TimeOut => {
+                        return ts;
+                    }
+                }
+            }
+
+            // Let's put a stone for now.
+            // とりあえず石を置きましょう。
             self.nodes += 1;
             // * `promotion_value` - 評価値用。成ったら加点☆（＾～＾）
             let promotion_value = if move_.promote {
@@ -202,8 +216,6 @@ impl Search {
                 None
             };
 
-            // 棋譜に入れる☆
-            pos.set_move(&move_);
             pos.do_move(pos.history.get_turn(), &move_);
 
             let (captured_piece_centi_pawn, delta_promotion_bonus) = self
@@ -211,15 +223,29 @@ impl Search {
                 .after_do_move(captured_piece_type, promotion_value);
 
             // TODO 廃止方針☆（＾～＾）
-            if let Some(captured_piece_type_val) = captured_piece_type {
-                if captured_piece_type_val == PieceType::King {
-                    // 玉を取る手より強い手はないぜ☆（＾～＾）！探索終了～☆（＾～＾）！この手を選べだぜ☆（＾～＾）！
-                    ts.bestmove.catch_king(move_);
+            let forward_cut_off2 = {
+                if let Some(captured_piece_type_val) = captured_piece_type {
+                    if captured_piece_type_val == PieceType::King {
+                        // 玉を取る手より強い手はないぜ☆（＾～＾）！探索終了～☆（＾～＾）！この手を選べだぜ☆（＾～＾）！
+                        Some(ForwardCutOff2::KingCatch)
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                }
+            };
 
-                    self.evaluation
-                        .before_undo_move(captured_piece_centi_pawn, delta_promotion_bonus);
-                    pos.undo_move();
-                    break;
+            if let Some(forward_cut_off2) = forward_cut_off2 {
+                match forward_cut_off2 {
+                    ForwardCutOff2::KingCatch => {
+                        ts.bestmove.catch_king(move_);
+
+                        self.evaluation
+                            .before_undo_move(captured_piece_centi_pawn, delta_promotion_bonus);
+                        pos.undo_move();
+                        break;
+                    }
                 }
             }
 
@@ -249,7 +275,6 @@ impl Search {
                             self.evaluation.promotion(),
                         ))),
                     ));
-                    self.info.set_interval();
                     Log::print_info(&Search::info_str(
                         Some(pos.pv_len()),
                         Some((self.nodes, self.nps())),
@@ -282,14 +307,17 @@ impl Search {
                     ts.turn_over_and_choice(&opponent_ts, move_, self.evaluation.centi_pawn());
             }
 
+            // (2) Remove the placed stone.
+            // (二) 置いた石は取り除きます。
             self.evaluation
                 .before_undo_move(captured_piece_centi_pawn, delta_promotion_bonus);
             pos.undo_move();
 
+            let mut backword_cut_off = None;
             match ts.bestmove.value {
                 Value::Win => {
                     // この手について、次の手ではなく、２手以上先で勝ったんだろ☆（＾～＾）もう探索しなくていいぜ☆（＾～＾）この手にしようぜ☆（＾～＾）！
-                    break;
+                    backword_cut_off = Some(BackwardCutOff::YouWin);
                 }
                 Value::Lose => {
                     // この手について、次の相手の番で王さまを取られたか、３手先以上の奇数番で詰められたんだろ☆（＾～＾）詰められてない別の手を探すんだぜ、続行☆（＾～＾）！
@@ -301,7 +329,7 @@ impl Search {
                             // 兄弟局面より良い手を見つけたのなら、相手から見ればこの手は選ばないから、もう探索しなくていいぜ☆（＾～＾）
                             // これが　いわゆるベータカットだぜ☆（＾～＾）
                             if another_branch_best_centi_pawn <= current_centi_pawn {
-                                break;
+                                backword_cut_off = Some(BackwardCutOff::BetaCut);
                             }
                         }
                         Value::Win => {
@@ -311,8 +339,18 @@ impl Search {
                         Value::Lose => {
                             // 兄弟局面に負けがあるんだったら、この
                             // 負けに比べればどんな手でも良いぜ☆（＾～＾）ベータカットな☆（＾～＾）！
-                            break;
+                            backword_cut_off = Some(BackwardCutOff::BetaCut);
                         }
+                    }
+                }
+            }
+
+            // (4) Depending on the condition, the sibling node search is skipped.
+            // (四) 条件によっては、兄弟ノードの検索がスキップされます。
+            if let Some(backword_cut_off) = backword_cut_off {
+                match backword_cut_off {
+                    BackwardCutOff::YouWin | BackwardCutOff::BetaCut => {
+                        break;
                     }
                 }
             }
@@ -334,6 +372,32 @@ impl Search {
 
         ts
     }
+}
+
+/// The reason for ending the forward search.  
+/// 前向き探索を終了した理由。  
+pub enum ForwardCutOff1 {
+    /// The urgency of the remaining time.  
+    /// 残り時間の切迫。  
+    TimeOut,
+}
+/// The reason for ending the forward search.  
+/// 前向き探索を終了した理由。  
+pub enum ForwardCutOff2 {
+    /// Capture the king.
+    /// 玉を取った。
+    KingCatch,
+}
+
+/// The reason for ending the backward search.  
+/// 後ろ向き探索を終了した理由。  
+pub enum BackwardCutOff {
+    /// End with a you win.
+    /// あなたの勝ちにつき、終了。
+    YouWin,
+    /// Beta cut-off.
+    /// ベータ・カット。
+    BetaCut,
 }
 
 #[derive(Clone)]

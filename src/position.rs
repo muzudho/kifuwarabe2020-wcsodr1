@@ -142,8 +142,14 @@ impl Position {
         count
     }
 
-    /// 入れた指し手の通り指すぜ☆（＾～＾）
+    /// 棋譜に書き込んで、指すぜ☆（＾～＾）
     pub fn do_move(&mut self, turn: Phase, move_: &Movement) {
+        self.set_move(&move_);
+        self.redo_move(turn, move_);
+    }
+
+    /// 入れた指し手の通り指すぜ☆（＾～＾）
+    pub fn redo_move(&mut self, turn: Phase, move_: &Movement) {
         // 局面ハッシュを作り直す
         self.hash_seed
             .update_by_do_move(&mut self.history, &self.table, move_);

@@ -187,7 +187,7 @@ impl Chiyuri {
             let move_ = universe.game.history.movements[ply as usize];
             universe
                 .game
-                .do_move(universe.game.history.get_turn(), &move_);
+                .redo_move(universe.game.history.get_turn(), &move_);
         }
     }
     pub fn genmove(universe: &Universe) {

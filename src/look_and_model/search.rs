@@ -1,4 +1,4 @@
-use crate::computer_player::daydream::Value;
+use crate::computer_player::search::Value;
 use crate::cosmic::recording::Movement;
 use crate::cosmic::smart::evaluator::Evaluation;
 use crate::spaceship::equipment::PvString;
