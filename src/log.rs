@@ -5,11 +5,20 @@ use casual_logger::{Level, Log};
 /// Extend the functionality of the log.  
 /// ログの機能を拡張します。  
 pub trait LogExt {
+    fn print_debug(s: &str);
     fn print_info(s: &str);
     fn print_notice(s: &str);
     fn print_fatal(s: &str) -> String;
 }
 impl LogExt for Log {
+    /// Display 'info' level messages and write to log.  
+    /// 情報レベル メッセージを表示し、ログに書き込みます。  
+    fn print_debug(s: &str) {
+        if Log::enabled(Level::Debug) {
+            println!("{}", s);
+        }
+        Log::debug(s);
+    }
     /// Display 'info' level messages and write to log.  
     /// 情報レベル メッセージを表示し、ログに書き込みます。  
     fn print_info(s: &str) {

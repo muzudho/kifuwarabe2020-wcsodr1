@@ -472,7 +472,9 @@ pub fn set_position(pos: &mut Position, p: &mut CommandLineSeek) {
             p.go_next_to(" 1 ");
         }
     } else {
-        Log::print_info("'position startpos' でも、'position sfen ' でも始まらなかった。");
+        Log::print_debug(
+            "info string 'position startpos' でも、'position sfen ' でも始まらなかった。",
+        );
         return;
     }
 

@@ -39,6 +39,7 @@ use casual_logger::{Log, Table};
 
 fn main() {
     Log::set_file_name(LOG_FILE);
+    // Log::set_level(Level::Notice);
     Log::remove_old_logs();
     // 宇宙☆（＾～＾）変化するぜ☆（＾～＾）
     let mut universe: Universe = Universe::default();

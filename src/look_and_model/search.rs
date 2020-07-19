@@ -1,4 +1,5 @@
 use crate::computer_player::search::Value;
+use crate::config::INFO_INTERVAL_MSEC;
 use crate::cosmic::recording::Movement;
 use crate::cosmic::smart::evaluator::Evaluation;
 use crate::spaceship::equipment::PvString;
@@ -144,7 +145,8 @@ impl InfoDisplay {
     pub fn is_printable(&self) -> bool {
         // 初回か、前回より1秒以上経過していれば。
         self.info_first
-            || self.info_previous.as_secs() + 1 < self.info_stopwatch.elapsed().as_secs()
+            || self.info_previous.as_millis() + INFO_INTERVAL_MSEC
+                < self.info_stopwatch.elapsed().as_millis()
     }
 
     /// 表示間隔を開けます。
