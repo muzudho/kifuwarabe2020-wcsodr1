@@ -142,13 +142,25 @@ impl Position {
         count
     }
 
-    /// 棋譜に書き込んで、指すぜ☆（＾～＾）
+    /// Place the stone.  
+    /// １手指します。  
     pub fn do_move(&mut self, turn: Phase, move_: &Movement) {
+        // Principal variation.
+        if self.pv_text.is_empty() {
+            self.pv_text.push_str(&move_.to_string());
+        } else {
+            self.pv_text.push_str(&format!(" {}", move_));
+        }
+        self.pv_len += 1;
+
         self.set_move(&move_);
         self.redo_move(turn, move_);
     }
 
-    /// 入れた指し手の通り指すぜ☆（＾～＾）
+    /// Place the stone.  
+    /// Do not write to the pv.  
+    /// １手指します。  
+    /// 読み筋への書き込みを行いません。  
     pub fn redo_move(&mut self, turn: Phase, move_: &Movement) {
         // 局面ハッシュを作り直す
         self.hash_seed
@@ -181,14 +193,6 @@ impl Position {
         // self.history.set_position_hash(ky_hash);
 
         self.history.ply += 1;
-
-        // Principal variation.
-        if self.pv_text.is_empty() {
-            self.pv_text.push_str(&move_.to_string());
-        } else {
-            self.pv_text.push_str(&format!(" {}", move_));
-        }
-        self.pv_len += 1;
     }
 
     /// 逆順に指します。
