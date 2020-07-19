@@ -224,87 +224,91 @@ impl Search {
 
             // TODO 廃止方針☆（＾～＾）
             let forward_cut_off2 = {
+                let mut cut = None;
                 if let Some(captured_piece_type_val) = captured_piece_type {
                     if captured_piece_type_val == PieceType::King {
                         // 玉を取る手より強い手はないぜ☆（＾～＾）！探索終了～☆（＾～＾）！この手を選べだぜ☆（＾～＾）！
-                        Some(ForwardCutOff2::KingCatch)
-                    } else {
-                        None
+                        cut = Some(ForwardCutOff2::KingCatch);
                     }
-                } else {
-                    None
                 }
+
+                if let None = cut {
+                    if self.max_depth0 < pos.pv_len() {
+                        cut = Some(ForwardCutOff2::Leaf);
+                    }
+                }
+
+                cut
             };
 
-            if let Some(forward_cut_off2) = forward_cut_off2 {
+            if let Some(forward_cut_off2) = &forward_cut_off2 {
                 match forward_cut_off2 {
                     ForwardCutOff2::KingCatch => {
                         ts.bestmove.catch_king(move_);
+                    }
+                    ForwardCutOff2::Leaf => {
+                        // 葉だぜ☆（＾～＾）
 
-                        self.evaluation
-                            .before_undo_move(captured_piece_centi_pawn, delta_promotion_bonus);
-                        pos.undo_move();
-                        break;
+                        // 評価を集計するぜ☆（＾～＾）
+                        ts.choice_friend(&Value::CentiPawn(self.evaluation.centi_pawn()), move_);
+
+                        if self.info.is_printable() {
+                            // 何かあったタイミングで読み筋表示するのではなく、定期的に表示しようぜ☆（＾～＾）
+                            // PV を表示するには、葉のタイミングで出すしかないぜ☆（＾～＾）
+                            let movement = ts.bestmove.movement;
+                            Log::print_info(&Search::info_str(
+                                None,
+                                None,
+                                None,
+                                None,
+                                &Some(PvString::String(format!(
+                                    "ways={} | komawari={} | promotion={}", //  | {} {} {} |
+                                    self.evaluation.ways(),
+                                    self.evaluation.komawari(),
+                                    self.evaluation.promotion(),
+                                ))),
+                            ));
+                            Log::print_info(&Search::info_str(
+                                Some(pos.pv_len()),
+                                Some((self.nodes, self.nps())),
+                                Some(ts.bestmove.value),
+                                movement,
+                                &Some(PvString::PV(self.msec(), pos.pv_text().to_string())),
+                            ));
+                            self.info.set_interval();
+                        }
                     }
                 }
             }
 
-            // 千日手かどうかを判定する☆（＾～＾）
-            if SENNTITE_NUM <= pos.count_same_position() {
-                // 千日手か……☆（＾～＾） 一応覚えておくぜ☆（＾～＾）
-                ts.repetition_movement = Some(move_);
-            } else if self.max_depth0 < pos.pv_len() {
-                // 葉だぜ☆（＾～＾）
+            if let None = forward_cut_off2 {
+                // 千日手かどうかを判定する☆（＾～＾）
+                if SENNTITE_NUM <= pos.count_same_position() {
+                    // 千日手か……☆（＾～＾） 一応覚えておくぜ☆（＾～＾）
+                    ts.repetition_movement = Some(move_);
+                } else if self.max_depth0 < pos.pv_len() {
+                } else {
+                    // 枝局面なら、更に深く進むぜ☆（＾～＾）
+                    self.evaluation.before_search();
+                    let opponent_ts = self.node(
+                        pos,
+                        match ts.bestmove.value {
+                            Value::CentiPawn(centi_pawn) => Value::CentiPawn(-centi_pawn),
+                            Value::Win => Value::Lose,
+                            Value::Lose => Value::Win,
+                        },
+                    );
 
-                // 評価を集計するぜ☆（＾～＾）
-                ts.choice_friend(&Value::CentiPawn(self.evaluation.centi_pawn()), move_);
+                    if ts.timeout {
+                        // すでにタイムアウトしていたのなら、終了処理 すっとばして早よ終われだぜ☆（＾～＾）
+                        return ts;
+                    }
+                    self.evaluation.after_search();
 
-                if self.info.is_printable() {
-                    // 何かあったタイミングで読み筋表示するのではなく、定期的に表示しようぜ☆（＾～＾）
-                    // PV を表示するには、葉のタイミングで出すしかないぜ☆（＾～＾）
-                    let movement = ts.bestmove.movement;
-                    Log::print_info(&Search::info_str(
-                        None,
-                        None,
-                        None,
-                        None,
-                        &Some(PvString::String(format!(
-                            "ways={} | komawari={} | promotion={}", //  | {} {} {} |
-                            self.evaluation.ways(),
-                            self.evaluation.komawari(),
-                            self.evaluation.promotion(),
-                        ))),
-                    ));
-                    Log::print_info(&Search::info_str(
-                        Some(pos.pv_len()),
-                        Some((self.nodes, self.nps())),
-                        Some(ts.bestmove.value),
-                        movement,
-                        &Some(PvString::PV(self.msec(), pos.pv_text().to_string())),
-                    ));
-                    self.info.set_interval();
+                    // 下の木の結果を、ひっくり返して、引き継ぎます。
+                    exists_lose =
+                        ts.turn_over_and_choice(&opponent_ts, move_, self.evaluation.centi_pawn());
                 }
-            } else {
-                // 枝局面なら、更に深く進むぜ☆（＾～＾）
-                self.evaluation.before_search();
-                let opponent_ts = self.node(
-                    pos,
-                    match ts.bestmove.value {
-                        Value::CentiPawn(centi_pawn) => Value::CentiPawn(-centi_pawn),
-                        Value::Win => Value::Lose,
-                        Value::Lose => Value::Win,
-                    },
-                );
-
-                if ts.timeout {
-                    // すでにタイムアウトしていたのなら、終了処理 すっとばして早よ終われだぜ☆（＾～＾）
-                    return ts;
-                }
-                self.evaluation.after_search();
-
-                // 下の木の結果を、ひっくり返して、引き継ぎます。
-                exists_lose =
-                    ts.turn_over_and_choice(&opponent_ts, move_, self.evaluation.centi_pawn());
             }
 
             // (2) Remove the placed stone.
@@ -312,6 +316,15 @@ impl Search {
             self.evaluation
                 .before_undo_move(captured_piece_centi_pawn, delta_promotion_bonus);
             pos.undo_move();
+
+            if let Some(forward_cut_off2) = &forward_cut_off2 {
+                match forward_cut_off2 {
+                    ForwardCutOff2::KingCatch => {
+                        break;
+                    }
+                    ForwardCutOff2::Leaf => {}
+                }
+            }
 
             let mut backword_cut_off = None;
             match ts.bestmove.value {
@@ -387,6 +400,9 @@ pub enum ForwardCutOff2 {
     /// Capture the king.
     /// 玉を取った。
     KingCatch,
+    /// Leaf.
+    /// 葉。
+    Leaf,
 }
 
 /// The reason for ending the backward search.  
