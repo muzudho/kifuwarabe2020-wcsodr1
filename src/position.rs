@@ -17,7 +17,6 @@ use crate::cosmic::toy_box::*;
 use crate::law::generate_move::Area;
 use crate::law::speed_of_light::Nine299792458;
 use crate::log::LogExt;
-use crate::look_and_model::info_display::InfoDisplay;
 use crate::look_and_model::piece::Piece;
 use casual_logger::Log;
 use num_traits::FromPrimitive;
@@ -33,8 +32,6 @@ pub struct Position {
     pub hash_seed: GameHashSeed,
     /// 現在の卓
     pub table: GameTable,
-    /// 情報表示担当
-    pub info: InfoDisplay,
     pub movegen_phase: MovegenPhase,
 
     // Principal variation(読み筋)☆（＾～＾）
@@ -48,7 +45,6 @@ impl Default for Position {
             starting_table: GameTable::default(),
             hash_seed: GameHashSeed::default(),
             table: GameTable::default(),
-            info: InfoDisplay::default(),
             movegen_phase: MovegenPhase::default(),
             pv_text: String::with_capacity(PV_BUFFER),
             pv_len: 0,

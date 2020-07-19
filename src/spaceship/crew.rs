@@ -1,5 +1,4 @@
 use crate::command_line_seek::CommandLineSeek;
-use crate::computer_player::daydream::Search;
 use crate::config::*;
 use crate::cosmic::playing::PosNums;
 use crate::cosmic::recording::Movement;
@@ -12,6 +11,7 @@ use crate::law::generate_move::MoveGen;
 use crate::law::usi::*;
 use crate::log::LogExt;
 use crate::look_and_model::facility::{CommandRoom, GameRoom, Kitchen, TheaterRoom1, TheaterRoom2};
+use crate::look_and_model::search::Search;
 use crate::spaceship::engine;
 use crate::spaceship::equipment::{PvString, Telescope};
 use casual_logger::{Log, Table};
@@ -67,7 +67,7 @@ impl Kifuwarabe {
 
         let ts = tree.iteration_deeping(universe);
         // その手を選んだ理由☆（＾～＾）
-        Log::print_info(&universe.game.info.info_str(
+        Log::print_info(&Search::info_str(
             None,
             Some((tree.nodes, tree.nps())),
             Some(ts.bestmove.value),

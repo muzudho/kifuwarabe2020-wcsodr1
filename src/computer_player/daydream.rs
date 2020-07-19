@@ -3,55 +3,21 @@
 //!
 
 use crate::cosmic::recording::{Movement, Phase, SENNTITE_NUM};
-use crate::cosmic::smart::evaluator::{Evaluation, REPITITION_VALUE};
+use crate::cosmic::smart::evaluator::REPITITION_VALUE;
 use crate::cosmic::smart::features::PieceType;
 use crate::cosmic::universe::Universe;
 use crate::law::generate_move::{MoveGen, Ways};
 use crate::log::LogExt;
+use crate::look_and_model::search::Search;
 use crate::position::Position;
 use crate::spaceship::equipment::PvString;
 use casual_logger::Log;
 use std::fmt;
-use std::time::Instant;
 
-/// ツリーは探索中に１つしか生成しないぜ☆（＾～＾）
-pub struct Search {
-    /// Number of state nodes searched.  
-    /// 探索した状態ノード数。  
-    pub nodes: u64,
-    /// Start the stopwatch when this structure is created.  
-    /// この構造体を生成した時点からストップ・ウォッチを開始します。  
-    pub stopwatch: Instant,
-
-    // 思考時間（ミリ秒）をランダムにすることで、指し手を変えるぜ☆（＾～＾）
-    pub think_msec: u128,
-
-    pub evaluation: Evaluation,
-
-    // 反復深化探索の１回目だけ真☆（＾～＾）
-    pub depth_not_to_give_up: usize,
-    // 読みの深さの上限☆（＾～＾）１手を読み切るなら 0 を指定しろだぜ☆（＾～＾）
-    max_depth0: usize,
-}
 impl Search {
-    pub fn new(
-        many_ways_weight: isize,
-        komawari_weight: isize,
-        promotion_weight: isize,
-        depth_not_to_give_up: usize,
-    ) -> Self {
-        Search {
-            stopwatch: Instant::now(),
-            nodes: 0,
-            think_msec: 0,
-            evaluation: Evaluation::new(many_ways_weight, komawari_weight, promotion_weight),
-            depth_not_to_give_up: depth_not_to_give_up,
-            max_depth0: 0,
-        }
-    }
     /// 反復深化探索だぜ☆（＾～＾）
     pub fn iteration_deeping(&mut self, universe: &mut Universe) -> TreeState {
-        universe.game.info.clear();
+        self.info.clear();
 
         let max_ply = std::cmp::max(
             universe.option_max_depth,
@@ -69,7 +35,7 @@ impl Search {
             self.max_depth0 = id;
             // 現在のベストムーブ表示☆（＾～＾） PV にすると将棋所は符号を日本語に翻訳してくれるぜ☆（＾～＾）
             let movement = best_ts.bestmove.movement;
-            Log::print_info(&universe.game.info.info_str(
+            Log::print_info(&Search::info_str(
                 Some(self.max_depth0),
                 Some((self.nodes, self.nps())),
                 Some(best_ts.bestmove.value),
@@ -86,6 +52,7 @@ impl Search {
                     ),
                 )), // この指し手を選んだ時の pv の読み筋が欲しいぜ☆（＾～＾）
             ));
+            self.info.set_interval();
 
             if let None = movement {
                 // すでに投了が見えているのなら探索終了だぜ☆（＾～＾）
@@ -93,7 +60,7 @@ impl Search {
             }
 
             // 横線で仕切るぜ☆（＾～＾）
-            Log::print_info(&universe.game.info.info_str(
+            Log::print_info(&Search::info_str(
                 None,
                 None,
                 None,
@@ -102,6 +69,7 @@ impl Search {
                     "----------Iteration deeping----------"
                 ))),
             ));
+            self.info.set_interval();
 
             // 探索局面数は引き継ぐぜ☆（＾～＾）積み上げていった方が見てて面白いだろ☆（＾～＾）
             self.evaluation.before_search();
@@ -265,11 +233,11 @@ impl Search {
                 // 評価を集計するぜ☆（＾～＾）
                 ts.choice_friend(&Value::CentiPawn(self.evaluation.centi_pawn()), move_);
 
-                if pos.info.is_printable() {
+                if self.info.is_printable() {
                     // 何かあったタイミングで読み筋表示するのではなく、定期的に表示しようぜ☆（＾～＾）
                     // PV を表示するには、葉のタイミングで出すしかないぜ☆（＾～＾）
                     let movement = ts.bestmove.movement;
-                    Log::print_info(&pos.info.info_str(
+                    Log::print_info(&Search::info_str(
                         None,
                         None,
                         None,
@@ -281,13 +249,15 @@ impl Search {
                             self.evaluation.promotion(),
                         ))),
                     ));
-                    Log::print_info(&pos.info.info_str(
+                    self.info.set_interval();
+                    Log::print_info(&Search::info_str(
                         Some(pos.pv_len()),
                         Some((self.nodes, self.nps())),
                         Some(ts.bestmove.value),
                         movement,
                         &Some(PvString::PV(self.msec(), pos.pv_text().to_string())),
                     ));
+                    self.info.set_interval();
                 }
             } else {
                 // 枝局面なら、更に深く進むぜ☆（＾～＾）
