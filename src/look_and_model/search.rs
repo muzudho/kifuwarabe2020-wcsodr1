@@ -112,6 +112,11 @@ impl Search {
         );
         s.to_string()
     }
+
+    /// ストップウォッチを初期化します。
+    pub fn remake_info_display(&mut self) {
+        self.info = InfoDisplay::default();
+    }
 }
 
 /// 行き先表示案内板だぜ☆（＾～＾）
@@ -135,13 +140,6 @@ impl Default for InfoDisplay {
     }
 }
 impl InfoDisplay {
-    /// ストップウォッチを初期化します。
-    pub fn clear(&mut self) {
-        self.info_stopwatch = Instant::now();
-        self.info_previous = self.info_stopwatch.elapsed();
-        self.info_first = true;
-    }
-
     pub fn is_printable(&self) -> bool {
         // 初回か、前回より1秒以上経過していれば。
         self.info_first

@@ -279,9 +279,13 @@ impl MoveGen {
         match source {
             FireAddress::Board(_src_sq) => {
                 let piece_type = game.table.get_type(
-                    game.table
-                        .piece_num_at(game.history.get_turn(), &source)
-                        .unwrap(),
+                    if let Some(piece_num) =
+                        game.table.piece_num_at(game.history.get_turn(), &source)
+                    {
+                        piece_num
+                    } else {
+                        panic!(Log::print_fatal("Invalid piece_num."));
+                    },
                 );
 
                 let moving =
@@ -327,9 +331,14 @@ impl MoveGen {
                                 // 成ったり、成れなかったりできるとき。
                                 if !forbidden {
                                     listen_move(Movement::new(
-                                        game.table
+                                        if let Some(piece_num) = game
+                                            .table
                                             .piece_num_at(game.history.get_turn(), &source)
-                                            .unwrap(),
+                                        {
+                                            piece_num
+                                        } else {
+                                            panic!(Log::print_fatal("Invalid piece_num."));
+                                        },
                                         *source,
                                         *destination,
                                         false,
@@ -348,9 +357,13 @@ impl MoveGen {
                                     ));
                                 }
                                 listen_move(Movement::new(
-                                    game.table
-                                        .piece_num_at(game.history.get_turn(), &source)
-                                        .unwrap(),
+                                    if let Some(piece_num) =
+                                        game.table.piece_num_at(game.history.get_turn(), &source)
+                                    {
+                                        piece_num
+                                    } else {
+                                        panic!(Log::print_fatal("Invalid piece_num."));
+                                    },
                                     *source,
                                     *destination,
                                     true,
@@ -372,9 +385,14 @@ impl MoveGen {
                                 // 成れるか、成れないかのどちらかのとき。
                                 if promotion || !forbidden {
                                     listen_move(Movement::new(
-                                        game.table
+                                        if let Some(piece_num) = game
+                                            .table
                                             .piece_num_at(game.history.get_turn(), &source)
-                                            .unwrap(),
+                                        {
+                                            piece_num
+                                        } else {
+                                            panic!(Log::print_fatal("Invalid piece_num."));
+                                        },
                                         *source,
                                         *destination,
                                         promotion,
@@ -431,9 +449,13 @@ impl MoveGen {
                                 _ => {}
                             }
                             listen_move(Movement::new(
-                                game.table
-                                    .piece_num_at(game.history.get_turn(), &fire_hand)
-                                    .unwrap(),
+                                if let Some(piece_num) =
+                                    game.table.piece_num_at(game.history.get_turn(), &fire_hand)
+                                {
+                                    piece_num
+                                } else {
+                                    panic!(Log::print_fatal("Invalid piece_num."));
+                                },
                                 fire_hand,    // 打った駒種類
                                 *destination, // どの升へ行きたいか
                                 false,        // 打に成りは無し

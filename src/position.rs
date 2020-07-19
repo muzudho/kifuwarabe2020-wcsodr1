@@ -244,7 +244,11 @@ impl Position {
                 FireAddress::Hand(_src_drop_type) => {
                     // 打なら
                     // 打った場所に駒があるはずだぜ☆（＾～＾）
-                    let piece_num = moveing_piece_num.unwrap();
+                    let piece_num = if let Some(piece_num) = moveing_piece_num {
+                        piece_num
+                    } else {
+                        panic!(Log::print_fatal("(Err.250) Invalid moveing_piece_num"));
+                    };
                     // 自分の持ち駒を増やそうぜ☆（＾～＾）！
                     let turn = self.table.get_phase(piece_num);
                     // TODO この駒を置くことになる場所は☆（＾～＾）？
@@ -431,7 +435,12 @@ impl GameTable {
     pub fn rotate_piece_hand_to_board(&mut self, turn: Phase, move_: &Movement) {
         if let Some(move2_val) = move_.captured {
             // アンドゥだから盤にまだない。
-            let piece_type = self.last_hand_type(turn, &move2_val.destination).unwrap();
+            let piece_type =
+                if let Some(piece_type) = self.last_hand_type(turn, &move2_val.destination) {
+                    piece_type
+                } else {
+                    panic!(Log::print_fatal("(Err.441) Invalid piece_type."));
+                };
 
             // 取った方の駒台の先後に合わせるぜ☆（＾～＾）
             // 取った方の持ち駒を減らす
@@ -445,7 +454,11 @@ impl GameTable {
                     double_faced_piece.type_(),
                     AbsoluteAddress2D::default(),
                 ));
-                self.pop_piece(turn, &fire1).unwrap()
+                if let Some(piece_num) = self.pop_piece(turn, &fire1) {
+                    piece_num
+                } else {
+                    panic!(Log::print_fatal("Invalid piece_num."));
+                }
             };
             // 先後をひっくり返す。
             self.turn_phase(piece_num);
@@ -534,8 +547,13 @@ impl GameTable {
             _ => {
                 let drop_type = piece.double_faced_piece().type_() as usize;
                 // 玉以外の背番号は、先後に関わりなく SFENに書いてあった順で☆（＾～＾）
-                let piece_num =
-                    PieceNum::from_usize(self.double_faced_piece_type_index[drop_type]).unwrap();
+                let piece_num = if let Some(piece_num) =
+                    PieceNum::from_usize(self.double_faced_piece_type_index[drop_type])
+                {
+                    piece_num
+                } else {
+                    panic!(Log::print_fatal("Invalid piece_num."));
+                };
                 // カウントアップ☆（＾～＾）
                 self.double_faced_piece_type_index[drop_type] += 1;
                 self.new_piece_num(piece, piece_num)
@@ -690,7 +708,11 @@ impl GameTable {
             match fire {
                 FireAddress::Board(sq) => {
                     // 盤上の駒☆（＾～＾）
-                    let piece_info = self.piece_info_at1(&fire).unwrap();
+                    let piece_info = if let Some(piece_info) = self.piece_info_at1(&fire) {
+                        piece_info
+                    } else {
+                        panic!(Log::print_fatal("Invalid piece_info."));
+                    };
                     piece_get(i, Some(&sq), Some(piece_info));
                 }
                 FireAddress::Hand(_drop) => {
@@ -830,7 +852,11 @@ impl GameTable {
                 // 位置を増減するぜ☆（＾～＾）
                 self.add_hand_cur(drop, -GameTable::hand_direction(drop));
                 // 駒台の駒をはがすぜ☆（＾～＾）
-                let num = self.board[self.hand_cur(drop) as usize].unwrap();
+                let num = if let Some(num) = self.board[self.hand_cur(drop) as usize] {
+                    num
+                } else {
+                    panic!(Log::print_fatal("Invalid num."));
+                };
                 self.board[self.hand_cur(drop) as usize] = None;
                 num
             }

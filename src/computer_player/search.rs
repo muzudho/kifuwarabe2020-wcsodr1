@@ -17,7 +17,7 @@ use std::fmt;
 impl Search {
     /// 反復深化探索だぜ☆（＾～＾）
     pub fn iteration_deeping(&mut self, universe: &mut Universe) -> TreeState {
-        self.info.clear();
+        self.remake_info_display();
 
         let max_ply = std::cmp::max(
             universe.option_max_depth,
@@ -141,13 +141,19 @@ impl Search {
             // 次は駒を取ったグループの中で、玉を取った手をグループの先頭に集めるぜ☆（＾～＾）
             let mut king = 0;
             for i in 0..cap {
-                let fire = ways.get(i).captured.unwrap().source;
+                let fire = if let Some(captured_move) = ways.get(i).captured {
+                    captured_move.source
+                } else {
+                    panic!(Log::print_fatal("Invalid captured_move."));
+                };
                 let piece_type = pos.table.get_type(
-                    pos.table
-                        .piece_num_at(pos.history.get_turn(), &fire)
-                        .unwrap(),
+                    if let Some(piece_type) = pos.table.piece_num_at(pos.history.get_turn(), &fire)
+                    {
+                        piece_type
+                    } else {
+                        panic!(Log::print_fatal("Invalid piece_type."));
+                    },
                 );
-                // let piece_type = ways.get(i).captured.unwrap().piece_type;
                 match piece_type {
                     PieceType::King => {
                         // 玉を取った手は、リストの先頭に集めるぜ☆（＾～＾）
@@ -206,9 +212,14 @@ impl Search {
             let captured_piece_type = if let Some(captured) = move_.captured {
                 Some(
                     pos.table.get_type(
-                        pos.table
+                        if let Some(piece_num) = pos
+                            .table
                             .piece_num_at(pos.history.get_turn(), &captured.source)
-                            .unwrap(),
+                        {
+                            piece_num
+                        } else {
+                            panic!(Log::print_fatal("Invalid piece_num."));
+                        },
                     ),
                 )
             // Some(captured.piece_type)

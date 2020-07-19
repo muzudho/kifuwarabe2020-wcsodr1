@@ -26,7 +26,7 @@ impl Kifuwarabe {
     pub fn go(universe: &mut Universe, p: &mut CommandLineSeek) {
         // go btime 40000 wtime 50000 binc 10000 winc 10000
         let go1 = engine::Go::parse(p);
-        Log::debug(&format!("info string test {}", go1));
+        Log::debug(&format!("Debug   | go=|{}|", go1));
         let mut tree = Search::new(
             universe.option_many_ways_weight,
             universe.option_komawari_weight,
@@ -106,28 +106,68 @@ impl Kifuwarabe {
             );
             match name.as_str() {
                 "MaxPly" => {
-                    universe.option_max_ply = value.parse().unwrap();
+                    universe.option_max_ply = match value.parse() {
+                        Result::Ok(val) => val,
+                        Result::Err(e) => {
+                            panic!(Log::print_fatal(&format!("Invalid value=|{}|", e)))
+                        }
+                    };
                 }
                 "ManyWaysPer1000" => {
-                    universe.option_many_ways_weight = value.parse().unwrap();
+                    universe.option_many_ways_weight = match value.parse() {
+                        Result::Ok(val) => val,
+                        Result::Err(e) => {
+                            panic!(Log::print_fatal(&format!("Invalid value=|{}|", e)))
+                        }
+                    };
                 }
                 "DepthNotToGiveUp" => {
-                    universe.option_depth_not_to_give_up = value.parse().unwrap();
+                    universe.option_depth_not_to_give_up = match value.parse() {
+                        Result::Ok(val) => val,
+                        Result::Err(e) => {
+                            panic!(Log::print_fatal(&format!("Invalid value=|{}|", e)))
+                        }
+                    };
                 }
                 "KomawariWeightPer1000" => {
-                    universe.option_komawari_weight = value.parse().unwrap();
+                    universe.option_komawari_weight = match value.parse() {
+                        Result::Ok(val) => val,
+                        Result::Err(e) => {
+                            panic!(Log::print_fatal(&format!("Invalid value=|{}|", e)))
+                        }
+                    };
                 }
                 "PromotionWeightPer1000" => {
-                    universe.option_promotion_weight = value.parse().unwrap();
+                    universe.option_promotion_weight = match value.parse() {
+                        Result::Ok(val) => val,
+                        Result::Err(e) => {
+                            panic!(Log::print_fatal(&format!("Invalid value=|{}|", e)))
+                        }
+                    };
                 }
                 "MaxDepth" => {
-                    universe.option_max_depth = value.parse().unwrap();
+                    universe.option_max_depth = match value.parse() {
+                        Result::Ok(val) => val,
+                        Result::Err(e) => {
+                            panic!(Log::print_fatal(&format!("Invalid value=|{}|", e)))
+                        }
+                    };
                 }
                 "MinThinkMsec" => {
-                    universe.option_min_think_msec = value.parse().unwrap();
+                    universe.option_min_think_msec = match value.parse() {
+                        Result::Ok(val) => val,
+                        Result::Err(e) => {
+                            panic!(Log::print_fatal(&format!("Invalid value=|{}|", e)))
+                        }
+                    };
                 }
                 "MaxThinkMsec" => {
-                    universe.option_max_think_msec = value.parse().unwrap();
+                    universe.option_max_think_msec = match value.parse() {
+                        Result::Ok(val) => val,
+                        Result::Err(e) => {
+                            panic!(Log::print_fatal(&format!("Invalid value=|{}|", e)))
+                        }
+                    };
                 }
                 _ => {}
             }

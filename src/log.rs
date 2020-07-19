@@ -12,11 +12,8 @@ pub trait LogExt {
 }
 impl LogExt for Log {
     /// Display 'info' level messages and write to log.  
-    /// 情報レベル メッセージを表示し、ログに書き込みます。  
+    /// 情報レベル メッセージを、ログに書き込みます。  
     fn print_debug(s: &str) {
-        if Log::enabled(Level::Debug) {
-            println!("{}", s);
-        }
         Log::debug(s);
     }
     /// Display 'info' level messages and write to log.  

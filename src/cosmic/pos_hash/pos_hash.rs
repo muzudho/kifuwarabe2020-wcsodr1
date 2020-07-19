@@ -82,7 +82,12 @@ impl GameHashSeed {
         // 移動する駒。
         match move_.source {
             FireAddress::Board(src_sq) => {
-                let src_piece_hash_index = table.get_piece_board_hash_index(&move_.source).unwrap();
+                let src_piece_hash_index =
+                    if let Some(hash_index) = table.get_piece_board_hash_index(&move_.source) {
+                        hash_index
+                    } else {
+                        panic!(Log::print_fatal("Invalid captured_move."));
+                    };
                 // 移動前マスに、動かしたい駒があるときのハッシュ。
                 prev_hash ^= self.piece[src_sq.serial_number() as usize][src_piece_hash_index];
                 // 移動後マスに、動かしたい駒があるときのハッシュ。
