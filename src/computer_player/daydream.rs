@@ -69,7 +69,7 @@ impl Search {
             self.max_depth0 = id;
             // 現在のベストムーブ表示☆（＾～＾） PV にすると将棋所は符号を日本語に翻訳してくれるぜ☆（＾～＾）
             let movement = best_ts.bestmove.movement;
-            universe.game.info.print(
+            Log::print_info(&universe.game.info.info_str(
                 Some(self.max_depth0),
                 Some((self.nodes, self.nps())),
                 Some(best_ts.bestmove.value),
@@ -85,7 +85,7 @@ impl Search {
                         },
                     ),
                 )), // この指し手を選んだ時の pv の読み筋が欲しいぜ☆（＾～＾）
-            );
+            ));
 
             if let None = movement {
                 // すでに投了が見えているのなら探索終了だぜ☆（＾～＾）
@@ -93,7 +93,7 @@ impl Search {
             }
 
             // 横線で仕切るぜ☆（＾～＾）
-            universe.game.info.print(
+            Log::print_info(&universe.game.info.info_str(
                 None,
                 None,
                 None,
@@ -101,7 +101,7 @@ impl Search {
                 &Some(PvString::String(format!(
                     "----------Iteration deeping----------"
                 ))),
-            );
+            ));
 
             // 探索局面数は引き継ぐぜ☆（＾～＾）積み上げていった方が見てて面白いだろ☆（＾～＾）
             self.evaluation.before_search();
@@ -269,7 +269,7 @@ impl Search {
                     // 何かあったタイミングで読み筋表示するのではなく、定期的に表示しようぜ☆（＾～＾）
                     // PV を表示するには、葉のタイミングで出すしかないぜ☆（＾～＾）
                     let movement = ts.bestmove.movement;
-                    pos.info.print(
+                    Log::print_info(&pos.info.info_str(
                         None,
                         None,
                         None,
@@ -280,14 +280,14 @@ impl Search {
                             self.evaluation.komawari(),
                             self.evaluation.promotion(),
                         ))),
-                    );
-                    pos.info.print(
+                    ));
+                    Log::print_info(&pos.info.info_str(
                         Some(pos.pv_len()),
                         Some((self.nodes, self.nps())),
                         Some(ts.bestmove.value),
                         movement,
                         &Some(PvString::PV(self.msec(), pos.pv_text().to_string())),
-                    );
+                    ));
                 }
             } else {
                 // 枝局面なら、更に深く進むぜ☆（＾～＾）

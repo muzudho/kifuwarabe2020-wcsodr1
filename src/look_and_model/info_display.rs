@@ -1,8 +1,6 @@
 use crate::computer_player::daydream::Value;
 use crate::cosmic::recording::Movement;
-use crate::log::LogExt;
 use crate::spaceship::equipment::PvString;
-use casual_logger::Log;
 use std::time::{Duration, Instant};
 
 /// 行き先表示案内板だぜ☆（＾～＾）
@@ -11,6 +9,7 @@ pub struct InfoDisplay {
     /// 情報用のストップウォッチ
     stopwatch: Instant,
     previous: Duration,
+    /// 初回は必ず表示。
     first: bool,
 }
 impl Default for InfoDisplay {
@@ -36,16 +35,16 @@ impl InfoDisplay {
         self.first || self.previous.as_secs() + 1 < self.stopwatch.elapsed().as_secs()
     }
     /// 情報表示
-    pub fn print(
+    pub fn info_str(
         &mut self,
         cur_depth: Option<usize>,
         state_nodes_nps: Option<(u64, u64)>,
         value: Option<Value>,
         movement: Option<Movement>,
         pv_string: &Option<PvString>,
-    ) {
+    ) -> String {
         // TODO 評価値が自分のか相手のか調べてないぜ☆（＾～＾）
-        Log::print_info(&format!(
+        let s = format!(
             "info{}{}{}{}{}{}",
             // 1. 思考を開始してからのミリ秒☆（＾～＾）
             if let Some(pv_string_val) = pv_string {
@@ -100,8 +99,9 @@ impl InfoDisplay {
             } else {
                 "".to_string()
             }
-        ));
+        );
         self.first = false;
         self.previous = self.stopwatch.elapsed();
+        s.to_string()
     }
 }

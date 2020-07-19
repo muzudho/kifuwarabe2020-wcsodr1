@@ -67,13 +67,13 @@ impl Kifuwarabe {
 
         let ts = tree.iteration_deeping(universe);
         // その手を選んだ理由☆（＾～＾）
-        universe.game.info.print(
+        Log::print_info(&universe.game.info.info_str(
             None,
             Some((tree.nodes, tree.nps())),
             Some(ts.bestmove.value),
             ts.bestmove.movement,
             &Some(PvString::String(ts.bestmove.reason.to_string())),
-        );
+        ));
         // 例: bestmove 7g7f
         // 例: bestmove resign
         Log::print_info(&format!(
