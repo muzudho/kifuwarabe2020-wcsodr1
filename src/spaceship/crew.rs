@@ -108,65 +108,73 @@ impl Kifuwarabe {
                 "MaxPly" => {
                     universe.option_max_ply = match value.parse() {
                         Result::Ok(val) => val,
-                        Result::Err(e) => {
-                            panic!(Log::print_fatal(&format!("Invalid value=|{}|", e)))
-                        }
+                        Result::Err(e) => std::panic::panic_any(Log::print_fatal(&format!(
+                            "Invalid value=|{}|",
+                            e
+                        ))),
                     };
                 }
                 "ManyWaysPer1000" => {
                     universe.option_many_ways_weight = match value.parse() {
                         Result::Ok(val) => val,
-                        Result::Err(e) => {
-                            panic!(Log::print_fatal(&format!("Invalid value=|{}|", e)))
-                        }
+                        Result::Err(e) => std::panic::panic_any(Log::print_fatal(&format!(
+                            "Invalid value=|{}|",
+                            e
+                        ))),
                     };
                 }
                 "DepthNotToGiveUp" => {
                     universe.option_depth_not_to_give_up = match value.parse() {
                         Result::Ok(val) => val,
-                        Result::Err(e) => {
-                            panic!(Log::print_fatal(&format!("Invalid value=|{}|", e)))
-                        }
+                        Result::Err(e) => std::panic::panic_any(Log::print_fatal(&format!(
+                            "Invalid value=|{}|",
+                            e
+                        ))),
                     };
                 }
                 "KomawariWeightPer1000" => {
                     universe.option_komawari_weight = match value.parse() {
                         Result::Ok(val) => val,
-                        Result::Err(e) => {
-                            panic!(Log::print_fatal(&format!("Invalid value=|{}|", e)))
-                        }
+                        Result::Err(e) => std::panic::panic_any(Log::print_fatal(&format!(
+                            "Invalid value=|{}|",
+                            e
+                        ))),
                     };
                 }
                 "PromotionWeightPer1000" => {
                     universe.option_promotion_weight = match value.parse() {
                         Result::Ok(val) => val,
-                        Result::Err(e) => {
-                            panic!(Log::print_fatal(&format!("Invalid value=|{}|", e)))
-                        }
+                        Result::Err(e) => std::panic::panic_any(Log::print_fatal(&format!(
+                            "Invalid value=|{}|",
+                            e
+                        ))),
                     };
                 }
                 "MaxDepth" => {
                     universe.option_max_depth = match value.parse() {
                         Result::Ok(val) => val,
-                        Result::Err(e) => {
-                            panic!(Log::print_fatal(&format!("Invalid value=|{}|", e)))
-                        }
+                        Result::Err(e) => std::panic::panic_any(Log::print_fatal(&format!(
+                            "Invalid value=|{}|",
+                            e
+                        ))),
                     };
                 }
                 "MinThinkMsec" => {
                     universe.option_min_think_msec = match value.parse() {
                         Result::Ok(val) => val,
-                        Result::Err(e) => {
-                            panic!(Log::print_fatal(&format!("Invalid value=|{}|", e)))
-                        }
+                        Result::Err(e) => std::panic::panic_any(Log::print_fatal(&format!(
+                            "Invalid value=|{}|",
+                            e
+                        ))),
                     };
                 }
                 "MaxThinkMsec" => {
                     universe.option_max_think_msec = match value.parse() {
                         Result::Ok(val) => val,
-                        Result::Err(e) => {
-                            panic!(Log::print_fatal(&format!("Invalid value=|{}|", e)))
-                        }
+                        Result::Err(e) => std::panic::panic_any(Log::print_fatal(&format!(
+                            "Invalid value=|{}|",
+                            e
+                        ))),
                     };
                 }
                 _ => {}

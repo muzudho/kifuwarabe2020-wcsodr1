@@ -59,19 +59,28 @@ pub fn _assert_in_board_as_absolute(ab_adr: &AbsoluteAddress2D, hint: &str) {
 fn test_dort(test_name: &str, expected: &str, actual: &DictOrthant) {
     debug_assert!(
         format!("{:?}", actual) == expected,
-        format!("{}: expected={} | actual={:?}", test_name, expected, actual)
+        "{}: expected={} | actual={:?}",
+        test_name,
+        expected,
+        actual
     );
 }
 fn test_d45ort(test_name: &str, expected: &str, actual: &Degree45Orthant) {
     debug_assert!(
         format!("{:?}", actual) == expected,
-        format!("{}: expected={} | actual={:?}", test_name, expected, actual)
+        "{}: expected={} | actual={:?}",
+        test_name,
+        expected,
+        actual
     );
 }
 fn test_rsq(test_name: &str, expected: &str, actual: &RelAdr2D) {
     debug_assert!(
         format!("{:?}", actual) == expected,
-        format!("{}: expected={} | actual={:?}", test_name, expected, actual)
+        "{}: expected={} | actual={:?}",
+        test_name,
+        expected,
+        actual
     );
 }
 
@@ -615,11 +624,8 @@ impl Default for AbsoluteAddress2D {
 }
 impl AbsoluteAddress2D {
     pub fn new(file: u8, rank: u8) -> Self {
-        debug_assert!(FILE0U8 <= file && file < FILE13U8, format!("file={}", file));
-        debug_assert!(
-            RANK0U8 <= rank && rank < RANK10U8 as u8,
-            format!("rank={}", rank)
-        );
+        debug_assert!(FILE0U8 <= file && file < FILE13U8, "file={}", file);
+        debug_assert!(RANK0U8 <= rank && rank < RANK10U8 as u8, "rank={}", rank);
         AbsoluteAddress2D {
             serial: 10 * file as u8 + rank as u8,
         }
@@ -631,8 +637,8 @@ impl AbsoluteAddress2D {
         if serial == 0 {
             None
         } else {
-            debug_assert!(FILE0U8 <= file && file < FILE13U8, format!("file={}", file));
-            debug_assert!(RANK0U8 <= rank && rank < RANK10U8, format!("rank={}", rank));
+            debug_assert!(FILE0U8 <= file && file < FILE13U8, "file={}", file);
+            debug_assert!(RANK0U8 <= rank && rank < RANK10U8, "rank={}", rank);
             Some(AbsoluteAddress2D::new(file, rank))
         }
     }

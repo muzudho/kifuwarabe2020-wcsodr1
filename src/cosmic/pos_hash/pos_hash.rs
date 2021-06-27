@@ -86,7 +86,7 @@ impl GameHashSeed {
                     if let Some(hash_index) = table.get_piece_board_hash_index(&move_.source) {
                         hash_index
                     } else {
-                        panic!(Log::print_fatal("Invalid captured_move."));
+                        std::panic::panic_any(Log::print_fatal("Invalid captured_move."));
                     };
                 // 移動前マスに、動かしたい駒があるときのハッシュ。
                 prev_hash ^= self.piece[src_sq.serial_number() as usize][src_piece_hash_index];
@@ -97,7 +97,7 @@ impl GameHashSeed {
                             self.piece[dst_sq.serial_number() as usize][src_piece_hash_index];
                     }
                     FireAddress::Hand(_dst_drop_type) => {
-                        panic!(Log::print_fatal("(Err.90) 未対応☆（＾～＾）"))
+                        std::panic::panic_any(Log::print_fatal("(Err.90) 未対応☆（＾～＾）"))
                     }
                 }
             }
@@ -114,7 +114,7 @@ impl GameHashSeed {
                             [src_drop.nonpromoted_piece_hash_index()];
                     }
                     FireAddress::Hand(_dst_drop_type) => {
-                        panic!(Log::print_fatal("(Err.90) 未対応☆（＾～＾）"))
+                        std::panic::panic_any(Log::print_fatal("(Err.90) 未対応☆（＾～＾）"))
                     }
                 }
             }
@@ -141,7 +141,7 @@ impl GameHashSeed {
                         prev_hash ^= self.hands[double_faced_piece as usize][count as usize + 1];
                     }
                     FireAddress::Hand(_dst_drop_type) => {
-                        panic!(Log::print_fatal("(Err.90) 未対応☆（＾～＾）"))
+                        std::panic::panic_any(Log::print_fatal("(Err.90) 未対応☆（＾～＾）"))
                     }
                 }
             }
@@ -196,7 +196,9 @@ impl GameHashSeed {
         // 持ち駒ハッシュ
         HandAddresses::for_all(
             &mut |turn: &Phase, fire_hand: &FireAddress| match fire_hand {
-                FireAddress::Board(_sq) => panic!(Log::print_fatal("(Err.175) 未対応☆（＾～＾）")),
+                FireAddress::Board(_sq) => {
+                    std::panic::panic_any(Log::print_fatal("(Err.175) 未対応☆（＾～＾）"))
+                }
                 FireAddress::Hand(drop_type) => {
                     let drop = DoubleFacedPiece::from_phase_and_type(*turn, drop_type.old);
                     let count = table.count_hand(*turn, fire_hand);

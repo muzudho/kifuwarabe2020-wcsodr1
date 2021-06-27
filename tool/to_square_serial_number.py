@@ -27,7 +27,7 @@ for phase in range(1, 3):
     for hand in ['King', 'Rook', 'Bishop', 'Gold', 'Silver', 'Knight', 'Lance', 'Pawn']:
         print(f'    {enums[i]} |')
         i += 1
-print(f'    => panic!("（＾～＾）"),')
+print(f'    => std::panic::panic_any("（＾～＾）"),')
 print('};')
 
 i = 0
@@ -42,7 +42,7 @@ for phase in range(1, 3):
     for hand in ['King', 'Rook', 'Bishop', 'Gold', 'Silver', 'Knight', 'Lance', 'Pawn']:
         print(f'    {enums[i]} |')
         i += 1
-print(f'    => panic!("（＾～＾）"),')
+print(f'    => std::panic::panic_any("（＾～＾）"),')
 print('};')
 
 i = 0
@@ -57,7 +57,7 @@ for phase in range(1, 3):
     for hand in ['King', 'Rook', 'Bishop', 'Gold', 'Silver', 'Knight', 'Lance', 'Pawn']:
         print(f'    {enums[i]} |')
         i += 1
-print(f'    => panic!("（＾～＾）"),')
+print(f'    => std::panic::panic_any("（＾～＾）"),')
 print('};')
 
 print('trace   | Finished.')

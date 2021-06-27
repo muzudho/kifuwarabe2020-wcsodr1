@@ -11,7 +11,7 @@ for phase in range(1, 3):
         for rank in range(1, 10):
             print(f' {enums[i]} |', end='')
             i += 1
-print(f'    => panic!("（＾～＾）"),')
+print(f'    => std::panic::panic_any("（＾～＾）"),')
 for phase in range(1, 3):
     for hand in ['King', 'Rook', 'Bishop', 'Gold', 'Silver', 'Knight', 'Lance', 'Pawn']:
         print(

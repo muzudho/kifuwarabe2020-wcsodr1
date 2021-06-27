@@ -18,7 +18,7 @@ for phase in range(0, 81):
     print(
         f'    {enums[i]} => UNIFIED_SQ_{i}_TO_ABSOLUTE_ADDRESS_2D,')
     i += 1
-print(f'    _ => panic!("（＾～＾）"),')
+print(f'    _ => std::panic::panic_any("（＾～＾）"),')
 print('};')
 
 print('trace   | Finished.')

@@ -144,14 +144,14 @@ impl Search {
                 let fire = if let Some(captured_move) = ways.get(i).captured {
                     captured_move.source
                 } else {
-                    panic!(Log::print_fatal("Invalid captured_move."));
+                    std::panic::panic_any(Log::print_fatal("Invalid captured_move."));
                 };
                 let piece_type = pos.table.get_type(
                     if let Some(piece_type) = pos.table.piece_num_at(pos.history.get_turn(), &fire)
                     {
                         piece_type
                     } else {
-                        panic!(Log::print_fatal("Invalid piece_type."));
+                        std::panic::panic_any(Log::print_fatal("Invalid piece_type."));
                     },
                 );
                 match piece_type {
@@ -218,7 +218,7 @@ impl Search {
                         {
                             piece_num
                         } else {
-                            panic!(Log::print_fatal("Invalid piece_num."));
+                            std::panic::panic_any(Log::print_fatal("Invalid piece_num."));
                         },
                     ),
                 )
@@ -509,20 +509,26 @@ impl TreeState {
                 } else {
                     match self.bestmove.value {
                         Value::Win => {
-                            panic!(Log::print_fatal(
+                            std::panic::panic_any(Log::print_fatal(
                                 "(Err.405) 自分が勝つ手を既に読んでるのに、ここに来るのはおかしいぜ☆（＾～＾）"
                             ))
                         }
                         Value::Lose => {
                             // 自分が負けるところを、まだそうでない手があるのなら、更新するぜ☆（＾～＾）
-                            self.bestmove
-                            .update(friend_movement, &Value::CentiPawn(friend_centi_pawn2), Reason::AnyMoveMoreThanLose);
+                            self.bestmove.update(
+                                friend_movement,
+                                &Value::CentiPawn(friend_centi_pawn2),
+                                Reason::AnyMoveMoreThanLose,
+                            );
                         }
                         Value::CentiPawn(best_centi_pawn) => {
                             if best_centi_pawn < friend_centi_pawn2 {
                                 // 上方修正
-                                self.bestmove
-                                .update(friend_movement, &Value::CentiPawn(friend_centi_pawn2), Reason::ValueUp);
+                                self.bestmove.update(
+                                    friend_movement,
+                                    &Value::CentiPawn(friend_centi_pawn2),
+                                    Reason::ValueUp,
+                                );
                             }
                         }
                     }
@@ -542,8 +548,8 @@ impl TreeState {
             return;
         } else {
             match self.bestmove.value {
-                Value::Win => panic!(Log::print_fatal(
-                    "(Err.397) 自分が勝つ手を読んでるなら、ここに来るのはおかしいぜ☆（＾～＾）"
+                Value::Win => std::panic::panic_any(Log::print_fatal(
+                    "(Err.397) 自分が勝つ手を読んでるなら、ここに来るのはおかしいぜ☆（＾～＾）",
                 )),
                 Value::Lose => {
                     // どんな評価値でも、負けるよりマシだろ☆（＾～＾）

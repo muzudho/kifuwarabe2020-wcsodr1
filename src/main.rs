@@ -65,7 +65,7 @@ fn main_loop(universe: &mut Universe) {
             Ok(_n) => {}
             // Tips. You can separate error numbers by simply specifying the line number.
             // テクニック。 エラー番号は行番号を振っておくだけで少しはばらけます。
-            Err(e) => panic!(Log::print_fatal(&format!(
+            Err(e) => std::panic::panic_any(Log::print_fatal(&format!(
                 "(Err.373) Failed to read line. / {}",
                 e
             ))),
@@ -74,6 +74,15 @@ fn main_loop(universe: &mut Universe) {
         // Write input to log.
         // 入力をログに書きます。
         Log::notice_t(&line, Table::default().str("Description", "Input."));
+
+        if line.chars().count() == 26 && line == "position startpos moves *0" {
+            // 将棋所の連続対局中に
+            // 相手が 時間切れを知らずに bestmove を返すと、
+            // 将棋所は `isready` など次の対局が始まっている最中に
+            // `position startpos moves *0` を返してくる。
+            // この `*0` をパースできずに落ちることがあるので、無視するぜ（＾～＾）
+            continue;
+        }
 
         // p is the acronym for parser.
         // p は parser の頭文字。
@@ -103,7 +112,7 @@ fn main_loop(universe: &mut Universe) {
         }
     } //loop
 
-    Log::wait();
+    Log::flush();
 }
 
 /// 独自コマンド☆（＾～＾）

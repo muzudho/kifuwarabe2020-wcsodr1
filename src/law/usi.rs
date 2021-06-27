@@ -112,7 +112,7 @@ pub fn read_sasite(pos: &mut Position, p: &mut CommandLineSeek) -> bool {
             {
                 num
             } else {
-                panic!(Log::print_fatal(&format!(
+                std::panic::panic_any(Log::print_fatal(&format!(
                     "(Err.72)  '{}' だった。",
                     &p.line()[p.current()..=p.current()]
                 )))
@@ -157,7 +157,7 @@ pub fn read_sasite(pos: &mut Position, p: &mut CommandLineSeek) -> bool {
                     FireAddress::Board(AbsoluteAddress2D::new(file, 9))
                 }
                 _ => {
-                    panic!(Log::print_fatal(&format!(
+                    std::panic::panic_any(Log::print_fatal(&format!(
                         "(Err.90)  '{}' だった。",
                         &p.line()[p.current()..=p.current()]
                     )));
@@ -172,7 +172,7 @@ pub fn read_sasite(pos: &mut Position, p: &mut CommandLineSeek) -> bool {
     let file = if let Some(num) = atoi::<u8>(&p.line()[p.current()..=p.current()].as_bytes()) {
         num
     } else {
-        panic!(Log::print_fatal(&format!(
+        std::panic::panic_any(Log::print_fatal(&format!(
             "(Err.118)  '{}' だった。",
             &p.line()[p.current()..=p.current()]
         )));
@@ -190,7 +190,7 @@ pub fn read_sasite(pos: &mut Position, p: &mut CommandLineSeek) -> bool {
         "h" => 8,
         "i" => 9,
         _ => {
-            panic!(Log::print_fatal(&format!(
+            std::panic::panic_any(Log::print_fatal(&format!(
                 "(Err.136)  '{}' だった。",
                 &p.line()[p.current()..=p.current()]
             )));
@@ -299,7 +299,7 @@ pub fn read_board(pos: &mut Position, p: &mut CommandLineSeek) {
                     "l" => BoardPart::Alphabet((Phase::Second, PieceType::PromotedLance)),
                     "p" => BoardPart::Alphabet((Phase::Second, PieceType::PromotedPawn)),
                     _ => {
-                        panic!(Log::print_fatal(&format!(
+                        std::panic::panic_any(Log::print_fatal(&format!(
                             "(Err.235)  盤部(0) '{}' だった。",
                             &p.line()[p.current()..=p.current()]
                         )));
@@ -406,7 +406,7 @@ pub fn set_position(pos: &mut Position, p: &mut CommandLineSeek) {
                                 "7" => HandCount::N2Digit(17),
                                 "8" => HandCount::N2Digit(18),
                                 _ => {
-                                    panic!(Log::print_fatal(&format!(
+                                    std::panic::panic_any(Log::print_fatal(&format!(
                                         "(Err.346)  持駒部(0) '{}' だった。",
                                         &p.line()[p.current()..(p.current() + 2)]
                                     )));

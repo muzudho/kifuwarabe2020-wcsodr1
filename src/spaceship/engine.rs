@@ -26,25 +26,35 @@ impl Go {
     pub fn parse(p: &mut CommandLineSeek) -> Go {
         let re = match Regex::new(r"^go btime (\d+) wtime (\d+) binc (\d+) winc (\d+)$") {
             Result::Ok(val) => val,
-            Result::Err(e) => panic!(Log::print_fatal(&format!("Invalid regex=|{}|", e))),
+            Result::Err(e) => {
+                std::panic::panic_any(Log::print_fatal(&format!("Invalid regex=|{}|", e)))
+            }
         };
         if let Some(cap) = re.captures(p.line()) {
             Go {
                 btime: match cap[1].parse() {
                     Result::Ok(val) => val,
-                    Result::Err(e) => panic!(Log::print_fatal(&format!("Invalid cap1=|{}|", e))),
+                    Result::Err(e) => {
+                        std::panic::panic_any(Log::print_fatal(&format!("Invalid cap1=|{}|", e)))
+                    }
                 },
                 wtime: match cap[2].parse() {
                     Result::Ok(val) => val,
-                    Result::Err(e) => panic!(Log::print_fatal(&format!("Invalid cap2=|{}|", e))),
+                    Result::Err(e) => {
+                        std::panic::panic_any(Log::print_fatal(&format!("Invalid cap2=|{}|", e)))
+                    }
                 },
                 binc: match cap[3].parse() {
                     Result::Ok(val) => val,
-                    Result::Err(e) => panic!(Log::print_fatal(&format!("Invalid cap3=|{}|", e))),
+                    Result::Err(e) => {
+                        std::panic::panic_any(Log::print_fatal(&format!("Invalid cap3=|{}|", e)))
+                    }
                 },
                 winc: match cap[4].parse() {
                     Result::Ok(val) => val,
-                    Result::Err(e) => panic!(Log::print_fatal(&format!("Invalid cap4=|{}|", e))),
+                    Result::Err(e) => {
+                        std::panic::panic_any(Log::print_fatal(&format!("Invalid cap4=|{}|", e)))
+                    }
                 },
             }
         } else {

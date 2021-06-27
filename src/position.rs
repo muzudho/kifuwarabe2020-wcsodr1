@@ -175,8 +175,8 @@ impl Position {
             if let Some(piece_num) = src_piece_num {
                 self.table.promote(piece_num);
             } else {
-                panic!(Log::print_fatal(
-                    "(Err.248) 成ったのに、元の升に駒がなかった☆（＾～＾）"
+                std::panic::panic_any(Log::print_fatal(
+                    "(Err.248) 成ったのに、元の升に駒がなかった☆（＾～＾）",
                 ));
             }
         }
@@ -228,8 +228,8 @@ impl Position {
                         if let Some(source_piece_num) = moveing_piece_num {
                             self.table.demote(source_piece_num);
                         } else {
-                            panic!(Log::print_fatal(
-                                "(Err.305) 成ったのに移動先に駒が無いぜ☆（＾～＾）！"
+                            std::panic::panic_any(Log::print_fatal(
+                                "(Err.305) 成ったのに移動先に駒が無いぜ☆（＾～＾）！",
                             ))
                         }
                     }
@@ -247,7 +247,9 @@ impl Position {
                     let piece_num = if let Some(piece_num) = moveing_piece_num {
                         piece_num
                     } else {
-                        panic!(Log::print_fatal("(Err.250) Invalid moveing_piece_num"));
+                        std::panic::panic_any(Log::print_fatal(
+                            "(Err.250) Invalid moveing_piece_num",
+                        ));
                     };
                     // 自分の持ち駒を増やそうぜ☆（＾～＾）！
                     let turn = self.table.get_phase(piece_num);
@@ -439,7 +441,7 @@ impl GameTable {
                 if let Some(piece_type) = self.last_hand_type(turn, &move2_val.destination) {
                     piece_type
                 } else {
-                    panic!(Log::print_fatal("(Err.441) Invalid piece_type."));
+                    std::panic::panic_any(Log::print_fatal("(Err.441) Invalid piece_type."));
                 };
 
             // 取った方の駒台の先後に合わせるぜ☆（＾～＾）
@@ -457,7 +459,7 @@ impl GameTable {
                 if let Some(piece_num) = self.pop_piece(turn, &fire1) {
                     piece_num
                 } else {
-                    panic!(Log::print_fatal("Invalid piece_num."));
+                    std::panic::panic_any(Log::print_fatal("Invalid piece_num."));
                 }
             };
             // 先後をひっくり返す。
@@ -552,7 +554,7 @@ impl GameTable {
                 {
                     piece_num
                 } else {
-                    panic!(Log::print_fatal("Invalid piece_num."));
+                    std::panic::panic_any(Log::print_fatal("Invalid piece_num."));
                 };
                 // カウントアップ☆（＾～＾）
                 self.double_faced_piece_type_index[drop_type] += 1;
@@ -585,7 +587,7 @@ impl GameTable {
                     None
                 }
             }
-            FireAddress::Hand(_drop_type) => panic!(Log::print_fatal(&format!(
+            FireAddress::Hand(_drop_type) => std::panic::panic_any(Log::print_fatal(&format!(
                 "(Err.345) 駒台は非対応☆（＾～＾）！",
             ))),
         }
@@ -599,7 +601,7 @@ impl GameTable {
             _ => {
                 self.last_hand_num(turn, fire)
                 /*
-                    panic!(Log::print_fatal(&format!(
+                    std::panic::panic_any(Log::print_fatal(&format!(
                     "(Err.254) まだ駒台は実装してないぜ☆（＾～＾）！",
                 )))
                 */
@@ -609,7 +611,7 @@ impl GameTable {
     pub fn piece_num_board_at(&self, addr: &FireAddress) -> Option<PieceNum> {
         match addr {
             FireAddress::Board(sq) => self.board[sq.serial_number() as usize],
-            _ => panic!(Log::print_fatal(&format!(
+            _ => std::panic::panic_any(Log::print_fatal(&format!(
                 "(Err.254) まだ駒台は実装してないぜ☆（＾～＾）！",
             ))),
         }
@@ -628,7 +630,7 @@ impl GameTable {
                     None
                 }
             }
-            _ => panic!(Log::print_fatal(&format!(
+            _ => std::panic::panic_any(Log::print_fatal(&format!(
                 "(Err.321) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
@@ -644,7 +646,7 @@ impl GameTable {
                     None
                 }
             }
-            _ => panic!(Log::print_fatal(&format!(
+            _ => std::panic::panic_any(Log::print_fatal(&format!(
                 "(Err.321) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
@@ -676,7 +678,7 @@ impl GameTable {
                     0
                 }
             }
-            FireAddress::Hand(_drop_type) => panic!(Log::print_fatal(&format!(
+            FireAddress::Hand(_drop_type) => std::panic::panic_any(Log::print_fatal(&format!(
                 "(Err.254) まだ実装してないぜ☆（＾～＾）！",
             ))),
         }
@@ -691,7 +693,7 @@ impl GameTable {
     }
     pub fn count_hand(&self, turn: Phase, fire: &FireAddress) -> usize {
         match fire {
-            FireAddress::Board(_sq) => panic!(Log::print_fatal(&format!(
+            FireAddress::Board(_sq) => std::panic::panic_any(Log::print_fatal(&format!(
                 "(Err.3266) 未対応☆（＾～＾）！",
             ))),
             FireAddress::Hand(drop_type) => self.len_hand(turn, &FireAddress::Hand(*drop_type)),
@@ -711,7 +713,7 @@ impl GameTable {
                     let piece_info = if let Some(piece_info) = self.piece_info_at1(&fire) {
                         piece_info
                     } else {
-                        panic!(Log::print_fatal("Invalid piece_info."));
+                        std::panic::panic_any(Log::print_fatal("Invalid piece_info."));
                     };
                     piece_get(i, Some(&sq), Some(piece_info));
                 }
@@ -855,7 +857,7 @@ impl GameTable {
                 let num = if let Some(num) = self.board[self.hand_cur(drop) as usize] {
                     num
                 } else {
-                    panic!(Log::print_fatal("Invalid num."));
+                    std::panic::panic_any(Log::print_fatal("Invalid num."));
                 };
                 self.board[self.hand_cur(drop) as usize] = None;
                 num
@@ -866,7 +868,7 @@ impl GameTable {
     /// 指し手生成で使うぜ☆（＾～＾）
     pub fn last_hand(&self, turn: Phase, fire: &FireAddress) -> Option<(PieceType, FireAddress)> {
         match fire {
-            FireAddress::Board(_sq) => panic!(Log::print_fatal(&format!(
+            FireAddress::Board(_sq) => std::panic::panic_any(Log::print_fatal(&format!(
                 "(Err.3251) 未対応☆（＾～＾）！",
             ))),
             FireAddress::Hand(drop_type) => {
@@ -893,7 +895,9 @@ impl GameTable {
     }
     pub fn last_hand_num(&self, turn: Phase, fire: &FireAddress) -> Option<PieceNum> {
         match fire {
-            FireAddress::Board(_sq) => panic!(Log::print_fatal("(Err.3431) 未対応☆（＾～＾）")),
+            FireAddress::Board(_sq) => {
+                std::panic::panic_any(Log::print_fatal("(Err.3431) 未対応☆（＾～＾）"))
+            }
             FireAddress::Hand(drop_type) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(turn, drop_type.old);
                 let direction = GameTable::hand_direction(drop);
@@ -918,7 +922,9 @@ impl GameTable {
     /// 指し手生成で使うぜ☆（＾～＾）有無を調べるぜ☆（＾～＾）
     pub fn is_empty_hand(&self, turn: Phase, fire: &FireAddress) -> bool {
         match fire {
-            FireAddress::Board(_sq) => panic!(Log::print_fatal("(Err.3431) 未対応☆（＾～＾）")),
+            FireAddress::Board(_sq) => {
+                std::panic::panic_any(Log::print_fatal("(Err.3431) 未対応☆（＾～＾）"))
+            }
             FireAddress::Hand(drop_type) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(turn, drop_type.old);
                 if GameTable::hand_direction(drop) < 0 {
@@ -941,7 +947,9 @@ impl GameTable {
 
     fn len_hand(&self, turn: Phase, fire: &FireAddress) -> usize {
         match fire {
-            FireAddress::Board(_sq) => panic!(Log::print_fatal("(Err.3431) 未対応☆（＾～＾）")),
+            FireAddress::Board(_sq) => {
+                std::panic::panic_any(Log::print_fatal("(Err.3431) 未対応☆（＾～＾）"))
+            }
             FireAddress::Hand(drop_type) => {
                 let drop = DoubleFacedPiece::from_phase_and_type(turn, drop_type.old);
                 if GameTable::hand_direction(drop) < 0 {

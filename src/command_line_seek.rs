@@ -61,7 +61,7 @@ impl CommandLineSeek {
         // 末尾の改行を削除します。
         let line: String = match line.trim().parse() {
             Ok(n) => n,
-            Err(e) => panic!(Log::print_fatal(&format!(
+            Err(e) => std::panic::panic_any(Log::print_fatal(&format!(
                 "(Err.38)  Failed to parse. / {}",
                 e
             ))),
