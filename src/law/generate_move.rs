@@ -502,7 +502,7 @@ impl MoveGen {
         source: &FireAddress,
         moving: &mut F1,
     ) where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, MoveRange, Option<PermissionType>) -> bool,
     {
         match piece_type {
             PieceType::Pawn => MoveGen::pawn(game, phase_operation, source, moving),
@@ -536,7 +536,7 @@ impl MoveGen {
         source: &FireAddress,
         moving: &mut F1,
     ) where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, MoveRange, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
             MoveGen::promote_pawn_lance(phase_operation, destination, moving)
@@ -561,7 +561,7 @@ impl MoveGen {
         source: &FireAddress,
         moving: &mut F1,
     ) where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, MoveRange, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
             MoveGen::promote_pawn_lance(phase_operation, destination, moving)
@@ -586,7 +586,7 @@ impl MoveGen {
         source: &FireAddress,
         moving: &mut F1,
     ) where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, MoveRange, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
             MoveGen::promote_knight(phase_operation, destination, moving)
@@ -610,7 +610,7 @@ impl MoveGen {
         source: &FireAddress,
         moving: &mut F1,
     ) where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, MoveRange, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
             MoveGen::promote_silver(phase_operation, &source, destination, moving)
@@ -631,10 +631,10 @@ impl MoveGen {
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn gold<F1>(game: &Position, source: &FireAddress, moving: &mut F1)
     where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, MoveRange, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
-            moving(destination, Promotability::Deny, Agility::Hopping, None)
+            moving(destination, Promotability::Deny, MoveRange::Adjacent, None)
         };
 
         for mobility in PieceType::Gold.mobility().iter() {
@@ -651,10 +651,10 @@ impl MoveGen {
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn king<F1>(game: &Position, source: &FireAddress, moving: &mut F1)
     where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, MoveRange, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
-            moving(destination, Promotability::Deny, Agility::Hopping, None)
+            moving(destination, Promotability::Deny, MoveRange::Adjacent, None)
         };
 
         for mobility in PieceType::King.mobility().iter() {
@@ -675,7 +675,7 @@ impl MoveGen {
         source: &FireAddress,
         moving: &mut F1,
     ) where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, MoveRange, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
             MoveGen::promote_bishop_rook(phase_operation, source, destination, moving)
@@ -698,7 +698,7 @@ impl MoveGen {
         source: &FireAddress,
         moving: &mut F1,
     ) where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, MoveRange, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, _agility| {
             MoveGen::promote_bishop_rook(phase_operation, source, destination, moving)
@@ -717,7 +717,7 @@ impl MoveGen {
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn horse<F1>(game: &Position, source: &FireAddress, moving: &mut F1)
     where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, MoveRange, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, agility| {
             moving(destination, Promotability::Deny, agility, None)
@@ -737,7 +737,7 @@ impl MoveGen {
     /// * `moving` - 絶対番地、成れるか、動き方、移動できるかを受け取れだぜ☆（＾～＾）
     fn dragon<F1>(game: &Position, source: &FireAddress, moving: &mut F1)
     where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, MoveRange, Option<PermissionType>) -> bool,
     {
         let moving = &mut |destination: &FireAddress, agility| {
             moving(destination, Promotability::Deny, agility, None)
@@ -758,7 +758,7 @@ impl MoveGen {
     /// * `moving` - 絶対番地を受け取れだぜ☆（＾～＾）
     fn move_<F1>(game: &Position, start: &FireAddress, mobility: Mobility, moving: &mut F1)
     where
-        F1: FnMut(&FireAddress, Agility) -> bool,
+        F1: FnMut(&FireAddress, MoveRange) -> bool,
     {
         let angle =
             // 後手なら１８０°回転だぜ☆（＾～＾）
@@ -771,7 +771,7 @@ impl MoveGen {
         match start {
             FireAddress::Board(start_sq) => {
                 match mobility.agility {
-                    Agility::Sliding => {
+                    MoveRange::Sliding => {
                         let mut cur = start_sq.clone();
                         let r = RelAdr2D::new(1, 0).rotate(angle).clone();
                         loop {
@@ -785,14 +785,14 @@ impl MoveGen {
                         }
                     }
                     // 桂馬専用☆（＾～＾）行き先の無いところに置いてないはずだぜ☆（＾～＾）
-                    Agility::Knight => {
+                    MoveRange::Knight => {
                         let mut cur = start_sq.clone();
                         // 西隣から反時計回りだぜ☆（＾～＾）
                         if !cur.offset(&angle.west_ccw_double_rank()).wall() {
                             moving(&FireAddress::Board(cur), mobility.agility);
                         }
                     }
-                    Agility::Hopping => {
+                    MoveRange::Adjacent => {
                         let mut cur = start_sq.clone();
                         // 西隣から反時計回りだぜ☆（＾～＾）
                         if !cur.offset(&angle.west_ccw()).wall() {
@@ -821,7 +821,7 @@ impl MoveGen {
         callback: &mut F1,
     ) -> bool
     where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, MoveRange, Option<PermissionType>) -> bool,
     {
         callback(
             destination,
@@ -832,7 +832,7 @@ impl MoveGen {
             } else {
                 Promotability::Forced
             },
-            Agility::Hopping,
+            MoveRange::Adjacent,
             Some(PermissionType::PawnLance),
         )
     }
@@ -851,7 +851,7 @@ impl MoveGen {
         callback: &mut F1,
     ) -> bool
     where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, MoveRange, Option<PermissionType>) -> bool,
     {
         callback(
             destination,
@@ -862,7 +862,7 @@ impl MoveGen {
             } else {
                 Promotability::Forced
             },
-            Agility::Knight,
+            MoveRange::Knight,
             Some(PermissionType::Knight),
         )
     }
@@ -883,7 +883,7 @@ impl MoveGen {
         callback: &mut F1,
     ) -> bool
     where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, MoveRange, Option<PermissionType>) -> bool,
     {
         callback(
             destination,
@@ -893,7 +893,7 @@ impl MoveGen {
             } else {
                 Promotability::Deny
             },
-            Agility::Hopping,
+            MoveRange::Adjacent,
             None,
         )
     }
@@ -915,7 +915,7 @@ impl MoveGen {
         callback: &mut F1,
     ) -> bool
     where
-        F1: FnMut(&FireAddress, Promotability, Agility, Option<PermissionType>) -> bool,
+        F1: FnMut(&FireAddress, Promotability, MoveRange, Option<PermissionType>) -> bool,
     {
         callback(
             destination,
@@ -925,7 +925,7 @@ impl MoveGen {
             } else {
                 Promotability::Deny
             },
-            Agility::Sliding,
+            MoveRange::Sliding,
             None,
         )
     }
@@ -984,9 +984,9 @@ impl Default for Area {
 
 /// 機敏性。
 #[derive(Clone, Copy, Debug)]
-pub enum Agility {
+pub enum MoveRange {
     /// 隣へ１つ進む駒。
-    Hopping,
+    Adjacent,
     /// 長い利き。
     Sliding,
     /// 桂馬。
@@ -1041,10 +1041,10 @@ impl Ways {
 #[derive(Clone, Copy)]
 pub struct Mobility {
     pub angle: Angle,
-    pub agility: Agility,
+    pub agility: MoveRange,
 }
 impl Mobility {
-    pub fn new(angle: Angle, agility: Agility) -> Self {
+    pub fn new(angle: Angle, agility: MoveRange) -> Self {
         Mobility {
             angle: angle,
             agility: agility,
